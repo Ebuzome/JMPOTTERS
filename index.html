@@ -3,21 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JMPOTTERS | Where Style Meets Simplicity</title>
+    <title>JM POTTERS | Premium Boutique</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         /* ===== VARIABLES & RESET ===== */
         :root {
-            --beige: #faf7f2;
-            --white: #ffffff;
-            --pink: #f8e1e7;
-            --gold: #e6c567;
-            --light-gold: #f9f3e6;
-            --dark-gold: #d4af37;
+            --primary-bg: #0d0d0d;
+            --accent: #d4af37;
+            --secondary-gold: #f5e6b8;
+            --text: #eaeaea;
             --gray: #6c757d;
-            --dark: #333333;
-            --shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
@@ -29,8 +26,8 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            color: var(--dark);
-            background-color: var(--beige);
+            color: var(--text);
+            background-color: var(--primary-bg);
             overflow-x: hidden;
             line-height: 1.6;
         }
@@ -39,6 +36,7 @@
             font-family: 'Playfair Display', serif;
             font-weight: 600;
             letter-spacing: -0.5px;
+            color: var(--secondary-gold);
         }
 
         .container {
@@ -67,16 +65,16 @@
             transform: translateX(-50%);
             width: 80px;
             height: 3px;
-            background: var(--gold);
+            background: var(--accent);
         }
 
         .btn {
             display: inline-block;
             padding: 14px 32px;
-            background: var(--gold);
-            color: var(--dark);
+            background: var(--accent);
+            color: var(--primary-bg);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: 1px;
             border-radius: 0;
             transition: var(--transition);
@@ -88,7 +86,8 @@
 
         .btn:hover {
             background: transparent;
-            border-color: var(--gold);
+            border-color: var(--accent);
+            color: var(--accent);
             transform: translateY(-3px);
             box-shadow: var(--shadow);
         }
@@ -106,8 +105,8 @@
         }
 
         header.scrolled {
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background: rgba(13, 13, 13, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             padding: 15px 0;
         }
 
@@ -121,32 +120,34 @@
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--secondary-gold);
             text-decoration: none;
             letter-spacing: 1px;
         }
 
         .logo span {
-            color: var(--gold);
+            color: var(--accent);
         }
 
+        /* Navigation */
         .nav-links {
             display: flex;
             list-style: none;
         }
 
         .nav-links li {
-            margin-left: 30px;
+            margin-left: 15px;
         }
 
         .nav-links a {
-            color: var(--dark);
+            color: var(--text);
             text-decoration: none;
             font-weight: 500;
             font-size: 0.9rem;
             letter-spacing: 1px;
             position: relative;
             transition: var(--transition);
+            padding: 8px 12px;
         }
 
         .nav-links a:after {
@@ -156,7 +157,7 @@
             left: 0;
             width: 0;
             height: 1px;
-            background: var(--gold);
+            background: var(--accent);
             transition: var(--transition);
         }
 
@@ -164,24 +165,37 @@
             width: 100%;
         }
 
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .mobile-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--text);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
         .cart-icon {
             position: relative;
             margin-left: 30px;
             font-size: 1.2rem;
-            color: var(--dark);
+            color: var(--text);
             transition: var(--transition);
         }
 
         .cart-icon:hover {
-            color: var(--gold);
+            color: var(--accent);
         }
 
         .cart-count {
             position: absolute;
             top: -8px;
             right: -10px;
-            background: var(--gold);
-            color: var(--dark);
+            background: var(--accent);
+            color: var(--primary-bg);
             font-size: 0.7rem;
             width: 18px;
             height: 18px;
@@ -192,6 +206,86 @@
             font-weight: 600;
         }
 
+        /* Mobile Navigation */
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 320px;
+            height: 100vh;
+            background: var(--primary-bg);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            z-index: 1100;
+            transition: var(--transition);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .mobile-nav.active {
+            right: 0;
+        }
+
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(245, 230, 184, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 15px;
+        }
+
+        .mobile-nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: block;
+            padding: 10px 0;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(245, 230, 184, 0.05);
+        }
+
+        .mobile-nav-links a:hover {
+            color: var(--accent);
+            padding-left: 10px;
+        }
+
+        .close-nav {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-nav:hover {
+            color: var(--accent);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1050;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
         /* ===== HERO SECTION ===== */
         .hero {
             height: 100vh;
@@ -199,7 +293,7 @@
             align-items: center;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+            background: linear-gradient(rgba(13, 13, 13, 0.6), rgba(13, 13, 13, 0.6)), 
                         url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1950&q=80');
             background-size: cover;
             background-position: center;
@@ -213,7 +307,7 @@
 
         .hero-content {
             max-width: 700px;
-            color: var(--white);
+            color: var(--text);
             opacity: 0;
             animation: fadeInUp 1s ease-out 0.5s forwards;
         }
@@ -233,12 +327,14 @@
             font-size: 4rem;
             margin-bottom: 20px;
             line-height: 1.1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
 
         .hero p {
             font-size: 1.2rem;
             margin-bottom: 40px;
             max-width: 600px;
+            color: var(--secondary-gold);
         }
 
         /* ===== CATEGORIES SECTION ===== */
@@ -257,6 +353,7 @@
             opacity: 0;
             transform: translateY(30px);
             transition: var(--transition);
+            border: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .category-card.appear {
@@ -281,14 +378,15 @@
             left: 0;
             width: 100%;
             padding: 20px;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-            color: var(--white);
+            background: linear-gradient(transparent, rgba(13, 13, 13, 0.8));
+            color: var(--text);
             transition: var(--transition);
         }
 
         .category-overlay h3 {
             font-size: 1.5rem;
             margin-bottom: 5px;
+            color: var(--secondary-gold);
         }
 
         .category-overlay p {
@@ -298,7 +396,9 @@
 
         /* ===== TOP PRODUCTS SECTION ===== */
         .top-products {
-            background-color: var(--white);
+            background-color: rgba(13, 13, 13, 0.8);
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .products-container {
@@ -318,13 +418,14 @@
             scroll-snap-align: start;
             flex: 0 0 auto;
             width: 280px;
-            background: var(--white);
+            background: rgba(13, 13, 13, 0.7);
             border-radius: 5px;
             overflow: hidden;
             box-shadow: var(--shadow);
             opacity: 0;
             transform: translateX(20px);
             transition: var(--transition);
+            border: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .product-card.appear {
@@ -334,7 +435,8 @@
 
         .product-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(212, 175, 55, 0.3);
         }
 
         .product-img {
@@ -360,6 +462,7 @@
         .product-info h3 {
             font-size: 1.1rem;
             margin-bottom: 8px;
+            color: var(--secondary-gold);
         }
 
         .product-info p {
@@ -374,6 +477,7 @@
             align-items: center;
             font-weight: 600;
             font-size: 1.1rem;
+            color: var(--accent);
         }
 
         .old-price {
@@ -385,25 +489,26 @@
 
         /* ===== LIMITED OFFERS SECTION ===== */
         .limited-offers {
-            background-color: var(--light-gold);
+            background-color: rgba(13, 13, 13, 0.9);
+            border: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .offer-banner {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--white);
+            background: rgba(13, 13, 13, 0.8);
             padding: 25px;
             border-radius: 5px;
             box-shadow: var(--shadow);
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(230, 197, 103, 0.3);
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
         .offer-icon {
             font-size: 2rem;
-            color: var(--dark-gold);
+            color: var(--accent);
             margin-right: 20px;
             animation: pulse 2s infinite;
         }
@@ -417,10 +522,11 @@
         .offer-text {
             font-size: 1.2rem;
             font-weight: 500;
+            color: var(--text);
         }
 
         .offer-text span {
-            color: var(--dark-gold);
+            color: var(--accent);
             font-weight: 600;
         }
 
@@ -440,6 +546,7 @@
             opacity: 0;
             transform: translateY(30px);
             transition: var(--transition);
+            border: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .moment-card.appear {
@@ -459,21 +566,23 @@
             left: 0;
             width: 100%;
             padding: 25px;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-            color: var(--white);
+            background: linear-gradient(transparent, rgba(13, 13, 13, 0.8));
+            color: var(--text);
             text-align: center;
         }
 
         .moment-overlay p {
             font-size: 1.1rem;
             font-style: italic;
+            color: var(--secondary-gold);
         }
 
         /* ===== FOOTER ===== */
         footer {
-            background: var(--dark);
-            color: var(--beige);
+            background: #050505;
+            color: var(--text);
             padding: 70px 0 30px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .footer-content {
@@ -488,6 +597,7 @@
             margin-bottom: 25px;
             position: relative;
             padding-bottom: 10px;
+            color: var(--secondary-gold);
         }
 
         .footer-column h3:after {
@@ -497,7 +607,7 @@
             left: 0;
             width: 40px;
             height: 2px;
-            background: var(--gold);
+            background: var(--accent);
         }
 
         .footer-links {
@@ -509,14 +619,14 @@
         }
 
         .footer-links a {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(234, 234, 234, 0.7);
             text-decoration: none;
             transition: var(--transition);
             font-size: 0.95rem;
         }
 
         .footer-links a:hover {
-            color: var(--gold);
+            color: var(--accent);
             padding-left: 5px;
         }
 
@@ -533,24 +643,24 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--beige);
+            background: rgba(245, 230, 184, 0.1);
+            color: var(--secondary-gold);
             transition: var(--transition);
             font-size: 1.1rem;
         }
 
         .social-links a:hover {
-            background: var(--gold);
-            color: var(--dark);
+            background: var(--accent);
+            color: var(--primary-bg);
             transform: translateY(-5px);
         }
 
         .copyright {
             text-align: center;
             padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(245, 230, 184, 0.1);
             font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(234, 234, 234, 0.6);
         }
 
         /* ===== WHATSAPP FLOATING BUTTON ===== */
@@ -567,7 +677,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.8rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             z-index: 100;
             animation: float 3s ease-in-out infinite;
             transition: var(--transition);
@@ -585,6 +695,17 @@
         }
 
         /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .nav-links li {
+                margin-left: 10px;
+            }
+            
+            .nav-links a {
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
         @media (max-width: 992px) {
             .categories-grid, .moments-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -597,15 +718,19 @@
             .hero h1 {
                 font-size: 3rem;
             }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
         }
 
         @media (max-width: 768px) {
             section {
                 padding: 60px 0;
-            }
-            
-            .nav-links {
-                display: none;
             }
             
             .hero h1 {
@@ -642,20 +767,61 @@
     <!-- Header -->
     <header id="header">
         <div class="container header-container">
-            <a href="#" class="logo">JMPOTTERS<span>.</span></a>
+            <a href="index.html" class="logo">JM POTTERS<span>.</span></a>
+            
+            <!-- Desktop Navigation -->
             <ul class="nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Products</a></li>
-                <li><a href="#">Collections</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop/products.html">Shop</a></li>
+                <li><a href="footwear.html">Footwear</a></li>
+                <li><a href="bags.html">Bags</a></li>
+                <li><a href="accessories.html">Accessories</a></li>
+                <li><a href="beauty.html">Beauty</a></li>
+                <li><a href="skincare.html">Skincare</a></li>
+                <li><a href="household.html">Household</a></li>
+                <li><a href="watches.html">Watches</a></li>
+                <li><a href="kids.html">Kids & Babies</a></li>
+                <li><a href="healthcare.html">Healthcare</a></li>
+                <li><a href="blog/blog.html">Blog</a></li>
+                <li><a href="contact.html">Contact</a></li>
             </ul>
+            
+            <button class="mobile-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
             <a href="#" class="cart-icon">
                 <i class="fas fa-shopping-bag"></i>
                 <span class="cart-count">0</span>
             </a>
         </div>
     </header>
+
+    <!-- Mobile Navigation -->
+    <div class="overlay" id="nav-overlay"></div>
+    <div class="mobile-nav" id="mobile-nav">
+        <div class="mobile-nav-header">
+            <div class="logo">JM POTTERS<span>.</span></div>
+            <button class="close-nav">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop/products.html">Shop</a></li>
+            <li><a href="footwear.html">Footwear</a></li>
+            <li><a href="bags.html">Bags</a></li>
+            <li><a href="accessories.html">Accessories</a></li>
+            <li><a href="beauty.html">Beauty</a></li>
+            <li><a href="skincare.html">Skincare</a></li>
+            <li><a href="household.html">Household</a></li>
+            <li><a href="watches.html">Watches</a></li>
+            <li><a href="kids.html">Kids & Babies</a></li>
+            <li><a href="healthcare.html">Healthcare</a></li>
+            <li><a href="blog/blog.html">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -683,19 +849,20 @@
                 <div class="category-card">
                     <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Fashion">
                     <div class="category-overlay">
-                        <h3>Fashion</h3>
-                        <p>Timeless pieces for every occasion</p>
+                        <h3>Bags</h3>
+                        <p>Carry sophistication</p>
                     </div>
                 </div>
                 <div class="category-card">
                     <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Home Essentials">
                     <div class="category-overlay">
-                        <h3>Home Essentials</h3>
+                        <h3>Household</h3>
                         <p>Elevate your living space</p>
                     </div>
                 </div>
                 <div class="category-card">
-                    <img src="https://images.unsplash.com/photo-1556228724-4b3ca6036b2d&auto=format&fit=crop&w=600&q=80" alt="Accessories">
+                    <!-- Updated Accessories image -->
+                    <img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Accessories">
                     <div class="category-overlay">
                         <h3>Accessories</h3>
                         <p>Finishing touches to perfection</p>
@@ -832,7 +999,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
-                    <h3>JMPOTTERS</h3>
+                    <h3>JM POTTERS</h3>
                     <p>Where Style Meets Simplicity. We curate elegant, minimalist pieces for the modern lifestyle.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-whatsapp"></i></a>
@@ -844,18 +1011,18 @@
                 <div class="footer-column">
                     <h3>Shop</h3>
                     <ul class="footer-links">
-                        <li><a href="#">New Arrivals</a></li>
-                        <li><a href="#">Best Sellers</a></li>
-                        <li><a href="#">Sale</a></li>
-                        <li><a href="#">Footwear</a></li>
-                        <li><a href="#">Home Essentials</a></li>
+                        <li><a href="shop/products.html">New Arrivals</a></li>
+                        <li><a href="shop/products.html">Best Sellers</a></li>
+                        <li><a href="shop/products.html">Sale</a></li>
+                        <li><a href="footwear.html">Footwear</a></li>
+                        <li><a href="household.html">Home Essentials</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Information</h3>
                     <ul class="footer-links">
                         <li><a href="#">About Us</a></li>
-                        <li><a href="#">Contact</a></li>
+                        <li><a href="contact.html">Contact</a></li>
                         <li><a href="#">Shipping Policy</a></li>
                         <li><a href="#">Returns & Exchanges</a></li>
                         <li><a href="#">FAQ</a></li>
@@ -871,7 +1038,7 @@
                 </div>
             </div>
             <div class="copyright">
-                &copy; 2025 JMPOTTERS. All rights reserved.
+                &copy; 2023 JM POTTERS. All rights reserved.
             </div>
         </div>
     </footer>
@@ -890,6 +1057,30 @@
             } else {
                 header.classList.remove('scrolled');
             }
+        });
+
+        // Mobile navigation toggle
+        const mobileToggle = document.querySelector('.mobile-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
+        const overlay = document.getElementById('nav-overlay');
+        const closeNav = document.querySelector('.close-nav');
+        
+        mobileToggle.addEventListener('click', function() {
+            mobileNav.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeNav.addEventListener('click', function() {
+            mobileNav.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        overlay.addEventListener('click', function() {
+            mobileNav.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
         });
 
         // Scroll animations for sections
