@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JM POTTERS | Premium Boutique</title>
+    <title>JM POTTERS | Luxury Ceramics & Homeware</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* ===== VARIABLES & RESET ===== */
         :root {
-            --primary-bg: #0d0d0d;
-            --accent: #d4af37;
-            --secondary-gold: #f5e6b8;
-            --text: #eaeaea;
-            --gray: #6c757d;
-            --shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            --cream-light: #fefaf0;
+            --cream-medium: #fffaf3;
+            --cream-dark: #f7f0e1;
+            --gold-primary: #d4af37;
+            --gold-secondary: #e8c170;
+            --gold-light: #f5e6b8;
+            --gold-dark: #b8860b;
+            --charcoal: #333333;
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.1);
+            --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.4);
         }
 
         * {
@@ -26,8 +30,8 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            color: var(--text);
-            background-color: var(--primary-bg);
+            color: var(--charcoal);
+            background-color: var(--cream-light);
             overflow-x: hidden;
             line-height: 1.6;
         }
@@ -36,18 +40,18 @@
             font-family: 'Playfair Display', serif;
             font-weight: 600;
             letter-spacing: -0.5px;
-            color: var(--secondary-gold);
+            color: var(--gold-dark);
         }
 
         .container {
             width: 90%;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 15px;
+            padding: 0 20px;
         }
 
         section {
-            padding: 80px 0;
+            padding: 100px 0;
         }
 
         .section-title {
@@ -65,14 +69,14 @@
             transform: translateX(-50%);
             width: 80px;
             height: 3px;
-            background: var(--accent);
+            background: var(--gold-primary);
         }
 
         .btn {
             display: inline-block;
-            padding: 14px 32px;
-            background: var(--accent);
-            color: var(--primary-bg);
+            padding: 16px 36px;
+            background: var(--gold-primary);
+            color: white;
             text-decoration: none;
             font-weight: 600;
             letter-spacing: 1px;
@@ -82,32 +86,53 @@
             font-size: 0.9rem;
             border: 2px solid transparent;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: var(--transition);
+            z-index: -1;
         }
 
         .btn:hover {
             background: transparent;
-            border-color: var(--accent);
-            color: var(--accent);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow);
+            border-color: var(--gold-primary);
+            color: var(--gold-dark);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-gold);
         }
 
-        /* ===== HEADER ===== */
+        .btn:hover:before {
+            left: 100%;
+        }
+
+        /* Header Styles */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 1000;
-            padding: 20px 0;
-            background: transparent;
+            padding: 25px 0;
+            background: rgba(254, 250, 240, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
+            border-bottom: 1px solid transparent;
         }
 
         header.scrolled {
-            background: rgba(13, 13, 13, 0.95);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             padding: 15px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid var(--gold-light);
         }
 
         .header-container {
@@ -116,89 +141,121 @@
             align-items: center;
         }
 
-        .logo {
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-img {
+            height: 50px;
+            transition: var(--transition);
+        }
+
+        header.scrolled .logo-img {
+            height: 40px;
+        }
+
+        .logo-text {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--secondary-gold);
+            color: var(--gold-dark);
             text-decoration: none;
             letter-spacing: 1px;
+            transition: var(--transition);
         }
 
-        .logo span {
-            color: var(--accent);
+        header.scrolled .logo-text {
+            font-size: 1.6rem;
         }
 
         /* Navigation */
         .nav-links {
             display: flex;
             list-style: none;
+            gap: 10px;
         }
 
         .nav-links li {
-            margin-left: 15px;
+            position: relative;
         }
 
         .nav-links a {
-            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--charcoal);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             letter-spacing: 1px;
             position: relative;
             transition: var(--transition);
-            padding: 8px 12px;
+            padding: 12px 18px;
+            border-radius: 30px;
+        }
+
+        .nav-links a i {
+            color: var(--gold-primary);
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .nav-links a:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-dark);
+        }
+
+        .nav-links a:hover i {
+            transform: translateY(-3px);
+            color: var(--gold-dark);
         }
 
         .nav-links a:after {
             content: '';
             position: absolute;
-            bottom: -5px;
-            left: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 0;
-            height: 1px;
-            background: var(--accent);
+            height: 2px;
+            background: var(--gold-primary);
             transition: var(--transition);
         }
 
         .nav-links a:hover:after {
-            width: 100%;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent);
-        }
-
-        .mobile-toggle {
-            display: none;
-            font-size: 1.5rem;
-            color: var(--text);
-            background: none;
-            border: none;
-            cursor: pointer;
+            width: 60%;
         }
 
         .cart-icon {
             position: relative;
-            margin-left: 30px;
+            margin-left: 20px;
             font-size: 1.2rem;
-            color: var(--text);
+            color: var(--charcoal);
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
         }
 
         .cart-icon:hover {
-            color: var(--accent);
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-dark);
         }
 
         .cart-count {
             position: absolute;
-            top: -8px;
-            right: -10px;
-            background: var(--accent);
-            color: var(--primary-bg);
+            top: -5px;
+            right: -5px;
+            background: var(--gold-primary);
+            color: white;
             font-size: 0.7rem;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -206,20 +263,43 @@
             font-weight: 600;
         }
 
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--charcoal);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-toggle:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-dark);
+        }
+
         /* Mobile Navigation */
         .mobile-nav {
             position: fixed;
             top: 0;
             right: -100%;
-            width: 80%;
-            max-width: 320px;
+            width: 85%;
+            max-width: 350px;
             height: 100vh;
-            background: var(--primary-bg);
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            background: rgba(254, 250, 240, 0.98);
+            backdrop-filter: blur(10px);
             z-index: 1100;
             transition: var(--transition);
-            overflow-y: auto;
-            padding: 20px;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid var(--gold-primary);
         }
 
         .mobile-nav.active {
@@ -231,12 +311,34 @@
             justify-content: space-between;
             align-items: center;
             padding-bottom: 20px;
-            border-bottom: 1px solid rgba(245, 230, 184, 0.1);
             margin-bottom: 20px;
+            border-bottom: 1px solid var(--gold-light);
+        }
+
+        .close-nav {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--charcoal);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-nav:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-dark);
+            transform: rotate(90deg);
         }
 
         .mobile-nav-links {
             list-style: none;
+            flex-grow: 1;
         }
 
         .mobile-nav-links li {
@@ -244,31 +346,35 @@
         }
 
         .mobile-nav-links a {
-            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--charcoal);
             text-decoration: none;
+            font-weight: 500;
             font-size: 1.1rem;
-            display: block;
-            padding: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
             transition: var(--transition);
-            border-bottom: 1px solid rgba(245, 230, 184, 0.05);
+        }
+
+        .mobile-nav-links a i {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            width: 30px;
+            text-align: center;
+            transition: var(--transition);
         }
 
         .mobile-nav-links a:hover {
-            color: var(--accent);
-            padding-left: 10px;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-dark);
+            padding-left: 20px;
         }
 
-        .close-nav {
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .close-nav:hover {
-            color: var(--accent);
+        .mobile-nav-links a:hover i {
+            transform: scale(1.2);
+            color: var(--gold-dark);
         }
 
         .overlay {
@@ -277,67 +383,64 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1050;
             display: none;
+            backdrop-filter: blur(5px);
         }
 
         .overlay.active {
             display: block;
         }
 
-        /* ===== HERO SECTION ===== */
+        /* Hero Section */
         .hero {
             height: 100vh;
             display: flex;
             align-items: center;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(rgba(13, 13, 13, 0.6), rgba(13, 13, 13, 0.6)), 
-                        url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1950&q=80');
+            background: linear-gradient(rgba(254, 250, 240, 0.2), rgba(254, 250, 240, 0.2)), 
+                        url('https://images.unsplash.com/photo-1600566752355-35792bedcfea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
-            animation: zoomIn 20s ease-in-out forwards;
-        }
-
-        @keyframes zoomIn {
-            from { transform: scale(1.1); }
-            to { transform: scale(1); }
+            margin-top: 0;
+            padding-top: 80px;
         }
 
         .hero-content {
             max-width: 700px;
-            color: var(--text);
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 0.5s forwards;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            color: var(--charcoal);
+            text-align: center;
+            margin: 0 auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--gold-light);
         }
 
         .hero h1 {
             font-size: 4rem;
             margin-bottom: 20px;
             line-height: 1.1;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: var(--gold-dark);
         }
 
         .hero p {
             font-size: 1.2rem;
             margin-bottom: 40px;
-            max-width: 600px;
-            color: var(--secondary-gold);
+            color: #555;
         }
 
-        /* ===== CATEGORIES SECTION ===== */
+        /* Categories Section */
+        .categories {
+            background: var(--cream-medium);
+            padding: 100px 0;
+        }
+
         .categories-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -348,17 +451,16 @@
             position: relative;
             height: 300px;
             overflow: hidden;
-            border-radius: 5px;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            transform: translateY(30px);
+            border-radius: 8px;
+            box-shadow: var(--shadow-light);
             transition: var(--transition);
-            border: 1px solid rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--gold-light);
         }
 
-        .category-card.appear {
-            opacity: 1;
-            transform: translateY(0);
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--gold-primary);
         }
 
         .category-card img {
@@ -377,70 +479,46 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 20px;
-            background: linear-gradient(transparent, rgba(13, 13, 13, 0.8));
-            color: var(--text);
-            transition: var(--transition);
+            padding: 25px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: white;
+            text-align: center;
         }
 
         .category-overlay h3 {
             font-size: 1.5rem;
             margin-bottom: 5px;
-            color: var(--secondary-gold);
+            color: var(--gold-light);
         }
 
-        .category-overlay p {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        /* ===== TOP PRODUCTS SECTION ===== */
-        .top-products {
-            background-color: rgba(13, 13, 13, 0.8);
-            border-top: 1px solid rgba(212, 175, 55, 0.1);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        /* Featured Products */
+        .featured-products {
+            background: var(--cream-light);
         }
 
         .products-container {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            gap: 25px;
-            padding: 20px 0;
-            scrollbar-width: none; /* Firefox */
-        }
-
-        .products-container::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
         }
 
         .product-card {
-            scroll-snap-align: start;
-            flex: 0 0 auto;
-            width: 280px;
-            background: rgba(13, 13, 13, 0.7);
-            border-radius: 5px;
+            background: white;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            transform: translateX(20px);
+            box-shadow: var(--shadow-light);
             transition: var(--transition);
-            border: 1px solid rgba(212, 175, 55, 0.1);
-        }
-
-        .product-card.appear {
-            opacity: 1;
-            transform: translateX(0);
+            border: 1px solid var(--gold-light);
         }
 
         .product-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--gold-primary);
         }
 
         .product-img {
-            height: 280px;
+            height: 250px;
             overflow: hidden;
         }
 
@@ -457,147 +535,109 @@
 
         .product-info {
             padding: 20px;
-        }
-
-        .product-info h3 {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-            color: var(--secondary-gold);
-        }
-
-        .product-info p {
-            font-size: 0.9rem;
-            color: var(--gray);
-            margin-bottom: 15px;
-            min-height: 40px;
-        }
-
-        .price {
-            display: flex;
-            align-items: center;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--accent);
-        }
-
-        .old-price {
-            text-decoration: line-through;
-            color: var(--gray);
-            margin-right: 10px;
-            font-size: 0.9rem;
-        }
-
-        /* ===== LIMITED OFFERS SECTION ===== */
-        .limited-offers {
-            background-color: rgba(13, 13, 13, 0.9);
-            border: 1px solid rgba(212, 175, 55, 0.1);
-        }
-
-        .offer-banner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(13, 13, 13, 0.8);
-            padding: 25px;
-            border-radius: 5px;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-        }
-
-        .offer-icon {
-            font-size: 2rem;
-            color: var(--accent);
-            margin-right: 20px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .offer-text {
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: var(--text);
-        }
-
-        .offer-text span {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* ===== STYLE MOMENTS SECTION ===== */
-        .moments-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-        }
-
-        .moment-card {
-            position: relative;
-            height: 400px;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            transform: translateY(30px);
-            transition: var(--transition);
-            border: 1px solid rgba(212, 175, 55, 0.1);
-        }
-
-        .moment-card.appear {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .moment-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .moment-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 25px;
-            background: linear-gradient(transparent, rgba(13, 13, 13, 0.8));
-            color: var(--text);
             text-align: center;
         }
 
-        .moment-overlay p {
-            font-size: 1.1rem;
-            font-style: italic;
-            color: var(--secondary-gold);
+        .product-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
         }
 
-        /* ===== FOOTER ===== */
+        .product-info .price {
+            font-weight: 600;
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            background: var(--cream-medium);
+            text-align: center;
+        }
+
+        .testimonial-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--gold-light);
+            position: relative;
+        }
+
+        .testimonial-container:before {
+            content: """;
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 6rem;
+            color: var(--gold-light);
+            font-family: 'Playfair Display', serif;
+            line-height: 1;
+        }
+
+        .testimonial-text {
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--gold-dark);
+        }
+
+        /* Newsletter */
+        .newsletter {
+            background: var(--cream-light);
+            text-align: center;
+        }
+
+        .newsletter-form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 15px;
+        }
+
+        .newsletter-input {
+            flex-grow: 1;
+            padding: 16px 20px;
+            border: 1px solid var(--gold-light);
+            border-radius: 0;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .newsletter-input:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Footer */
         footer {
-            background: #050505;
-            color: var(--text);
-            padding: 70px 0 30px;
-            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            background: var(--cream-dark);
+            padding: 80px 0 30px;
+            border-top: 1px solid var(--gold-light);
         }
 
         .footer-content {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-            margin-bottom: 50px;
+            gap: 40px;
+            margin-bottom: 60px;
         }
 
         .footer-column h3 {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             margin-bottom: 25px;
             position: relative;
             padding-bottom: 10px;
-            color: var(--secondary-gold);
         }
 
         .footer-column h3:after {
@@ -605,9 +645,19 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 40px;
+            width: 50px;
             height: 2px;
-            background: var(--accent);
+            background: var(--gold-primary);
+        }
+
+        .footer-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo img {
+            height: 70px;
+            margin-bottom: 20px;
         }
 
         .footer-links {
@@ -619,15 +669,28 @@
         }
 
         .footer-links a {
-            color: rgba(234, 234, 234, 0.7);
+            color: #555;
             text-decoration: none;
             transition: var(--transition);
             font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a i {
+            color: var(--gold-primary);
+            width: 20px;
+            transition: var(--transition);
         }
 
         .footer-links a:hover {
-            color: var(--accent);
+            color: var(--gold-dark);
             padding-left: 5px;
+        }
+
+        .footer-links a:hover i {
+            transform: translateX(5px);
         }
 
         .social-links {
@@ -643,27 +706,27 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(245, 230, 184, 0.1);
-            color: var(--secondary-gold);
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-primary);
             transition: var(--transition);
             font-size: 1.1rem;
         }
 
         .social-links a:hover {
-            background: var(--accent);
-            color: var(--primary-bg);
+            background: var(--gold-primary);
+            color: white;
             transform: translateY(-5px);
         }
 
         .copyright {
             text-align: center;
             padding-top: 30px;
-            border-top: 1px solid rgba(245, 230, 184, 0.1);
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
             font-size: 0.9rem;
-            color: rgba(234, 234, 234, 0.6);
+            color: #888;
         }
 
-        /* ===== WHATSAPP FLOATING BUTTON ===== */
+        /* WhatsApp Floating Button */
         .whatsapp-float {
             position: fixed;
             bottom: 30px;
@@ -677,7 +740,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.8rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             z-index: 100;
             animation: float 3s ease-in-out infinite;
             transition: var(--transition);
@@ -694,29 +757,21 @@
             100% { transform: translateY(0px); }
         }
 
-        /* ===== RESPONSIVE DESIGN ===== */
+        /* Responsive Design */
         @media (max-width: 1200px) {
-            .nav-links li {
-                margin-left: 10px;
-            }
-            
-            .nav-links a {
-                font-size: 0.85rem;
-                padding: 8px 10px;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .categories-grid, .moments-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .categories-grid,
+            .products-container {
+                grid-template-columns: repeat(3, 1fr);
             }
             
             .footer-content {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
+        }
+
+        @media (max-width: 992px) {
             .hero h1 {
-                font-size: 3rem;
+                font-size: 3.2rem;
             }
             
             .nav-links {
@@ -724,13 +779,22 @@
             }
             
             .mobile-toggle {
-                display: block;
+                display: flex;
+            }
+            
+            .categories-grid,
+            .products-container {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 768px) {
             section {
-                padding: 60px 0;
+                padding: 80px 0;
+            }
+            
+            .hero {
+                height: 80vh;
             }
             
             .hero h1 {
@@ -745,20 +809,40 @@
                 font-size: 2rem;
             }
             
-            .categories-grid, .moments-grid {
+            .categories-grid,
+            .products-container {
                 grid-template-columns: 1fr;
             }
             
-            .category-card, .moment-card {
+            .category-card {
                 height: 250px;
             }
             
-            .product-card {
-                width: 260px;
+            .newsletter-form {
+                flex-direction: column;
             }
             
             .footer-content {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                height: 70vh;
+                padding-top: 70px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .logo-text {
+                font-size: 1.5rem;
+            }
+            
+            header.scrolled .logo-text {
+                font-size: 1.4rem;
             }
         }
     </style>
@@ -767,26 +851,22 @@
     <!-- Header -->
     <header id="header">
         <div class="container header-container">
-            <a href="index.html" class="logo">JM POTTERS<span>.</span></a>
+            <div class="logo-container">
+                <img src="assets/images/logo-1.jpg" alt="JM POTTERS Logo" class="logo-img">
+                <a href="index.html" class="logo-text">JM POTTERS</a>
+            </div>
             
             <!-- Desktop Navigation -->
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="shop/products.html">Shop</a></li>
-                <li><a href="footwear.html">Footwear</a></li>
-                <li><a href="bags.html">Bags</a></li>
-                <li><a href="accessories.html">Accessories</a></li>
-                <li><a href="beauty.html">Beauty</a></li>
-                <li><a href="skincare.html">Skincare</a></li>
-                <li><a href="household.html">Household</a></li>
-                <li><a href="household.html">Household</a></li>
-                <li><a href="kids.html">Kids & Babies</a></li>
-                <li><a href="healthcare.html">Healthcare</a></li>
-                <li><a href="blog/blog.html">Blog</a></li>
-                <li><a href="contact.html">Contact</a></li>
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="household.html"><i class="fas fa-couch"></i> Household</a></li>
+                <li><a href="styles.html"><i class="fas fa-palette"></i> Styles</a></li>
+                <li><a href="collections.html"><i class="fas fa-crown"></i> Collections</a></li>
+                <li><a href="about.html"><i class="fas fa-store"></i> About</a></li>
+                <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
             </ul>
             
-            <button class="mobile-toggle">
+            <button class="mobile-toggle" id="mobileToggle">
                 <i class="fas fa-bars"></i>
             </button>
             
@@ -798,28 +878,21 @@
     </header>
 
     <!-- Mobile Navigation -->
-    <div class="overlay" id="nav-overlay"></div>
-    <div class="mobile-nav" id="mobile-nav">
+    <div class="overlay" id="navOverlay"></div>
+    <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <div class="logo">JM POTTERS<span>.</span></div>
+            <div class="logo-text">JM POTTERS</div>
             <button class="close-nav">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <ul class="mobile-nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="shop/products.html">Shop</a></li>
-            <li><a href="footwear.html">Footwear</a></li>
-            <li><a href="bags.html">Bags</a></li>
-            <li><a href="accessories.html">Accessories</a></li>
-            <li><a href="beauty.html">Beauty</a></li>
-            <li><a href="skincare.html">Skincare</a></li>
-            <li><a href="household.html">Household</a></li>
-            <li><a href="watches.html">Watches</a></li>
-            <li><a href="kids.html">Kids & Babies</a></li>
-            <li><a href="healthcare.html">Healthcare</a></li>
-            <li><a href="blog/blog.html">Blog</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="household.html"><i class="fas fa-couch"></i> Household</a></li>
+            <li><a href="styles.html"><i class="fas fa-palette"></i> Styles</a></li>
+            <li><a href="collections.html"><i class="fas fa-crown"></i> Collections</a></li>
+            <li><a href="about.html"><i class="fas fa-store"></i> About</a></li>
+            <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
         </ul>
     </div>
 
@@ -827,124 +900,88 @@
     <section class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1>Where Style Meets Simplicity</h1>
-                <p>Explore fashion-forward collections for every space and season</p>
-                <a href="#products" class="btn">Browse Collection</a>
+                <h1>Artisan Crafted Luxury</h1>
+                <p>Discover our exclusive collection of handcrafted ceramics and homeware that blend tradition with contemporary elegance</p>
+                <a href="collections.html" class="btn">Explore Collections</a>
             </div>
         </div>
     </section>
 
-    <!-- Featured Categories -->
+    <!-- Categories Section -->
     <section class="categories">
         <div class="container">
-            <h2 class="section-title">Shop by Category</h2>
+            <h2 class="section-title">Our Collections</h2>
             <div class="categories-grid">
                 <div class="category-card">
-                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Footwear">
+                    <img src="https://images.unsplash.com/photo-1591369822091-9d09abe3a3e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Dining Collection">
                     <div class="category-overlay">
-                        <h3>Footwear</h3>
-                        <p>Step into elegance</p>
+                        <h3>Dining Collection</h3>
+                        <p>Elevate your dining experience</p>
                     </div>
                 </div>
                 <div class="category-card">
-                    <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Fashion">
+                    <img src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Home Decor">
                     <div class="category-overlay">
-                        <h3>Bags</h3>
-                        <p>Carry sophistication</p>
+                        <h3>Home Decor</h3>
+                        <p>Artistic pieces for every space</p>
                     </div>
                 </div>
                 <div class="category-card">
-                    <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Home Essentials">
+                    <img src="https://images.unsplash.com/photo-1603791445824-0050bd4367d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Kitchen Essentials">
                     <div class="category-overlay">
-                        <h3>Household</h3>
-                        <p>Elevate your living space</p>
+                        <h3>Kitchen Essentials</h3>
+                        <p>Functional and beautiful</p>
                     </div>
                 </div>
                 <div class="category-card">
-                    <!-- Updated Accessories image -->
-                    <img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Accessories">
+                    <img src="https://images.unsplash.com/photo-1601760561441-16420502c7e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Special Editions">
                     <div class="category-overlay">
-                        <h3>Accessories</h3>
-                        <p>Finishing touches to perfection</p>
+                        <h3>Special Editions</h3>
+                        <p>Limited artisan pieces</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Top Products -->
-    <section class="top-products" id="products">
+    <!-- Featured Products -->
+    <section class="featured-products">
         <div class="container">
-            <h2 class="section-title">Top Picks</h2>
+            <h2 class="section-title">Featured Pieces</h2>
             <div class="products-container">
-                <!-- Product 1 -->
                 <div class="product-card">
                     <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
+                        <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Ceramic Vase">
                     </div>
                     <div class="product-info">
-                        <h3>Minimalist Leather Sandals</h3>
-                        <p>Handcrafted premium leather with gold accents</p>
-                        <div class="price">₦27,000 <span class="old-price">₦32,000</span></div>
+                        <h3>Artisan Ceramic Vase</h3>
+                        <div class="price">₦25,000</div>
                     </div>
                 </div>
-                
-                <!-- Product 2 -->
                 <div class="product-card">
                     <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
+                        <img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Dinner Set">
                     </div>
                     <div class="product-info">
-                        <h3>Cashmere Blend Sweater</h3>
-                        <p>Luxurious softness for everyday elegance</p>
-                        <div class="price">₦45,000</div>
+                        <h3>Porcelain Dinner Set</h3>
+                        <div class="price">₦85,000</div>
                     </div>
                 </div>
-                
-                <!-- Product 3 -->
                 <div class="product-card">
                     <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
+                        <img src="https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Tea Set">
                     </div>
                     <div class="product-info">
-                        <h3>Ceramic Tableware Set</h3>
-                        <p>Minimalist design for modern dining</p>
-                        <div class="price">₦38,500 <span class="old-price">₦45,000</span></div>
+                        <h3>Hand-painted Tea Set</h3>
+                        <div class="price">₦42,000</div>
                     </div>
                 </div>
-                
-                <!-- Product 4 -->
                 <div class="product-card">
                     <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
+                        <img src="https://images.unsplash.com/photo-1549980384-d61217e50c96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Decorative Bowl">
                     </div>
                     <div class="product-info">
-                        <h3>Gold Accent Watch</h3>
-                        <p>Elegant timepiece for the modern woman</p>
-                        <div class="price">₦62,000</div>
-                    </div>
-                </div>
-                
-                <!-- Product 5 -->
-                <div class="product-card">
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1591369822091-9d09abe3a3e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
-                    </div>
-                    <div class="product-info">
-                        <h3>Woven Storage Baskets</h3>
-                        <p>Natural materials for organized spaces</p>
-                        <div class="price">₦22,000 <span class="old-price">₦28,000</span></div>
-                    </div>
-                </div>
-                
-                <!-- Product 6 -->
-                <div class="product-card">
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
-                    </div>
-                    <div class="product-info">
-                        <h3>Silk Scarf Collection</h3>
-                        <p>Artisanal prints on premium silk</p>
+                        <h3>Decorative Serving Bowl</h3>
                         <div class="price">₦18,500</div>
                     </div>
                 </div>
@@ -952,99 +989,89 @@
         </div>
     </section>
 
-    <!-- Limited Offers -->
-    <section class="limited-offers">
+    <!-- Testimonials -->
+    <section class="testimonials">
         <div class="container">
-            <div class="offer-banner">
-                <div class="offer-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="offer-text">
-                    <strong>Limited Stock:</strong> <span>Exclusive Dish Rack</span>, <span>Granite Pot Set</span>, 
-                    <span>Chafing Dish</span>, and <span>Ladders</span>.
-                </div>
+            <h2 class="section-title">Client Testimonials</h2>
+            <div class="testimonial-container">
+                <p class="testimonial-text">"The craftsmanship of JM POTTERS ceramics is unparalleled. Each piece tells a story and brings an element of artistry to my home that I cherish daily."</p>
+                <div class="testimonial-author">- Adesuwa O., Lagos</div>
             </div>
         </div>
     </section>
 
-    <!-- Style Moments -->
-    <section class="style-moments">
+    <!-- Newsletter -->
+    <section class="newsletter">
         <div class="container">
-            <h2 class="section-title">Style Moments</h2>
-            <div class="moments-grid">
-                <div class="moment-card">
-                    <img src="https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Style Moment">
-                    <div class="moment-overlay">
-                        <p>Loved by 100+ happy customers</p>
-                    </div>
-                </div>
-                <div class="moment-card">
-                    <img src="https://images.unsplash.com/photo-1505842381624-c6b0579625a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Style Moment">
-                    <div class="moment-overlay">
-                        <p>Styled to fit your space</p>
-                    </div>
-                </div>
-                <div class="moment-card">
-                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Style Moment">
-                    <div class="moment-overlay">
-                        <p>Featured in top lifestyle magazines</p>
-                    </div>
-                </div>
-            </div>
+            <h2 class="section-title">Join Our Newsletter</h2>
+            <p>Subscribe to receive updates on new collections, exclusive offers, and design inspiration.</p>
+            <form class="newsletter-form">
+                <input type="email" class="newsletter-input" placeholder="Your email address" required>
+                <button type="submit" class="btn">Subscribe</button>
+            </form>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
         <div class="container">
+            <div class="footer-logo">
+                <img src="assets/images/logo-1.jpg" alt="JM POTTERS Logo">
+            </div>
             <div class="footer-content">
                 <div class="footer-column">
-                    <h3>JM POTTERS</h3>
-                    <p>Where Style Meets Simplicity. We curate elegant, minimalist pieces for the modern lifestyle.</p>
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="collections.html"><i class="fas fa-chevron-right"></i> Collections</a></li>
+                        <li><a href="styles.html"><i class="fas fa-chevron-right"></i> Styles & Inspiration</a></li>
+                        <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Collections</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Dining</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Kitchen</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Home Decor</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Special Editions</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Gift Sets</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Shipping Policy</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Returns & Exchanges</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Care Instructions</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> 24 Luxury Avenue, Lagos</a></li>
+                        <li><a href="tel:+2348123456789"><i class="fas fa-phone-alt"></i> +234 812 345 6789</a></li>
+                        <li><a href="mailto:info@jmpotters.com"><i class="fas fa-envelope"></i> info@jmpotters.com</a></li>
+                    </ul>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
                     </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Shop</h3>
-                    <ul class="footer-links">
-                        <li><a href="shop/products.html">New Arrivals</a></li>
-                        <li><a href="shop/products.html">Best Sellers</a></li>
-                        <li><a href="shop/products.html">Sale</a></li>
-                        <li><a href="footwear.html">Footwear</a></li>
-                        <li><a href="household.html">Home Essentials</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Information</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                        <li><a href="#">Shipping Policy</a></li>
-                        <li><a href="#">Returns & Exchanges</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Newsletter</h3>
-                    <p>Subscribe to receive updates, access to exclusive deals, and more.</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Your email address" required>
-                        <button type="submit" class="btn">Subscribe</button>
-                    </form>
                 </div>
             </div>
             <div class="copyright">
-                &copy; 2023 JM POTTERS. All rights reserved.
+                &copy; 2023 JM POTTERS. All rights reserved. | Handcrafted with <i class="fas fa-heart" style="color: #d4af37;"></i> in Nigeria
             </div>
         </div>
     </footer>
 
     <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/234XXXXXXXXXX" class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -1060,62 +1087,36 @@
         });
 
         // Mobile navigation toggle
-        const mobileToggle = document.querySelector('.mobile-toggle');
-        const mobileNav = document.getElementById('mobile-nav');
-        const overlay = document.getElementById('nav-overlay');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const mobileNav = document.getElementById('mobileNav');
+        const navOverlay = document.getElementById('navOverlay');
         const closeNav = document.querySelector('.close-nav');
         
         mobileToggle.addEventListener('click', function() {
             mobileNav.classList.add('active');
-            overlay.classList.add('active');
+            navOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
         
         closeNav.addEventListener('click', function() {
             mobileNav.classList.remove('active');
-            overlay.classList.remove('active');
+            navOverlay.classList.remove('active');
             document.body.style.overflow = '';
         });
         
-        overlay.addEventListener('click', function() {
+        navOverlay.addEventListener('click', function() {
             mobileNav.classList.remove('active');
-            overlay.classList.remove('active');
+            navOverlay.classList.remove('active');
             document.body.style.overflow = '';
         });
 
-        // Scroll animations for sections
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('appear');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        // Observe all elements with the class
-        document.querySelectorAll('.category-card, .product-card, .moment-card').forEach(card => {
-            observer.observe(card);
-        });
-
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    window.scrollTo({
-                        top: target.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                }
-            });
+        // Add scroll padding to first section
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.getElementById('header');
+            const firstSection = document.querySelector('.hero');
+            if (header && firstSection) {
+                firstSection.style.paddingTop = header.offsetHeight + 'px';
+            }
         });
     </script>
 </body>
