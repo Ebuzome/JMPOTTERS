@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxury Household Essentials | JMPOTTERS</title>
+    <title>Household Collection | JMPOTTERS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --cream: #faf7f2;
-            --gold: #d4af37;
-            --light-gold: #f5e6b8;
-            --dark-gold: #b8860b;
+            --cream-light: #fefaf0;
+            --cream-medium: #fffaf3;
+            --gold-primary: #d4af37;
+            --gold-secondary: #e8c170;
+            --gold-light: #f5e6b8;
+            --gold-dark: #b8860b;
             --charcoal: #333333;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.4);
         }
 
         * {
@@ -26,7 +29,7 @@
         body {
             font-family: 'Montserrat', sans-serif;
             color: var(--charcoal);
-            background-color: var(--cream);
+            background-color: var(--cream-light);
             overflow-x: hidden;
             line-height: 1.6;
         }
@@ -35,7 +38,7 @@
             font-family: 'Playfair Display', serif;
             font-weight: 600;
             letter-spacing: -0.5px;
-            color: var(--dark-gold);
+            color: var(--gold-dark);
         }
 
         .container {
@@ -64,18 +67,18 @@
             transform: translateX(-50%);
             width: 80px;
             height: 3px;
-            background: var(--gold);
+            background: var(--gold-primary);
         }
 
         .btn {
             display: inline-block;
-            padding: 14px 32px;
-            background: var(--gold);
-            color: #fff;
+            padding: 12px 24px;
+            background: var(--gold-primary);
+            color: white;
             text-decoration: none;
             font-weight: 600;
             letter-spacing: 1px;
-            border-radius: 0;
+            border-radius: 4px;
             transition: var(--transition);
             text-transform: uppercase;
             font-size: 0.9rem;
@@ -85,13 +88,13 @@
 
         .btn:hover {
             background: transparent;
-            border-color: var(--gold);
-            color: var(--dark-gold);
+            border-color: var(--gold-primary);
+            color: var(--gold-dark);
             transform: translateY(-3px);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-gold);
         }
 
-        /* Header Styles */
+        /* Header */
         header {
             position: fixed;
             top: 0;
@@ -99,7 +102,7 @@
             width: 100%;
             z-index: 1000;
             padding: 20px 0;
-            background: rgba(250, 247, 242, 0.95);
+            background: rgba(254, 250, 240, 0.95);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
         }
@@ -110,75 +113,56 @@
             align-items: center;
         }
 
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-img {
+            height: 50px;
+        }
+
         .logo {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--dark-gold);
+            color: var(--gold-dark);
             text-decoration: none;
             letter-spacing: 1px;
         }
 
         .logo span {
-            color: var(--gold);
+            color: var(--gold-primary);
         }
 
-        .nav-links {
+        .header-icons {
             display: flex;
-            list-style: none;
+            align-items: center;
+            gap: 20px;
         }
 
-        .nav-links li {
-            margin-left: 20px;
-        }
-
-        .nav-links a {
-            color: var(--charcoal);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+        .header-icon {
             position: relative;
-            transition: var(--transition);
-            padding: 8px 0;
-        }
-
-        .nav-links a:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gold);
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover:after {
-            width: 100%;
-        }
-
-        .cart-icon {
-            position: relative;
-            margin-left: 30px;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             color: var(--charcoal);
             transition: var(--transition);
+            cursor: pointer;
         }
 
-        .cart-icon:hover {
-            color: var(--gold);
+        .header-icon:hover {
+            color: var(--gold-primary);
         }
 
-        .cart-count {
+        .icon-badge {
             position: absolute;
             top: -8px;
-            right: -10px;
-            background: var(--gold);
+            right: -8px;
+            background: var(--gold-primary);
             color: white;
             font-size: 0.7rem;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -186,113 +170,86 @@
             font-weight: 600;
         }
 
-        /* Hero Section */
-        .hero {
-            height: 70vh;
+        /* Filters Section */
+        .filters-section {
+            background: var(--cream-medium);
+            padding: 30px 0;
+            margin-top: 80px;
+            border-bottom: 1px solid var(--gold-light);
+        }
+
+        .filters-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .filter-group {
             display: flex;
             align-items: center;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
-                        url('https://images.unsplash.com/photo-1600566752355-35792bedcfea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1950&q=80');
-            background-size: cover;
-            background-position: center;
-            margin-top: 70px;
+            gap: 15px;
         }
 
-        .hero-content {
-            max-width: 800px;
-            color: white;
-            text-align: center;
-            margin: 0 auto;
-            padding: 20px;
+        .filter-label {
+            font-weight: 600;
+            color: var(--gold-dark);
         }
 
-        .hero h1 {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            line-height: 1.1;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            color: var(--light-gold);
+        .filter-control {
+            padding: 10px 15px;
+            border: 1px solid var(--gold-light);
+            border-radius: 4px;
+            background: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            min-width: 200px;
         }
 
-        /* Ad Carousel */
-        .carousel {
-            margin: 50px auto;
-            max-width: 1200px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            height: 400px;
-        }
-
-        .carousel-inner {
+        .price-range {
             display: flex;
-            transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
-            height: 100%;
-        }
-
-        .carousel-item {
-            min-width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .carousel-controls {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        .carousel-control {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: var(--transition);
+        .price-input {
+            width: 100px;
+            padding: 10px;
+            border: 1px solid var(--gold-light);
+            border-radius: 4px;
+            text-align: center;
         }
 
-        .carousel-control.active {
-            background: var(--gold);
-            transform: scale(1.2);
-        }
-
-        /* Search Bar */
         .search-container {
-            max-width: 800px;
-            margin: 40px auto 60px;
             position: relative;
+            flex-grow: 1;
+            max-width: 400px;
         }
 
         .search-bar {
             width: 100%;
-            padding: 18px 25px;
-            border: 2px solid var(--light-gold);
-            border-radius: 50px;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid var(--gold-light);
+            border-radius: 30px;
             font-size: 1rem;
             font-family: 'Montserrat', sans-serif;
             outline: none;
             transition: var(--transition);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
         .search-bar:focus {
-            border-color: var(--gold);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
         }
 
         .search-icon {
             position: absolute;
-            right: 25px;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gold);
+            color: var(--gold-primary);
             font-size: 1.2rem;
         }
 
@@ -301,6 +258,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px;
+            margin-top: 40px;
         }
 
         .product-card {
@@ -312,11 +270,13 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            border: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .product-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: rgba(212, 175, 55, 0.3);
         }
 
         .product-image {
@@ -329,7 +289,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.8s ease;
+            transition: var(--transition);
         }
 
         .product-card:hover .product-image img {
@@ -340,34 +300,13 @@
             position: absolute;
             top: 15px;
             left: 15px;
-            background: var(--gold);
+            background: var(--gold-primary);
             color: white;
             padding: 5px 12px;
             border-radius: 30px;
             font-size: 0.8rem;
             font-weight: 600;
             z-index: 2;
-        }
-
-        .like-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            z-index: 2;
-            color: #ccc;
-        }
-
-        .like-btn:hover, .like-btn.active {
-            color: #ff4757;
         }
 
         .product-info {
@@ -395,7 +334,7 @@
         .current-price {
             font-size: 1.2rem;
             font-weight: 700;
-            color: var(--gold);
+            color: var(--gold-primary);
         }
 
         .old-price {
@@ -405,8 +344,8 @@
         }
 
         .product-toggle {
-            background: var(--light-gold);
-            color: var(--dark-gold);
+            background: var(--gold-light);
+            color: var(--gold-dark);
             border: none;
             width: 100%;
             padding: 12px;
@@ -415,10 +354,11 @@
             cursor: pointer;
             transition: var(--transition);
             font-family: 'Montserrat', sans-serif;
+            border-radius: 4px;
         }
 
         .product-toggle:hover {
-            background: var(--gold);
+            background: var(--gold-primary);
             color: white;
         }
 
@@ -472,9 +412,9 @@
         }
 
         .quantity-btn:hover {
-            background: var(--gold);
+            background: var(--gold-primary);
             color: white;
-            border-color: var(--gold);
+            border-color: var(--gold-primary);
         }
 
         .quantity {
@@ -491,7 +431,7 @@
         }
 
         .cart-btn {
-            background: var(--gold);
+            background: var(--gold-primary);
             color: white;
             border: none;
             padding: 12px;
@@ -503,10 +443,33 @@
         }
 
         .cart-btn:hover {
-            background: var(--dark-gold);
+            background: var(--gold-dark);
+        }
+
+        .wishlist-btn {
+            background: transparent;
+            color: #888;
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .wishlist-btn:hover, .wishlist-btn.active {
+            background: #ff4757;
+            color: white;
+            border-color: #ff4757;
         }
 
         .whatsapp-btn {
+            grid-column: span 2;
             background: #25d366;
             color: white;
             border: none;
@@ -532,6 +495,7 @@
             justify-content: center;
             margin-top: 60px;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .page-btn {
@@ -549,135 +513,134 @@
         }
 
         .page-btn:hover, .page-btn.active {
-            background: var(--gold);
+            background: var(--gold-primary);
             color: white;
-            border-color: var(--gold);
+            border-color: var(--gold-primary);
         }
 
-        /* Cart Dropdown */
-        .cart-dropdown {
+        /* Wishlist Panel */
+        .wishlist-panel {
             position: fixed;
-            top: 80px;
-            right: 30px;
+            top: 0;
+            right: -100%;
+            width: 85%;
+            max-width: 400px;
+            height: 100vh;
             background: white;
-            width: 350px;
-            border-radius: 8px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
             z-index: 1100;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease;
+            transition: var(--transition);
+            overflow-y: auto;
+            padding: 30px;
+            border-left: 3px solid var(--gold-primary);
         }
 
-        .cart-dropdown.active {
-            max-height: 500px;
-            padding: 20px;
-            border: 1px solid #eee;
+        .wishlist-panel.active {
+            right: 0;
         }
 
-        .cart-header {
+        .wishlist-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 15px;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gold-light);
         }
 
-        .cart-items {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 15px;
+        .wishlist-title {
+            font-size: 1.5rem;
+            color: var(--gold-dark);
         }
 
-        .cart-item {
+        .close-wishlist {
+            background: none;
+            border: none;
+            color: var(--charcoal);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-wishlist:hover {
+            color: var(--gold-primary);
+            transform: rotate(90deg);
+        }
+
+        .wishlist-items {
+            min-height: 300px;
+        }
+
+        .wishlist-empty {
+            text-align: center;
+            padding: 40px 0;
+            color: #888;
+        }
+
+        .wishlist-item {
             display: flex;
             align-items: center;
-            padding: 12px 0;
+            padding: 15px 0;
             border-bottom: 1px solid #f5f5f5;
         }
 
-        .cart-item-image {
-            width: 60px;
-            height: 60px;
+        .wishlist-item-image {
+            width: 80px;
+            height: 80px;
             border-radius: 4px;
             overflow: hidden;
             margin-right: 15px;
         }
 
-        .cart-item-image img {
+        .wishlist-item-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .cart-item-details {
+        .wishlist-item-details {
             flex-grow: 1;
         }
 
-        .cart-item-name {
+        .wishlist-item-name {
             font-weight: 600;
             margin-bottom: 5px;
-            font-size: 0.9rem;
         }
 
-        .cart-item-price {
-            color: var(--gold);
+        .wishlist-item-price {
+            color: var(--gold-primary);
             font-weight: 600;
         }
 
-        .cart-item-quantity {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 5px;
-        }
-
-        .cart-item-remove {
+        .wishlist-item-remove {
             color: #e74c3c;
             background: none;
             border: none;
             cursor: pointer;
             margin-left: 15px;
+            font-size: 1.2rem;
             transition: var(--transition);
         }
 
-        .cart-item-remove:hover {
+        .wishlist-item-remove:hover {
             color: #c0392b;
+            transform: scale(1.2);
         }
 
-        .cart-total {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-top: 1px solid #eee;
-            font-weight: 700;
-            font-size: 1.1rem;
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            display: none;
+            backdrop-filter: blur(5px);
         }
 
-        .cart-actions {
-            display: grid;
-            gap: 10px;
-        }
-
-        .whatsapp-order-btn {
-            background: #25d366;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        .whatsapp-order-btn:hover {
-            background: #128c7e;
+        .overlay.active {
+            display: block;
         }
 
         /* Footer */
@@ -699,6 +662,7 @@
             margin-bottom: 25px;
             position: relative;
             padding-bottom: 10px;
+            color: var(--gold-dark);
         }
 
         .footer-column h3:after {
@@ -708,7 +672,7 @@
             left: 0;
             width: 40px;
             height: 2px;
-            background: var(--gold);
+            background: var(--gold-primary);
         }
 
         .footer-links {
@@ -727,7 +691,7 @@
         }
 
         .footer-links a:hover {
-            color: var(--gold);
+            color: var(--gold-primary);
             padding-left: 5px;
         }
 
@@ -745,13 +709,13 @@
             height: 40px;
             border-radius: 50%;
             background: rgba(212, 175, 55, 0.1);
-            color: var(--gold);
+            color: var(--gold-primary);
             transition: var(--transition);
             font-size: 1.1rem;
         }
 
         .social-links a:hover {
-            background: var(--gold);
+            background: var(--gold-primary);
             color: white;
             transform: translateY(-5px);
         }
@@ -772,7 +736,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: #25d366;
+            background: #25D366;
             color: white;
             display: flex;
             align-items: center;
@@ -807,12 +771,18 @@
         }
 
         @media (max-width: 992px) {
-            .hero h1 {
-                font-size: 3rem;
+            .filters-container {
+                flex-direction: column;
+                align-items: stretch;
             }
             
-            .carousel {
-                height: 350px;
+            .filter-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             }
         }
 
@@ -821,43 +791,45 @@
                 padding: 60px 0;
             }
             
-            .hero {
-                height: 50vh;
-            }
-            
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-            
-            .carousel {
-                height: 250px;
-            }
-            
             .section-title {
                 font-size: 2rem;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
             }
             
             .footer-content {
                 grid-template-columns: 1fr;
             }
             
-            .cart-dropdown {
-                right: 10px;
-                width: 300px;
+            .wishlist-panel {
+                width: 90%;
             }
         }
 
         @media (max-width: 576px) {
-            .nav-links {
-                display: none;
+            .filter-control {
+                min-width: 150px;
+            }
+            
+            .price-range {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .price-input {
+                width: 100%;
             }
             
             .products-grid {
                 grid-template-columns: 1fr;
             }
             
-            .action-buttons {
-                grid-template-columns: 1fr;
+            .page-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -866,84 +838,71 @@
     <!-- Header -->
     <header id="header">
         <div class="container header-container">
-            <a href="index.html" class="logo">JMPOTTERS<span>.</span></a>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="shop/products.html">Shop</a></li>
-                <li><a href="footwear.html">Footwear</a></li>
-                <li><a href="bags.html">Bags</a></li>
-                <li><a href="accessories.html">Accessories</a></li>
-                <li><a href="beauty.html">Beauty</a></li>
-                <li><a href="skincare.html">Skincare</a></li>
-                <li><a href="household.html" class="active">Household</a></li>
-                <li><a href="watches.html">Watches</a></li>
-                <li><a href="kids.html">Kids & Babies</a></li>
-                <li><a href="healthcare.html">Healthcare</a></li>
-                <li><a href="blog/blog.html">Blog</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-            <a href="#" class="cart-icon" id="cartIcon">
-                <i class="fas fa-shopping-bag"></i>
-                <span class="cart-count">0</span>
-            </a>
+            <div class="logo-container">
+                <img src="assets/images/logo-1.jpg" alt="JM POTTERS Logo" class="logo-img">
+                <a href="index.html" class="logo">JMPOTTERS<span>.</span></a>
+            </div>
+            
+            <div class="header-icons">
+                <div class="header-icon" id="wishlistIcon">
+                    <i class="fas fa-heart"></i>
+                    <span class="icon-badge" id="wishlistCount">0</span>
+                </div>
+                <a href="#" class="header-icon" id="cartIcon">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="icon-badge" id="cartCount">0</span>
+                </a>
+            </div>
         </div>
     </header>
 
-    <!-- Cart Dropdown -->
-    <div class="cart-dropdown" id="cartDropdown">
-        <div class="cart-header">
-            <h3>Your Cart</h3>
-            <span id="cartClose"><i class="fas fa-times"></i></span>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <!-- Cart items will be added here dynamically -->
-            <div class="empty-cart">Your cart is empty</div>
-        </div>
-        <div class="cart-total">
-            <span>Total:</span>
-            <span id="cartTotal">₦0</span>
-        </div>
-        <div class="cart-actions">
-            <button class="whatsapp-order-btn" id="whatsappOrderBtn">
-                <i class="fab fa-whatsapp"></i> Order via WhatsApp
+    <!-- Wishlist Panel -->
+    <div class="overlay" id="wishlistOverlay"></div>
+    <div class="wishlist-panel" id="wishlistPanel">
+        <div class="wishlist-header">
+            <h3 class="wishlist-title">Your Wishlist</h3>
+            <button class="close-wishlist">
+                <i class="fas fa-times"></i>
             </button>
+        </div>
+        <div class="wishlist-items" id="wishlistItems">
+            <div class="wishlist-empty">Your wishlist is empty</div>
         </div>
     </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
+    <!-- Filters Section -->
+    <section class="filters-section">
         <div class="container">
-            <div class="hero-content">
-                <h1>Elegant Household Essentials</h1>
+            <div class="filters-container">
+                <div class="filter-group">
+                    <span class="filter-label">Price Range:</span>
+                    <div class="price-range">
+                        <input type="number" id="minPrice" class="price-input" placeholder="Min" min="0">
+                        <span>-</span>
+                        <input type="number" id="maxPrice" class="price-input" placeholder="Max" min="0">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <span class="filter-label">Sort By:</span>
+                    <select id="sortBy" class="filter-control">
+                        <option value="default">Featured</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="name-asc">Name: A–Z</option>
+                        <option value="name-desc">Name: Z–A</option>
+                    </select>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" class="search-bar" id="searchBar" placeholder="Search household items...">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
-
-    <!-- Advertisement Carousel -->
-    <div class="container">
-        <div class="carousel" id="carousel">
-            <div class="carousel-inner" id="carouselInner">
-                <div class="carousel-item" style="background-image: url('assets/images/household/dish-rack-double-layer-6500.jpg');"></div>
-                <div class="carousel-item" style="background-image: url('assets/images/household/royal-cabinet-18000.jpg');"></div>
-                <div class="carousel-item" style="background-image: url('assets/images/household/mop-and-bucket-set-7000.jpg');"></div>
-            </div>
-            <div class="carousel-controls" id="carouselControls">
-                <div class="carousel-control active"></div>
-                <div class="carousel-control"></div>
-                <div class="carousel-control"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="container">
-        <div class="search-container">
-            <input type="text" class="search-bar" id="searchBar" placeholder="Search for household items...">
-            <div class="search-icon">
-                <i class="fas fa-search"></i>
-            </div>
-        </div>
-    </div>
 
     <!-- Product Gallery -->
     <section class="product-gallery">
@@ -994,7 +953,7 @@
                 </div>
                 <div class="footer-column">
                     <h3>Newsletter</h3>
-                    <p>Subscribe to receive updates, access to exclusive deals, and style inspiration.</p>
+                    <p>Subscribe to receive updates on new collections, exclusive offers, and style inspiration.</p>
                     <form class="newsletter-form">
                         <input type="email" placeholder="Your email address" required>
                         <button type="submit" class="btn">Subscribe</button>
@@ -1032,51 +991,86 @@
             { id: 15, name: "jean shorts and gown", price: 6200, image: "jean-shorts-and-gown-6200.jpg" },
             { id: 16, name: "keychain light", price: 2500, image: "keychain-light-2500.jpg" },
             { id: 17, name: "kitchen apron", price: 1000, image: "kitchen-apron-1000.jpg" },
-            { id: 18, name: "kitchen scissors", price: 1800, image: "kitchen-scissors-1800.jpg" },
-            { id: 19, name: "luxury soap dish", price: 2100, image: "luxury-soap-dish-2100.jpg" },
-            { id: 20, name: "maximus kettle", price: 10300, image: "maximus-kettle-10300.jpg" },
-            { id: 21, name: "maximus toaster", price: 12000, image: "maximus-toaster-12000.jpg" },
-            { id: 22, name: "mini fan", price: 3100, image: "mini-fan-3100.jpg" },
-            { id: 23, name: "mini humidifier", price: 2500, image: "mini-humidifier-2500.jpg" },
-            { id: 24, name: "morocco basket", price: 1000, image: "morocco-basket-1000.jpg" },
-            { id: 25, name: "non stick desktop gas", price: 20000, image: "non-stick-desktop-gas-20000.jpg" },
-            { id: 26, name: "oily glue", price: 1400, image: "oily-glue-1400.jpg" },
-            { id: 27, name: "phone hanger", price: 2400, image: "phone-hanger-2400.jpg" },
-            { id: 28, name: "pot cleaner", price: 1900, image: "pot-cleaner-1900.jpg" },
-            { id: 29, name: "quality basket", price: 2000, image: "quality-basket-2000.jpg" },
-            { id: 30, name: "royal cabinet", price: 18000, image: "royal-cabinet-18000.jpg" },
-            { id: 31, name: "shoe wipes", price: 1800, image: "shoe-wipes-1800.jpg" },
-            { id: 32, name: "sink sieve", price: 1750, image: "sink-sieve-1750.jpg" },
-            { id: 33, name: "snap and go", price: 2000, image: "snap-and-go-2000.jpg" },
-            { id: 34, name: "snap button", price: 3000, image: "snap-button-3000.jpg" },
-            { id: 35, name: "solar rechargeable fan", price: 45000, image: "solar-rechargeable-fan-45000.jpg" },
-            { id: 36, name: "sonik rechargeable fan", price: 42000, image: "sonik-rechargeable-fan-42000.jpg" },
-            { id: 37, name: "soup spoon", price: 950, image: "soup-spoon-950.jpg" },
-            { id: 38, name: "temperature flask", price: 3999, image: "temperature-flask-3999.jpg" },
-            { id: 39, name: "toilet anti slip mat", price: 4000, image: "toilet-anti-slip-mat-4000.jpg" },
-            { id: 40, name: "toilet cleaner", price: 1850, image: "toilet-cleaner-1850.jpg" },
-            { id: 41, name: "toilet fragrance", price: 1900, image: "toilet-fragrance-1900.jpg" },
-            { id: 42, name: "tongue scraper", price: 1500, image: "tongue-scraper-1500.jpg" },
-            { id: 43, name: "toothbrush case", price: 1200, image: "toothbrush-case-1200.jpg" },
-            { id: 44, name: "transparent jar", price: 4750, image: "transparent-jar-4750.jpg" },
-            { id: 45, name: "triple plate rack", price: 28000, image: "triple-plate-rack-28000.jpg" },
-            { id: 46, name: "trouser hanger", price: 2500, image: "trouser-hanger-2500.jpg" },
-            { id: 47, name: "vacuum cleaner", price: 6000, image: "vacuum-cleaner-6000.jpg" },
-            { id: 48, name: "towel rack wallmount", price: 4000, image: "towel-rack-wallmount-4000.jpg" },
-            { id: 49, name: "kitchen basket set", price: 5500, image: "kitchen-basket-set-5500.jpg" },
-            { id: 50, name: "dish rack double layer", price: 6500, image: "dish-rack-double-layer-6500.jpg" },
-            { id: 51, name: "bathroom organizer", price: 4200, image: "bathroom-organizer-4200.jpg" },
-            { id: 52, name: "plastic storage bin", price: 3800, image: "plastic-storage-bin-3800.jpg" },
-            { id: 53, name: "mini storage drawers", price: 6000, image: "mini-storage-drawers-6000.jpg" },
-            { id: 54, name: "shelf multipurpose", price: 5000, image: "shelf-multipurpose-5000.jpg" },
-            { id: 55, name: "mop and bucket set", price: 7000, image: "mop-and-bucket-set-7000.jpg" },
-            { id: 56, name: "toilet brush holder", price: 2800, image: "toilet-brush-holder-2800.jpg" },
-            { id: 57, name: "stainless sink strainer", price: 2500, image: "stainless-sink-strainer-2500.jpg" },
-            { id: 58, name: "rotating kitchen shelf", price: 6800, image: "rotating-kitchen-shelf-6800.jpg" },
-            { id: 59, name: "plastic bowl stack", price: 2000, image: "plastic-bowl-stack-2000.jpg" },
-            { id: 60, name: "dish drying rack", price: 5500, image: "dish-drying-rack-5500.jpg" },
-            { id: 61, name: "mini cutting board", price: 1800, image: "mini-cutting-board-1800.jpg" },
-            { id: 62, name: "toilet cleaning set", price: 3200, image: "toilet-cleaning-set-3200.jpg" }
+            { id: 18, name: "kitchen basket set", price: 5500, image: "kitchen-basket-set-5500.jpg" },
+            { id: 19, name: "kitchen scissors", price: 1800, image: "kitchen-scissors-1800.jpg" },
+            { id: 20, name: "luxury soap dish", price: 2100, image: "luxury-soap-dish-2100.jpg" },
+            { id: 21, name: "maximus kettle", price: 10300, image: "maximus-kettle-10300.jpg" },
+            { id: 22, name: "maximus toaster", price: 12000, image: "maximus-toaster-12000.jpg" },
+            { id: 23, name: "mini cutting board", price: 1800, image: "mini-cutting-board-1800.jpg" },
+            { id: 24, name: "mini fan", price: 3100, image: "mini-fan-3100.jpg" },
+            { id: 25, name: "mini humidifier", price: 2500, image: "mini-humidifier-2500.jpg" },
+            { id: 26, name: "mini storage drawers", price: 6000, image: "mini-storage-drawers-6000.jpg" },
+            { id: 27, name: "morocco basket", price: 1000, image: "morocco-basket-1000.jpg" },
+            { id: 28, name: "non stick desktop gas", price: 20000, image: "non-stick-desktop-gas-20000.jpg" },
+            { id: 29, name: "oily glue", price: 1400, image: "oily-glue-1400.jpg" },
+            { id: 30, name: "phone hanger", price: 2400, image: "phone-hanger-2400.jpg" },
+            { id: 31, name: "plastic bowl stack", price: 2000, image: "plastic-bowl-stack-2000.jpg" },
+            { id: 32, name: "plastic storage bin", price: 3800, image: "plastic-storage-bin-3800.jpg" },
+            { id: 33, name: "pot cleaner", price: 1900, image: "pot-cleaner-1900.jpg" },
+            { id: 34, name: "quality basket", price: 2000, image: "quality-basket-2000.jpg" },
+            { id: 35, name: "rechargeable mist cooling fan", price: 12500, image: "rechargeable-mist-cooling-fan-12500.jpg" },
+            { id: 36, name: "rotating kitchen shelf", price: 6800, image: "rotating-kitchen-shelf-6800.jpg" },
+            { id: 37, name: "royal cabinet", price: 18000, image: "royal-cabinet-18000.jpg" },
+            { id: 38, name: "shelf multipurpose", price: 5000, image: "shelf-multipurpose-5000.jpg" },
+            { id: 39, name: "shoe wipes", price: 1800, image: "shoe-wipes-1800.jpg" },
+            { id: 40, name: "sink sieve", price: 1750, image: "sink-sieve-1750.jpg" },
+            { id: 41, name: "snap and go", price: 2000, image: "snap-and-go-2000.jpg" },
+            { id: 42, name: "snap button", price: 3000, image: "snap-button-3000.jpg" },
+            { id: 43, name: "solar rechargeable fan", price: 45000, image: "solar-rechargeable-fan-45000.jpg" },
+            { id: 44, name: "sonik rechargeable fan", price: 42000, image: "sonik-rechargeable-fan-42000.jpg" },
+            { id: 45, name: "soup spoon", price: 950, image: "soup-spoon-950.jpg" },
+            { id: 46, name: "stainless sink strainer", price: 2500, image: "stainless-sink-strainer-2500.jpg" },
+            { id: 47, name: "table mat 4pcs", price: 4500, image: "table-mat-4pcs-4500.jpg" },
+            { id: 48, name: "temperature flask", price: 3999, image: "temperature-flask-3999.jpg" },
+            { id: 49, name: "toilet anti slip mat", price: 4000, image: "toilet-anti-slip-mat-4000.jpg" },
+            { id: 50, name: "toilet brush holder", price: 2800, image: "toilet-brush-holder-2800.jpg" },
+            { id: 51, name: "toilet cleaner", price: 1850, image: "toilet-cleaner-1850.jpg" },
+            { id: 52, name: "toilet cleaning set", price: 3200, image: "toilet-cleaning-set-3200.jpg" },
+            { id: 53, name: "toilet fragrance", price: 1900, image: "toilet-fragrance-1900.jpg" },
+            { id: 54, name: "tongue scraper", price: 1500, image: "tongue-scraper-1500.jpg" },
+            { id: 55, name: "toothbrush case", price: 1200, image: "toothbrush-case-1200.jpg" },
+            { id: 56, name: "transparent jar", price: 4750, image: "transparent-jar-4750.jpg" },
+            { id: 57, name: "triple plate rack", price: 28000, image: "triple-plate-rack-28000.jpg" },
+            { id: 58, name: "trouser hanger", price: 2500, image: "trouser-hanger-2500.jpg" },
+            { id: 59, name: "towel rack wallmount", price: 4000, image: "towel-rack-wallmount-4000.jpg" },
+            { id: 60, name: "vacuum cleaner", price: 6000, image: "vacuum-cleaner-6000.jpg" },
+            { id: 61, name: "dish drying rack", price: 5500, image: "dish-drying-rack-5500.jpg" },
+            { id: 62, name: "dish rack double layer", price: 6500, image: "dish-rack-double-layer-6500.jpg" },
+            { id: 63, name: "bathroom organizer", price: 4200, image: "bathroom-organizer-4200.jpg" },
+            { id: 64, name: "air freshener", price: 1500, image: "air-freshener-1500.jpg" },
+            { id: 65, name: "dish sponge", price: 900, image: "dish-sponge-900.jpg" },
+            { id: 66, name: "Arabian style center rug", price: 30000, image: "Arabian-Style-Center-Rug-30000.jpg" },
+            { id: 67, name: "blossom potted flower", price: 2800, image: "blossom-potted-flower-2800.jpg" },
+            { id: 68, name: "camellia potted flower", price: 2800, image: "camellia-potted-flower-2800.jpg" },
+            { id: 69, name: "cartoon fruit infusion straw cup", price: 2700, image: "cartoon-fruit-infusion-straw-cup-2700.jpg" },
+            { id: 70, name: "castle decorative lamp", price: 2200, image: "castle-decorative-lamp-2200.jpg" },
+            { id: 71, name: "deli 5pcs glass set", price: 9300, image: "deli-5pcs-glass-set-9300.jpg" },
+            { id: 72, name: "double pole 3 layer hanger and shoe rack", price: 19000, image: "double-pole-3-layer-hanger-and-shoe-rack-19000.jpg" },
+            { id: 73, name: "dustproof bag rack", price: 3000, image: "dustproof-bag-rack-3000.jpg" },
+            { id: 74, name: "exercise mat", price: 15000, image: "exercise-mat-15000.jpg" },
+            { id: 75, name: "fluffy footmat", price: 3000, image: "fluffy-footmat-3000.jpg" },
+            { id: 76, name: "fur mat", price: 5500, image: "fur-mat-5500.jpg" },
+            { id: 77, name: "gym sling bag", price: 2700, image: "gym-sling-bag-2700.jpg" },
+            { id: 78, name: "hall stand heavy duty double layer rack", price: 28500, image: "hall-stand-heavy-duty-double-layer-rack-28500.jpg" },
+            { id: 79, name: "high pressure plunge", price: 3200, image: "high-pressure-plunge-3200.jpg" },
+            { id: 80, name: "inflatable recliner", price: 30000, image: "inflatable-recliner-30000.jpg" },
+            { id: 81, name: "kids bear plate with cutlery", price: 1700, image: "kids-bear-plate-with-cutlery-1700.jpg" },
+            { id: 82, name: "luxury acrylic tissue and accessories holder", price: 7500, image: "luxury-acrylic-tissue-and-accessories-holder-7500.jpg" },
+            { id: 83, name: "magic brush rechargeable multifunctional cleaning brush", price: 9500, image: "magic-brush-rechargeable-multifunctional-cleaning-brush-9500.jpg" },
+            { id: 84, name: "metal bathroom rack", price: 3200, image: "metal-bathroom-rack-3200.jpg" },
+            { id: 85, name: "mini decorative led lamp", price: 1700, image: "mini-decorative-led-lamp-1700.jpg" },
+            { id: 86, name: "minimalist center rug", price: 30000, image: "minimalist-center-rug-30000.jpg" },
+            { id: 87, name: "modern center rug", price: 30000, image: "modern-center-rug-30000.jpg" },
+            { id: 88, name: "multifunctional household vegetable cutter", price: 5500, image: "multifunctional-household-vegetable-cutter-5500.jpg" },
+            { id: 89, name: "nordic love decorative clock black", price: 9000, image: "nordic-love-decorative-clock-black-9000.jpg" },
+            { id: 90, name: "nordic love decorative clock gold", price: 9700, image: "nordic-love-decorative-clock-gold-9700.jpg" },
+            { id: 91, name: "nordic love decorative clock golden", price: 9500, image: "nordic-love-decorative-clock-golden-9500.jpg" },
+            { id: 92, name: "nordic welcome decorative clock", price: 10000, image: "nordic-welcome-decorative-clock-10000.jpg" },
+            { id: 93, name: "patterned inflatable sofa with footrest", price: 26500, image: "patterned-inflatable-sofa-with-footrest-26500.jpg" },
+            { id: 94, name: "patterned inflatable sofa with footrest", price: 27000, image: "patterned-inflatable-sofa-with-footrest-27000.jpg" },
+            { id: 95, name: "phalaenopsis decorative potted flower", price: 3500, image: "phalaenopsis-decorative-potted-flower-3500.jpg" },
+            { id: 96, name: "pyramid triangle lamp wicker light", price: 5000, image: "pyramid-triangle-lamp-wicker-light-5000.jpg" },
+            { id: 97, name: "ripples center table", price: 70000, image: "ripples-center-table-70000.jpg" }
         ];
 
         // Format product names to Title Case
@@ -1090,32 +1084,55 @@
         let currentPage = 1;
         const itemsPerPage = 12;
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let likedProducts = JSON.parse(localStorage.getItem('likedProducts')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        let filteredProducts = [...products];
 
         // DOM Elements
         const productsGrid = document.getElementById('productsGrid');
         const pagination = document.getElementById('pagination');
         const searchBar = document.getElementById('searchBar');
-        const cartIcon = document.getElementById('cartIcon');
-        const cartDropdown = document.getElementById('cartDropdown');
-        const cartItems = document.getElementById('cartItems');
-        const cartTotal = document.getElementById('cartTotal');
-        const cartClose = document.getElementById('cartClose');
-        const whatsappOrderBtn = document.getElementById('whatsappOrderBtn');
+        const minPriceInput = document.getElementById('minPrice');
+        const maxPriceInput = document.getElementById('maxPrice');
+        const sortBySelect = document.getElementById('sortBy');
+        const wishlistIcon = document.getElementById('wishlistIcon');
+        const wishlistPanel = document.getElementById('wishlistPanel');
+        const wishlistOverlay = document.getElementById('wishlistOverlay');
+        const closeWishlist = document.querySelector('.close-wishlist');
+        const wishlistItems = document.getElementById('wishlistItems');
+        const wishlistCount = document.getElementById('wishlistCount');
+        const cartCount = document.getElementById('cartCount');
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', () => {
             renderProducts();
-            setupCarousel();
+            updateWishlistCount();
             updateCartCount();
         });
 
         // Render products to the grid
         function renderProducts() {
             const searchTerm = searchBar.value.toLowerCase();
-            const filteredProducts = products.filter(product => 
-                product.name.toLowerCase().includes(searchTerm)
+            const minPrice = minPriceInput.value ? parseInt(minPriceInput.value) : 0;
+            const maxPrice = maxPriceInput.value ? parseInt(maxPriceInput.value) : Number.MAX_SAFE_INTEGER;
+            
+            // Filter products
+            filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) &&
+                product.price >= minPrice && 
+                product.price <= maxPrice
             );
+            
+            // Sort products
+            const sortValue = sortBySelect.value;
+            if (sortValue === 'price-asc') {
+                filteredProducts.sort((a, b) => a.price - b.price);
+            } else if (sortValue === 'price-desc') {
+                filteredProducts.sort((a, b) => b.price - a.price);
+            } else if (sortValue === 'name-asc') {
+                filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortValue === 'name-desc') {
+                filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+            }
             
             const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
             const startIndex = (currentPage - 1) * itemsPerPage;
@@ -1127,7 +1144,7 @@
             // Add products to the grid
             paginatedProducts.forEach(product => {
                 const fakePrice = Math.round(product.price * (1 + 0.1 + Math.random() * 0.4));
-                const isLiked = likedProducts.includes(product.id);
+                const isInWishlist = wishlist.some(item => item.id === product.id);
                 const availability = Math.random() > 0.7 ? 'In Stock' : `Only ${Math.floor(Math.random() * 5) + 1} left!`;
                 
                 const productCard = document.createElement('div');
@@ -1135,10 +1152,7 @@
                 productCard.innerHTML = `
                     <div class="product-image">
                         <div class="product-badge">NEW</div>
-                        <button class="like-btn ${isLiked ? 'active' : ''}" data-id="${product.id}">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                        <img src="assets/images/household/${product.image}" alt="${product.name}" loading="lazy">
+                        <img src="assets/images/household2/${product.image}" alt="${product.name}" loading="lazy">
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">${product.name}</h3>
@@ -1162,8 +1176,11 @@
                             <button class="cart-btn" data-id="${product.id}">
                                 <i class="fas fa-shopping-cart"></i> Add to Cart
                             </button>
+                            <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}">
+                                <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Wishlist'}
+                            </button>
                             <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20${encodeURIComponent(product.name)}" class="whatsapp-btn" target="_blank">
-                                <i class="fab fa-whatsapp"></i> WhatsApp
+                                <i class="fab fa-whatsapp"></i> WhatsApp Order
                             </a>
                         </div>
                     </div>
@@ -1182,19 +1199,51 @@
         function renderPagination(totalPages) {
             pagination.innerHTML = '';
             
-            for (let i = 1; i <= totalPages; i++) {
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            // Previous button
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'page-btn';
+                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                prevBtn.addEventListener('click', () => {
+                    currentPage--;
+                    renderProducts();
+                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
+                });
+                pagination.appendChild(prevBtn);
+            }
+            
+            // Page buttons
+            for (let i = startPage; i <= endPage; i++) {
                 const pageBtn = document.createElement('button');
                 pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
                 pageBtn.textContent = i;
                 pageBtn.addEventListener('click', () => {
                     currentPage = i;
                     renderProducts();
-                    window.scrollTo({
-                        top: productsGrid.offsetTop - 100,
-                        behavior: 'smooth'
-                    });
+                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
                 });
                 pagination.appendChild(pageBtn);
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'page-btn';
+                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                nextBtn.addEventListener('click', () => {
+                    currentPage++;
+                    renderProducts();
+                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
+                });
+                pagination.appendChild(nextBtn);
             }
         }
 
@@ -1225,24 +1274,6 @@
                 });
             });
             
-            // Like buttons
-            document.querySelectorAll('.like-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    this.classList.toggle('active');
-                    
-                    if (this.classList.contains('active')) {
-                        if (!likedProducts.includes(productId)) {
-                            likedProducts.push(productId);
-                        }
-                    } else {
-                        likedProducts = likedProducts.filter(id => id !== productId);
-                    }
-                    
-                    localStorage.setItem('likedProducts', JSON.stringify(likedProducts));
-                });
-            });
-            
             // Add to Cart buttons
             document.querySelectorAll('.cart-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1251,6 +1282,92 @@
                     const quantity = parseInt(this.closest('.product-details').querySelector('.quantity').textContent);
                     
                     addToCart(product, quantity);
+                });
+            });
+            
+            // Wishlist buttons
+            document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    
+                    if (this.classList.contains('active')) {
+                        removeFromWishlist(productId);
+                        this.classList.remove('active');
+                        this.innerHTML = '<i class="fas fa-heart"></i> Wishlist';
+                    } else {
+                        addToWishlist(product);
+                        this.classList.add('active');
+                        this.innerHTML = '<i class="fas fa-heart"></i> In Wishlist';
+                    }
+                });
+            });
+        }
+
+        // Wishlist functions
+        function addToWishlist(product) {
+            if (!wishlist.some(item => item.id === product.id)) {
+                wishlist.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image
+                });
+                
+                localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                updateWishlistCount();
+                renderWishlistItems();
+            }
+        }
+
+        function removeFromWishlist(productId) {
+            wishlist = wishlist.filter(item => item.id !== productId);
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            updateWishlistCount();
+            renderWishlistItems();
+        }
+
+        function updateWishlistCount() {
+            wishlistCount.textContent = wishlist.length;
+        }
+
+        function renderWishlistItems() {
+            wishlistItems.innerHTML = '';
+            
+            if (wishlist.length === 0) {
+                wishlistItems.innerHTML = '<div class="wishlist-empty">Your wishlist is empty</div>';
+                return;
+            }
+            
+            wishlist.forEach(item => {
+                const wishlistItem = document.createElement('div');
+                wishlistItem.className = 'wishlist-item';
+                wishlistItem.innerHTML = `
+                    <div class="wishlist-item-image">
+                        <img src="assets/images/household2/${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="wishlist-item-details">
+                        <div class="wishlist-item-name">${item.name}</div>
+                        <div class="wishlist-item-price">₦${item.price.toLocaleString()}</div>
+                    </div>
+                    <button class="wishlist-item-remove" data-id="${item.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                wishlistItems.appendChild(wishlistItem);
+            });
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.wishlist-item-remove').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    removeFromWishlist(productId);
+                    
+                    // Also update the product card button
+                    document.querySelectorAll(`.wishlist-btn[data-id="${productId}"]`).forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.innerHTML = '<i class="fas fa-heart"></i> Wishlist';
+                    });
                 });
             });
         }
@@ -1282,7 +1399,7 @@
                 bottom: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                background: var(--gold);
+                background: var(--gold-primary);
                 color: white;
                 padding: 10px 20px;
                 border-radius: 30px;
@@ -1298,132 +1415,48 @@
 
         function updateCartCount() {
             const count = cart.reduce((total, item) => total + item.quantity, 0);
-            document.querySelector('.cart-count').textContent = count;
+            cartCount.textContent = count;
         }
 
-        function renderCartItems() {
-            cartItems.innerHTML = '';
-            
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
-                cartTotal.textContent = '₦0';
-                return;
-            }
-            
-            let total = 0;
-            
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <div class="cart-item-image">
-                        <img src="assets/images/household/${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="cart-item-details">
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">₦${item.price.toLocaleString()}</div>
-                        <div class="cart-item-quantity">
-                            <span>Qty: ${item.quantity}</span>
-                            <span>Total: ₦${itemTotal.toLocaleString()}</span>
-                        </div>
-                    </div>
-                    <button class="cart-item-remove" data-id="${item.id}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-                cartItems.appendChild(cartItem);
-            });
-            
-            cartTotal.textContent = `₦${total.toLocaleString()}`;
-            
-            // Add event listeners to remove buttons
-            document.querySelectorAll('.cart-item-remove').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    removeFromCart(productId);
-                });
-            });
-        }
-
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            renderCartItems();
-        }
-
-        // Setup carousel
-        function setupCarousel() {
-            const carouselInner = document.getElementById('carouselInner');
-            const controls = document.querySelectorAll('.carousel-control');
-            let currentIndex = 0;
-            
-            function goToSlide(index) {
-                carouselInner.style.transform = `translateX(-${index * 100}%)`;
-                controls.forEach((ctrl, i) => {
-                    ctrl.classList.toggle('active', i === index);
-                });
-                currentIndex = index;
-            }
-            
-            controls.forEach((ctrl, index) => {
-                ctrl.addEventListener('click', () => goToSlide(index));
-            });
-            
-            // Auto slide
-            setInterval(() => {
-                const nextIndex = (currentIndex + 1) % controls.length;
-                goToSlide(nextIndex);
-            }, 5000);
-        }
-
-        // Cart toggle
-        cartIcon.addEventListener('click', (e) => {
-            e.preventDefault();
-            cartDropdown.classList.toggle('active');
-            if (cartDropdown.classList.contains('active')) {
-                renderCartItems();
-            }
-        });
-
-        cartClose.addEventListener('click', () => {
-            cartDropdown.classList.remove('active');
-        });
-
-        // WhatsApp order button
-        whatsappOrderBtn.addEventListener('click', () => {
-            if (cart.length === 0) return;
-            
-            let message = "I'd like to order the following items from JMPOTTERS:%0A%0A";
-            let total = 0;
-            
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                message += `- ${item.name} (Qty: ${item.quantity}) - ₦${itemTotal.toLocaleString()}%0A`;
-            });
-            
-            message += `%0ATotal: ₦${total.toLocaleString()}%0A%0APlease confirm my order.`;
-            
-            const whatsappUrl = `https://wa.me/2348139583320?text=${message}`;
-            window.open(whatsappUrl, '_blank');
-        });
-
-        // Search functionality
+        // Filter and sort event listeners
         searchBar.addEventListener('input', () => {
             currentPage = 1;
             renderProducts();
         });
 
-        // Close cart when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!cartDropdown.contains(e.target) && !cartIcon.contains(e.target) && 
-                cartDropdown.classList.contains('active')) {
-                cartDropdown.classList.remove('active');
-            }
+        minPriceInput.addEventListener('input', () => {
+            currentPage = 1;
+            renderProducts();
+        });
+
+        maxPriceInput.addEventListener('input', () => {
+            currentPage = 1;
+            renderProducts();
+        });
+
+        sortBySelect.addEventListener('change', () => {
+            currentPage = 1;
+            renderProducts();
+        });
+
+        // Wishlist panel toggle
+        wishlistIcon.addEventListener('click', () => {
+            wishlistPanel.classList.add('active');
+            wishlistOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            renderWishlistItems();
+        });
+
+        closeWishlist.addEventListener('click', () => {
+            wishlistPanel.classList.remove('active');
+            wishlistOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        wishlistOverlay.addEventListener('click', () => {
+            wishlistPanel.classList.remove('active');
+            wishlistOverlay.classList.remove('active');
+            document.body.style.overflow = '';
         });
     </script>
 </body>
