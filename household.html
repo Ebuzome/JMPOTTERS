@@ -119,8 +119,19 @@
             gap: 15px;
         }
 
+        .logo-img-container {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--gold-light);
+        }
+
         .logo-img {
-            height: 50px;
+            height: 60px;
         }
 
         .logo {
@@ -134,6 +145,62 @@
 
         .logo span {
             color: var(--gold-primary);
+        }
+
+        /* Navigation */
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 15px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--charcoal);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            position: relative;
+            transition: var(--transition);
+            padding: 8px 15px;
+            border-radius: 30px;
+        }
+
+        .nav-links a i {
+            color: var(--gold-primary);
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .nav-links a:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-dark);
+        }
+
+        .nav-links a:hover i {
+            transform: translateY(-3px);
+            color: var(--gold-dark);
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--gold-primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
         }
 
         .header-icons {
@@ -170,11 +237,178 @@
             font-weight: 600;
         }
 
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--charcoal);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mobile-toggle:hover {
+            color: var(--gold-primary);
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 85%;
+            max-width: 320px;
+            height: 100vh;
+            background: rgba(254, 250, 240, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1100;
+            transition: var(--transition);
+            overflow-y: auto;
+            padding: 30px;
+            border-left: 2px solid var(--gold-primary);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-nav.active {
+            right: 0;
+        }
+
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gold-light);
+        }
+
+        .close-nav {
+            background: none;
+            border: none;
+            color: var(--charcoal);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-nav:hover {
+            color: var(--gold-primary);
+            transform: rotate(90deg);
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 15px;
+        }
+
+        .mobile-nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--charcoal);
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-links a i {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            width: 30px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-links a:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-dark);
+            padding-left: 20px;
+        }
+
+        .mobile-nav-links a:hover i {
+            transform: scale(1.2);
+            color: var(--gold-dark);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), 
+                        url('assets/images/household2/dada-design.jpg');
+            background-size: cover;
+            background-position: center;
+            margin-top: 80px;
+            animation: zoomIn 20s ease-in-out forwards;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(1.1); }
+            to { transform: scale(1); }
+        }
+
+        .hero-content {
+            max-width: 700px;
+            color: white;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+            padding: 0 20px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            color: var(--gold-light);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
         /* Filters Section */
         .filters-section {
             background: var(--cream-medium);
             padding: 30px 0;
-            margin-top: 80px;
             border-bottom: 1px solid var(--gold-light);
         }
 
@@ -627,22 +861,6 @@
             transform: scale(1.2);
         }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1050;
-            display: none;
-            backdrop-filter: blur(5px);
-        }
-
-        .overlay.active {
-            display: block;
-        }
-
         /* Footer */
         footer {
             background: #f0e9d9;
@@ -736,7 +954,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: #25D366;
+            background: #25d366;
             color: white;
             display: flex;
             align-items: center;
@@ -759,6 +977,26 @@
             100% { transform: translateY(0px); }
         }
 
+        /* Bottom Left Logo */
+        .corner-logo {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--gold-light);
+            z-index: 99;
+            box-shadow: var(--shadow);
+        }
+        
+        .corner-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         /* Responsive Design */
         @media (max-width: 1200px) {
             .footer-content {
@@ -767,6 +1005,14 @@
             
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-toggle {
+                display: block;
             }
         }
 
@@ -806,6 +1052,10 @@
             .wishlist-panel {
                 width: 90%;
             }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
         }
 
         @media (max-width: 576px) {
@@ -831,6 +1081,10 @@
                 height: 35px;
                 font-size: 0.9rem;
             }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
@@ -839,9 +1093,32 @@
     <header id="header">
         <div class="container header-container">
             <div class="logo-container">
-                <img src="assets/images/logo-1.jpg" alt="JM POTTERS Logo" class="logo-img">
+                <div class="logo-img-container">
+                    <img src="assets/images/logo-1.jpg" alt="JM POTTERS Logo" class="logo-img">
+                </div>
                 <a href="index.html" class="logo">JMPOTTERS<span>.</span></a>
             </div>
+            
+            <!-- Desktop Navigation -->
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="shop/products.html"><i class="fas fa-shopping-bag"></i> Shop</a></li>
+                <li><a href="footwear.html"><i class="fas fa-shoe-prints"></i> Footwear</a></li>
+                <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
+                <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
+                <li><a href="beauty.html"><i class="fas fa-spa"></i> Beauty</a></li>
+                <li><a href="skincare.html"><i class="fas fa-soap"></i> Skincare</a></li>
+                <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
+                <li><a href="watches.html"><i class="fas fa-clock"></i> Watches</a></li>
+                <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
+                <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
+                <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
+                <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
+            </ul>
+            
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
             
             <div class="header-icons">
                 <div class="header-icon" id="wishlistIcon">
@@ -856,19 +1133,42 @@
         </div>
     </header>
 
-    <!-- Wishlist Panel -->
-    <div class="overlay" id="wishlistOverlay"></div>
-    <div class="wishlist-panel" id="wishlistPanel">
-        <div class="wishlist-header">
-            <h3 class="wishlist-title">Your Wishlist</h3>
-            <button class="close-wishlist">
+    <!-- Mobile Navigation -->
+    <div class="overlay" id="navOverlay"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <div class="logo">JMPOTTERS<span>.</span></div>
+            <button class="close-nav">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <div class="wishlist-items" id="wishlistItems">
-            <div class="wishlist-empty">Your wishlist is empty</div>
-        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="shop/products.html"><i class="fas fa-shopping-bag"></i> Shop</a></li>
+            <li><a href="footwear.html"><i class="fas fa-shoe-prints"></i> Footwear</a></li>
+            <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
+            <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
+            <li><a href="beauty.html"><i class="fas fa-spa"></i> Beauty</a></li>
+            <li><a href="skincare.html"><i class="fas fa-soap"></i> Skincare</a></li>
+            <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
+            <li><a href="watches.html"><i class="fas fa-clock"></i> Watches</a></li>
+            <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
+            <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
+            <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
+            <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
+        </ul>
     </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Premium Household Essentials</h1>
+                <p>Elevate your home with our curated collection of luxury household items, designed for both style and functionality</p>
+                <a href="#products" class="btn">Shop Collection</a>
+            </div>
+        </div>
+    </section>
 
     <!-- Filters Section -->
     <section class="filters-section">
@@ -905,7 +1205,7 @@
     </section>
 
     <!-- Product Gallery -->
-    <section class="product-gallery">
+    <section class="product-gallery" id="products">
         <div class="container">
             <h2 class="section-title">Premium Household Collection</h2>
             <div class="products-grid" id="productsGrid">
@@ -916,6 +1216,20 @@
             </div>
         </div>
     </section>
+
+    <!-- Wishlist Panel -->
+    <div class="wishlist-overlay" id="wishlistOverlay"></div>
+    <div class="wishlist-panel" id="wishlistPanel">
+        <div class="wishlist-header">
+            <h3 class="wishlist-title">Your Wishlist</h3>
+            <button class="close-wishlist">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="wishlist-items" id="wishlistItems">
+            <div class="wishlist-empty">Your wishlist is empty</div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer>
@@ -970,6 +1284,11 @@
     <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
+
+    <!-- Bottom Left Logo -->
+    <div class="corner-logo">
+        <img src="assets/images/logo-1.jpg" alt="JM POTTERS Logo">
+    </div>
 
     <script>
         // Product data from filenames
@@ -1101,6 +1420,10 @@
         const wishlistItems = document.getElementById('wishlistItems');
         const wishlistCount = document.getElementById('wishlistCount');
         const cartCount = document.getElementById('cartCount');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const mobileNav = document.getElementById('mobileNav');
+        const navOverlay = document.getElementById('navOverlay');
+        const closeNav = document.querySelector('.close-nav');
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', () => {
@@ -1158,7 +1481,7 @@
                         <h3 class="product-title">${product.name}</h3>
                         <div class="product-price">
                             <span class="current-price">₦${product.price.toLocaleString()}</span>
-                            <span class="old-price">₦${fakePrice.toLocaleString()}</span>
+                            ${product.price >= 8000 ? `<span class="old-price">₦${fakePrice.toLocaleString()}</span>` : ''}
                         </div>
                         <button class="product-toggle">View Details</button>
                     </div>
@@ -1456,6 +1779,25 @@
         wishlistOverlay.addEventListener('click', () => {
             wishlistPanel.classList.remove('active');
             wishlistOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        // Mobile navigation toggle
+        mobileToggle.addEventListener('click', function() {
+            mobileNav.classList.add('active');
+            navOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeNav.addEventListener('click', function() {
+            mobileNav.classList.remove('active');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        navOverlay.addEventListener('click', function() {
+            mobileNav.classList.remove('active');
+            navOverlay.classList.remove('active');
             document.body.style.overflow = '';
         });
     </script>
