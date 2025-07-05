@@ -188,7 +188,8 @@
 
         .logo {
             font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
+            /* Reduced font size from 1.8rem to 1.6rem */
+            font-size: 1.6rem;
             font-weight: 700;
             color: var(--gold-dark);
             text-decoration: none;
@@ -990,6 +991,7 @@
             gap: 10px;
         }
 
+        /* REMOVED: Continue Shopping button */
         .checkout-btn {
             background: var(--gold-primary);
             color: white;
@@ -1006,23 +1008,6 @@
 
         .checkout-btn:hover {
             background: var(--gold-dark);
-            transform: translateY(-3px);
-        }
-
-        .continue-shopping {
-            background: transparent;
-            color: var(--charcoal);
-            border: 1px solid #ddd;
-            padding: 12px;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: none;
-            transition: var(--transition);
-            text-align: center;
-        }
-
-        .continue-shopping:hover {
-            background: #f5f5f5;
             transform: translateY(-3px);
         }
 
@@ -1408,11 +1393,11 @@
                 <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
                 <li><a href="beauty.html"><i class="fas fa-spa"></i> Beauty</a></li>
                 <li><a href="skincare.html"><i class="fas fa-soap"></i> Skincare</a></li>
-                <极> <a href="household.html"><i class="fas fa-home"></i> Household</a></li>
+                <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
                 <li><a href="watches.html"><i class="fas fa-clock"></i> Watches</a></li>
                 <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
                 <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
-                <li><a href="blog/blog.html"><i class="fas fa-blog"></极> Blog</a></li>
+                <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
                 <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
             </ul>
             
@@ -1466,7 +1451,7 @@
                 <h1>Premium Household Essentials</h1>
                 <p>Elevate your home with our curated collection of luxury household items, designed for both style and functionality</p>
                 <a href="#products" class="btn">Shop Collection</a>
-            </极>
+            </div>
         </div>
     </section>
 
@@ -1534,8 +1519,8 @@
             <span id="cartTotal">₦0</span>
         </div>
         <div class="cart-actions">
-            <a href="#" id="whatsappCheckout" class="checkout-btn">Proceed to Checkout via WhatsApp</a>
-            <button class="continue-shopping">Continue Shopping</button>
+            <!-- Removed: Continue Shopping button -->
+            <a href="#" class="checkout-btn" id="whatsappCheckout">Proceed to Checkout</a>
         </div>
     </div>
 
@@ -1620,7 +1605,7 @@
             { id: 3, name: "3kg burner control and stand", price: 3700, image: "3kg-burnercontrol-and-stand-3700.jpg" },
             { id: 4, name: "bathroom brush", price: 2500, image: "bathroom-brush-2500.jpg" },
             { id: 5, name: "bluey top", price: 4300, image: "bluey-top-4300.jpg" },
-            { id: 6, name: "cat fan", price: 3500, image极: "cat-fan-3500.jpg" },
+            { id: 6, name: "cat fan", price: 3500, image: "cat-fan-3500.jpg" },
             { id: 7, name: "cloth rope", price: 1500, image: "cloth-rope-1500.jpg" },
             { id: 8, name: "cold water bottle", price: 900, image: "cold-water-bottle-900.jpg" },
             { id: 9, name: "container set 3 in one", price: 4200, image: "container-set-3-in-one-4200.jpg" },
@@ -1643,7 +1628,7 @@
             { id: 26, name: "mini storage drawers", price: 6000, image: "mini-storage-drawers-6000.jpg" },
             { id: 27, name: "morocco basket", price: 1000, image: "morocco-basket-1000.jpg" },
             { id: 28, name: "non stick desktop gas", price: 20000, image: "non-stick-desktop-gas-20000.jpg" },
-            { id: 29, name: "oily glue", price: 极400, image: "oily-glue-1400.jpg" },
+            { id: 29, name: "oily glue", price: 1400, image: "oily-glue-1400.jpg" },
             { id: 30, name: "phone hanger", price: 2400, image: "phone-hanger-2400.jpg" },
             { id: 31, name: "plastic bowl stack", price: 2000, image: "plastic-bowl-stack-2000.jpg" },
             { id: 32, name: "plastic storage bin", price: 3800, image: "plastic-storage-bin-3800.jpg" },
@@ -1703,7 +1688,7 @@
             { id: 86, name: "minimalist center rug", price: 30000, image: "minimalist-center-rug-30000.jpg" },
             { id: 87, name: "modern center rug", price: 30000, image: "modern-center-rug-30000.jpg" },
             { id: 88, name: "multifunctional household vegetable cutter", price: 5500, image: "multifunctional-household-vegetable-cutter-5500.jpg" },
-            { id: 89, name: "nordic love decorative clock black", price: 9000, image: "nordic-love-decorative-clock-black-9000极.jpg" },
+            { id: 89, name: "nordic love decorative clock black", price: 9000, image: "nordic-love-decorative-clock-black-9000.jpg" },
             { id: 90, name: "nordic love decorative clock gold", price: 9700, image: "nordic-love-decorative-clock-gold-9700.jpg" },
             { id: 91, name: "nordic love decorative clock golden", price: 9500, image: "nordic-love-decorative-clock-golden-9500.jpg" },
             { id: 92, name: "nordic welcome decorative clock", price: 10000, image: "nordic-welcome-decorative-clock-10000.jpg" },
@@ -1748,13 +1733,13 @@
         const closeCart = document.querySelector('.close-cart');
         const cartItems = document.getElementById('cartItems');
         const cartTotal = document.getElementById('cartTotal');
-        const whatsappCheckout = document.getElementById('whatsappCheckout');
         const mobileToggle = document.getElementById('mobileToggle');
         const mobileNav = document.getElementById('mobileNav');
         const navOverlay = document.getElementById('navOverlay');
         const closeNav = document.querySelector('.close-nav');
         const cursor = document.querySelector('.cursor');
         const cursorFollower = document.querySelector('.cursor-follower');
+        const whatsappCheckout = document.getElementById('whatsappCheckout');
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', () => {
@@ -1762,7 +1747,6 @@
             updateWishlistCount();
             updateCartCount();
             updateCartTotal();
-            updateWhatsappCheckoutLink();
             
             // Initialize custom cursor
             if (window.innerWidth > 768) {
@@ -1789,7 +1773,7 @@
         function moveCursor(e) {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
-            cursorFollower.style.left = e.clientX + '极x';
+            cursorFollower.style.left = e.clientX + 'px';
             cursorFollower.style.top = e.clientY + 'px';
         }
 
@@ -2044,7 +2028,7 @@
                         <img src="assets/images/household2/${item.image}" alt="${item.name}">
                     </div>
                     <div class="wishlist-item-details">
-                        <div class极="wishlist-item-name">${item.name}</div>
+                        <div class="wishlist-item-name">${item.name}</div>
                         <div class="wishlist-item-price">₦${item.price.toLocaleString()}</div>
                     </div>
                     <button class="wishlist-item-remove" data-id="${item.id}">
@@ -2089,7 +2073,6 @@
             updateCartCount();
             updateCartTotal();
             renderCartItems();
-            updateWhatsappCheckoutLink();
             
             // Show confirmation
             showNotification(`${quantity} ${product.name} added to cart!`);
@@ -2157,6 +2140,9 @@
                     updateCartItemQuantity(productId, 1);
                 });
             });
+            
+            // Update WhatsApp checkout link
+            updateWhatsAppCheckoutLink();
         }
 
         function removeFromCart(productId) {
@@ -2165,7 +2151,6 @@
             updateCartCount();
             updateCartTotal();
             renderCartItems();
-            updateWhatsappCheckoutLink();
         }
 
         function updateCartItemQuantity(productId, change) {
@@ -2179,26 +2164,27 @@
                     updateCartCount();
                     updateCartTotal();
                     renderCartItems();
-                    updateWhatsappCheckoutLink();
                 }
             }
         }
-
-        function updateWhatsappCheckoutLink() {
+        
+        // Generate WhatsApp message for checkout
+        function updateWhatsAppCheckoutLink() {
             if (cart.length === 0) {
                 whatsappCheckout.href = "#";
                 return;
             }
             
-            let message = "Hello! I would like to place an order for the following items:\n\n";
-            let total = 0;
+            let message = "I would like to purchase the following items from JMPOTTERS:\n\n";
             
             cart.forEach(item => {
-                message += `- ${item.name} (Quantity: ${item.quantity}) - ₦${(item.price * item.quantity).toLocaleString()}\n`;
-                total += item.price * item.quantity;
+                const itemTotal = item.price * item.quantity;
+                message += `- ${item.name} (${item.quantity} x ₦${item.price.toLocaleString()}) = ₦${itemTotal.toLocaleString()}\n`;
             });
             
-            message += `\nTotal: ₦${total.toLocaleString()}\n\nPlease confirm availability and let me know how to proceed with payment and delivery.`;
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            message += `\n*Total: ₦${total.toLocaleString()}*`;
+            message += "\n\nPlease confirm the order and provide delivery details.";
             
             whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(message)}`;
         }
@@ -2282,12 +2268,6 @@
         });
 
         cartOverlay.addEventListener('click', () => {
-            cartPanel.classList.remove('active');
-            cartOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        document.querySelector('.continue-shopping').addEventListener('click', () => {
             cartPanel.classList.remove('active');
             cartOverlay.classList.remove('active');
             document.body.style.overflow = '';
