@@ -1906,138 +1906,161 @@
         const slides = document.querySelectorAll('.slide');
 
         // Initialize the page
-        document.addEventListener('DOMContentLoaded', () => {
-            renderProducts();
-            startSlideshow();
-            updateWishlistCount();
-            updateCartCount();
-            updateCartTotal();
-            updateWhatsAppCheckoutLink();
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize section visibility observer
+        initSectionObserver();
+        
+        renderProducts();
+        startSlideshow();
+        updateWishlistCount();
+        updateCartCount();
+        updateCartTotal();
+        updateWhatsAppCheckoutLink();
+        
+        // Initialize custom cursor
+        if (window.innerWidth > 768) {
+            document.addEventListener('mousemove', moveCursor);
+            document.addEventListener('mousedown', cursorClick);
+            document.addEventListener('mouseup', cursorUnclick);
             
-            // Initialize custom cursor
-            if (window.innerWidth > 768) {
-                document.addEventListener('mousemove', moveCursor);
-                document.addEventListener('mousedown', cursorClick);
-                document.addEventListener('mouseup', cursorUnclick);
-                
-                // Add hover effects to interactive elements
-                const interactiveElements = document.querySelectorAll('a, button, .product-toggle, input, select, .page-btn, .quantity-btn');
-                interactiveElements.forEach(el => {
-                    el.addEventListener('mouseenter', () => {
-                        cursor.classList.add('active');
-                        cursorFollower.classList.add('active');
-                    });
-                    el.addEventListener('mouseleave', () => {
-                        cursor.classList.remove('active');
-                        cursorFollower.classList.remove('active');
-                    });
+            // Add hover effects to interactive elements
+            const interactiveElements = document.querySelectorAll('a, button, .product-toggle, input, select, .page-btn, .quantity-btn');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.classList.add('active');
+                    cursorFollower.classList.add('active');
                 });
-            }
-        });
-
-        // Custom cursor functions
-        function moveCursor(e) {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorFollower.style.left = e.clientX + 'px';
-            cursorFollower.style.top = e.clientY + 'px';
-        }
-
-        function cursorClick() {
-            cursor.classList.add('click');
-            cursorFollower.classList.add('click');
-        }
-
-        function cursorUnclick() {
-            cursor.classList.remove('click');
-            cursorFollower.classList.remove('click');
-        }
-
-        // Render products to the grid
-        function renderProducts() {
-            const searchTerm = searchBar.value.toLowerCase();
-            const minPrice = minPriceInput.value ? parseInt(minPriceInput.value) : 0;
-            const maxPrice = maxPriceInput.value ? parseInt(maxPriceInput.value) : Number.MAX_SAFE_INTEGER;
-            
-            // Filter products
-            filteredProducts = products.filter(product => 
-                product.name.toLowerCase().includes(searchTerm) &&
-                product.price >= minPrice && 
-                product.price <= maxPrice
-            );
-            
-            // Sort products
-            const sortValue = sortBySelect.value;
-            if (sortValue === 'price-asc') {
-                filteredProducts.sort((a, b) => a.price - b.price);
-            } else if (sortValue === 'price-desc') {
-                filteredProducts.sort((a, b) => b.price - a.price);
-            } else if (sortValue === 'name-asc') {
-                filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-            } else if (sortValue === 'name-desc') {
-                filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
-            }
-            
-            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-            
-            // Clear the grid
-            productsGrid.innerHTML = '';
-            
-            // Add products to the grid
-            paginatedProducts.forEach(product => {
-                const fakePrice = Math.round(product.price * (1 + 0.1 + Math.random() * 0.4));
-                const isInWishlist = wishlist.some(item => item.id === product.id);
-                const availability = Math.random() > 0.7 ? 'In Stock' : `Only ${Math.floor(Math.random() * 5) + 1} left!`;
-                
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.innerHTML = `
-                    <div class="product-image">
-                        <div class="product-badge">NEW</div>
-                        <img src="assets/images/kids/${product.image}" alt="${product.name}" loading="lazy">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">${product.name}</h3>
-                        <div class="product-price">
-                            <span class="current-price">₦${product.price.toLocaleString()}</span>
-                            ${product.price >= 8000 ? `<span class="old-price">₦${fakePrice.toLocaleString()}</span>` : ''}
-                        </div>
-                        <button class="product-toggle">View Details</button>
-                    </div>
-                    <div class="product-details">
-                        <p class="product-description">Premium quality kids item designed for durability and comfort. Perfect for your little ones.</p>
-                        <div class="availability">
-                            <i class="fas fa-check-circle"></i> ${availability}
-                        </div>
-                        <div class="quantity-controls">
-                            <button class="quantity-btn minus">-</button>
-                            <span class="quantity">1</span>
-                            <button class="quantity-btn plus">+</button>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="cart-btn" data-id="${product.id}">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
-                            </button>
-                            <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}">
-                                <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Wishlist'}
-                            </button>
-                            <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20${encodeURIComponent(product.name)}" class="whatsapp-btn" target="_blank">
-                                <i class="fab fa-whatsapp"></i> WhatsApp Order
-                            </a>
-                        </div>
-                    </div>
-                `;
-                productsGrid.appendChild(productCard);
+                el.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('active');
+                    cursorFollower.classList.remove('active');
+                });
             });
-            
-            // Setup event listeners for the new products
-            setupProductInteractions();
-            
-            // Render pagination
-            renderPagination(totalPages);
         }
+    });
+
+    // Initialize Intersection Observer for sections
+    function initSectionObserver() {
+        const sections = document.querySelectorAll('section');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+        
+        // Force hero section to be visible immediately
+        document.querySelector('.hero').classList.add('visible');
+    }
+
+    // Custom cursor functions
+    function moveCursor(e) {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+        cursorFollower.style.left = e.clientX + 'px';
+        cursorFollower.style.top = e.clientY + 'px';
+    }
+
+    function cursorClick() {
+        cursor.classList.add('click');
+        cursorFollower.classList.add('click');
+    }
+
+    function cursorUnclick() {
+        cursor.classList.remove('click');
+        cursorFollower.classList.remove('click');
+    }
+
+    // Render products to the grid
+    function renderProducts() {
+        const searchTerm = searchBar.value.toLowerCase();
+        const minPrice = minPriceInput.value ? parseInt(minPriceInput.value) : 0;
+        const maxPrice = maxPriceInput.value ? parseInt(maxPriceInput.value) : Number.MAX_SAFE_INTEGER;
+        
+        // Filter products
+        filteredProducts = products.filter(product => 
+            product.name.toLowerCase().includes(searchTerm) &&
+            product.price >= minPrice && 
+            product.price <= maxPrice
+        );
+        
+        // Sort products
+        const sortValue = sortBySelect.value;
+        if (sortValue === 'price-asc') {
+            filteredProducts.sort((a, b) => a.price - b.price);
+        } else if (sortValue === 'price-desc') {
+            filteredProducts.sort((a, b) => b.price - a.price);
+        } else if (sortValue === 'name-asc') {
+            filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortValue === 'name-desc') {
+            filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+        }
+        
+        const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+        
+        // Clear the grid
+        productsGrid.innerHTML = '';
+        
+        // Add products to the grid
+        paginatedProducts.forEach(product => {
+            const fakePrice = Math.round(product.price * (1 + 0.1 + Math.random() * 0.4));
+            const isInWishlist = wishlist.some(item => item.id === product.id);
+            const availability = Math.random() > 0.7 ? 'In Stock' : `Only ${Math.floor(Math.random() * 5) + 1} left!`;
+            
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+                <div class="product-image">
+                    <div class="product-badge">NEW</div>
+                    <img src="assets/images/kids/${product.image}" alt="${product.name}" loading="lazy">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <div class="product-price">
+                        <span class="current-price">₦${product.price.toLocaleString()}</span>
+                        ${product.price >= 8000 ? `<span class="old-price">₦${fakePrice.toLocaleString()}</span>` : ''}
+                    </div>
+                    <button class="product-toggle">View Details</button>
+                </div>
+                <div class="product-details">
+                    <p class="product-description">Premium quality kids item designed for durability and comfort. Perfect for your little ones.</p>
+                    <div class="availability">
+                        <i class="fas fa-check-circle"></i> ${availability}
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus">-</button>
+                        <span class="quantity">1</span>
+                        <button class="quantity-btn plus">+</button>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="cart-btn" data-id="${product.id}">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}">
+                            <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Wishlist'}
+                        </button>
+                        <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20${encodeURIComponent(product.name)}" class="whatsapp-btn" target="_blank">
+                            <i class="fab fa-whatsapp"></i> WhatsApp Order
+                        </a>
+                    </div>
+                </div>
+            `;
+            productsGrid.appendChild(productCard);
+        });
+        
+        // Setup event listeners for the new products
+        setupProductInteractions();
+        
+        // Render pagination
+        renderPagination(totalPages);
+    }
 
         // Render pagination controls
         function renderPagination(totalPages) {
@@ -2388,25 +2411,25 @@
         }
 
         // Filter and sort event listeners
-        searchBar.addEventListener('input', () => {
-            currentPage = 1;
-            renderProducts();
-        });
+    searchBar.addEventListener('input', () => {
+        currentPage = 1;
+        renderProducts();
+    });
 
-        minPriceInput.addEventListener('input', () => {
-            currentPage = 1;
-            renderProducts();
-        });
+    minPriceInput.addEventListener('input', () => {
+        currentPage = 1;
+        renderProducts();
+    });
 
-        maxPriceInput.addEventListener('input', () => {
-            currentPage = 1;
-            renderProducts();
-        });
+    maxPriceInput.addEventListener('input', () => {
+        currentPage = 1;
+        renderProducts();
+    });
 
-        sortBySelect.addEventListener('change', () => {
-            currentPage = 1;
-            renderProducts();
-        });
+    sortBySelect.addEventListener('change', () => {
+        currentPage = 1;
+        renderProducts();
+    });
 
         // Wishlist panel toggle
         wishlistIcon.addEventListener('click', () => {
