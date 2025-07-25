@@ -10,11 +10,11 @@
     <style>
         /* === GLOBAL STYLES === */
         :root {
-            --purple-dark: #3a0ca3;
-            --purple: #7209b7;
-            --purple-light: #b5179e;
-            --pink: #f72585;
-            --pink-light: #ff70a6;
+            --magenta-dark: #A00055;
+            --magenta: #D90077;
+            --magenta-light: #FF3399;
+            --orange: #FF6600;
+            --orange-light: #FF8833;
             --gold: #ffd166;
             --gold-light: #ffea9e;
             --black: #000;
@@ -74,7 +74,7 @@
             transform: translateX(-50%);
             width: 100px;
             height: 3px;
-            background: linear-gradient(90deg, var(--purple), var(--pink), var(--gold));
+            background: linear-gradient(90deg, var(--magenta), var(--orange), var(--gold));
         }
 
         .btn {
@@ -134,7 +134,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--purple-dark);
+            background: var(--magenta-dark);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -195,7 +195,7 @@
         }
 
         header.scrolled {
-            background: rgba(58, 12, 163, 0.9);
+            background: rgba(217, 0, 119, 0.9); /* Magenta */
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
 
@@ -223,14 +223,14 @@
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--purple-dark);
+            color: var(--magenta-dark);
             text-decoration: none;
             letter-spacing: 1px;
             transition: var(--transition);
         }
 
         .logo:hover {
-            color: var(--pink);
+            color: var(--orange);
         }
 
         /* Navigation */
@@ -264,7 +264,7 @@
         }
 
         .nav-links a:hover {
-            color: var(--pink);
+            color: var(--orange);
         }
 
         .nav-links a:after {
@@ -274,7 +274,7 @@
             left: 0;
             width: 0;
             height: 2px;
-            background: var(--pink);
+            background: var(--orange);
             transition: var(--transition);
         }
 
@@ -317,8 +317,8 @@
         }
 
         .dropdown-content a:hover {
-            background: rgba(247, 37, 133, 0.1);
-            color: var(--pink);
+            background: rgba(255, 102, 0, 0.1);
+            color: var(--orange);
         }
 
         .dropdown-content a i {
@@ -341,7 +341,7 @@
         }
 
         .header-icon:hover {
-            color: var(--pink);
+            color: var(--orange);
             transform: translateY(-3px);
         }
 
@@ -349,7 +349,7 @@
             position: absolute;
             top: -8px;
             right: -8px;
-            background: var(--pink);
+            background: var(--orange);
             color: var(--white);
             font-size: 0.7rem;
             width: 20px;
@@ -372,7 +372,7 @@
         }
 
         .mobile-toggle:hover {
-            color: var(--pink);
+            color: var(--orange);
             transform: rotate(90deg);
         }
 
@@ -384,13 +384,13 @@
             width: 85%;
             max-width: 320px;
             height: 100vh;
-            background: rgba(58, 12, 163, 0.95);
+            background: rgba(217, 0, 119, 0.95); /* Magenta */
             backdrop-filter: blur(10px);
             z-index: 1100;
             transition: var(--transition);
             overflow-y: auto;
             padding: 30px;
-            border-left: 2px solid var(--pink);
+            border-left: 2px solid var(--orange);
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
         }
 
@@ -602,9 +602,9 @@
 
         /* === PROMOTIONAL STRIP === */
         .promo-strip {
-            background: linear-gradient(45deg, var(--purple-dark) 25%, var(--purple) 25%, 
-                        var(--purple) 50%, var(--purple-dark) 50%, var(--purple-dark) 75%, 
-                        var(--purple) 75%, var(--purple));
+            background: linear-gradient(45deg, var(--magenta-dark) 25%, var(--magenta) 25%, 
+                        var(--magenta) 50%, var(--magenta-dark) 50%, var(--magenta-dark) 75%, 
+                        var(--magenta) 75%, var(--magenta));
             background-size: 60px 60px;
             padding: 20px 0;
             overflow: hidden;
@@ -680,7 +680,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(255,209,102,0.2) 0%, rgba(247,37,133,0) 70%);
+            background: radial-gradient(circle, rgba(255,209,102,0.2) 0%, rgba(255,102,0,0) 70%);
             z-index: 1;
         }
 
@@ -706,7 +706,7 @@
             position: absolute;
             top: 15px;
             left: 15px;
-            background: var(--pink);
+            background: var(--orange);
             color: var(--white);
             padding: 5px 15px;
             font-size: 0.9rem;
@@ -772,12 +772,65 @@
 
         .sizes {
             font-size: 0.95rem;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: var(--gray);
         }
 
         .sizes span {
             font-weight: 600;
+        }
+
+        /* Quantity selector */
+        .quantity-selector {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .toggle-bulk-options {
+            background: #f8f8f8;
+            border: 1px solid var(--gray-light);
+            padding: 8px 15px;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quantity-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            box-shadow: var(--shadow);
+            z-index: 10;
+            flex-direction: column;
+            border: 1px solid var(--gray-light);
+            border-top: none;
+        }
+
+        .quantity-options.active {
+            display: flex;
+        }
+
+        .quantity-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .quantity-option:hover {
+            background: #f0f0f0;
+        }
+
+        .quantity-option.selected {
+            background: var(--magenta-light);
+            color: var(--white);
         }
 
         .action-buttons {
@@ -801,14 +854,14 @@
         }
 
         .btn-add-cart {
-            background: var(--purple);
+            background: var(--magenta);
             color: var(--white);
         }
 
         .btn-view-details {
             background: var(--white);
-            color: var(--purple);
-            border: 1px solid var(--purple);
+            color: var(--magenta);
+            border: 1px solid var(--magenta);
         }
 
         .btn-add-cart:hover, .btn-view-details:hover {
@@ -817,11 +870,11 @@
         }
 
         .btn-add-cart:hover {
-            background: var(--pink);
+            background: var(--orange);
         }
 
         .btn-view-details:hover {
-            background: var(--purple);
+            background: var(--magenta);
             color: var(--white);
         }
 
@@ -855,15 +908,16 @@
             position: absolute;
             pointer-events: none;
             animation: floatHeart 1s ease-out forwards;
+            z-index: 999;
         }
 
         @keyframes floatHeart {
             0% {
-                transform: translate(0, 0);
+                transform: translate(0, 0) scale(1);
                 opacity: 1;
             }
             100% {
-                transform: translate(var(--tx), var(--ty));
+                transform: translate(var(--tx), var(--ty)) scale(0.1);
                 opacity: 0;
             }
         }
@@ -951,7 +1005,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--purple);
+            background: var(--magenta);
             color: var(--white);
             display: flex;
             align-items: center;
@@ -963,7 +1017,7 @@
         }
 
         .modal-close:hover {
-            background: var(--pink);
+            background: var(--orange);
             transform: rotate(90deg);
         }
 
@@ -1035,9 +1089,9 @@
         }
 
         .size-option:hover, .size-option.selected {
-            background: var(--purple);
+            background: var(--magenta);
             color: var(--white);
-            border-color: var(--purple);
+            border-color: var(--magenta);
         }
 
         .bulk-pricing {
@@ -1082,7 +1136,7 @@
 
         /* Glassmorphism effect */
         .modal-glass {
-            background: rgba(58, 12, 163, 0.4);
+            background: rgba(217, 0, 119, 0.4); /* Magenta */
             backdrop-filter: blur(10px);
             border-radius: 8px;
             padding: 20px;
@@ -1166,7 +1220,7 @@
             width: 45px;
             height: 45px;
             border-radius: 0;
-            border: 1px solid var(--purple);
+            border: 1px solid var(--magenta);
             background: var(--white);
             display: flex;
             align-items: center;
@@ -1177,7 +1231,7 @@
         }
 
         .page-btn:hover, .page-btn.active {
-            background: var(--purple);
+            background: var(--magenta);
             color: var(--white);
             transform: translateY(-3px);
         }
@@ -1192,7 +1246,7 @@
 
         .toast {
             padding: 15px 20px;
-            background: var(--purple);
+            background: var(--magenta);
             color: var(--white);
             border-radius: 8px;
             box-shadow: var(--shadow-dark);
@@ -1262,7 +1316,7 @@
             transition: var(--transition);
             overflow-y: auto;
             padding: 30px;
-            border-left: 3px solid var(--purple);
+            border-left: 3px solid var(--magenta);
         }
 
         .cart-panel.active {
@@ -1280,19 +1334,19 @@
 
         .cart-title {
             font-size: 1.5rem;
-            color: var(--purple);
+            color: var(--magenta);
         }
 
         .close-cart {
             background: none;
             border: none;
-            color: var(--purple);
+            color: var(--magenta);
             font-size: 1.5rem;
             transition: var(--transition);
         }
 
         .close-cart:hover {
-            color: var(--pink);
+            color: var(--orange);
             transform: rotate(90deg);
         }
 
@@ -1337,7 +1391,7 @@
         }
 
         .cart-item-price {
-            color: var(--purple);
+            color: var(--magenta);
             font-weight: 600;
             margin-bottom: 5px;
         }
@@ -1396,7 +1450,7 @@
         }
 
         .checkout-btn {
-            background: var(--purple);
+            background: var(--magenta);
             color: var(--white);
             border: none;
             padding: 12px;
@@ -1410,7 +1464,7 @@
         }
 
         .checkout-btn:hover {
-            background: var(--pink);
+            background: var(--orange);
             transform: translateY(-3px);
         }
 
@@ -1422,7 +1476,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: var(--purple);
+            background: var(--magenta);
             color: var(--white);
             display: flex;
             align-items: center;
@@ -1436,7 +1490,7 @@
 
         .chat-float:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(247, 37, 133, 0.7);
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.7);
         }
 
         .chat-modal {
@@ -1461,7 +1515,7 @@
 
         .chat-header {
             padding: 15px;
-            background: var(--purple);
+            background: var(--magenta);
             color: var(--white);
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
@@ -1480,7 +1534,7 @@
 
         /* === FOOTER === */
         footer {
-            background: var(--purple-dark);
+            background: var(--magenta-dark);
             padding: 80px 0 40px;
             color: var(--white);
         }
@@ -1635,7 +1689,7 @@
 
         .cursor.active {
             transform: translate(-50%, -50%) scale(1.5);
-            background: var(--pink);
+            background: var(--orange);
         }
 
         .particle {
@@ -2188,30 +2242,6 @@
     { user: "LuxuryShopper", rating: 4, text: "Premium materials and craftsmanship. Highly recommended." }
   ];
 
-  // Fake toast messages
-  const toastMessages = [
-    "🛍️ {name} from {location} just bought {quantity} {product} – ₦{amount} 🤑",
-    "🔥 {name} from {location} ordered {quantity} {product} – ₦{amount} ({discount}% OFF)",
-    "🤯 {name} in {location} just added {quantity} {product} to cart 👠",
-    "💸 {name} from {location} purchased {quantity} {product} worth ₦{amount}",
-    "🚀 {name} in {location} just bought {quantity} {product} – great choice!",
-    "👑 {name} from {location} got {quantity} {product} – premium selection!",
-    "🌟 {name} in {location} ordered {quantity} {product} – luxury at its best!",
-    "💼 {name} from {location} purchased {quantity} {product} – perfect for events!",
-    "🎯 {name} in {location} bought {quantity} {product} – perfect fit!",
-    "✨ {name} from {location} just got {quantity} {product} – style upgrade!",
-    "🏆 {name} in {location} purchased {quantity} {product} – winning choice!",
-    "💖 {name} from {location} added {quantity} {product} to their collection 💃",
-    "🛒 {name} in {location} just bought {quantity} {product} – amazing deal!",
-    "👠 {name} from {location} purchased {quantity} {product} – elegant choice!",
-    "💫 {name} in {location} added {quantity} {product} – trending now!"
-  ];
-
-  // Fake names and locations
-  const fakeNames = ["Chinwe", "Aisha", "Fatima", "Ngozi", "Bisi", "Amara", "Zainab", "Funke", "Chika", "Ada"];
-  const fakeLocations = ["Lagos", "Abuja", "Ibadan", "Port Harcourt", "Kano", "Enugu", "Aba", "Owerri", "Benin", "Kaduna"];
-  const fakeProducts = ["Heels", "Sandals", "Flats", "Boots", "Sneakers", "Designer Shoes", "Premium Footwear", "Luxury Heels"];
-
   // ========== INITIALIZE PAGE ========== //
   document.addEventListener('DOMContentLoaded', () => {
     // Initialize preloader
@@ -2326,6 +2356,20 @@
             Sizes Available: <span>36 - 45</span>
           </div>
           
+          <!-- Quantity selector -->
+          <div class="quantity-selector">
+            <button class="toggle-bulk-options">
+              Bulk Options <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="quantity-options">
+              <div class="quantity-option selected" data-qty="1">1 Unit</div>
+              <div class="quantity-option" data-qty="10">10 Units</div>
+              <div class="quantity-option" data-qty="25">25 Units</div>
+              <div class="quantity-option" data-qty="50">50 Units</div>
+              <div class="quantity-option" data-qty="100">100 Units</div>
+            </div>
+          </div>
+          
           <div class="action-buttons">
             <button class="btn-add-cart" data-id="${product.id}">
               <i class="fas fa-shopping-cart"></i> Add to Cart
@@ -2404,10 +2448,14 @@
         const productId = parseInt(this.getAttribute('data-id'));
         const product = products.find(p => p.id === productId);
         
-        addToCart(product, 1);
+        // Get selected quantity
+        const card = this.closest('.product-card');
+        const selectedQty = card.querySelector('.quantity-option.selected');
+        const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
+        
+        addToCart(product, quantity);
         
         // Create flying product animation
-        const card = this.closest('.product-card');
         const cardRect = card.getBoundingClientRect();
         const cartIconRect = cartIcon.getBoundingClientRect();
         
@@ -2443,6 +2491,30 @@
           // Create floating hearts animation
           createFloatingHearts(buttonRect, wishlistIconRect);
         }
+      });
+    });
+    
+    // Toggle bulk options
+    document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const options = this.nextElementSibling;
+        options.classList.toggle('active');
+      });
+    });
+    
+    // Quantity option selection
+    document.querySelectorAll('.quantity-option').forEach(option => {
+      option.addEventListener('click', function() {
+        // Remove selected class from all options
+        this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
+          el.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked option
+        this.classList.add('selected');
+        
+        // Close options
+        this.parentElement.classList.remove('active');
       });
     });
   }
@@ -2545,6 +2617,20 @@
           </div>
         </div>
         
+        <!-- Quantity selector in modal -->
+        <div class="quantity-selector">
+          <button class="toggle-bulk-options">
+            Bulk Options <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="quantity-options">
+            <div class="quantity-option selected" data-qty="1">1 Unit</div>
+            <div class="quantity-option" data-qty="10">10 Units</div>
+            <div class="quantity-option" data-qty="25">25 Units</div>
+            <div class="quantity-option" data-qty="50">50 Units</div>
+            <div class="quantity-option" data-qty="100">100 Units</div>
+          </div>
+        </div>
+        
         <div class="bulk-pricing">
           <div class="size-title">Bulk Purchase Options:</div>
           <table class="bulk-table">
@@ -2561,25 +2647,25 @@
                 <td>10 pcs</td>
                 <td>₦${(product.price * 0.9).toLocaleString()}</td>
                 <td>₦${(product.price * 10 * 0.9).toLocaleString()}</td>
-                <td><span class="bulk-tag">-20%</span></td>
+                <td><span class="bulk-tag">-10%</span></td>
               </tr>
               <tr>
                 <td>25 pcs</td>
                 <td>₦${(product.price * 0.85).toLocaleString()}</td>
                 <td>₦${(product.price * 25 * 0.85).toLocaleString()}</td>
-                <td><span class="bulk-tag">-30%</span></td>
+                <td><span class="bulk-tag">-15%</span></td>
               </tr>
               <tr>
                 <td>50 pcs</td>
                 <td>₦${(product.price * 0.8).toLocaleString()}</td>
                 <td>₦${(product.price * 50 * 0.8).toLocaleString()}</td>
-                <td><span class="bulk-tag">-35%</span></td>
+                <td><span class="bulk-tag">-20%</span></td>
               </tr>
               <tr>
                 <td>100 pcs</td>
                 <td>₦${(product.price * 0.75).toLocaleString()}</td>
                 <td>₦${(product.price * 100 * 0.75).toLocaleString()}</td>
-                <td><span class="bulk-tag">-40%</span></td>
+                <td><span class="bulk-tag">-25%</span></td>
               </tr>
             </tbody>
           </table>
@@ -2639,7 +2725,11 @@
         const productId = parseInt(this.getAttribute('data-id'));
         const product = products.find(p => p.id === productId);
         
-        addToCart(product, 1);
+        // Get selected quantity
+        const selectedQty = document.querySelector('.modal .quantity-option.selected');
+        const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
+        
+        addToCart(product, quantity);
       });
     });
     
@@ -2667,6 +2757,28 @@
       option.addEventListener('click', function() {
         document.querySelectorAll('.size-option').forEach(el => el.classList.remove('selected'));
         this.classList.add('selected');
+      });
+    });
+    
+    // Toggle bulk options in modal
+    document.querySelector('.modal .toggle-bulk-options').addEventListener('click', function() {
+      const options = this.nextElementSibling;
+      options.classList.toggle('active');
+    });
+    
+    // Quantity option selection in modal
+    document.querySelectorAll('.modal .quantity-option').forEach(option => {
+      option.addEventListener('click', function() {
+        // Remove selected class from all options
+        this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
+          el.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked option
+        this.classList.add('selected');
+        
+        // Close options
+        this.parentElement.classList.remove('active');
       });
     });
     
@@ -2971,6 +3083,30 @@
       showFakeToast();
     }, 15000); // Show every 15 seconds
   }
+
+  // Fake toast messages
+  const toastMessages = [
+    "🛍️ {name} from {location} just bought {quantity} {product} – ₦{amount} 🤑",
+    "🔥 {name} from {location} ordered {quantity} {product} – ₦{amount} ({discount}% OFF)",
+    "🤯 {name} in {location} just added {quantity} {product} to cart 👠",
+    "💸 {name} from {location} purchased {quantity} {product} worth ₦{amount}",
+    "🚀 {name} in {location} just bought {quantity} {product} – great choice!",
+    "👑 {name} from {location} got {quantity} {product} – premium selection!",
+    "🌟 {name} in {location} ordered {quantity} {product} – luxury at its best!",
+    "💼 {name} from {location} purchased {quantity} {product} – perfect for events!",
+    "🎯 {name} in {location} bought {quantity} {product} – perfect fit!",
+    "✨ {name} from {location} just got {quantity} {product} – style upgrade!",
+    "🏆 {name} in {location} purchased {quantity} {product} – winning choice!",
+    "💖 {name} from {location} added {quantity} {product} to their collection 💃",
+    "🛒 {name} in {location} just bought {quantity} {product} – amazing deal!",
+    "👠 {name} from {location} purchased {quantity} {product} – elegant choice!",
+    "💫 {name} in {location} added {quantity} {product} – trending now!"
+  ];
+
+  // Fake names and locations
+  const fakeNames = ["Chinwe", "Aisha", "Fatima", "Ngozi", "Bisi", "Amara", "Zainab", "Funke", "Chika", "Ada"];
+  const fakeLocations = ["Lagos", "Abuja", "Ibadan", "Port Harcourt", "Kano", "Enugu", "Aba", "Owerri", "Benin", "Kaduna"];
+  const fakeProducts = ["Heels", "Sandals", "Flats", "Boots", "Sneakers", "Designer Shoes", "Premium Footwear", "Luxury Heels"];
 
   function showFakeToast() {
     const template = toastMessages[Math.floor(Math.random() * toastMessages.length)];
