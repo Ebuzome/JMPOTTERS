@@ -746,13 +746,7 @@
             margin-right: 8px;
         }
 
-        .price-original {
-            font-size: 1rem;
-            color: var(--gray);
-            text-decoration: none;
-        }
-
-        .price-discounted {
+        .price-actual {
             font-size: 1.4rem;
             font-weight: 700;
             color: var(--black);
@@ -784,39 +778,6 @@
 
         .sizes span {
             font-weight: 600;
-        }
-
-        /* Quantity selector */
-        .quantity-selector {
-            margin-bottom: 20px;
-        }
-
-        .quantity-label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .quantity-options {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .quantity-option {
-            padding: 8px 15px;
-            border: 1px solid var(--gray-light);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 0.9rem;
-            border-radius: 4px;
-        }
-
-        .quantity-option:hover, 
-        .quantity-option.selected {
-            background: var(--purple);
-            color: var(--white);
-            border-color: var(--purple);
         }
 
         .action-buttons {
@@ -2055,1138 +2016,1048 @@
                     <h3>Shop</h3>
                     <ul class="footer-links">
                         <li><a href="#">Heels</a></li>
-                        <li><a href="#">Sandals</a></li>
-                        <li><a href="#">Flats</a></li>
-                        <li><a href="#">Boots</a></li>
-                        <li><a href="#">Sneakers</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Information</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                        <li><a href="#">Shipping Policy</a></li>
-                        <li><a href="#">Returns & Exchanges</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Shop by Category</h3>
-                    <ul class="footer-links">
-                        <li><a href="#" class="category-filter" data-category="all">All Footwear</a></li>
-                        <li><a href="#" class="category-filter" data-category="heels">Heels</a></li>
-                        <li><a href="#" class="category-filter" data-category="sandals">Sandals</a></li>
-                        <li><a href="#" class="category-filter" data-category="flats">Flats</a></li>
-                        <li><a href="#" class="category-filter" data-category="boots">Boots</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                &copy; 2023 JMPOTTERS. All rights reserved.
-            </div>
-        </div>
-    </footer>
-
-    <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <!-- Chat Support Button -->
-    <div class="chat-float" id="chatFloat">
-        <i class="fas fa-comments"></i>
+        <li><a href="#">Sandals</a></li>
+        <li><a href="#">Flats</a></li>
+        <li><a href="#">Boots</a></li>
+        <li><a href="#">Sneakers</a></li>
+      </ul>
     </div>
+    <div class="footer-column">
+      <h3>Information</h3>
+      <ul class="footer-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="#">Shipping Policy</a></li>
+        <li><a href="#">Returns & Exchanges</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h3>Shop by Category</h3>
+      <ul class="footer-links">
+        <li><a href="#" class="category-filter" data-category="all">All Footwear</a></li>
+        <li><a href="#" class="category-filter" data-category="heels">Heels</a></li>
+        <li><a href="#" class="category-filter" data-category="sandals">Sandals</a></li>
+        <li><a href="#" class="category-filter" data-category="flats">Flats</a></li>
+        <li><a href="#" class="category-filter" data-category="boots">Boots</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="copyright">
+    &copy; 2023 JMPOTTERS. All rights reserved.
+  </div>
+</div>
+</footer>
+
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- Chat Support Button -->
+<div class="chat-float" id="chatFloat">
+  <i class="fas fa-comments"></i>
+</div>
+
+<!-- Chat Support Modal -->
+<div class="chat-modal" id="chatModal">
+  <div class="chat-header">
+    <i class="fas fa-headset"></i> Customer Support
+  </div>
+  <div class="chat-content">
+    <p>Hello! Need help with orders or shoe sizes?</p>
+    <div class="chat-actions">
+      <a href="https://wa.me/2348139583320" class="btn btn-gold" target="_blank">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+      </a>
+      <button class="btn" id="closeChat">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  // ========== INITIALIZATION ========== //
+  // Initialize AOS
+  AOS.init({
+    duration: 800,
+    once: true
+  });
+
+  // Product data for women's footwear
+  const products = [
+    { id: 1, name: "2-inches Louboutin Heel Black", price: 25000, image: "2-inches-Louboutin-Heel-Black-25000.jpg" },
+    { id: 2, name: "2-inches Louboutin Heel White", price: 25000, image: "2-inches-Louboutin-Heel-White-25000.jpg" },
+    { id: 3, name: "Aaron Fairy", price: 21000, image: "Aaron-Fairy-21000.jpg" },
+    { id: 4, name: "Aaron Fairy Black", price: 20000, image: "Aaron-fairy-20000.jpg" },
+    { id: 5, name: "Aldo All Golden", price: 15000, image: "Aldo-All-Golden-15000.jpg" },
+    { id: 6, name: "Aldo Black and Gold", price: 15000, image: "Aldo-Black-and-Gold-15000.jpg" },
+    { id: 7, name: "Aldo Brown and Gold", price: 15000, image: "Aldo-Brown-and-Gold-15000.jpg" },
+    { id: 8, name: "Beauty Heels", price: 9500, image: "Beauty-Heels-9500.jpg" },
+    { id: 9, name: "Big Fittings", price: 12000, image: "Big-Fittings-12000.jpg" },
+    { id: 10, name: "Black Strapped Heels", price: 9500, image: "Black-Strapped-Heels-9500.jpg" },
+    { id: 11, name: "Black Thick Soles", price: 6500, image: "Black-Thick-Soles-6500.jpg" },
+    { id: 12, name: "Diva Heel", price: 16500, image: "Diva-Heel-16500.jpg" },
+    { id: 13, name: "Fashion High Heels", price: 17000, image: "Fashion-high-Heels-17000.jpg" },
+    { id: 14, name: "Lacy Heels", price: 18000, image: "Lacy-Heels-18000.jpg" },
+    { id: 15, name: "Ladies Sandals", price: 12000, image: "Ladies-Sandals-12000.jpg" },
+    { id: 16, name: "Looking Mart Black Only", price: 6500, image: "Looking-mart-Black-Only-6500.jpg" },
+    { id: 17, name: "Louboutin", price: 23000, image: "Louboutin-23000.jpg" },
+    { id: 18, name: "Lumansi Flat Shoes", price: 17500, image: "Lumansi-Flat-Shoes-17500.jpg" },
+    { id: 19, name: "Luxury Butterfly Heels", price: 18000, image: "Luxury-Butterfly-Heels-18000.jpg" },
+    { id: 20, name: "Luxury Crossed Heels", price: 13000, image: "Luxury-Crossed-Heels-13000.jpg" },
+    { id: 21, name: "Luxury Hermes Slide", price: 27000, image: "Luxury-Hermes-Slide-27000.jpg" },
+    { id: 22, name: "Luxury Hermes Slide Grey", price: 29000, image: "Luxury-Hermes-Slide-Grey-29000.jpg" },
+    { id: 23, name: "Patterned Heels", price: 18000, image: "Patterned-Heels-18000.jpg" },
+    { id: 24, name: "Pink Ladies Sneakers", price: 18500, image: "Pink-Ladies-Sneakers-18500.jpg" },
+    { id: 25, name: "Pink and Grey Sandals", price: 5200, image: "Pink-and-Grey-Sandals-5200.jpg" },
+    { id: 26, name: "Premium Bow-tied Heels", price: 18500, image: "Premium-Bow-tied-Heels-18500.jpg" },
+    { id: 27, name: "Premium Heels", price: 18000, image: "Premium-Heels-18000.jpg" },
+    { id: 28, name: "Quality Black Heels", price: 14000, image: "Quality-Black-Heels-14000.jpg" },
+    { id: 29, name: "Quality Golden Heels", price: 17000, image: "Quality-Golden-Heels-17000.jpg" },
+    { id: 30, name: "Quality Female Loafers", price: 18000, image: "Quality-female-Loafers-18000.jpg" },
+    { id: 31, name: "Quality Female Loafers Blue", price: 18000, image: "Quality-female-Loafers-Blue-18000.jpg" },
+    { id: 32, name: "Ritas Girl", price: 7500, image: "Ritas-Girl-7500.jpg" },
+    { id: 33, name: "Ritas Girl Heels", price: 9500, image: "Ritas-Girl-heels-9500.jpg" },
+    { id: 34, name: "Sleek Heels", price: 18500, image: "Sleek-Heels-18500.jpg" },
+    { id: 35, name: "Slip-in Sandals", price: 15000, image: "Slip-in-Sandals-15000.jpg" },
+    { id: 36, name: "Strapped Flat Shoe", price: 11000, image: "Strapped-Flat-shoe-11000.jpg" },
+    { id: 37, name: "Thick Stomp Heels", price: 19000, image: "Thick-Stomp-Heels-19000.jpg" },
+    { id: 38, name: "Unisex Loafers", price: 9000, image: "Unisex-Loafers-9000.jpg" },
+    { id: 39, name: "Women Loafers", price: 10000, image: "Women-Loafers-10000.jpg" },
+    { id: 40, name: "Zara Black", price: 16500, image: "Zara-Black-16500.jpg" },
+    { id: 41, name: "Zara Blue", price: 16500, image: "Zara-Blue-16500.jpg" },
+    { id: 42, name: "Zara Brown", price: 16500, image: "Zara-Brown-16500.jpg" },
+    { id: 43, name: "Zara Gold", price: 16500, image: "Zara-Gold-16500.jpg" },
+    { id: 44, name: "Zara Green", price: 16500, image: "Zara-Green-16500.jpg" },
+    { id: 45, name: "Zara Red", price: 16500, image: "Zara-Red-16500.jpg" },
+    { id: 46, name: "Zara White", price: 16500, image: "Zara-White-16500.jpg" }
+  ];
+
+  // Initialize variables
+  let currentPage = 1;
+  const itemsPerPage = 12;
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+  let filteredProducts = [...products];
+  let currentProduct = null;
+  let currentFilter = 'all';
+
+  // DOM Elements
+  const preloader = document.getElementById('preloader');
+  const productsGrid = document.getElementById('productsGrid');
+  const pagination = document.getElementById('pagination');
+  const wishlistIcon = document.getElementById('wishlistIcon');
+  const wishlistCount = document.getElementById('wishlistCount');
+  const cartIcon = document.getElementById('cartIcon');
+  const cartCount = document.getElementById('cartCount');
+  const cartPanel = document.getElementById('cartPanel');
+  const cartOverlay = document.getElementById('cartOverlay');
+  const closeCart = document.querySelector('.close-cart');
+  const cartItems = document.getElementById('cartItems');
+  const cartTotal = document.getElementById('cartTotal');
+  const mobileToggle = document.getElementById('mobileToggle');
+  const mobileNav = document.getElementById('mobileNav');
+  const navOverlay = document.getElementById('navOverlay');
+  const closeNav = document.querySelector('.close-nav');
+  const cursor = document.getElementById('cursor');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalClose = document.getElementById('modalClose');
+  const modalContent = document.getElementById('modalContent');
+  const toastContainer = document.getElementById('toastContainer');
+  const whatsappCheckout = document.getElementById('whatsappCheckout');
+  const header = document.getElementById('header');
+  const chatFloat = document.getElementById('chatFloat');
+  const chatModal = document.getElementById('chatModal');
+  const closeChat = document.getElementById('closeChat');
+  const categoryFilters = document.querySelectorAll('.category-filter');
+  const filterMessage = document.getElementById('filterMessage');
+  const mobileDropdowns = document.querySelectorAll('.mobile-dropdown-toggle');
+
+  // Fake reviews data
+  const fakeReviews = [
+    { user: "ShoeQueen", rating: 5, text: "These heels are absolutely stunning! Perfect for special occasions." },
+    { user: "Fashionista", rating: 4, text: "Comfortable and stylish - exactly what I was looking for." },
+    { user: "StyleGuru", rating: 5, text: "Received so many compliments on these shoes. Worth every penny!" },
+    { user: "HeelLover", rating: 4, text: "Perfect height and fit. Will definitely buy again." },
+    { user: "ShoeAddict", rating: 5, text: "The quality is exceptional. They look even better in person." },
+    { user: "ElegantLady", rating: 4, text: "Great for both day and evening wear. Very versatile." },
+    { user: "TrendSetter", rating: 5, text: "These shoes are on-trend and incredibly comfortable." },
+    { user: "LuxuryShopper", rating: 4, text: "Premium materials and craftsmanship. Highly recommended." }
+  ];
+
+  // Fake toast messages
+  const toastMessages = [
+    "🛍️ {name} from {location} just bought {quantity} {product} – ₦{amount} 🤑",
+    "🔥 {name} from {location} ordered {quantity} {product} – ₦{amount} ({discount}% OFF)",
+    "🤯 {name} in {location} just added {quantity} {product} to cart 👠",
+    "💸 {name} from {location} purchased {quantity} {product} worth ₦{amount}",
+    "🚀 {name} in {location} just bought {quantity} {product} – great choice!",
+    "👑 {name} from {location} got {quantity} {product} – premium selection!",
+    "🌟 {name} in {location} ordered {quantity} {product} – luxury at its best!",
+    "💼 {name} from {location} purchased {quantity} {product} – perfect for events!",
+    "🎯 {name} in {location} bought {quantity} {product} – perfect fit!",
+    "✨ {name} from {location} just got {quantity} {product} – style upgrade!",
+    "🏆 {name} in {location} purchased {quantity} {product} – winning choice!",
+    "💖 {name} from {location} added {quantity} {product} to their collection 💃",
+    "🛒 {name} in {location} just bought {quantity} {product} – amazing deal!",
+    "👠 {name} from {location} purchased {quantity} {product} – elegant choice!",
+    "💫 {name} in {location} added {quantity} {product} – trending now!"
+  ];
+
+  // Fake names and locations
+  const fakeNames = ["Chinwe", "Aisha", "Fatima", "Ngozi", "Bisi", "Amara", "Zainab", "Funke", "Chika", "Ada"];
+  const fakeLocations = ["Lagos", "Abuja", "Ibadan", "Port Harcourt", "Kano", "Enugu", "Aba", "Owerri", "Benin", "Kaduna"];
+  const fakeProducts = ["Heels", "Sandals", "Flats", "Boots", "Sneakers", "Designer Shoes", "Premium Footwear", "Luxury Heels"];
+
+  // ========== INITIALIZE PAGE ========== //
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize preloader
+    initializePreloader();
     
-    <!-- Chat Support Modal -->
-    <div class="chat-modal" id="chatModal">
-        <div class="chat-header">
-            <i class="fas fa-headset"></i> Customer Support
+    // Initialize header scroll effect
+    initializeHeader();
+    
+    // Initialize hero carousel
+    initializeCarousel();
+    
+    // Render products
+    renderProducts();
+    
+    // Initialize cart and wishlist counts
+    updateWishlistCount();
+    updateCartCount();
+    updateCartTotal();
+    
+    // Setup chat support
+    setupChatSupport();
+    
+    // Setup category filters
+    setupCategoryFilters();
+    
+    // Setup mobile dropdowns
+    setupMobileDropdowns();
+    
+    // Start toast messages
+    startToastMessages();
+  });
+
+  // ========== PRELOADER FUNCTIONS ========== //
+  function initializePreloader() {
+    const letters = document.querySelectorAll('.preloader-text span');
+    letters.forEach((letter, index) => {
+      setTimeout(() => {
+        letter.style.transform = 'translateY(0)';
+        letter.style.opacity = '1';
+      }, index * 150);
+    });
+    
+    // Hide preloader after 3 seconds
+    setTimeout(() => {
+      preloader.style.opacity = '0';
+      preloader.style.visibility = 'hidden';
+    }, 3000);
+  }
+
+  // ========== HEADER FUNCTIONS ========== //
+  function initializeHeader() {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  }
+
+  // ========== HERO CAROUSEL FUNCTIONS ========== //
+  function initializeCarousel() {
+    const slides = document.querySelectorAll('.hero-slide');
+    let currentSlide = 0;
+    
+    // Set initial active slide
+    slides[currentSlide].classList.add('active');
+    
+    // Auto advance carousel
+    setInterval(() => {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }, 5000);
+  }
+
+  // ========== PRODUCT FUNCTIONS ========== //
+  function renderProducts() {
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+    
+    // Clear the grid
+    productsGrid.innerHTML = '';
+    
+    // Add products to the grid
+    paginatedProducts.forEach(product => {
+      // Generate fake price (₦5,000–₦10,000 higher than real price)
+      const fakePrice = product.price + Math.floor(Math.random() * 5000) + 5000;
+      
+      const productCard = document.createElement('div');
+      productCard.className = 'product-card';
+      productCard.setAttribute('data-aos', 'fade-up');
+      productCard.innerHTML = `
+        <div class="product-image">
+          <div class="product-badge">-${Math.floor(Math.random() * 30) + 10}%</div>
+          <img src="assets/images/${product.image}" alt="${product.name}" loading="lazy">
+          <button class="wishlist-btn ${wishlist.some(item => item.id === product.id) ? 'active' : ''}" data-id="${product.id}">
+            <i class="fas fa-heart"></i>
+          </button>
         </div>
-        <div class="chat-content">
-            <p>Hello! Need help with orders or shoe sizes?</p>
-            <div class="chat-actions">
-                <a href="https://wa.me/2348139583320" class="btn btn-gold" target="_blank">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </a>
-                <button class="btn" id="closeChat">
-                    Close
-                </button>
-            </div>
+        <div class="product-info">
+          <h3 class="product-title">${product.name}</h3>
+          <div class="product-price">
+            <del class="price-fake">₦${fakePrice.toLocaleString()}</del>
+            <span class="price-actual">₦${product.price.toLocaleString()}</span>
+          </div>
+          <div class="availability">
+            <i class="fas fa-check-circle"></i> In Stock
+          </div>
+          <div class="sizes">
+            Sizes Available: <span>36 - 45</span>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="btn-add-cart" data-id="${product.id}">
+              <i class="fas fa-shopping-cart"></i> Add to Cart
+            </button>
+            <button class="btn-view-details" data-id="${product.id}">
+              <i class="fas fa-eye"></i> View Details
+            </button>
+          </div>
         </div>
-    </div>
+      `;
+      productsGrid.appendChild(productCard);
+    });
+    
+    // Setup event listeners for the new products
+    setupProductInteractions();
+    
+    // Render pagination
+    renderPagination(totalPages);
+  }
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        // ========== INITIALIZATION ========== //
-        // Initialize AOS
-        AOS.init({
-            duration: 800,
-            once: true
-        });
+  function renderPagination(totalPages) {
+    pagination.innerHTML = '';
+    
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    // Previous button
+    if (currentPage > 1) {
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'page-btn';
+      prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+      prevBtn.addEventListener('click', () => {
+        currentPage--;
+        renderProducts();
+        window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
+      });
+      pagination.appendChild(prevBtn);
+    }
+    
+    // Page buttons
+    for (let i = startPage; i <= endPage; i++) {
+      const pageBtn = document.createElement('button');
+      pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+      pageBtn.textContent = i;
+      pageBtn.addEventListener('click', () => {
+        currentPage = i;
+        renderProducts();
+        window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
+      });
+      pagination.appendChild(pageBtn);
+    }
+    
+    // Next button
+    if (currentPage < totalPages) {
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'page-btn';
+      nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+      nextBtn.addEventListener('click', () => {
+        currentPage++;
+        renderProducts();
+        window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
+      });
+      pagination.appendChild(nextBtn);
+    }
+  }
 
-        // Product data for women's footwear
-        const products = [
-            { id: 1, name: "2-inches Louboutin Heel Black", price: 25000, image: "2-inches-Louboutin-Heel-Black-25000.jpg" },
-            { id: 2, name: "2-inches Louboutin Heel White", price: 25000, image: "2-inches-Louboutin-Heel-White-25000.jpg" },
-            { id: 3, name: "Aaron Fairy", price: 21000, image: "Aaron-Fairy-21000.jpg" },
-            { id: 4, name: "Aaron Fairy Black", price: 20000, image: "Aaron-fairy-20000.jpg" },
-            { id: 5, name: "Aldo All Golden", price: 15000, image: "Aldo-All-Golden-15000.jpg" },
-            { id: 6, name: "Aldo Black and Gold", price: 15000, image: "Aldo-Black-and-Gold-15000.jpg" },
-            { id: 7, name: "Aldo Brown and Gold", price: 15000, image: "Aldo-Brown-and-Gold-15000.jpg" },
-            { id: 8, name: "Beauty Heels", price: 9500, image: "Beauty-Heels-9500.jpg" },
-            { id: 9, name: "Big Fittings", price: 12000, image: "Big-Fittings-12000.jpg" },
-            { id: 10, name: "Black Strapped Heels", price: 9500, image: "Black-Strapped-Heels-9500.jpg" },
-            { id: 11, name: "Black Thick Soles", price: 6500, image: "Black-Thick-Soles-6500.jpg" },
-            { id: 12, name: "Diva Heel", price: 16500, image: "Diva-Heel-16500.jpg" },
-            { id: 13, name: "Fashion High Heels", price: 17000, image: "Fashion-high-Heels-17000.jpg" },
-            { id: 14, name: "Lacy Heels", price: 18000, image: "Lacy-Heels-18000.jpg" },
-            { id: 15, name: "Ladies Sandals", price: 12000, image: "Ladies-Sandals-12000.jpg" },
-            { id: 16, name: "Looking Mart Black Only", price: 6500, image: "Looking-mart-Black-Only-6500.jpg" },
-            { id: 17, name: "Louboutin", price: 23000, image: "Louboutin-23000.jpg" },
-            { id: 18, name: "Lumansi Flat Shoes", price: 17500, image: "Lumansi-Flat-Shoes-17500.jpg" },
-            { id: 19, name: "Luxury Butterfly Heels", price: 18000, image: "Luxury-Butterfly-Heels-18000.jpg" },
-            { id: 20, name: "Luxury Crossed Heels", price: 13000, image: "Luxury-Crossed-Heels-13000.jpg" },
-            { id: 21, name: "Luxury Hermes Slide", price: 27000, image: "Luxury-Hermes-Slide-27000.jpg" },
-            { id: 22, name: "Luxury Hermes Slide Grey", price: 29000, image: "Luxury-Hermes-Slide-Grey-29000.jpg" },
-            { id: 23, name: "Patterned Heels", price: 18000, image: "Patterned-Heels-18000.jpg" },
-            { id: 24, name: "Pink Ladies Sneakers", price: 18500, image: "Pink-Ladies-Sneakers-18500.jpg" },
-            { id: 25, name: "Pink and Grey Sandals", price: 5200, image: "Pink-and-Grey-Sandals-5200.jpg" },
-            { id: 26, name: "Premium Bow-tied Heels", price: 18500, image: "Premium-Bow-tied-Heels-18500.jpg" },
-            { id: 27, name: "Premium Heels", price: 18000, image: "Premium-Heels-18000.jpg" },
-            { id: 28, name: "Quality Black Heels", price: 14000, image: "Quality-Black-Heels-14000.jpg" },
-            { id: 29, name: "Quality Golden Heels", price: 17000, image: "Quality-Golden-Heels-17000.jpg" },
-            { id: 30, name: "Quality Female Loafers", price: 18000, image: "Quality-female-Loafers-18000.jpg" },
-            { id: 31, name: "Quality Female Loafers Blue", price: 18000, image: "Quality-female-Loafers-Blue-18000.jpg" },
-            { id: 32, name: "Ritas Girl", price: 7500, image: "Ritas-Girl-7500.jpg" },
-            { id: 33, name: "Ritas Girl Heels", price: 9500, image: "Ritas-Girl-heels-9500.jpg" },
-            { id: 34, name: "Sleek Heels", price: 18500, image: "Sleek-Heels-18500.jpg" },
-            { id: 35, name: "Slip-in Sandals", price: 15000, image: "Slip-in-Sandals-15000.jpg" },
-            { id: 36, name: "Strapped Flat Shoe", price: 11000, image: "Strapped-Flat-shoe-11000.jpg" },
-            { id: 37, name: "Thick Stomp Heels", price: 19000, image: "Thick-Stomp-Heels-19000.jpg" },
-            { id: 38, name: "Unisex Loafers", price: 9000, image: "Unisex-Loafers-9000.jpg" },
-            { id: 39, name: "Women Loafers", price: 10000, image: "Women-Loafers-10000.jpg" },
-            { id: 40, name: "Zara Black", price: 16500, image: "Zara-Black-16500.jpg" },
-            { id: 41, name: "Zara Blue", price: 16500, image: "Zara-Blue-16500.jpg" },
-            { id: 42, name: "Zara Brown", price: 16500, image: "Zara-Brown-16500.jpg" },
-            { id: 43, name: "Zara Gold", price: 16500, image: "Zara-Gold-16500.jpg" },
-            { id: 44, name: "Zara Green", price: 16500, image: "Zara-Green-16500.jpg" },
-            { id: 45, name: "Zara Red", price: 16500, image: "Zara-Red-16500.jpg" },
-            { id: 46, name: "Zara White", price: 16500, image: "Zara-White-16500.jpg" }
-        ];
-
-        // Generate fake discounts for display
-        products.forEach(product => {
-            const discounts = [10, 20, 35];
-            product.displayDiscount = discounts[Math.floor(Math.random() * discounts.length)];
-        });
-
-        // Initialize variables
-        let currentPage = 1;
-        const itemsPerPage = 12;
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-        let filteredProducts = [...products];
-        let currentProduct = null;
-        let currentFilter = 'all';
-
-        // DOM Elements
-        const preloader = document.getElementById('preloader');
-        const productsGrid = document.getElementById('productsGrid');
-        const pagination = document.getElementById('pagination');
-        const wishlistIcon = document.getElementById('wishlistIcon');
-        const wishlistCount = document.getElementById('wishlistCount');
-        const cartIcon = document.getElementById('cartIcon');
-        const cartCount = document.getElementById('cartCount');
-        const cartPanel = document.getElementById('cartPanel');
-        const cartOverlay = document.getElementById('cartOverlay');
-        const closeCart = document.querySelector('.close-cart');
-        const cartItems = document.getElementById('cartItems');
-        const cartTotal = document.getElementById('cartTotal');
-        const mobileToggle = document.getElementById('mobileToggle');
-        const mobileNav = document.getElementById('mobileNav');
-        const navOverlay = document.getElementById('navOverlay');
-        const closeNav = document.querySelector('.close-nav');
-        const cursor = document.getElementById('cursor');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalClose = document.getElementById('modalClose');
-        const modalContent = document.getElementById('modalContent');
-        const toastContainer = document.getElementById('toastContainer');
-        const whatsappCheckout = document.getElementById('whatsappCheckout');
-        const header = document.getElementById('header');
-        const chatFloat = document.getElementById('chatFloat');
-        const chatModal = document.getElementById('chatModal');
-        const closeChat = document.getElementById('closeChat');
-        const categoryFilters = document.querySelectorAll('.category-filter');
-        const filterMessage = document.getElementById('filterMessage');
-        const mobileDropdowns = document.querySelectorAll('.mobile-dropdown-toggle');
-
-        // Fake reviews data
-        const fakeReviews = [
-            { user: "ShoeQueen", rating: 5, text: "These heels are absolutely stunning! Perfect for special occasions." },
-            { user: "Fashionista", rating: 4, text: "Comfortable and stylish - exactly what I was looking for." },
-            { user: "StyleGuru", rating: 5, text: "Received so many compliments on these shoes. Worth every penny!" },
-            { user: "HeelLover", rating: 4, text: "Perfect height and fit. Will definitely buy again." },
-            { user: "ShoeAddict", rating: 5, text: "The quality is exceptional. They look even better in person." },
-            { user: "ElegantLady", rating: 4, text: "Great for both day and evening wear. Very versatile." },
-            { user: "TrendSetter", rating: 5, text: "These shoes are on-trend and incredibly comfortable." },
-            { user: "LuxuryShopper", rating: 4, text: "Premium materials and craftsmanship. Highly recommended." }
-        ];
-
-        // Fake toast messages
-        const toastMessages = [
-            "🛍️ {name} from {location} just bought {quantity} {product} – ₦{amount} 🤑",
-            "🔥 {name} from {location} ordered {quantity} {product} – ₦{amount} ({discount}% OFF)",
-            "🤯 {name} in {location} just added {quantity} {product} to cart 👠",
-            "💸 {name} from {location} purchased {quantity} {product} worth ₦{amount}",
-            "🚀 {name} in {location} just bought {quantity} {product} – great choice!",
-            "👑 {name} from {location} got {quantity} {product} – premium selection!",
-            "🌟 {name} in {location} ordered {quantity} {product} – luxury at its best!",
-            "💼 {name} from {location} purchased {quantity} {product} – perfect for events!",
-            "🎯 {name} in {location} bought {quantity} {product} – perfect fit!",
-            "✨ {name} from {location} just got {quantity} {product} – style upgrade!",
-            "🏆 {name} in {location} purchased {quantity} {product} – winning choice!",
-            "💖 {name} from {location} added {quantity} {product} to their collection 💃",
-            "🛒 {name} in {location} just bought {quantity} {product} – amazing deal!",
-            "👠 {name} from {location} purchased {quantity} {product} – elegant choice!",
-            "💫 {name} in {location} added {quantity} {product} – trending now!"
-        ];
-
-        // Fake names and locations
-        const fakeNames = ["Chinwe", "Aisha", "Fatima", "Ngozi", "Bisi", "Amara", "Zainab", "Funke", "Chika", "Ada"];
-        const fakeLocations = ["Lagos", "Abuja", "Ibadan", "Port Harcourt", "Kano", "Enugu", "Aba", "Owerri", "Benin", "Kaduna"];
-        const fakeProducts = ["Heels", "Sandals", "Flats", "Boots", "Sneakers", "Designer Shoes", "Premium Footwear", "Luxury Heels"];
-
-        // ========== INITIALIZE PAGE ========== //
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize preloader
-            initializePreloader();
-            
-            // Initialize header scroll effect
-            initializeHeader();
-            
-            // Initialize hero carousel
-            initializeCarousel();
-            
-            // Render products
-            renderProducts();
-            
-            // Initialize cart and wishlist counts
-            updateWishlistCount();
-            updateCartCount();
-            updateCartTotal();
-            
-            // Initialize custom cursor
-            if (window.innerWidth > 768) {
-                initializeCursor();
-            }
-            
-            // Setup chat support
-            setupChatSupport();
-            
-            // Setup category filters
-            setupCategoryFilters();
-            
-            // Setup mobile dropdowns
-            setupMobileDropdowns();
-            
-            // Start toast messages
-            startToastMessages();
-        });
-
-        // ========== PRELOADER FUNCTIONS ========== //
-        function initializePreloader() {
-            const letters = document.querySelectorAll('.preloader-text span');
-            letters.forEach((letter, index) => {
-                setTimeout(() => {
-                    letter.style.transform = 'translateY(0)';
-                    letter.style.opacity = '1';
-                }, index * 150);
-            });
-            
-            // Hide preloader after 3 seconds
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                preloader.style.visibility = 'hidden';
-            }, 3000);
+  function setupProductInteractions() {
+    // Add to Cart buttons
+    document.querySelectorAll('.btn-add-cart').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = parseInt(this.getAttribute('data-id'));
+        const product = products.find(p => p.id === productId);
+        
+        addToCart(product, 1);
+        
+        // Create flying product animation
+        const card = this.closest('.product-card');
+        const cardRect = card.getBoundingClientRect();
+        const cartIconRect = cartIcon.getBoundingClientRect();
+        
+        createFlyingProduct(product.image, cardRect, cartIconRect);
+      });
+    });
+    
+    // View Details buttons
+    document.querySelectorAll('.btn-view-details').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = parseInt(this.getAttribute('data-id'));
+        currentProduct = products.find(p => p.id === productId);
+        
+        openProductModal(currentProduct);
+      });
+    });
+    
+    // Wishlist buttons
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = parseInt(this.getAttribute('data-id'));
+        const product = products.find(p => p.id === productId);
+        const buttonRect = this.getBoundingClientRect();
+        const wishlistIconRect = wishlistIcon.getBoundingClientRect();
+        
+        if (this.classList.contains('active')) {
+          removeFromWishlist(productId);
+          this.classList.remove('active');
+        } else {
+          addToWishlist(product);
+          this.classList.add('active');
+          
+          // Create floating hearts animation
+          createFloatingHearts(buttonRect, wishlistIconRect);
         }
+      });
+    });
+  }
 
-        // ========== HEADER FUNCTIONS ========== //
-        function initializeHeader() {
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
-                }
-            });
-        }
+  function createFloatingHearts(startRect, endRect) {
+    for (let i = 0; i < 5; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart-animation';
+      heart.innerHTML = '<i class="fas fa-heart" style="color: #ff4757;"></i>';
+      
+      // Calculate random starting position around the button
+      const startX = startRect.left + startRect.width/2 + (Math.random() - 0.5) * 30;
+      const startY = startRect.top + startRect.height/2 + (Math.random() - 0.5) * 30;
+      
+      // Calculate target position at the wishlist icon
+      const endX = endRect.left + endRect.width/2;
+      const endY = endRect.top + endRect.height/2;
+      
+      // Calculate translation values
+      const tx = endX - startX;
+      const ty = endY - startY;
+      
+      // Set initial position
+      heart.style.left = startX + 'px';
+      heart.style.top = startY + 'px';
+      heart.style.fontSize = (Math.random() * 10 + 16) + 'px';
+      
+      // Set animation properties
+      heart.style.setProperty('--tx', tx + 'px');
+      heart.style.setProperty('--ty', ty + 'px');
+      
+      document.body.appendChild(heart);
+      
+      // Remove heart after animation
+      setTimeout(() => {
+        heart.remove();
+      }, 1000);
+    }
+  }
 
-        // ========== HERO CAROUSEL FUNCTIONS ========== //
-        function initializeCarousel() {
-            const slides = document.querySelectorAll('.hero-slide');
-            let currentSlide = 0;
-            
-            // Set initial active slide
-            slides[currentSlide].classList.add('active');
-            
-            // Auto advance carousel
-            setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }, 5000);
-        }
+  function createFlyingProduct(image, startRect, endRect) {
+    const flyingProduct = document.createElement('div');
+    flyingProduct.className = 'flying-product';
+    flyingProduct.style.backgroundImage = `url('assets/images/${image}')`;
+    
+    // Calculate translation values
+    const tx = endRect.left + endRect.width/2 - (startRect.left + startRect.width/2);
+    const ty = endRect.top + endRect.height/2 - (startRect.top + startRect.height/2);
+    
+    // Set initial position
+    flyingProduct.style.left = (startRect.left + startRect.width/2) + 'px';
+    flyingProduct.style.top = (startRect.top + startRect.height/2) + 'px';
+    
+    // Set animation properties
+    flyingProduct.style.setProperty('--tx', tx + 'px');
+    flyingProduct.style.setProperty('--ty', ty + 'px');
+    
+    document.body.appendChild(flyingProduct);
+    
+    // Remove element after animation
+    setTimeout(() => {
+      flyingProduct.remove();
+    }, 800);
+  }
 
-        // ========== CURSOR FUNCTIONS ========== //
-        function initializeCursor() {
-            document.addEventListener('mousemove', moveCursor);
-            document.addEventListener('mousedown', cursorClick);
-            document.addEventListener('mouseup', cursorUnclick);
-            
-            // Add hover effects to interactive elements
-            const interactiveElements = document.querySelectorAll('a, button, .product-toggle, .size-option, .page-btn, .quantity-btn');
-            interactiveElements.forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    cursor.classList.add('active');
-                });
-                el.addEventListener('mouseleave', () => {
-                    cursor.classList.remove('active');
-                });
-            });
-        }
-
-        function moveCursor(e) {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        }
-
-        function cursorClick() {
-            cursor.classList.add('click');
-            createParticles(e.clientX, e.clientY);
-        }
-
-        function cursorUnclick() {
-            cursor.classList.remove('click');
-        }
-
-        function createParticles(x, y) {
-            // Create particles
-            for (let i = 0; i < 10; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = x + 'px';
-                particle.style.top = y + 'px';
-                
-                // Random direction
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 50 + Math.random() * 100;
-                const tx = Math.cos(angle) * distance;
-                const ty = Math.sin(angle) * distance;
-                
-                particle.style.setProperty('--tx', tx + 'px');
-                particle.style.setProperty('--ty', ty + 'px');
-                
-                document.body.appendChild(particle);
-                
-                // Remove particle after animation
-                setTimeout(() => {
-                    particle.remove();
-                }, 600);
-            }
-        }
-
-        // ========== PRODUCT FUNCTIONS ========== //
-        function renderProducts() {
-            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-            
-            // Clear the grid
-            productsGrid.innerHTML = '';
-            
-            // Add products to the grid
-            paginatedProducts.forEach(product => {
-                // Generate fake price (₦5,000–₦10,000 higher than real price)
-                const fakePrice = product.price + Math.floor(Math.random() * 5000) + 5000;
-                const discountedPrice = Math.round(product.price * (1 - 0.1)); // 10% discount
-                
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.setAttribute('data-aos', 'fade-up');
-                productCard.innerHTML = `
-                    <div class="product-image">
-                        <div class="product-badge">-${product.displayDiscount}%</div>
-                        <img src="assets/images/${product.image}" alt="${product.name}" loading="lazy">
-                        <button class="wishlist-btn ${wishlist.some(item => item.id === product.id) ? 'active' : ''}" data-id="${product.id}">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">${product.name}</h3>
-                        <div class="product-price">
-                            <del class="price-fake">₦${fakePrice.toLocaleString()}</del>
-                            <span class="price-original">₦${product.price.toLocaleString()}</span>
-                            <span class="price-discounted">₦${discountedPrice.toLocaleString()}</span>
-                        </div>
-                        <div class="availability">
-                            <i class="fas fa-check-circle"></i> In Stock
-                        </div>
-                        <div class="sizes">
-                            Sizes Available: <span>36 - 45</span>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button class="btn-add-cart" data-id="${product.id}">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
-                            </button>
-                            <button class="btn-view-details" data-id="${product.id}">
-                                <i class="fas fa-eye"></i> View Details
-                            </button>
-                        </div>
-                    </div>
-                `;
-                productsGrid.appendChild(productCard);
-            });
-            
-            // Setup event listeners for the new products
-            setupProductInteractions();
-            
-            // Render pagination
-            renderPagination(totalPages);
-        }
-
-        function renderPagination(totalPages) {
-            pagination.innerHTML = '';
-            
-            const maxVisiblePages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-            
-            if (endPage - startPage < maxVisiblePages - 1) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-            }
-            
-            // Previous button
-            if (currentPage > 1) {
-                const prevBtn = document.createElement('button');
-                prevBtn.className = 'page-btn';
-                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-                prevBtn.addEventListener('click', () => {
-                    currentPage--;
-                    renderProducts();
-                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
-                });
-                pagination.appendChild(prevBtn);
-            }
-            
-            // Page buttons
-            for (let i = startPage; i <= endPage; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                pageBtn.textContent = i;
-                pageBtn.addEventListener('click', () => {
-                    currentPage = i;
-                    renderProducts();
-                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
-                });
-                pagination.appendChild(pageBtn);
-            }
-            
-            // Next button
-            if (currentPage < totalPages) {
-                const nextBtn = document.createElement('button');
-                nextBtn.className = 'page-btn';
-                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-                nextBtn.addEventListener('click', () => {
-                    currentPage++;
-                    renderProducts();
-                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
-                });
-                pagination.appendChild(nextBtn);
-            }
-        }
-
-        function setupProductInteractions() {
-            // Add to Cart buttons
-            document.querySelectorAll('.btn-add-cart').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    addToCart(product, 1);
-                    
-                    // Create flying product animation
-                    const card = this.closest('.product-card');
-                    const cardRect = card.getBoundingClientRect();
-                    const cartIconRect = cartIcon.getBoundingClientRect();
-                    
-                    createFlyingProduct(product.image, cardRect, cartIconRect);
-                });
-            });
-            
-            // View Details buttons
-            document.querySelectorAll('.btn-view-details').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    currentProduct = products.find(p => p.id === productId);
-                    
-                    openProductModal(currentProduct);
-                });
-            });
-            
-            // Wishlist buttons
-            document.querySelectorAll('.wishlist-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    const buttonRect = this.getBoundingClientRect();
-                    const wishlistIconRect = wishlistIcon.getBoundingClientRect();
-                    
-                    if (this.classList.contains('active')) {
-                        removeFromWishlist(productId);
-                        this.classList.remove('active');
-                    } else {
-                        addToWishlist(product);
-                        this.classList.add('active');
-                        
-                        // Create floating hearts animation
-                        createFloatingHearts(buttonRect, wishlistIconRect);
-                    }
-                });
-            });
-        }
-
-        function createFloatingHearts(startRect, endRect) {
-            for (let i = 0; i < 5; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'heart-animation';
-                heart.innerHTML = '<i class="fas fa-heart" style="color: #ff4757;"></i>';
-                
-                // Calculate random starting position around the button
-                const startX = startRect.left + startRect.width/2 + (Math.random() - 0.5) * 30;
-                const startY = startRect.top + startRect.height/2 + (Math.random() - 0.5) * 30;
-                
-                // Calculate target position at the wishlist icon
-                const endX = endRect.left + endRect.width/2;
-                const endY = endRect.top + endRect.height/2;
-                
-                // Calculate translation values
-                const tx = endX - startX;
-                const ty = endY - startY;
-                
-                // Set initial position
-                heart.style.left = startX + 'px';
-                heart.style.top = startY + 'px';
-                heart.style.fontSize = (Math.random() * 10 + 16) + 'px';
-                
-                // Set animation properties
-                heart.style.setProperty('--tx', tx + 'px');
-                heart.style.setProperty('--ty', ty + 'px');
-                
-                document.body.appendChild(heart);
-                
-                // Remove heart after animation
-                setTimeout(() => {
-                    heart.remove();
-                }, 1000);
-            }
-        }
-
-        function createFlyingProduct(image, startRect, endRect) {
-            const flyingProduct = document.createElement('div');
-            flyingProduct.className = 'flying-product';
-            flyingProduct.style.backgroundImage = `url('assets/images/${image}')`;
-            
-            // Calculate translation values
-            const tx = endRect.left + endRect.width/2 - (startRect.left + startRect.width/2);
-            const ty = endRect.top + endRect.height/2 - (startRect.top + startRect.height/2);
-            
-            // Set initial position
-            flyingProduct.style.left = (startRect.left + startRect.width/2) + 'px';
-            flyingProduct.style.top = (startRect.top + startRect.height/2) + 'px';
-            
-            // Set animation properties
-            flyingProduct.style.setProperty('--tx', tx + 'px');
-            flyingProduct.style.setProperty('--ty', ty + 'px');
-            
-            document.body.appendChild(flyingProduct);
-            
-            // Remove element after animation
-            setTimeout(() => {
-                flyingProduct.remove();
-            }, 800);
-        }
-
-        function openProductModal(product) {
-            // Generate fake price (₦5,000–₦10,000 higher than real price)
-            const fakePrice = product.price + Math.floor(Math.random() * 5000) + 5000;
-            const discountedPrice = Math.round(product.price * (1 - 0.1)); // 10% discount
-            
-            // Get 3-5 random reviews
-            const reviews = [];
-            const reviewCount = Math.floor(Math.random() * 3) + 3; // 3-5 reviews
-            for (let i = 0; i < reviewCount; i++) {
-                reviews.push(fakeReviews[Math.floor(Math.random() * fakeReviews.length)]);
-            }
-            
-            modalContent.innerHTML = `
-                <div class="modal-image">
-                    <img src="assets/images/${product.image}" alt="${product.name}">
+  function openProductModal(product) {
+    // Generate fake price (₦5,000–₦10,000 higher than real price)
+    const fakePrice = product.price + Math.floor(Math.random() * 5000) + 5000;
+    
+    // Get 3-5 random reviews
+    const reviews = [];
+    const reviewCount = Math.floor(Math.random() * 3) + 3; // 3-5 reviews
+    for (let i = 0; i < reviewCount; i++) {
+      reviews.push(fakeReviews[Math.floor(Math.random() * fakeReviews.length)]);
+    }
+    
+    modalContent.innerHTML = `
+      <div class="modal-image">
+        <img src="assets/images/${product.image}" alt="${product.name}">
+      </div>
+      <div class="modal-details">
+        <h3 class="modal-title">${product.name}</h3>
+        <div class="modal-price">
+          <del class="price-fake">₦${fakePrice.toLocaleString()}</del>
+          <span class="price-actual">₦${product.price.toLocaleString()}</span>
+          <span class="discount-tag">-${Math.floor(Math.random() * 30) + 10}% OFF</span>
+        </div>
+        <p class="modal-description">
+          Premium women's footwear crafted with the finest materials for ultimate comfort and style. 
+          Features a durable sole, cushioned insole, and premium materials. Perfect for both 
+          formal occasions and casual outings.
+        </p>
+        
+        <div class="size-selection">
+          <div class="size-title">Select Size:</div>
+          <div class="sizes-grid">
+            ${Array.from({length: 10}, (_, i) => i + 36).map(size => `
+              <div class="size-option">${size}</div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="bulk-pricing">
+          <div class="size-title">Bulk Purchase Options:</div>
+          <table class="bulk-table">
+            <thead>
+              <tr>
+                <th>Quantity</th>
+                <th>Price per Unit</th>
+                <th>Total Price</th>
+                <th>Discount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>10 pcs</td>
+                <td>₦${(product.price * 0.9).toLocaleString()}</td>
+                <td>₦${(product.price * 10 * 0.9).toLocaleString()}</td>
+                <td><span class="bulk-tag">-20%</span></td>
+              </tr>
+              <tr>
+                <td>25 pcs</td>
+                <td>₦${(product.price * 0.85).toLocaleString()}</td>
+                <td>₦${(product.price * 25 * 0.85).toLocaleString()}</td>
+                <td><span class="bulk-tag">-30%</span></td>
+              </tr>
+              <tr>
+                <td>50 pcs</td>
+                <td>₦${(product.price * 0.8).toLocaleString()}</td>
+                <td>₦${(product.price * 50 * 0.8).toLocaleString()}</td>
+                <td><span class="bulk-tag">-35%</span></td>
+              </tr>
+              <tr>
+                <td>100 pcs</td>
+                <td>₦${(product.price * 0.75).toLocaleString()}</td>
+                <td>₦${(product.price * 100 * 0.75).toLocaleString()}</td>
+                <td><span class="bulk-tag">-40%</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="modal-actions">
+          <button class="btn-add-cart" data-id="${product.id}" style="flex: 2;">
+            <i class="fas fa-shopping-cart"></i> Add to Cart
+          </button>
+          <button class="wishlist-btn ${wishlist.some(item => item.id === product.id) ? 'active' : ''}" data-id="${product.id}" style="flex: 1;">
+            <i class="fas fa-heart"></i>
+          </button>
+        </div>
+        
+        <!-- Glassmorphism section -->
+        <div class="modal-glass">
+          <div class="reviews-section">
+            <div class="reviews-title">Customer Reviews <span class="review-count">(${reviews.length})</span></div>
+            ${reviews.slice(0, 1).map(review => `
+              <div class="review">
+                <div class="review-header">
+                  <div class="review-user">${review.user}</div>
+                  <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
                 </div>
-                <div class="modal-details">
-                    <h3 class="modal-title">${product.name}</h3>
-                    <div class="modal-price">
-                        <del class="price-fake">₦${fakePrice.toLocaleString()}</del>
-                        <span class="price-original">₦${product.price.toLocaleString()}</span>
-                        <span class="price-discounted">₦${discountedPrice.toLocaleString()}</span>
-                        <span class="discount-tag">-${product.displayDiscount}% OFF</span>
+                <p class="review-text">"${review.text}"</p>
+              </div>
+            `).join('')}
+            ${reviews.length > 1 ? `
+              <div class="show-more-reviews">
+                <a href="#" id="showAllReviews">Show all ${reviews.length} reviews</a>
+              </div>
+              <div class="all-reviews" style="display: none;">
+                ${reviews.slice(1).map(review => `
+                  <div class="review">
+                    <div class="review-header">
+                      <div class="review-user">${review.user}</div>
+                      <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
                     </div>
-                    <p class="modal-description">
-                        Premium women's footwear crafted with the finest materials for ultimate comfort and style. 
-                        Features a durable sole, cushioned insole, and premium materials. Perfect for both 
-                        formal occasions and casual outings.
-                    </p>
-                    
-                    <div class="size-selection">
-                        <div class="size-title">Select Size:</div>
-                        <div class="sizes-grid">
-                            ${Array.from({length: 10}, (_, i) => i + 36).map(size => `
-                                <div class="size-option">${size}</div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    
-                    <div class="bulk-pricing">
-                        <div class="size-title">Bulk Purchase Options:</div>
-                        <table class="bulk-table">
-                            <thead>
-                                <tr>
-                                    <th>Quantity</th>
-                                    <th>Price per Unit</th>
-                                    <th>Total Price</th>
-                                    <th>Discount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>10 pcs</td>
-                                    <td>₦${discountedPrice.toLocaleString()}</td>
-                                    <td>₦${(discountedPrice * 10).toLocaleString()}</td>
-                                    <td><span class="bulk-tag">-20%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>25 pcs</td>
-                                    <td>₦${discountedPrice.toLocaleString()}</td>
-                                    <td>₦${(discountedPrice * 25).toLocaleString()}</td>
-                                    <td><span class="bulk-tag">-30%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>50 pcs</td>
-                                    <td>₦${discountedPrice.toLocaleString()}</td>
-                                    <td>₦${(discountedPrice * 50).toLocaleString()}</td>
-                                    <td><span class="bulk-tag">-35%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>100 pcs</td>
-                                    <td>₦${discountedPrice.toLocaleString()}</td>
-                                    <td>₦${(discountedPrice * 100).toLocaleString()}</td>
-                                    <td><span class="bulk-tag">-40%</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="modal-actions">
-                        <button class="btn-add-cart" data-id="${product.id}" style="flex: 2;">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
-                        <button class="wishlist-btn ${wishlist.some(item => item.id === product.id) ? 'active' : ''}" data-id="${product.id}" style="flex: 1;">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- Glassmorphism section -->
-                    <div class="modal-glass">
-                        <div class="reviews-section">
-                            <div class="reviews-title">Customer Reviews <span class="review-count">(${reviews.length})</span></div>
-                            ${reviews.slice(0, 1).map(review => `
-                                <div class="review">
-                                    <div class="review-header">
-                                        <div class="review-user">${review.user}</div>
-                                        <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
-                                    </div>
-                                    <p class="review-text">"${review.text}"</p>
-                                </div>
-                            `).join('')}
-                            ${reviews.length > 1 ? `
-                                <div class="show-more-reviews">
-                                    <a href="#" id="showAllReviews">Show all ${reviews.length} reviews</a>
-                                </div>
-                                <div class="all-reviews" style="display: none;">
-                                    ${reviews.slice(1).map(review => `
-                                        <div class="review">
-                                            <div class="review-header">
-                                                <div class="review-user">${review.user}</div>
-                                                <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
-                                            </div>
-                                            <p class="review-text">"${review.text}"</p>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            ` : ''}
-                        </div>
-                        
-                        <div class="urgency-note">
-                            <i class="fas fa-exclamation-triangle"></i> 
-                            Bulk purchases are subject to availability. Add now to secure stock.
-                        </div>
-                    </div>
-                </div>
-            `;
+                    <p class="review-text">"${review.text}"</p>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+          
+          <div class="urgency-note">
+            <i class="fas fa-exclamation-triangle"></i> 
+            Bulk purchases are subject to availability. Add now to secure stock.
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add event listeners inside modal
+    document.querySelectorAll('.modal .btn-add-cart').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = parseInt(this.getAttribute('data-id'));
+        const product = products.find(p => p.id === productId);
+        
+        addToCart(product, 1);
+      });
+    });
+    
+    document.querySelectorAll('.modal .wishlist-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = parseInt(this.getAttribute('data-id'));
+        const product = products.find(p => p.id === productId);
+        const buttonRect = this.getBoundingClientRect();
+        const wishlistIconRect = wishlistIcon.getBoundingClientRect();
+        
+        if (this.classList.contains('active')) {
+          removeFromWishlist(productId);
+          this.classList.remove('active');
+        } else {
+          addToWishlist(product);
+          this.classList.add('active');
+          
+          // Create floating hearts animation
+          createFloatingHearts(buttonRect, wishlistIconRect);
+        }
+      });
+    });
+    
+    document.querySelectorAll('.size-option').forEach(option => {
+      option.addEventListener('click', function() {
+        document.querySelectorAll('.size-option').forEach(el => el.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+    
+    // Show all reviews
+    const showAllReviews = document.getElementById('showAllReviews');
+    if (showAllReviews) {
+      showAllReviews.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector('.all-reviews').style.display = 'block';
+        this.style.display = 'none';
+      });
+    }
+    
+    // Show modal
+    modalOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Close modal
+  modalClose.addEventListener('click', () => {
+    modalOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  });
+
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      modalOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+
+  // ========== WISHLIST FUNCTIONS ========== //
+  function addToWishlist(product) {
+    if (!wishlist.some(item => item.id === product.id)) {
+      wishlist.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image
+      });
+      
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+      updateWishlistCount();
+      
+      // Show confirmation
+      showToast(`${product.name} added to wishlist!`, product.image);
+    }
+  }
+
+  function removeFromWishlist(productId) {
+    wishlist = wishlist.filter(item => item.id !== productId);
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    updateWishlistCount();
+  }
+
+  function updateWishlistCount() {
+    wishlistCount.textContent = wishlist.length;
+  }
+
+  // ========== CART FUNCTIONS ========== //
+  function addToCart(product, quantity) {
+    const existingItem = cart.find(item => item.id === product.id);
+    
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+        image: product.image
+      });
+    }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    updateCartTotal();
+    renderCartItems();
+    
+    // Show confirmation
+    showToast(`${quantity} ${product.name} added to cart!`, product.image);
+  }
+
+  function updateCartCount() {
+    const count = cart.reduce((total, item) => total + item.quantity, 0);
+    cartCount.textContent = count;
+  }
+
+  function updateCartTotal() {
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    cartTotal.textContent = `₦${total.toLocaleString()}`;
+  }
+
+  function renderCartItems() {
+    cartItems.innerHTML = '';
+    
+    if (cart.length === 0) {
+      cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+      return;
+    }
+    
+    cart.forEach(item => {
+      const cartItem = document.createElement('div');
+      cartItem.className = 'cart-item';
+      cartItem.innerHTML = `
+        <div class="cart-item-image">
+          <img src="assets/images/${item.image}" alt="${item.name}">
+        </div>
+        <div class="cart-item-details">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">₦${item.price.toLocaleString()} x ${item.quantity}</div>
+          <div class="cart-item-quantity">
+            <button class="decrease" data-id="${item.id}">-</button>
+            <span>${item.quantity}</span>
+            <button class="increase" data-id="${item.id}">+</button>
+          </div>
+        </div>
+        <button class="cart-item-remove" data-id="${item.id}">
+          <i class="fas fa-trash"></i>
+        </button>
+      `;
+      cartItems.appendChild(cartItem);
+    });
+    
+    // Add event listeners to cart item buttons
+    document.querySelectorAll('.cart-item-remove').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = parseInt(this.getAttribute('data-id'));
+        removeFromCart(productId);
+      });
+    });
+    
+    document.querySelectorAll('.decrease').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = parseInt(this.getAttribute('data-id'));
+        updateCartItemQuantity(productId, -1);
+      });
+    });
+    
+    document.querySelectorAll('.increase').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = parseInt(this.getAttribute('data-id'));
+        updateCartItemQuantity(productId, 1);
+      });
+    });
+    
+    // Update WhatsApp checkout link
+    updateWhatsAppCheckoutLink();
+  }
+
+  function removeFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    updateCartTotal();
+    renderCartItems();
+  }
+
+  function updateCartItemQuantity(productId, change) {
+    const item = cart.find(item => item.id === productId);
+    if (item) {
+      item.quantity += change;
+      if (item.quantity < 1) {
+        removeFromCart(productId);
+      } else {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        updateCartTotal();
+        renderCartItems();
+      }
+    }
+  }
+  
+  // Generate WhatsApp message for checkout
+  function updateWhatsAppCheckoutLink() {
+    if (cart.length === 0) {
+      whatsappCheckout.href = "#";
+      return;
+    }
+    
+    let message = "I would like to purchase the following items from JMPOTTERS Women's Footwear Collection:\n\n";
+    
+    cart.forEach(item => {
+      const itemTotal = item.price * item.quantity;
+      message += `- ${item.name} (${item.quantity} x ₦${item.price.toLocaleString()}) = ₦${itemTotal.toLocaleString()}\n`;
+    });
+    
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    message += `\n*Total: ₦${total.toLocaleString()}*`;
+    message += "\n\nPlease confirm the order and provide delivery details.";
+    
+    whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(message)}`;
+  }
+
+  // ========== CHAT SUPPORT FUNCTIONS ========== //
+  function setupChatSupport() {
+    chatFloat.addEventListener('click', () => {
+      chatModal.classList.toggle('active');
+    });
+    
+    closeChat.addEventListener('click', () => {
+      chatModal.classList.remove('active');
+    });
+  }
+
+  // ========== CATEGORY FILTER FUNCTIONS ========== //
+  function setupCategoryFilters() {
+    categoryFilters.forEach(filter => {
+      filter.addEventListener('click', function(e) {
+        e.preventDefault();
+        const category = this.dataset.category;
+        currentFilter = category;
+        
+        // Update active state
+        categoryFilters.forEach(f => f.parentElement.classList.remove('active'));
+        this.parentElement.classList.add('active');
+        
+        // Filter products
+        if (category === 'all') {
+          filteredProducts = [...products];
+          filterMessage.style.display = 'none';
+        } else {
+          filteredProducts = products.filter(product => {
+            const name = product.name.toLowerCase();
             
-            // Add event listeners inside modal
-            document.querySelectorAll('.modal .btn-add-cart').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    addToCart(product, 1);
-                });
-            });
-            
-            document.querySelectorAll('.modal .wishlist-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    if (this.classList.contains('active')) {
-                        removeFromWishlist(productId);
-                        this.classList.remove('active');
-                    } else {
-                        addToWishlist(product);
-                        this.classList.add('active');
-                    }
-                });
-            });
-            
-            document.querySelectorAll('.size-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.size-option').forEach(el => el.classList.remove('selected'));
-                    this.classList.add('selected');
-                });
-            });
-            
-            // Show all reviews
-            const showAllReviews = document.getElementById('showAllReviews');
-            if (showAllReviews) {
-                showAllReviews.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    document.querySelector('.all-reviews').style.display = 'block';
-                    this.style.display = 'none';
-                });
+            if (category === 'heels') {
+              return name.includes('heel');
+            } else if (category === 'sandals') {
+              return name.includes('sandal');
+            } else if (category === 'flats') {
+              return name.includes('flat') || name.includes('loafer') || name.includes('slip');
+            } else if (category === 'boots') {
+              return name.includes('boot');
             }
-            
-            // Show modal
-            modalOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Close modal
-        modalClose.addEventListener('click', () => {
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-
-        // ========== WISHLIST FUNCTIONS ========== //
-        function addToWishlist(product) {
-            if (!wishlist.some(item => item.id === product.id)) {
-                wishlist.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    image: product.image
-                });
-                
-                localStorage.setItem('wishlist', JSON.stringify(wishlist));
-                updateWishlistCount();
-                
-                // Show confirmation
-                showNotification(`${product.name} added to wishlist!`);
-            }
-        }
-
-        function removeFromWishlist(productId) {
-            wishlist = wishlist.filter(item => item.id !== productId);
-            localStorage.setItem('wishlist', JSON.stringify(wishlist));
-            updateWishlistCount();
-        }
-
-        function updateWishlistCount() {
-            wishlistCount.textContent = wishlist.length;
-        }
-
-        // ========== CART FUNCTIONS ========== //
-        function addToCart(product, quantity) {
-            const existingItem = cart.find(item => item.id === product.id);
-            
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({
-                    id: product.id,
-                    name: product.name,
-                    price: Math.round(product.price * (1 - 0.1)), // Apply 10% discount
-                    quantity: quantity,
-                    image: product.image
-                });
-            }
-            
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            updateCartTotal();
-            renderCartItems();
-            
-            // Show confirmation
-            showToast(`${quantity} ${product.name} added to cart!`, product.image);
-        }
-
-        function updateCartCount() {
-            const count = cart.reduce((total, item) => total + item.quantity, 0);
-            cartCount.textContent = count;
-        }
-
-        function updateCartTotal() {
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            cartTotal.textContent = `₦${total.toLocaleString()}`;
-        }
-
-        function renderCartItems() {
-            cartItems.innerHTML = '';
-            
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
-                return;
-            }
-            
-            cart.forEach(item => {
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <div class="cart-item-image">
-                        <img src="assets/images/${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="cart-item-details">
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">₦${item.price.toLocaleString()} x ${item.quantity}</div>
-                        <div class="cart-item-quantity">
-                            <button class="decrease" data-id="${item.id}">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="increase" data-id="${item.id}">+</button>
-                        </div>
-                    </div>
-                    <button class="cart-item-remove" data-id="${item.id}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-                cartItems.appendChild(cartItem);
-            });
-            
-            // Add event listeners to cart item buttons
-            document.querySelectorAll('.cart-item-remove').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    removeFromCart(productId);
-                });
-            });
-            
-            document.querySelectorAll('.decrease').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    updateCartItemQuantity(productId, -1);
-                });
-            });
-            
-            document.querySelectorAll('.increase').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    updateCartItemQuantity(productId, 1);
-                });
-            });
-            
-            // Update WhatsApp checkout link
-            updateWhatsAppCheckoutLink();
-        }
-
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            updateCartTotal();
-            renderCartItems();
-        }
-
-        function updateCartItemQuantity(productId, change) {
-            const item = cart.find(item => item.id === productId);
-            if (item) {
-                item.quantity += change;
-                if (item.quantity < 1) {
-                    removeFromCart(productId);
-                } else {
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    updateCartCount();
-                    updateCartTotal();
-                    renderCartItems();
-                }
-            }
+            return false;
+          });
+          
+          // Show filter message
+          filterMessage.innerHTML = `
+            Showing ${filteredProducts.length} results for 
+            <strong>${this.textContent}</strong> 
+            ${category === 'heels' ? '👠' : 
+              category === 'sandals' ? '👡' : 
+              category === 'flats' ? '🥿' : '👢'}
+          `;
+          filterMessage.style.display = 'block';
         }
         
-        // Generate WhatsApp message for checkout
-        function updateWhatsAppCheckoutLink() {
-            if (cart.length === 0) {
-                whatsappCheckout.href = "#";
-                return;
-            }
-            
-            let message = "I would like to purchase the following items from JMPOTTERS Women's Footwear Collection:\n\n";
-            
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                message += `- ${item.name} (${item.quantity} x ₦${item.price.toLocaleString()}) = ₦${itemTotal.toLocaleString()}\n`;
-            });
-            
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            message += `\n*Total: ₦${total.toLocaleString()}*`;
-            message += "\n\nPlease confirm the order and provide delivery details.";
-            
-            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(message)}`;
-        }
+        // Reset to first page and render
+        currentPage = 1;
+        renderProducts();
+      });
+    });
+  }
 
-        // ========== CHAT SUPPORT FUNCTIONS ========== //
-        function setupChatSupport() {
-            chatFloat.addEventListener('click', () => {
-                chatModal.classList.toggle('active');
-            });
-            
-            closeChat.addEventListener('click', () => {
-                chatModal.classList.remove('active');
-            });
-        }
+  // ========== MOBILE DROPDOWNS ========== //
+  function setupMobileDropdowns() {
+    mobileDropdowns.forEach(toggle => {
+      toggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        const content = this.nextElementSibling;
+        this.classList.toggle('active');
+        content.classList.toggle('active');
+      });
+    });
+  }
 
-        // ========== CATEGORY FILTER FUNCTIONS ========== //
-        function setupCategoryFilters() {
-            categoryFilters.forEach(filter => {
-                filter.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const category = this.dataset.category;
-                    currentFilter = category;
-                    
-                    // Update active state
-                    categoryFilters.forEach(f => f.parentElement.classList.remove('active'));
-                    this.parentElement.classList.add('active');
-                    
-                    // Filter products
-                    if (category === 'all') {
-                        filteredProducts = [...products];
-                        filterMessage.style.display = 'none';
-                    } else {
-                        filteredProducts = products.filter(product => {
-                            const name = product.name.toLowerCase();
-                            
-                            if (category === 'heels') {
-                                return name.includes('heel');
-                            } else if (category === 'sandals') {
-                                return name.includes('sandal');
-                            } else if (category === 'flats') {
-                                return name.includes('flat') || name.includes('loafer') || name.includes('slip');
-                            } else if (category === 'boots') {
-                                return name.includes('boot');
-                            }
-                            return false;
-                        });
-                        
-                        // Show filter message
-                        filterMessage.innerHTML = `
-                            Showing ${filteredProducts.length} results for 
-                            <strong>${this.textContent}</strong> 
-                            ${category === 'heels' ? '👠' : 
-                              category === 'sandals' ? '👡' : 
-                              category === 'flats' ? '🥿' : '👢'}
-                        `;
-                        filterMessage.style.display = 'block';
-                    }
-                    
-                    // Reset to first page and render
-                    currentPage = 1;
-                    renderProducts();
-                });
-            });
-        }
+  function showToast(message, image) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `
+      <div class="toast-icon">
+        <i class="fas fa-shopping-bag"></i>
+      </div>
+      <div class="toast-image">
+        <img src="assets/images/${image}" alt="Product">
+      </div>
+      <div class="toast-content">
+        <div class="toast-title">Item Added!</div>
+        <div class="toast-message">${message}</div>
+      </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 500);
+    }, 5000);
+  }
 
-        // ========== MOBILE DROPDOWNS ========== //
-        function setupMobileDropdowns() {
-            mobileDropdowns.forEach(toggle => {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const content = this.nextElementSibling;
-                    this.classList.toggle('active');
-                    content.classList.toggle('active');
-                });
-            });
-        }
+  // ========== TOAST MESSAGE FUNCTIONS ========== //
+  function startToastMessages() {
+    setInterval(() => {
+      showFakeToast();
+    }, 15000); // Show every 15 seconds
+  }
 
-        // ========== NOTIFICATION FUNCTIONS ========== //
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: var(--purple);
-                color: var(--white);
-                padding: 10px 20px;
-                border-radius: 4px;
-                z-index: 2000;
-                animation: fadeInOut 3s forwards;
-            `;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
+  function showFakeToast() {
+    const template = toastMessages[Math.floor(Math.random() * toastMessages.length)];
+    const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+    const location = fakeLocations[Math.floor(Math.random() * fakeLocations.length)];
+    const product = fakeProducts[Math.floor(Math.random() * fakeProducts.length)];
+    const quantity = [1, 2, 3, 5, 10][Math.floor(Math.random() * 5)];
+    const discount = [10, 20, 35][Math.floor(Math.random() * 3)];
+    const amount = (quantity * (Math.floor(Math.random() * 50000) + 10000)).toLocaleString();
+    const productImage = products[Math.floor(Math.random() * products.length)].image;
+    
+    const message = template
+      .replace('{name}', name)
+      .replace('{location}', location)
+      .replace('{product}', product)
+      .replace('{quantity}', quantity)
+      .replace('{discount}', discount)
+      .replace('{amount}', amount);
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `
+      <div class="toast-icon">
+        <i class="fas fa-bolt"></i>
+      </div>
+      <div class="toast-image">
+        <img src="assets/images/${productImage}" alt="Product">
+      </div>
+      <div class="toast-content">
+        <div class="toast-title">New Purchase!</div>
+        <div class="toast-message">${message}</div>
+      </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 500);
+    }, 5000);
+  }
 
-        function showToast(message, image) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `
-                <div class="toast-icon">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <div class="toast-image">
-                    <img src="assets/images/${image}" alt="Product">
-                </div>
-                <div class="toast-content">
-                    <div class="toast-title">Item Added!</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-            `;
-            
-            toastContainer.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    toast.remove();
-                }, 500);
-            }, 5000);
-        }
+  // ========== PANEL TOGGLE FUNCTIONS ========== //
+  // Cart panel toggle
+  cartIcon.addEventListener('click', () => {
+    cartPanel.classList.add('active');
+    cartOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    renderCartItems();
+  });
 
-        // ========== TOAST MESSAGE FUNCTIONS ========== //
-        function startToastMessages() {
-            setInterval(() => {
-                showFakeToast();
-            }, 15000); // Show every 15 seconds
-        }
+  closeCart.addEventListener('click', () => {
+    cartPanel.classList.remove('active');
+    cartOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  });
 
-        function showFakeToast() {
-            const template = toastMessages[Math.floor(Math.random() * toastMessages.length)];
-            const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
-            const location = fakeLocations[Math.floor(Math.random() * fakeLocations.length)];
-            const product = fakeProducts[Math.floor(Math.random() * fakeProducts.length)];
-            const quantity = [1, 2, 3, 5, 10][Math.floor(Math.random() * 5)];
-            const discount = [10, 20, 35][Math.floor(Math.random() * 3)];
-            const amount = (quantity * (Math.floor(Math.random() * 50000) + 10000)).toLocaleString();
-            const productImage = products[Math.floor(Math.random() * products.length)].image;
-            
-            const message = template
-                .replace('{name}', name)
-                .replace('{location}', location)
-                .replace('{product}', product)
-                .replace('{quantity}', quantity)
-                .replace('{discount}', discount)
-                .replace('{amount}', amount);
-            
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `
-                <div class="toast-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <div class="toast-image">
-                    <img src="assets/images/${productImage}" alt="Product">
-                </div>
-                <div class="toast-content">
-                    <div class="toast-title">New Purchase!</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-            `;
-            
-            toastContainer.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    toast.remove();
-                }, 500);
-            }, 5000);
-        }
+  cartOverlay.addEventListener('click', () => {
+    cartPanel.classList.remove('active');
+    cartOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  });
 
-        // ========== PANEL TOGGLE FUNCTIONS ========== //
-        // Cart panel toggle
-        cartIcon.addEventListener('click', () => {
-            cartPanel.classList.add('active');
-            cartOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            renderCartItems();
-        });
-
-        closeCart.addEventListener('click', () => {
-            cartPanel.classList.remove('active');
-            cartOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        cartOverlay.addEventListener('click', () => {
-            cartPanel.classList.remove('active');
-            cartOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        // Mobile navigation toggle
-        mobileToggle.addEventListener('click', function() {
-            mobileNav.classList.add('active');
-            navOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-        
-        closeNav.addEventListener('click', function() {
-            mobileNav.classList.remove('active');
-            navOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        
-        navOverlay.addEventListener('click', function() {
-            mobileNav.classList.remove('active');
-            navOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    </script>
+  // Mobile navigation toggle
+  mobileToggle.addEventListener('click', function() {
+    mobileNav.classList.add('active');
+    navOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  });
+  
+  closeNav.addEventListener('click', function() {
+    mobileNav.classList.remove('active');
+    navOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  });
+  
+  navOverlay.addEventListener('click', function() {
+    mobileNav.classList.remove('active');
+    navOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  });
+</script>
 </body>
 </html>
