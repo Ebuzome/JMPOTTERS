@@ -1377,18 +1377,22 @@
     <!-- Header -->
     <header id="header">
         <div class="container header-container">
-            <div class="logo-container">
-                <div class="logo-img-container">
-                    <img src="assets/images/logo-1.jpg" alt="JM POTTERS Logo" class="logo-img">
-                </div>
-                <a href="index.html" class="logo">JMPOTTERS<span>.</span></a>
-            </div>
+            <a href="index.html" class="logo">JMPOTTERS</a>
             
             <!-- Desktop Navigation -->
             <ul class="nav-links">
                 <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
                 <li><a href="shop/products.html"><i class="fas fa-shopping-bag"></i> Shop</a></li>
-                <li><a href="footwear.html"><i class="fas fa-shoe-prints"></i> Footwear</a></li>
+                
+                <!-- Footwear dropdown -->
+                <li class="dropdown">
+                    <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-content">
+                        <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
+                        <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
+                    </div>
+                </li>
+                
                 <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
                 <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
                 <li><a href="beauty.html"><i class="fas fa-spa"></i> Beauty</a></li>
@@ -1422,7 +1426,7 @@
     <div class="overlay" id="navOverlay"></div>
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <div class="logo">JMPOTTERS<span>.</span></div>
+            <a href="index.html" class="mobile-logo">JMPOTTERS</a>
             <button class="close-nav">
                 <i class="fas fa-times"></i>
             </button>
@@ -1430,7 +1434,16 @@
         <ul class="mobile-nav-links">
             <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
             <li><a href="shop/products.html"><i class="fas fa-shopping-bag"></i> Shop</a></li>
-            <li><a href="footwear.html"><i class="fas fa-shoe-prints"></i> Footwear</a></li>
+            
+            <!-- Mobile Footwear dropdown -->
+            <li class="mobile-dropdown" id="mobileFootwearDropdown">
+                <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
+                <div class="mobile-dropdown-content">
+                    <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
+                    <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
+                </div>
+            </li>
+            
             <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
             <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
             <li><a href="beauty.html"><i class="fas fa-spa"></i> Beauty</a></li>
@@ -1443,7 +1456,6 @@
             <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
         </ul>
     </div>
-
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
