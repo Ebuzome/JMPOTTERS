@@ -2272,6 +2272,9 @@
     
     // Start toast messages
     startToastMessages();
+    
+    // Set up event delegation for product interactions
+    setupProductInteractions();
   });
 
   // ========== PRELOADER FUNCTIONS ========== //
@@ -2383,9 +2386,6 @@
       productsGrid.appendChild(productCard);
     });
     
-    // Setup event listeners for the new products
-    setupProductInteractions();
-    
     // Render pagination
     renderPagination(totalPages);
   }
@@ -2442,14 +2442,16 @@
   }
 
   function setupProductInteractions() {
-    // Add to Cart buttons
-    document.querySelectorAll('.btn-add-cart').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const productId = parseInt(this.getAttribute('data-id'));
+    // Event delegation for product grid
+    productsGrid.addEventListener('click', function(e) {
+      // Add to cart
+      if (e.target.closest('.btn-add-cart')) {
+        const btn = e.target.closest('.btn-add-cart');
+        const productId = parseInt(btn.getAttribute('data-id'));
         const product = products.find(p => p.id === productId);
+        const card = btn.closest('.product-card');
         
         // Get selected quantity
-        const card = this.closest('.product-card');
         const selectedQty = card.querySelector('.quantity-option.selected');
         const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
         
@@ -2460,62 +2462,64 @@
         const cartIconRect = cartIcon.getBoundingClientRect();
         
         createFlyingProduct(product.image, cardRect, cartIconRect);
-      });
-    });
-    
-    // View Details buttons
-    document.querySelectorAll('.btn-view-details').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const productId = parseInt(this.getAttribute('data-id'));
-        currentProduct = products.find(p => p.id === productId);
-        
-        openProductModal(currentProduct);
-      });
-    });
-    
-    // Wishlist buttons
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const productId = parseInt(this.getAttribute('data-id'));
+      }
+      
+      // View details
+      if (e.target.closest('.btn-view-details')) {
+        const btn = e.target.closest('.btn-view-details');
+        const productId = parseInt(btn.getAttribute('data-id'));
         const product = products.find(p => p.id === productId);
-        const buttonRect = this.getBoundingClientRect();
+        
+        openProductModal(product);
+      }
+      
+      // Wishlist
+      if (e.target.closest('.wishlist-btn')) {
+        const btn = e.target.closest('.wishlist-btn');
+        const productId = parseInt(btn.getAttribute('data-id'));
+        const product = products.find(p => p.id === productId);
+        const buttonRect = btn.getBoundingClientRect();
         const wishlistIconRect = wishlistIcon.getBoundingClientRect();
         
-        if (this.classList.contains('active')) {
+        if (btn.classList.contains('active')) {
           removeFromWishlist(productId);
-          this.classList.remove('active');
+          btn.classList.remove('active');
         } else {
           addToWishlist(product);
-          this.classList.add('active');
+          btn.classList.add('active');
           
           // Create floating hearts animation
           createFloatingHearts(buttonRect, wishlistIconRect);
         }
-      });
+      }
     });
     
     // Toggle bulk options
-    document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const options = this.nextElementSibling;
+    productsGrid.addEventListener('click', function(e) {
+      if (e.target.closest('.toggle-bulk-options')) {
+        const btn = e.target.closest('.toggle-bulk-options');
+        const options = btn.nextElementSibling;
         options.classList.toggle('active');
-      });
+      }
     });
     
     // Quantity option selection
-    document.querySelectorAll('.quantity-option').forEach(option => {
-      option.addEventListener('click', function() {
+    productsGrid.addEventListener('click', function(e) {
+      if (e.target.closest('.quantity-option')) {
+        const option = e.target.closest('.quantity-option');
+        const optionsContainer = option.parentElement;
+        
         // Remove selected class from all options
-        this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
+        optionsContainer.querySelectorAll('.quantity-option').forEach(el => {
           el.classList.remove('selected');
         });
         
         // Add selected class to clicked option
-        this.classList.add('selected');
+        option.classList.add('selected');
         
         // Close options
-        this.parentElement.classList.remove('active');
-      });
+        optionsContainer.classList.remove('active');
+      }
     });
   }
 
