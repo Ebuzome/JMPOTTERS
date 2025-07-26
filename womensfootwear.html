@@ -220,15 +220,13 @@
 
         .cursor-trail {
             position: fixed;
-            width: 8px;
-            height: 8px;
             border-radius: 50%;
-            background: var(--gold-light);
             pointer-events: none;
             z-index: 9998;
             transform: translate(-50%, -50%);
             opacity: 0.7;
             box-shadow: 0 0 10px var(--gold);
+            transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
         .cursor.active {
@@ -243,10 +241,7 @@
 
         .orb-particle {
             position: fixed;
-            width: 6px;
-            height: 6px;
             border-radius: 50%;
-            background: var(--gold);
             pointer-events: none;
             z-index: 9997;
             opacity: 0;
@@ -1162,9 +1157,9 @@
             margin-top: auto;
         }
 
-        /* Glassmorphism effect */
+        /* Glassmorphism effect - increased opacity */
         .modal-glass {
-            background: rgba(165, 42, 42, 0.1);
+            background: rgba(165, 42, 42, 0.25); /* Increased opacity */
             backdrop-filter: blur(10px);
             border-radius: 8px;
             padding: 20px;
@@ -2452,12 +2447,41 @@
         function initializeCarousel() {
             const slides = document.querySelectorAll('.hero-slide');
             let currentSlide = 0;
+            let timer;
             
-            setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }, 5000);
+            function showSlide(index) {
+                // Hide all slides
+                slides.forEach(slide => slide.classList.remove('active'));
+                
+                // Show current slide
+                slides[index].classList.add('active');
+                
+                // Check if it's a video
+                const isVideo = slides[index].querySelector('video');
+                
+                // Set timeout based on content type
+                let slideDuration;
+                if (isVideo) {
+                    // Get video duration
+                    const video = slides[index].querySelector('video');
+                    slideDuration = video.duration * 1000; // Convert to milliseconds
+                } else {
+                    // Default image duration
+                    slideDuration = 10000; // 10 seconds
+                }
+                
+                // Clear previous timer
+                clearTimeout(timer);
+                
+                // Set timer for next slide
+                timer = setTimeout(() => {
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    showSlide(currentSlide);
+                }, slideDuration);
+            }
+            
+            // Start the carousel
+            showSlide(currentSlide);
         }
 
         // ========== CURSOR FUNCTIONS ========== //
@@ -2469,6 +2493,9 @@
             // Add explosion effect on click
             document.addEventListener('click', createOrbExplosion);
             
+            // Create trail orbs
+            createTrailOrbs();
+            
             // Add hover effects to interactive elements
             const interactiveElements = document.querySelectorAll('a, button, .product-toggle, .size-option, .page-btn, .quantity-btn');
             interactiveElements.forEach(el => {
@@ -2478,6 +2505,77 @@
                 el.addEventListener('mouseleave', () => {
                     cursor.classList.remove('active');
                 });
+            });
+        }
+
+        function createTrailOrbs() {
+            // Create 5 trail orbs
+            for (let i = 0; i < 5; i++) {
+                const orb = document.createElement('div');
+                orb.className = 'cursor-trail';
+                orb.style.width = `${24 - i * 4}px`;
+                orb.style.height = `${24 - i * 4}px`;
+                orb.style.background = `radial-gradient(circle, 
+                    rgba(212, 175, 55, ${0.7 - i * 0.15}), 
+                    rgba(255, 140, 0, ${0.7 - i * 0.15}))`;
+                orb.style.zIndex = `${9998 - i}`;
+                document.body.appendChild(orb);
+            }
+            
+            // Initialize position tracking
+            let lastX = 0, lastY = 0;
+            let trailPositions = Array(5).fill({x: 0, y: 0});
+            
+            // Update trail positions
+            function updateTrail(e) {
+                const x = e.clientX;
+                const y = e.clientY;
+                
+                // Only update if cursor moved
+                if (x !== lastX || y !== lastY) {
+                    // Update trail positions
+                    trailPositions.unshift({x, y});
+                    trailPositions.pop();
+                    
+                    // Update trail orbs
+                    const trailOrbs = document.querySelectorAll('.cursor-trail');
+                    trailOrbs.forEach((orb, i) => {
+                        const pos = trailPositions[i];
+                        if (pos) {
+                            orb.style.left = pos.x + 'px';
+                            orb.style.top = pos.y + 'px';
+                        }
+                    });
+                    
+                    lastX = x;
+                    lastY = y;
+                }
+                
+                requestAnimationFrame(() => updateTrail(e));
+            }
+            
+            document.addEventListener('mousemove', (e) => {
+                requestAnimationFrame(() => updateTrail(e));
+            });
+            
+            // Converge when mouse stops
+            let idleTimer;
+            document.addEventListener('mousemove', () => {
+                clearTimeout(idleTimer);
+                const trailOrbs = document.querySelectorAll('.cursor-trail');
+                trailOrbs.forEach(orb => {
+                    orb.style.transition = 'all 0.3s ease';
+                });
+                
+                idleTimer = setTimeout(() => {
+                    trailOrbs.forEach((orb, i) => {
+                        orb.style.transition = 'all 0.5s ease';
+                        orb.style.left = lastX + 'px';
+                        orb.style.top = lastY + 'px';
+                        orb.style.opacity = '0';
+                        orb.style.transform = 'scale(0)';
+                    });
+                }, 300);
             });
         }
 
@@ -2496,16 +2594,19 @@
 
         function createOrbExplosion(e) {
             // Create explosion particles
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 15; i++) { // Increased number of particles
                 const orb = document.createElement('div');
                 orb.className = 'orb-particle';
+                orb.style.width = '9px'; // Increased size
+                orb.style.height = '9px'; // Increased size
                 orb.style.left = e.clientX + 'px';
                 orb.style.top = e.clientY + 'px';
+                orb.style.background = `radial-gradient(circle, var(--gold), var(--accent))`;
                 document.body.appendChild(orb);
                 
                 // Random direction
                 const angle = Math.random() * Math.PI * 2;
-                const distance = 50 + Math.random() * 100;
+                const distance = 70 + Math.random() * 100; // Increased distance
                 const tx = Math.cos(angle) * distance;
                 const ty = Math.sin(angle) * distance;
                 
@@ -2514,7 +2615,7 @@
                     { transform: 'translate(0, 0) scale(1)', opacity: 1 },
                     { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
                 ], {
-                    duration: 600,
+                    duration: 800, // Longer duration
                     easing: 'ease-out',
                     fill: 'forwards'
                 });
@@ -2522,7 +2623,7 @@
                 // Remove after animation
                 setTimeout(() => {
                     orb.remove();
-                }, 600);
+                }, 800);
             }
         }
 
@@ -2977,7 +3078,7 @@
 
         // Floating hearts animation
         function createFloatingHearts(button) {
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 8; i++) { // More hearts
                 const heart = document.createElement('div');
                 heart.className = 'floating-heart';
                 heart.innerHTML = '<i class="fas fa-heart"></i>';
@@ -2989,23 +3090,18 @@
                 
                 document.body.appendChild(heart);
                 
-                // Random movement
+                // Random movement (float up and maybe left/right a bit)
                 const angle = Math.random() * Math.PI * 2;
                 const distance = 50 + Math.random() * 100;
                 const tx = Math.cos(angle) * distance;
-                const ty = Math.sin(angle) * distance;
+                const ty = -Math.abs(Math.sin(angle) * distance * 2); // mostly upward
                 
-                // Animate to wishlist icon
-                const wishlistRect = wishlistIcon.getBoundingClientRect();
-                const targetX = wishlistRect.left + wishlistRect.width / 2;
-                const targetY = wishlistRect.top + wishlistRect.height / 2;
-                
+                // Animate
                 heart.animate([
                     { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                    { transform: `translate(${tx}px, ${ty}px) scale(1.5)`, opacity: 0.8 },
-                    { transform: `translate(${targetX - rect.left - rect.width/2}px, ${targetY - rect.top - rect.height/2}px) scale(0.5)`, opacity: 0 }
+                    { transform: `translate(${tx}px, ${ty}px) scale(1.5)`, opacity: 0 }
                 ], {
-                    duration: 1000,
+                    duration: 1500 + Math.random() * 1000,
                     easing: 'ease-out',
                     fill: 'forwards'
                 });
@@ -3013,7 +3109,7 @@
                 // Remove after animation
                 setTimeout(() => {
                     heart.remove();
-                }, 1000);
+                }, 2500);
             }
         }
 
