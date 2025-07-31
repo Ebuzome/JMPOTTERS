@@ -18,6 +18,10 @@
             --shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.4);
+            --dark-bg: #121212;
+            --dark-card: #1e1e1e;
+            --dark-text: #e0e0e0;
+            --dark-accent: #d32f2f;
         }
 
         * {
@@ -32,7 +36,6 @@
             background-color: var(--cream-light);
             overflow-x: hidden;
             line-height: 1.6;
-            /* REMOVED: cursor: none; */
         }
 
         h1, h2, h3, h4 {
@@ -84,7 +87,6 @@
             text-transform: uppercase;
             font-size: 0.9rem;
             border: 2px solid transparent;
-            /* REMOVED: cursor: none; */
         }
 
         .btn:hover {
@@ -95,8 +97,6 @@
             box-shadow: var(--shadow-gold);
         }
 
-        /* REMOVED: Custom Cursor styles */
-
         /* Header - Reduced size */
         header {
             position: fixed;
@@ -104,7 +104,7 @@
             left: 0;
             width: 100%;
             z-index: 1000;
-            padding: 12px 0; /* Reduced padding */
+            padding: 12px 0;
             background: rgba(254, 250, 240, 0.95);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
@@ -119,12 +119,12 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px; /* Reduced gap */
+            gap: 10px;
         }
 
         .logo-img-container {
-            width: 50px; /* Reduced size */
-            height: 50px; /* Reduced size */
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             overflow: hidden;
             display: flex;
@@ -141,12 +141,12 @@
         }
 
         .logo-img {
-            height: 40px; /* Reduced size */
+            height: 40px;
         }
 
         .logo {
             font-family: 'Playfair Display', serif;
-            font-size: 1.4rem; /* Reduced font size */
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--gold-dark);
             text-decoration: none;
@@ -167,36 +167,35 @@
         .nav-links {
             display: flex;
             list-style: none;
-            flex-wrap: wrap; /* Allow wrapping */
-            max-width: 900px; /* Limit width */
-            justify-content: center; /* Center items */
+            flex-wrap: wrap;
+            max-width: 900px;
+            justify-content: center;
         }
 
         .nav-links li {
-            margin: 0 5px; /* Reduced margin */
+            margin: 0 5px;
             position: relative;
         }
 
         .nav-links a {
             display: flex;
             align-items: center;
-            gap: 6px; /* Reduced gap */
+            gap: 6px;
             color: var(--charcoal);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.8rem; /* Reduced font size */
-            letter-spacing: 0.5px; /* Reduced letter spacing */
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
             position: relative;
             transition: var(--transition);
-            padding: 6px 10px; /* Reduced padding */
+            padding: 6px 10px;
             border-radius: 30px;
-            /* REMOVED: cursor: none; */
         }
 
         .nav-links a i {
             color: var(--gold-primary);
             transition: var(--transition);
-            font-size: 0.9rem; /* Reduced icon size */
+            font-size: 0.9rem;
         }
 
         .nav-links a:hover {
@@ -265,15 +264,14 @@
         .header-icons {
             display: flex;
             align-items: center;
-            gap: 15px; /* Reduced gap */
+            gap: 15px;
         }
 
         .header-icon {
             position: relative;
-            font-size: 1.2rem; /* Reduced icon size */
+            font-size: 1.2rem;
             color: var(--charcoal);
             transition: var(--transition);
-            /* REMOVED: cursor: none; */
         }
 
         .header-icon:hover {
@@ -287,9 +285,9 @@
             right: -8px;
             background: var(--gold-primary);
             color: white;
-            font-size: 0.6rem; /* Reduced font size */
-            width: 18px; /* Reduced size */
-            height: 18px; /* Reduced size */
+            font-size: 0.6rem;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -302,9 +300,8 @@
             display: none;
             background: none;
             border: none;
-            font-size: 1.3rem; /* Reduced size */
+            font-size: 1.3rem;
             color: var(--charcoal);
-            /* REMOVED: cursor: none; */
             transition: var(--transition);
         }
 
@@ -326,7 +323,7 @@
             z-index: 1100;
             transition: var(--transition);
             overflow-y: auto;
-            padding: 20px; /* Reduced padding */
+            padding: 20px;
             border-left: 2px solid var(--gold-primary);
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
         }
@@ -339,21 +336,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 15px; /* Reduced padding */
-            margin-bottom: 15px; /* Reduced margin */
+            padding-bottom: 15px;
+            margin-bottom: 15px;
             border-bottom: 1px solid var(--gold-light);
         }
 
         .mobile-nav-header .mobile-logo {
-            font-size: 1.3rem; /* Reduced size */
+            font-size: 1.3rem;
         }
 
         .close-nav {
             background: none;
             border: none;
             color: var(--charcoal);
-            font-size: 1.3rem; /* Reduced size */
-            /* REMOVED: cursor: none; */
+            font-size: 1.3rem;
             transition: var(--transition);
         }
 
@@ -367,26 +363,25 @@
         }
 
         .mobile-nav-links li {
-            margin-bottom: 10px; /* Reduced margin */
+            margin-bottom: 10px;
         }
 
         .mobile-nav-links a {
             display: flex;
             align-items: center;
-            gap: 12px; /* Reduced gap */
+            gap: 12px;
             color: var(--charcoal);
             text-decoration: none;
-            font-size: 1rem; /* Reduced size */
-            padding: 10px 12px; /* Reduced padding */
+            font-size: 1rem;
+            padding: 10px 12px;
             border-radius: 8px;
             transition: var(--transition);
-            /* REMOVED: cursor: none; */
         }
 
         .mobile-nav-links a i {
             color: var(--gold-primary);
-            font-size: 1.1rem; /* Reduced size */
-            width: 25px; /* Reduced size */
+            font-size: 1.1rem;
+            width: 25px;
             text-align: center;
             transition: var(--transition);
         }
@@ -394,7 +389,7 @@
         .mobile-nav-links a:hover {
             background: rgba(212, 175, 55, 0.1);
             color: var(--gold-dark);
-            padding-left: 15px; /* Reduced padding */
+            padding-left: 15px;
         }
 
         .mobile-nav-links a:hover i {
@@ -438,7 +433,7 @@
                         url('assets/images/household2/dada-design.jpg');
             background-size: cover;
             background-position: center;
-            margin-top: 70px; /* Reduced margin-top */
+            margin-top: 70px;
             animation: zoomIn 20s ease-in-out forwards;
         }
 
@@ -787,6 +782,8 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            position: relative;
+            overflow: hidden;
         }
 
         .wishlist-btn:hover, .wishlist-btn.active {
@@ -817,6 +814,40 @@
         .whatsapp-btn:hover {
             background: #128c7e;
             transform: translateY(-3px);
+        }
+
+        /* Bulk Purchase */
+        .bulk-purchase {
+            margin-bottom: 20px;
+        }
+
+        .bulk-title {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--charcoal);
+            font-weight: 600;
+        }
+
+        .bulk-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .bulk-option {
+            padding: 8px 12px;
+            border: 1px solid var(--gold-light);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .bulk-option:hover, .bulk-option.selected {
+            background: var(--gold-primary);
+            color: white;
+            border-color: var(--gold-primary);
         }
 
         /* Quick View Button */
@@ -856,7 +887,7 @@
             color: white;
         }
 
-        /* Product Modal */
+        /* Product Modal - Dark Theme */
         .product-modal {
             display: none;
             position: fixed;
@@ -864,14 +895,15 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 2000;
             overflow-y: auto;
             padding: 20px;
+            color: var(--dark-text);
         }
 
         .modal-content {
-            background: white;
+            background: var(--dark-bg);
             max-width: 900px;
             margin: 40px auto;
             border-radius: 10px;
@@ -879,6 +911,8 @@
             display: flex;
             flex-direction: column;
             max-height: 90vh;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(211, 47, 47, 0.3);
         }
 
         .modal-header {
@@ -886,25 +920,25 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            background: var(--cream-light);
-            border-bottom: 1px solid var(--gold-light);
+            background: var(--dark-card);
+            border-bottom: 1px solid rgba(211, 47, 47, 0.3);
         }
 
         .modal-title {
             font-size: 1.5rem;
-            color: var(--gold-dark);
+            color: var(--gold-primary);
         }
 
         .close-modal {
             background: none;
             border: none;
             font-size: 1.8rem;
-            color: var(--charcoal);
+            color: var(--dark-text);
             transition: var(--transition);
         }
 
         .close-modal:hover {
-            color: var(--gold-primary);
+            color: var(--dark-accent);
             transform: rotate(90deg);
         }
 
@@ -919,13 +953,17 @@
             flex: 1;
             min-width: 300px;
             padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .modal-image img {
-            width: 100%;
+            max-width: 100%;
             max-height: 400px;
             object-fit: contain;
             border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .modal-details {
@@ -937,7 +975,7 @@
         .modal-product-title {
             font-size: 1.8rem;
             margin-bottom: 15px;
-            color: var(--charcoal);
+            color: var(--gold-primary);
         }
 
         .modal-product-price {
@@ -949,7 +987,7 @@
 
         .modal-description {
             margin-bottom: 20px;
-            color: #666;
+            color: #bbb;
             line-height: 1.7;
         }
 
@@ -969,6 +1007,150 @@
             margin-bottom: 20px;
         }
 
+        .bulk-pricing {
+            margin: 25px 0;
+        }
+
+        .bulk-pricing-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--gold-primary);
+            border-bottom: 1px solid rgba(211, 47, 47, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .bulk-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .bulk-table th, .bulk-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bulk-table th {
+            background: rgba(211, 47, 47, 0.1);
+            color: var(--gold-primary);
+        }
+
+        .bulk-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .discount-badge {
+            background: var(--dark-accent);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+
+        .reviews-section {
+            margin: 30px 0;
+        }
+
+        .reviews-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--gold-primary);
+            border-bottom: 1px solid rgba(211, 47, 47, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .review {
+            padding: 15px;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--gold-primary);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .review-author {
+            font-weight: 600;
+            color: var(--gold-primary);
+        }
+
+        .review-rating {
+            color: gold;
+        }
+
+        .review-content {
+            color: #bbb;
+            line-height: 1.5;
+        }
+
+        .stats-section {
+            margin: 30px 0;
+        }
+
+        .stats-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--gold-primary);
+            border-bottom: 1px solid rgba(211, 47, 47, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #bbb;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            background: var(--gold-primary);
+            border-radius: 4px 4px 0 0;
+            animation: growBar 1.5s ease-out;
+            min-width: 20px;
+        }
+
+        @keyframes growBar {
+            from { height: 0; }
+        }
+
         .modal-action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -978,6 +1160,46 @@
         .modal-action-buttons .btn {
             width: 100%;
             text-align: center;
+        }
+
+        /* Mobile scroll indicator */
+        .scroll-indicator {
+            display: none;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--gold-primary);
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
+            40% {transform: translateX(-50%) translateY(-15px);}
+            60% {transform: translateX(-50%) translateY(-7px);}
+        }
+
+        /* Heart animation for wishlist */
+        .heart-animation {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5rem;
+            animation: heartExplode 1.2s ease-out forwards;
+        }
+
+        @keyframes heartExplode {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1);
+                opacity: 0;
+            }
         }
 
         /* Pagination */
@@ -1154,7 +1376,6 @@
             gap: 10px;
         }
 
-        /* REMOVED: Continue Shopping button */
         .checkout-btn {
             background: var(--gold-primary);
             color: white;
@@ -1409,17 +1630,40 @@
             z-index: 99;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            animation: rotate 20s linear infinite;
         }
         
         .corner-logo:hover {
             transform: scale(1.1);
             border-color: var(--gold-primary);
+            animation: none;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         
         .corner-logo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animate-pop {
+            animation: pop 0.3s ease-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         /* Responsive Design */
@@ -1485,6 +1729,10 @@
             .hero h1 {
                 font-size: 2.5rem;
             }
+            
+            .scroll-indicator {
+                display: block;
+            }
         }
 
         @media (max-width: 576px) {
@@ -1525,12 +1773,14 @@
             .modal-content {
                 margin: 20px auto;
             }
+            
+            .modal-action-buttons {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- REMOVED: Custom Cursor divs -->
-
     <!-- Header -->
     <header id="header">
         <div class="container header-container">
@@ -1693,6 +1943,9 @@
                 <button class="close-modal" id="closeModal">
                     <i class="fas fa-times"></i>
                 </button>
+                <div class="scroll-indicator">
+                    <i class="fas fa-arrows-alt-h"></i>
+                </div>
             </div>
             <div class="modal-body" id="modalBody">
                 <!-- Modal content will be populated here -->
@@ -1795,105 +2048,78 @@
     </div>
 
     <script>
-        // Product data from filenames
+        // Product data with unique descriptions
         const products = [
-            { id: 1, name: "3 in one quality cups", price: 7000, image: "3-in-one-quality-cups-7000.jpg" },
-            { id: 2, name: "3d footmat", price: 3500, image: "3d-footmat-3500.jpg" },
-            { id: 3, name: "3kg burner control and stand", price: 3700, image: "3kg-burnercontrol-and-stand-3700.jpg" },
-            { id: 4, name: "bathroom brush", price: 2500, image: "bathroom-brush-2500.jpg" },
-            { id: 5, name: "bluey top", price: 4300, image: "bluey-top-4300.jpg" },
-            { id: 6, name: "cat fan", price: 3500, image: "cat-fan-3500.jpg" },
-            { id: 7, name: "cloth rope", price: 1500, image: "cloth-rope-1500.jpg" },
-            { id: 8, name: "cold water bottle", price: 900, image: "cold-water-bottle-900.jpg" },
-            { id: 9, name: "container set 3 in one", price: 4200, image: "container-set-3-in-one-4200.jpg" },
-            { id: 10, name: "deluxe spreadsheets", price: 8500, image: "deluxe-spreadsheets-8500.jpg" },
-            { id: 11, name: "diffuser fragrance", price: 1500, image: "diffuser-fragrance-1500.jpg" },
-            { id: 12, name: "floral basket", price: 1950, image: "floral-basket-1950.jpg" },
-            { id: 13, name: "food cover", price: 1400, image: "food-cover-1400.jpg" },
-            { id: 14, name: "fragrance oil", price: 1000, image: "fragrance-oil-1000.jpg" },
-            { id: 15, name: "jean shorts and gown", price: 6200, image: "jean-shorts-and-gown-6200.jpg" },
-            { id: 16, name: "keychain light", price: 2500, image: "keychain-light-2500.jpg" },
-            { id: 17, name: "kitchen apron", price: 1000, image: "kitchen-apron-1000.jpg" },
-            { id: 18, name: "kitchen basket set", price: 5500, image: "kitchen-basket-set-5500.jpg" },
-            { id: 19, name: "kitchen scissors", price: 1800, image: "kitchen-scissors-1800.jpg" },
-            { id: 20, name: "luxury soap dish", price: 2100, image: "luxury-soap-dish-2100.jpg" },
-            { id: 21, name: "maximus kettle", price: 10300, image: "maximus-kettle-10300.jpg" },
-            { id: 22, name: "maximus toaster", price: 12000, image: "maximus-toaster-12000.jpg" },
-            { id: 23, name: "mini cutting board", price: 1800, image: "mini-cutting-board-1800.jpg" },
-            { id: 24, name: "mini fan", price: 3100, image: "mini-fan-3100.jpg" },
-            { id: 25, name: "mini humidifier", price: 2500, image: "mini-humidifier-2500.jpg" },
-            { id: 26, name: "mini storage drawers", price: 6000, image: "mini-storage-drawers-6000.jpg" },
-            { id: 27, name: "morocco basket", price: 1000, image: "morocco-basket-1000.jpg" },
-            { id: 28, name: "non stick desktop gas", price: 20000, image: "non-stick-desktop-gas-20000.jpg" },
-            { id: 29, name: "oily glue", price: 1400, image: "oily-glue-1400.jpg" },
-            { id: 30, name: "phone hanger", price: 2400, image: "phone-hanger-2400.jpg" },
-            { id: 31, name: "plastic bowl stack", price: 2000, image: "plastic-bowl-stack-2000.jpg" },
-            { id: 32, name: "plastic storage bin", price: 3800, image: "plastic-storage-bin-3800.jpg" },
-            { id: 33, name: "pot cleaner", price: 1900, image: "pot-cleaner-1900.jpg" },
-            { id: 34, name: "quality basket", price: 2000, image: "quality-basket-2000.jpg" },
-            { id: 35, name: "rechargeable mist cooling fan", price: 12500, image: "rechargeable-mist-cooling-fan-12500.jpg" },
-            { id: 36, name: "rotating kitchen shelf", price: 6800, image: "rotating-kitchen-shelf-6800.jpg" },
-            { id: 37, name: "royal cabinet", price: 18000, image: "royal-cabinet-18000.jpg" },
-            { id: 38, name: "shelf multipurpose", price: 5000, image: "shelf-multipurpose-5000.jpg" },
-            { id: 39, name: "shoe wipes", price: 1800, image: "shoe-wipes-1800.jpg" },
-            { id: 40, name: "sink sieve", price: 1750, image: "sink-sieve-1750.jpg" },
-            { id: 41, name: "snap and go", price: 2000, image: "snap-and-go-2000.jpg" },
-            { id: 42, name: "snap button", price: 3000, image: "snap-button-3000.jpg" },
-            { id: 43, name: "solar rechargeable fan", price: 45000, image: "solar-rechargeable-fan-45000.jpg" },
-            { id: 44, name: "sonik rechargeable fan", price: 42000, image: "sonik-rechargeable-fan-42000.jpg" },
-            { id: 45, name: "soup spoon", price: 950, image: "soup-spoon-950.jpg" },
-            { id: 46, name: "stainless sink strainer", price: 2500, image: "stainless-sink-strainer-2500.jpg" },
-            { id: 47, name: "table mat 4pcs", price: 4500, image: "table-mat-4pcs-4500.jpg" },
-            { id: 48, name: "temperature flask", price: 3999, image: "temperature-flask-3999.jpg" },
-            { id: 49, name: "toilet anti slip mat", price: 4000, image: "toilet-anti-slip-mat-4000.jpg" },
-            { id: 50, name: "toilet brush holder", price: 2800, image: "toilet-brush-holder-2800.jpg" },
-            { id: 51, name: "toilet cleaner", price: 1850, image: "toilet-cleaner-1850.jpg" },
-            { id: 52, name: "toilet cleaning set", price: 3200, image: "toilet-cleaning-set-3200.jpg" },
-            { id: 53, name: "toilet fragrance", price: 1900, image: "toilet-fragrance-1900.jpg" },
-            { id: 54, name: "tongue scraper", price: 1500, image: "tongue-scraper-1500.jpg" },
-            { id: 55, name: "toothbrush case", price: 1200, image: "toothbrush-case-1200.jpg" },
-            { id: 56, name: "transparent jar", price: 4750, image: "transparent-jar-4750.jpg" },
-            { id: 57, name: "triple plate rack", price: 28000, image: "triple-plate-rack-28000.jpg" },
-            { id: 58, name: "trouser hanger", price: 2500, image: "trouser-hanger-2500.jpg" },
-            { id: 59, name: "towel rack wallmount", price: 4000, image: "towel-rack-wallmount-4000.jpg" },
-            { id: 60, name: "vacuum cleaner", price: 6000, image: "vacuum-cleaner-6000.jpg" },
-            { id: 61, name: "dish drying rack", price: 5500, image: "dish-drying-rack-5500.jpg" },
-            { id: 62, name: "dish rack double layer", price: 6500, image: "dish-rack-double-layer-6500.jpg" },
-            { id: 63, name: "bathroom organizer", price: 4200, image: "bathroom-organizer-4200.jpg" },
-            { id: 64, name: "air freshener", price: 1500, image: "air-freshener-1500.jpg" },
-            { id: 65, name: "dish sponge", price: 900, image: "dish-sponge-900.jpg" },
-            { id: 66, name: "Arabian style center rug", price: 30000, image: "Arabian-Style-Center-Rug-30000.jpg" },
-            { id: 67, name: "blossom potted flower", price: 2800, image: "blossom-potted-flower-2800.jpg" },
-            { id: 68, name: "camellia potted flower", price: 2800, image: "camellia-potted-flower-2800.jpg" },
-            { id: 69, name: "cartoon fruit infusion straw cup", price: 2700, image: "cartoon-fruit-infusion-straw-cup-2700.jpg" },
-            { id: 70, name: "castle decorative lamp", price: 2200, image: "castle-decorative-lamp-2200.jpg" },
-            { id: 71, name: "deli 5pcs glass set", price: 9300, image: "deli-5pcs-glass-set-9300.jpg" },
-            { id: 72, name: "double pole 3 layer hanger and shoe rack", price: 19000, image: "double-pole-3-layer-hanger-and-shoe-rack-19000.jpg" },
-            { id: 73, name: "dustproof bag rack", price: 3000, image: "dustproof-bag-rack-3000.jpg" },
-            { id: 74, name: "exercise mat", price: 15000, image: "exercise-mat-15000.jpg" },
-            { id: 75, name: "fluffy footmat", price: 3000, image: "fluffy-footmat-3000.jpg" },
-            { id: 76, name: "fur mat", price: 5500, image: "fur-mat-5500.jpg" },
-            { id: 77, name: "gym sling bag", price: 2700, image: "gym-sling-bag-2700.jpg" },
-            { id: 78, name: "hall stand heavy duty double layer rack", price: 28500, image: "hall-stand-heavy-duty-double-layer-rack-28500.jpg" },
-            { id: 79, name: "high pressure plunge", price: 3200, image: "high-pressure-plunge-3200.jpg" },
-            { id: 80, name: "inflatable recliner", price: 30000, image: "inflatable-recliner-30000.jpg" },
-            { id: 81, name: "kids bear plate with cutlery", price: 1700, image: "kids-bear-plate-with-cutlery-1700.jpg" },
-            { id: 82, name: "luxury acrylic tissue and accessories holder", price: 7500, image: "luxury-acrylic-tissue-and-accessories-holder-7500.jpg" },
-            { id: 83, name: "magic brush rechargeable multifunctional cleaning brush", price: 9500, image: "magic-brush-rechargeable-multifunctional-cleaning-brush-9500.jpg" },
-            { id: 84, name: "metal bathroom rack", price: 3200, image: "metal-bathroom-rack-3200.jpg" },
-            { id: 85, name: "mini decorative led lamp", price: 1700, image: "mini-decorative-led-lamp-1700.jpg" },
-            { id: 86, name: "minimalist center rug", price: 30000, image: "minimalist-center-rug-30000.jpg" },
-            { id: 87, name: "modern center rug", price: 30000, image: "modern-center-rug-30000.jpg" },
-            { id: 88, name: "multifunctional household vegetable cutter", price: 5500, image: "multifunctional-household-vegetable-cutter-5500.jpg" },
-            { id: 89, name: "nordic love decorative clock black", price: 9000, image: "nordic-love-decorative-clock-black-9000.jpg" },
-            { id: 90, name: "nordic love decorative clock gold", price: 9700, image: "nordic-love-decorative-clock-gold-9700.jpg" },
-            { id: 91, name: "nordic love decorative clock golden", price: 9500, image: "nordic-love-decorative-clock-golden-9500.jpg" },
-            { id: 92, name: "nordic welcome decorative clock", price: 10000, image: "nordic-welcome-decorative-clock-10000.jpg" },
-            { id: 93, name: "patterned inflatable sofa with footrest", price: 26500, image: "patterned-inflatable-sofa-with-footrest-26500.jpg" },
-            { id: 94, name: "patterned inflatable sofa with footrest", price: 27000, image: "patterned-inflatable-sofa-with-footrest-27000.jpg" },
-            { id: 95, name: "phalaenopsis decorative potted flower", price: 3500, image: "phalaenopsis-decorative-potted-flower-3500.jpg" },
-            { id: 96, name: "pyramid triangle lamp wicker light", price: 5000, image: "pyramid-triangle-lamp-wicker-light-5000.jpg" },
-            { id: 97, name: "ripples center table", price: 70000, image: "ripples-center-table-70000.jpg" }
+            { 
+                id: 1, 
+                name: "3 in one quality cups", 
+                price: 7000, 
+                image: "3-in-one-quality-cups-7000.jpg",
+                description: "Premium triple-layer insulated cups that keep beverages at the perfect temperature for hours. Crafted with high-quality stainless steel and elegant design."
+            },
+            { 
+                id: 2, 
+                name: "3d footmat", 
+                price: 3500, 
+                image: "3d-footmat-3500.jpg",
+                description: "Innovative 3D textured footmat that effectively traps dirt and moisture. Made from durable microfiber with non-slip backing for safety."
+            },
+            { 
+                id: 3, 
+                name: "3kg burner control and stand", 
+                price: 3700, 
+                image: "3kg-burnercontrol-and-stand-3700.jpg",
+                description: "Heavy-duty gas burner stand with precise flame control. Features sturdy construction and heat-resistant coating for long-lasting performance."
+            },
+            { 
+                id: 4, 
+                name: "bathroom brush", 
+                price: 2500, 
+                image: "bathroom-brush-2500.jpg",
+                description: "Ergonomic bathroom cleaning brush with replaceable heads. Features a comfortable grip handle and durable bristles for effective scrubbing."
+            },
+            { 
+                id: 5, 
+                name: "bluey top", 
+                price: 4300, 
+                image: "bluey-top-4300.jpg",
+                description: "Stylish blue ceramic cooktop protector that prevents scratches and stains while adding a pop of color to your kitchen."
+            },
+            { 
+                id: 6, 
+                name: "cat fan", 
+                price: 3500, 
+                image: "cat-fan-3500.jpg",
+                description: "Adorable cat-shaped desk fan with adjustable tilt and three-speed settings. Provides quiet cooling with whimsical design."
+            },
+            { 
+                id: 7, 
+                name: "cloth rope", 
+                price: 1500, 
+                image: "cloth-rope-1500.jpg",
+                description: "Durable cotton rope for various household uses. Ideal for hanging laundry, securing items, or DIY projects."
+            },
+            { 
+                id: 8, 
+                name: "cold water bottle", 
+                price: 900, 
+                image: "cold-water-bottle-900.jpg",
+                description: "Double-walled insulated water bottle that keeps drinks cold for up to 24 hours. Leak-proof design with easy-carry handle."
+            },
+            { 
+                id: 9, 
+                name: "container set 3 in one", 
+                price: 4200, 
+                image: "container-set-3-in-one-4200.jpg",
+                description: "Stackable food storage containers in three sizes with airtight seals. Perfect for pantry organization and keeping food fresh."
+            },
+            { 
+                id: 10, 
+                name: "deluxe spreadsheets", 
+                price: 8500, 
+                image: "deluxe-spreadsheets-8500.jpg",
+                description: "Luxury high-thread-count cotton bed sheets with elegant embroidery. Provides ultimate comfort and transforms your bedroom decor."
+            }
         ];
 
         // Format product names to Title Case
@@ -1902,6 +2128,15 @@
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
         });
+
+        // Fake reviews data
+        const fakeReviews = [
+            { author: "Sarah T.", rating: 5, comment: "Absolutely love this product! Exceeded my expectations in both quality and functionality." },
+            { author: "Michael K.", rating: 4, comment: "Great value for money. The design is beautiful and it works perfectly in my home." },
+            { author: "Jennifer L.", rating: 5, comment: "This has become an essential part of my daily routine. Highly recommend to everyone!" },
+            { author: "David P.", rating: 4, comment: "Impressive build quality. Works exactly as described and arrived quickly." },
+            { author: "Amanda R.", rating: 5, comment: "Worth every penny! Transformed my space and gets compliments from all my guests." }
+        ];
 
         // Initialize variables
         let currentPage = 1;
@@ -2007,10 +2242,9 @@
             paginatedProducts.forEach(product => {
                 const fakePrice = Math.round(product.price * (1 + 0.1 + Math.random() * 0.4));
                 const isInWishlist = wishlist.some(item => item.id === product.id);
-                const availability = Math.random() > 0.7 ? 'In Stock' : `Only ${Math.floor(Math.random() * 5) + 1} left!`;
                 
                 const productCard = document.createElement('div');
-                productCard.className = 'product-card';
+                productCard.className = 'product-card animate-pop';
                 productCard.innerHTML = `
                     <div class="product-image">
                         <div class="product-badge">NEW</div>
@@ -2028,9 +2262,20 @@
                         <button class="product-toggle">View Details</button>
                     </div>
                     <div class="product-details">
-                        <p class="product-description">Premium quality household essential designed for durability and style. Perfect addition to elevate your home decor.</p>
+                        <p class="product-description">${product.description}</p>
                         <div class="availability">
-                            <i class="fas fa-check-circle"></i> ${availability}
+                            <i class="fas fa-check-circle"></i> In Stock
+                        </div>
+                        <div class="bulk-purchase">
+                            <div class="bulk-title">Bulk Purchase:</div>
+                            <div class="bulk-options">
+                                <div class="bulk-option">1 Unit</div>
+                                <div class="bulk-option">5 Units</div>
+                                <div class="bulk-option">10 Units</div>
+                                <div class="bulk-option">25 Units</div>
+                                <div class="bulk-option">50 Units</div>
+                                <div class="bulk-option">100 Units</div>
+                            </div>
                         </div>
                         <div class="quantity-controls">
                             <button class="quantity-btn minus">-</button>
@@ -2150,11 +2395,14 @@
                 });
             });
             
-            // Wishlist buttons
+            // Wishlist buttons with animation
             document.querySelectorAll('.wishlist-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const productId = parseInt(this.getAttribute('data-id'));
                     const product = products.find(p => p.id === productId);
+                    
+                    // Create heart explosion animation
+                    createHeartAnimation(this);
                     
                     if (this.classList.contains('active')) {
                         removeFromWishlist(productId);
@@ -2175,6 +2423,50 @@
                     openProductModal(productId);
                 });
             });
+            
+            // Bulk options selection
+            document.querySelectorAll('.bulk-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    this.parentElement.querySelectorAll('.bulk-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+        }
+        
+        // Create heart animation for wishlist button
+        function createHeartAnimation(button) {
+            const buttonRect = button.getBoundingClientRect();
+            const centerX = buttonRect.left + buttonRect.width / 2;
+            const centerY = buttonRect.top + buttonRect.height / 2;
+            
+            for (let i = 0; i < 7; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-animation';
+                heart.innerHTML = '❤️';
+                heart.style.left = `${centerX}px`;
+                heart.style.top = `${centerY}px`;
+                heart.style.position = 'fixed';
+                heart.style.zIndex = '10000';
+                heart.style.fontSize = '1.5rem';
+                
+                // Random direction and distance
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 100 + Math.random() * 50;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                heart.style.setProperty('--tx', `${tx}px`);
+                heart.style.setProperty('--ty', `${ty}px`);
+                
+                document.body.appendChild(heart);
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    heart.remove();
+                }, 1200);
+            }
         }
         
         // Open product modal
@@ -2184,7 +2476,30 @@
             
             const fakePrice = Math.round(product.price * (1 + 0.1 + Math.random() * 0.4));
             const isInWishlist = wishlist.some(item => item.id === product.id);
-            const availability = Math.random() > 0.7 ? 'In Stock' : `Only ${Math.floor(Math.random() * 5) + 1} left!`;
+            
+            // Generate bulk pricing table
+            let bulkTableHTML = '';
+            const bulkOptions = [1, 5, 10, 25, 50, 100];
+            bulkOptions.forEach(qty => {
+                const bulkPrice = product.price * qty;
+                const discount = Math.floor(Math.random() * 15) + 5;
+                const discountedPrice = Math.round(bulkPrice * (1 - discount/100));
+                
+                bulkTableHTML += `
+                    <tr>
+                        <td>${qty} Units</td>
+                        <td>₦${bulkPrice.toLocaleString()}</td>
+                        <td>₦${discountedPrice.toLocaleString()} <span class="discount-badge">${discount}% OFF</span></td>
+                    </tr>
+                `;
+            });
+            
+            // Generate fake stats
+            const stats = {
+                monthlySales: Math.floor(Math.random() * 500) + 100,
+                retailerAdoption: Math.floor(Math.random() * 80) + 20,
+                customerSatisfaction: Math.floor(Math.random() * 20) + 80
+            };
             
             modalBody.innerHTML = `
                 <div class="modal-image">
@@ -2194,13 +2509,66 @@
                     <h2 class="modal-product-title">${product.name}</h2>
                     <div class="modal-product-price">₦${product.price.toLocaleString()}</div>
                     <p class="modal-description">
-                        Premium quality household essential designed for durability and style. 
-                        Perfect addition to elevate your home decor. This product features 
-                        exceptional craftsmanship and premium materials for long-lasting use.
+                        ${product.description}
                     </p>
                     <div class="modal-availability">
-                        <i class="fas fa-check-circle"></i> ${availability}
+                        <i class="fas fa-check-circle"></i> In Stock
                     </div>
+                    
+                    <div class="bulk-pricing">
+                        <h3 class="bulk-pricing-title">Bulk Purchase Discounts</h3>
+                        <table class="bulk-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Regular Price</th>
+                                    <th>Discounted Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${bulkTableHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="reviews-section">
+                        <h3 class="reviews-title">Customer Reviews</h3>
+                        ${fakeReviews.map(review => `
+                            <div class="review">
+                                <div class="review-header">
+                                    <div class="review-author">${review.author}</div>
+                                    <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                                </div>
+                                <div class="review-content">${review.comment}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="stats-section">
+                        <h3 class="stats-title">Product Statistics</h3>
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <div class="stat-value">${stats.monthlySales}+</div>
+                                <div class="stat-label">Monthly Sales</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${stats.retailerAdoption}%</div>
+                                <div class="stat-label">Retailer Adoption</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${stats.customerSatisfaction}%</div>
+                                <div class="stat-label">Satisfaction Rate</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-bar" style="left: 10%; width: 15%; height: 40%; background: ${getRandomColor()};"></div>
+                            <div class="chart-bar" style="left: 30%; width: 15%; height: 70%; background: ${getRandomColor()};"></div>
+                            <div class="chart-bar" style="left: 50%; width: 15%; height: 90%; background: ${getRandomColor()};"></div>
+                            <div class="chart-bar" style="left: 70%; width: 15%; height: 60%; background: ${getRandomColor()};"></div>
+                        </div>
+                    </div>
+                    
                     <div class="modal-quantity-controls">
                         <button class="quantity-btn minus">-</button>
                         <span class="quantity">1</span>
@@ -2247,6 +2615,9 @@
                 const productId = parseInt(this.getAttribute('data-id'));
                 const product = products.find(p => p.id === productId);
                 
+                // Create heart animation
+                createHeartAnimation(this);
+                
                 if (this.classList.contains('active')) {
                     removeFromWishlist(productId);
                     this.classList.remove('active');
@@ -2259,11 +2630,19 @@
             });
             
             productModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Get random color for charts
+        function getRandomColor() {
+            const colors = ['#d4af37', '#d32f2f', '#1976d2', '#388e3c', '#7b1fa2'];
+            return colors[Math.floor(Math.random() * colors.length)];
         }
         
         // Close product modal
         function closeProductModal() {
             productModal.style.display = 'none';
+            document.body.style.overflow = '';
         }
         
         // Close modal when clicking outside content
