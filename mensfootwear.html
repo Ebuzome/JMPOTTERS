@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Swiper JS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CountUp.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.0.8/countUp.min.js"></script>
     <style>
         /* === GLOBAL STYLES === */
         :root {
@@ -21,6 +27,9 @@
             --shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.4);
             --shadow-dark: 0 5px 15px rgba(0, 0, 0, 0.2);
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
         }
 
         * {
@@ -1209,6 +1218,174 @@
             font-weight: 600;
         }
 
+        /* === STATISTICS SECTION === */
+        .statistics-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .stats-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-title i {
+            color: var(--gold);
+        }
+
+        .swiper-container {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .swiper-slide {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--black);
+            text-align: center;
+        }
+
+        .stats-metric {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .stats-value {
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .metric-success {
+            color: var(--success);
+        }
+
+        .metric-warning {
+            color: var(--warning);
+        }
+
+        .metric-danger {
+            color: var(--danger);
+        }
+
+        .swiper-pagination-bullet {
+            width: 8px;
+            height: 8px;
+            background: var(--gray-light);
+            opacity: 1;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: var(--gold);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        .real-time-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric-card {
+            background: #f8f8f8;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .export-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .export-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .export-table th, .export-table td {
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .export-table th {
+            font-weight: 600;
+            background: #f8f8f8;
+        }
+
+        .export-table .country-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .country-flag {
+            width: 20px;
+            height: 15px;
+            background: var(--gray-light);
+            border-radius: 2px;
+        }
+
+        .volume-bar {
+            height: 10px;
+            background: var(--gray-light);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .volume-fill {
+            height: 100%;
+            background: var(--gold);
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: width 1.5s ease-out;
+        }
+
         /* === PAGINATION === */
         .pagination {
             display: flex;
@@ -1718,6 +1895,10 @@
             .modal-image {
                 height: 300px;
             }
+
+            .swiper-container {
+                height: 250px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1765,6 +1946,14 @@
             .chat-modal {
                 right: auto;
                 left: 30px;
+            }
+
+            .swiper-container {
+                height: 220px;
+            }
+
+            .real-time-metrics {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1821,6 +2010,10 @@
             
             .mobile-toggle {
                 order: 3;
+            }
+
+            .swiper-container {
+                height: 200px;
             }
         }
     </style>
@@ -2143,7 +2336,10 @@
         </div>
     </div>
 
+    <!-- Libraries -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    
     <script>
         // ========== INITIALIZATION ========== //
         // Initialize AOS
@@ -2753,6 +2949,84 @@
                         </button>
                     </div>
                     
+                    <!-- Statistics Section -->
+                    <div class="statistics-section">
+                        <div class="stats-title">
+                            <i class="fas fa-chart-line"></i> Business Insights & Wholesale Data
+                        </div>
+                        <div class="swiper-container">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <div class="chart-title">Sell-out Rate per Region</div>
+                                    <div class="chart-container">
+                                        <canvas id="sellOutChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="chart-title">Purchase Frequency</div>
+                                    <div class="chart-container">
+                                        <canvas id="purchaseFrequencyChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="chart-title">Geographic Reach</div>
+                                    <div class="chart-container">
+                                        <canvas id="geographicReachChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="chart-title">Product Movement Timeline</div>
+                                    <div class="chart-container">
+                                        <canvas id="movementTimelineChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="chart-title">Real-Time Metrics</div>
+                                    <div class="real-time-metrics">
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="metricToday">0</div>
+                                            <div class="metric-label">Today</div>
+                                        </div>
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="metricWeek">0</div>
+                                            <div class="metric-label">This Week</div>
+                                        </div>
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="metricMonth">0</div>
+                                            <div class="metric-label">This Month</div>
+                                        </div>
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="metricAllTime">0</div>
+                                            <div class="metric-label">All Time</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="chart-title">Buyer Types & Demographics</div>
+                                    <div class="chart-container">
+                                        <canvas id="buyerTypesChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="chart-title">Export Volume by Country</div>
+                                    <div class="export-table">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Country</th>
+                                                    <th>Volume</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="exportTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Add Pagination -->
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+                    
                     <!-- Glassmorphism section -->
                     <div class="modal-glass">
                         <div class="reviews-section">
@@ -2860,6 +3134,285 @@
             // Show modal
             modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Initialize statistics after a short delay to allow DOM rendering
+            setTimeout(() => {
+                initializeStatistics(product);
+            }, 100);
+        }
+
+        function initializeStatistics(product) {
+            // Initialize Swiper
+            const swiper = new Swiper('.swiper-container', {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                observer: true,
+                observeParents: true,
+            });
+
+            // Initialize charts
+            createSellOutChart(product);
+            createPurchaseFrequencyChart(product);
+            createGeographicReachChart(product);
+            createMovementTimelineChart(product);
+            createRealTimeMetrics(product);
+            createBuyerTypesChart(product);
+            createExportVolumeTable(product);
+        }
+
+        function createSellOutChart(product) {
+            const ctx = document.getElementById('sellOutChart').getContext('2d');
+            const regions = ['Lagos', 'Abuja', 'Kano', 'Port Harcourt', 'Nairobi', 'Johannesburg', 'Accra', 'Cairo', 'Dubai', 'London', 'New York'];
+            const colors = ['#27ae60', '#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#d35400', '#8e44ad', '#2980b9', '#16a085', '#c0392b'];
+            
+            const datasets = regions.map((region, index) => {
+                return {
+                    label: region,
+                    data: Array.from({length: 12}, () => Math.floor(Math.random() * 100)),
+                    borderColor: colors[index],
+                    backgroundColor: colors[index] + '20',
+                    tension: 0.4,
+                    fill: false
+                };
+            });
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPurchaseFrequencyChart(product) {
+            const ctx = document.getElementById('purchaseFrequencyChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Retailers', 'Individuals', 'Foreign Bulk', 'Online Agents'],
+                    datasets: [{
+                        data: [45, 25, 20, 10],
+                        backgroundColor: [
+                            '#d4af37',
+                            '#3498db',
+                            '#27ae60',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+        }
+
+        function createGeographicReachChart(product) {
+            const ctx = document.getElementById('geographicReachChart').getContext('2d');
+            
+            const countries = ['Nigeria', 'Ghana', 'Kenya', 'South Africa', 'Egypt', 'UK', 'USA', 'UAE', 'Germany', 'China'];
+            const sales = countries.map(() => Math.floor(Math.random() * 1000) + 500);
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: countries,
+                    datasets: [{
+                        label: 'Units Sold',
+                        data: sales,
+                        backgroundColor: '#d4af37',
+                        borderColor: '#b8972e',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createMovementTimelineChart(product) {
+            const ctx = document.getElementById('movementTimelineChart').getContext('2d');
+            
+            const weeks = Array.from({length: 16}, (_, i) => `Week ${i+1}`);
+            const sales = weeks.map(() => Math.floor(Math.random() * 500) + 100);
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: weeks,
+                    datasets: [{
+                        label: 'Units Sold',
+                        data: sales,
+                        borderColor: '#d4af37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRealTimeMetrics(product) {
+            const metrics = {
+                today: Math.floor(Math.random() * 50) + 20,
+                week: Math.floor(Math.random() * 300) + 150,
+                month: Math.floor(Math.random() * 1200) + 600,
+                allTime: Math.floor(Math.random() * 5000) + 3000
+            };
+            
+            // Animate numbers with CountUp.js
+            new CountUp('metricToday', 0, metrics.today, 0, 1.5).start();
+            new CountUp('metricWeek', 0, metrics.week, 0, 1.5).start();
+            new CountUp('metricMonth', 0, metrics.month, 0, 1.5).start();
+            new CountUp('metricAllTime', 0, metrics.allTime, 0, 1.5).start();
+        }
+
+        function createBuyerTypesChart(product) {
+            const ctx = document.getElementById('buyerTypesChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Business Owners', 'Resellers', 'Fashion Boutiques', 'Corporate Buyers', 'Export Agents'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: [
+                            '#d4af37',
+                            '#3498db',
+                            '#27ae60',
+                            '#9b59b6',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+        }
+
+        function createExportVolumeTable(product) {
+            const countries = [
+                {name: 'Nigeria', flag: '🇳🇬'},
+                {name: 'Ghana', flag: '🇬🇭'},
+                {name: 'Kenya', flag: '🇰🇪'},
+                {name: 'South Africa', flag: '🇿🇦'},
+                {name: 'United Kingdom', flag: '🇬🇧'},
+                {name: 'USA', flag: '🇺🇸'},
+                {name: 'UAE', flag: '🇦🇪'},
+                {name: 'Germany', flag: '🇩🇪'},
+                {name: 'China', flag: '🇨🇳'},
+                {name: 'France', flag: '🇫🇷'}
+            ];
+            
+            const tableBody = document.getElementById('exportTableBody');
+            tableBody.innerHTML = '';
+            
+            countries.forEach(country => {
+                const volume = Math.floor(Math.random() * 1000) + 200;
+                const maxVolume = 1200;
+                const percentage = (volume / maxVolume) * 100;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="country-cell">
+                            <span class="country-flag">${country.flag}</span>
+                            ${country.name}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="volume-bar">
+                            <div class="volume-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <div class="stats-metric">${volume} units</div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
         }
 
         // Close modal
