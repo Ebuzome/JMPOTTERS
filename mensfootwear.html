@@ -44,7 +44,7 @@
             background-color: var(--white);
             overflow-x: hidden;
             line-height: 1.6;
-            cursor: default; /* Changed from cursor: none */
+            cursor: default;
         }
 
         h1, h2, h3, h4 {
@@ -905,29 +905,7 @@
             display: none;
         }
 
-        /* === MODAL === */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1200;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
+        /* === MODAL STYLES === */
         .modal {
             background: #111; /* Dark background */
             width: 100vw;
@@ -942,80 +920,261 @@
             border-radius: 0;
             transform: none;
             color: white;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--black);
-            color: var(--white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: var(--transition);
-            z-index: 10;
-            border: 1px solid var(--gold);
-        }
-
-        .modal-close:hover {
-            background: var(--gold);
-            transform: rotate(90deg);
-        }
-
-        .modal-header {
-            padding: 20px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.8);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-title {
-            font-size: 1.8rem;
-            color: var(--gold);
-            text-align: center;
+            overflow: hidden;
         }
 
         .modal-body {
             display: flex;
             flex: 1;
             overflow: hidden;
-            padding: 20px;
+            padding: 0;
+        }
+
+        .product-panel {
+            flex: 0 0 38%;
+            padding: 30px;
+            overflow-y: auto;
+            background: rgba(20, 20, 20, 0.95);
+            border-right: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .analytics-panel {
+            flex: 0 0 62%;
+            position: relative;
+            overflow: hidden;
         }
 
         .product-preview {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            margin-right: 20px;
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         .product-preview img {
             max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+            max-height: 300px;
             border-radius: 8px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        .stat-slides {
+        .product-details {
+            margin-top: 20px;
+        }
+
+        .modal-product-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--gold);
+        }
+
+        .modal-product-price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .modal-product-description {
+            margin-bottom: 25px;
+            line-height: 1.7;
+            color: #ccc;
+        }
+
+        .selector-section {
+            margin-bottom: 25px;
+        }
+
+        .selector-title {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selector-title i {
+            color: var(--gold);
+        }
+
+        .sizes-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .size-option {
+            padding: 12px 5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: #ccc;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .size-option:hover, .size-option.selected {
+            background: var(--gold);
+            color: var(--black);
+            border-color: var(--gold);
+            transform: scale(1.05);
+        }
+
+        .quantity-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .quantity-option {
+            padding: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 4px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .quantity-option:hover, .quantity-option.selected {
+            background: var(--gold);
+            color: var(--black);
+            border-color: var(--gold);
+        }
+
+        .modal-action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .modal-btn {
             flex: 1;
-            background: rgba(30, 30, 30, 0.7);
-            border-radius: 10px;
+            padding: 15px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-add-cart-modal {
+            background: var(--black);
+            color: var(--white);
+            border: 1px solid var(--gold);
+        }
+
+        .btn-wishlist-modal {
+            background: var(--gold);
+            color: var(--black);
+        }
+
+        .btn-add-cart-modal:hover {
+            background: var(--gold);
+            color: var(--black);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-wishlist-modal:hover {
+            background: var(--black);
+            color: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .reviews-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-heading h3 {
+            font-size: 1.3rem;
+            color: var(--gold);
+        }
+
+        .view-all {
+            color: #aaa;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .view-all:hover {
+            color: var(--gold);
+        }
+
+        .review-card {
+            background: rgba(30, 30, 30, 0.5);
+            border-radius: 8px;
             padding: 20px;
-            overflow: hidden;
-            position: relative;
+            margin-bottom: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: var(--transition);
+        }
+
+        .review-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-3px);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .review-user {
+            font-weight: 600;
+        }
+
+        .review-rating {
+            color: var(--gold);
+        }
+
+        .review-text {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .social-sharing {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .social-icon:hover {
+            background: var(--gold);
+            color: var(--black);
+            transform: translateY(-3px);
+        }
+
+        /* Analytics Panel Styles */
+        .stat-slides {
+            height: 100%;
         }
 
         .swiper-container {
@@ -1024,48 +1183,145 @@
         }
 
         .swiper-slide {
-            background: transparent;
-            padding: 20px;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .chart-title-container {
             display: flex;
-            flex-direction: column;
-        }
-
-        .chart-container {
-            flex: 1;
-            position: relative;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-        }
-
-        .chart-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--gold);
-            text-align: center;
-            padding-bottom: 10px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .stats-title {
-            font-size: 1.2rem;
+        .chart-title {
+            font-size: 1.4rem;
             font-weight: 600;
-            margin-bottom: 20px;
             color: var(--gold);
             display: flex;
             align-items: center;
             gap: 10px;
-            justify-content: center;
         }
 
-        .stats-title i {
+        .chart-title i {
             color: var(--gold);
+        }
+
+        .chart-help {
+            color: #aaa;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chart-help:hover {
+            color: var(--gold);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .chart-insight {
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid var(--gold);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 25px;
+        }
+
+        .chart-insight i {
+            color: var(--gold);
+            margin-right: 8px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .kpi-card {
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-color: var(--gold);
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+            color: var(--gold);
+        }
+
+        .kpi-label {
+            font-size: 1rem;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+
+        .kpi-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .tag-positive {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+        }
+
+        .tag-warning {
+            background: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+        }
+
+        .kpi-insight {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-top: 10px;
+        }
+
+        .summary-points {
+            margin: 25px 0;
+            padding-left: 20px;
+        }
+
+        .summary-points li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .summary-points li:before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-size: 1.5rem;
+            line-height: 1;
         }
 
         .swiper-pagination {
             position: absolute;
-            bottom: 10px;
+            bottom: 20px;
             left: 0;
             width: 100%;
             display: flex;
@@ -1087,118 +1343,49 @@
             transform: scale(1.2);
         }
 
-        .real-time-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .metric-card {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            transition: var(--transition);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-        }
-
-        .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border-color: var(--gold);
-        }
-
-        .metric-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin: 10px 0;
-            color: var(--gold);
-        }
-
-        .metric-label {
-            font-size: 0.95rem;
-            color: #aaa;
-        }
-
-        .metric-success {
-            color: var(--success) !important;
-        }
-
-        .metric-warning {
-            color: var(--warning) !important;
-        }
-
-        .metric-danger {
-            color: var(--danger) !important;
-        }
-
-        .export-table {
-            width: 100%;
-            overflow-x: auto;
-            margin-top: 15px;
-        }
-
-        .export-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .export-table th, .export-table td {
-            padding: 10px 15px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .export-table th {
-            font-weight: 600;
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--gold);
-        }
-
-        .export-table .country-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .country-flag {
-            font-size: 1.2rem;
-        }
-
-        .volume-bar {
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-            margin-top: 5px;
-        }
-
-        .volume-fill {
-            height: 100%;
-            background: var(--gold);
+        .tooltip {
             position: absolute;
-            left: 0;
-            top: 0;
-            transition: width 1.5s ease-out;
-        }
-
-        .size-option {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--gold);
             padding: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            color: #ccc;
             border-radius: 4px;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            max-width: 300px;
         }
 
-        .size-option:hover, .size-option.selected {
-            background: var(--gold);
-            color: var(--black);
-            border-color: var(--gold);
-            transform: scale(1.05);
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .modal-body {
+                flex-direction: column;
+            }
+            
+            .product-panel, .analytics-panel {
+                flex: 1;
+                width: 100%;
+            }
+            
+            .product-panel {
+                max-height: 50vh;
+                border-right: none;
+                border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .modal-action-buttons {
+                flex-direction: column;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sizes-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
 
         /* === PAGINATION === */
@@ -1707,7 +1894,7 @@
                 flex-direction: column;
             }
             
-            .product-preview {
+            .product-panel {
                 margin-right: 0;
                 margin-bottom: 20px;
                 max-height: 40vh;
@@ -1978,59 +2165,284 @@
                 <i class="fas fa-times"></i>
             </button>
             <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Product Title</h3>
+                <h3 class="modal-title" id="modalTitle">Product Analytics Dashboard</h3>
             </div>
             <div class="modal-body">
-                <div class="product-preview">
-                    <img id="modalImage" src="" alt="Product Image">
-                </div>
-                <div class="stat-slides">
-                    <div class="swiper-container">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-                                <div class="chart-title">Purchase Frequency</div>
-                                <div class="chart-container">
-                                    <canvas id="purchaseFrequencyChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="chart-title">Sell-out Rate per Region</div>
-                                <div class="chart-container">
-                                    <canvas id="sellOutChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="stats-title">
-                                    <i class="fas fa-chart-line"></i> Business Insights
-                                </div>
-                                <div class="real-time-metrics">
-                                    <div class="metric-card">
-                                        <div class="metric-value" id="metricToday">0</div>
-                                        <div class="metric-label">Today</div>
-                                    </div>
-                                    <div class="metric-card">
-                                        <div class="metric-value" id="metricWeek">0</div>
-                                        <div class="metric-label">This Week</div>
-                                    </div>
-                                    <div class="metric-card">
-                                        <div class="metric-value metric-success" id="metricMonth">0</div>
-                                        <div class="metric-label">This Month</div>
-                                    </div>
-                                    <div class="metric-card">
-                                        <div class="metric-value metric-success" id="metricAllTime">0</div>
-                                        <div class="metric-label">All Time</div>
-                                    </div>
-                                </div>
+                <!-- Left Panel: Product Details -->
+                <div class="product-panel">
+                    <div class="product-preview">
+                        <img id="modalImage" src="" alt="Product Image">
+                    </div>
+                    
+                    <div class="product-details">
+                        <h2 class="modal-product-title" id="modalProductName"></h2>
+                        <div class="modal-product-price" id="modalProductPrice"></div>
+                        
+                        <div class="modal-product-description" id="modalProductDescription">
+                            Premium men's footwear crafted from genuine leather with cushioned insoles for all-day comfort. 
+                            Features anti-slip rubber soles and breathable lining. Perfect for both formal and casual occasions.
+                        </div>
+                        
+                        <!-- Size Selector -->
+                        <div class="selector-section">
+                            <h4 class="selector-title">
+                                <i class="fas fa-ruler"></i> Select Size
+                            </h4>
+                            <div class="sizes-grid" id="sizeOptions">
+                                <!-- Sizes will be added dynamically -->
                             </div>
                         </div>
-                        <!-- Add Pagination -->
-                        <div class="swiper-pagination"></div>
+                        
+                        <!-- Quantity Selector -->
+                        <div class="selector-section">
+                            <h4 class="selector-title">
+                                <i class="fas fa-cubes"></i> Quantity (Units)
+                            </h4>
+                            <div class="quantity-options">
+                                <div class="quantity-option selected" data-qty="1">1</div>
+                                <div class="quantity-option" data-qty="10">10</div>
+                                <div class="quantity-option" data-qty="25">25</div>
+                                <div class="quantity-option" data-qty="50">50</div>
+                                <div class="quantity-option" data-qty="100">100</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="modal-action-buttons">
+                            <button class="modal-btn btn-add-cart-modal" id="modalAddToCart">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <button class="modal-btn btn-wishlist-modal" id="modalAddToWishlist">
+                                <i class="fas fa-heart"></i> Wishlist
+                            </button>
+                        </div>
+                        
+                        <!-- Reviews Section -->
+                        <div class="reviews-section">
+                            <div class="section-heading">
+                                <h3><i class="fas fa-star"></i> Customer Reviews</h3>
+                                <a href="#" class="view-all">View All</a>
+                            </div>
+                            <div id="modalReviews">
+                                <!-- Reviews will be added dynamically -->
+                            </div>
+                        </div>
+                        
+                        <!-- Social Sharing -->
+                        <div class="social-sharing">
+                            <div class="social-icon">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="social-icon">
+                                <i class="fab fa-facebook-f"></i>
+                            </div>
+                            <div class="social-icon">
+                                <i class="fab fa-twitter"></i>
+                            </div>
+                            <div class="social-icon">
+                                <i class="fab fa-pinterest-p"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Panel: Analytics Dashboard -->
+                <div class="analytics-panel">
+                    <div class="stat-slides">
+                        <div class="swiper-container">
+                            <div class="swiper-wrapper">
+                                <!-- Slide 1: Purchase Frequency -->
+                                <div class="swiper-slide">
+                                    <div class="chart-title-container">
+                                        <div class="chart-title">
+                                            <i class="fas fa-chart-line"></i> Purchase Frequency
+                                        </div>
+                                        <div class="chart-help" title="Monthly order patterns">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="purchaseFrequencyChart"></canvas>
+                                    </div>
+                                    <div class="chart-insight">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <strong>Insight:</strong> July marked the highest demand from Lagos distributors in anticipation of Q3 school season.
+                                    </div>
+                                </div>
+                                
+                                <!-- Slide 2: Regional Sell-Out Rate -->
+                                <div class="swiper-slide">
+                                    <div class="chart-title-container">
+                                        <div class="chart-title">
+                                            <i class="fas fa-globe-africa"></i> Regional Sell-Out Rate
+                                        </div>
+                                        <div class="chart-help" title="Sell-out rates by region">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="sellOutChart"></canvas>
+                                    </div>
+                                    <div class="chart-insight">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <strong>Insight:</strong> Dubai sales doubled last month, signaling rising international interest in this line.
+                                    </div>
+                                </div>
+                                
+                                <!-- Slide 3: Market Share by Country -->
+                                <div class="swiper-slide">
+                                    <div class="chart-title-container">
+                                        <div class="chart-title">
+                                            <i class="fas fa-chart-pie"></i> Market Share by Country
+                                        </div>
+                                        <div class="chart-help" title="Market distribution by country">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="marketShareChart"></canvas>
+                                    </div>
+                                    <div class="chart-insight">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <strong>Insight:</strong> International clients now represent 35% of volume, a 12% increase over last quarter.
+                                    </div>
+                                </div>
+                                
+                                <!-- Slide 4: Order Channel Breakdown -->
+                                <div class="swiper-slide">
+                                    <div class="chart-title-container">
+                                        <div class="chart-title">
+                                            <i class="fas fa-shopping-cart"></i> Order Channel Breakdown
+                                        </div>
+                                        <div class="chart-help" title="Order distribution by channel">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="orderChannelChart"></canvas>
+                                    </div>
+                                    <div class="chart-insight">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <strong>Insight:</strong> Online orders dominate exports, but WhatsApp leads in local bulk purchase activity.
+                                    </div>
+                                </div>
+                                
+                                <!-- Slide 5: Return Rate vs Repeat Orders -->
+                                <div class="swiper-slide">
+                                    <div class="chart-title-container">
+                                        <div class="chart-title">
+                                            <i class="fas fa-exchange-alt"></i> Returns vs Repeat Orders
+                                        </div>
+                                        <div class="chart-help" title="Return rate vs customer retention">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="returnRateChart"></canvas>
+                                    </div>
+                                    <div class="chart-insight">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <strong>Insight:</strong> Strong repeat orders offset minor return surges in colder regions.
+                                    </div>
+                                </div>
+                                
+                                <!-- Slide 6: KPI Dashboard -->
+                                <div class="swiper-slide">
+                                    <div class="chart-title-container">
+                                        <div class="chart-title">
+                                            <i class="fas fa-tachometer-alt"></i> Performance Dashboard
+                                        </div>
+                                        <div class="chart-help" title="Key performance indicators">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="kpi-grid">
+                                        <div class="kpi-card">
+                                            <div class="kpi-label">Units Sold</div>
+                                            <div class="kpi-value" id="kpiUnitsSold">0</div>
+                                            <div class="kpi-tag tag-positive">Top Seller</div>
+                                            <div class="kpi-insight">Exceeding forecast by 18%</div>
+                                        </div>
+                                        <div class="kpi-card">
+                                            <div class="kpi-label">Return Rate</div>
+                                            <div class="kpi-value" id="kpiReturnRate">0%</div>
+                                            <div class="kpi-tag tag-positive">Excellent</div>
+                                            <div class="kpi-insight">Below industry average (5.2%)</div>
+                                        </div>
+                                        <div class="kpi-card">
+                                            <div class="kpi-label">Avg Order Value</div>
+                                            <div class="kpi-value" id="kpiAvgOrder">₦0</div>
+                                            <div class="kpi-tag tag-warning">Growing</div>
+                                            <div class="kpi-insight">12% increase from last quarter</div>
+                                        </div>
+                                        <div class="kpi-card">
+                                            <div class="kpi-label">Reorder Rate</div>
+                                            <div class="kpi-value" id="kpiReorder">0%</div>
+                                            <div class="kpi-tag tag-positive">High Retention</div>
+                                            <div class="kpi-insight">42% of customers reorder</div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-insight">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <strong>Insight:</strong> Return rate at 1.9% — below market average and trending downward.
+                                    </div>
+                                </div>
+                                
+                                <!-- Slide 7: Forecast & Trendline -->
+                                <div class="swiper-slide">
+                                    <div class="chart-title-container">
+                                        <div class="chart-title">
+                                            <i class="fas fa-project-diagram"></i> Sales Forecast
+                                        </div>
+                                        <div class="chart-help" title="6-month sales projection">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="forecastChart"></canvas>
+                                    </div>
+                                    <div class="chart-insight">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <strong>Insight:</strong> Anticipated Q4 surge expected — boost international marketing starting October.
+                                    </div>
+                                </div>
+                                
+                                <!-- Slide 8: Summary -->
+                                <div class="swiper-slide">
+                                    <div class="chart-title-container">
+                                        <div class="chart-title">
+                                            <i class="fas fa-clipboard-list"></i> Strategic Summary
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="chart-insight">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <strong>What This Means for Your Business</strong>
+                                    </div>
+                                    
+                                    <ul class="summary-points">
+                                        <li><strong>Growth Potential:</strong> International markets show 35% higher growth potential than domestic</li>
+                                        <li><strong>Best Sellers:</strong> Size 40-42 accounts for 65% of sales in African markets</li>
+                                        <li><strong>Seasonal Patterns:</strong> Order 25% extra stock before December for holiday demand surge</li>
+                                        <li><strong>Customer Profile:</strong> 78% of buyers are wholesalers ordering 50+ units monthly</li>
+                                        <li><strong>Recommendation:</strong> Create bundle offers for European retailers during Q4</li>
+                                    </ul>
+                                    
+                                    <div class="chart-insight">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <strong>Next Steps:</strong> Expand Dubai distribution, create winter bundle for EU, increase Lagos stock by 30% for Q4
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Add Pagination -->
+                            <div class="swiper-pagination"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <!-- Cart Panel -->
     <div class="overlay" id="cartOverlay"></div>
     <div class="cart-panel" id="cartPanel">
@@ -2191,7 +2603,7 @@
             once: true
         });
 
-        // Product data
+        // Product data (fixed 'Clanks' to 'Clarks')
         const products = [
             { id: 1, name: "Adidas Black and Red Stripped", price: 27000, image: "Adidas-Black-and-Red-Stripped-27000.jpg" },
             { id: 2, name: "Black Crimson GFT", price: 35000, image: "Black-Crimson-GFT-35000.jpg" },
@@ -2200,13 +2612,13 @@
             { id: 5, name: "Bottega Venetta", price: 35000, image: "Bottega-Venetta-35000.jpg" },
             { id: 6, name: "Bottega Venetta BTT", price: 35000, image: "Bottega-Venetta-BTT-35000.jpg" },
             { id: 7, name: "Bottega Venetta black BVX", price: 35000, image: "Bottega-Venetta-black-BVX-35000.jpg" },
-            { id: 8, name: "Clanks BBR", price: 25000, image: "Clanks-BBR-25000.jpg" },
-            { id: 9, name: "Clanks BSK", price: 25000, image: "Clanks-BSK-25000.jpg" },
-            { id: 10, name: "Clanks Black Shades", price: 25000, image: "Clanks-Black-Shades-25000.jpg" },
-            { id: 11, name: "Clanks Bold", price: 25000, image: "Clanks-Bold-25000.jpg" },
-            { id: 12, name: "Clanks Quality Loafers Brown", price: 30000, image: "Clanks-Quality-Loafers-Brown-30000.jpg" },
-            { id: 13, name: "Clanks Quality Loafers Deepblue", price: 30000, image: "Clanks-Quality-Loafers-Deepblue-30000.jpg" },
-            { id: 14, name: "Clanks quality loafers", price: 30000, image: "Clanks-quality-loafers-30000.jpg" },
+            { id: 8, name: "Clarks BBR", price: 25000, image: "Clarks-BBR-25000.jpg" },
+            { id: 9, name: "Clarks BSK", price: 25000, image: "Clarks-BSK-25000.jpg" },
+            { id: 10, name: "Clarks Black Shades", price: 25000, image: "Clarks-Black-Shades-25000.jpg" },
+            { id: 11, name: "Clarks Bold", price: 25000, image: "Clarks-Bold-25000.jpg" },
+            { id: 12, name: "Clarks Quality Loafers Brown", price: 30000, image: "Clarks-Quality-Loafers-Brown-30000.jpg" },
+            { id: 13, name: "Clarks Quality Loafers Deepblue", price: 30000, image: "Clarks-Quality-Loafers-Deepblue-30000.jpg" },
+            { id: 14, name: "Clarks quality loafers", price: 30000, image: "Clarks-quality-loafers-30000.jpg" },
             { id: 15, name: "Classic School Shoe", price: 15000, image: "Classic-School-Shoe-15000.jpg" },
             { id: 16, name: "Evero comfort sneakers", price: 7500, image: "Evero-comfort-sneakers-7500.jpg" },
             { id: 17, name: "Fendi", price: 26000, image: "Fendi-26000.jpg" },
@@ -2275,7 +2687,14 @@
         let currentProduct = null;
         let currentFilter = 'all';
         let modalSwiper = null;
-        let modalChartsInitialized = false;
+        let modalCharts = {
+            purchaseFrequency: null,
+            sellOut: null,
+            marketShare: null,
+            orderChannel: null,
+            returnRate: null,
+            forecast: null
+        };
 
         // DOM Elements
         const preloader = document.getElementById('preloader');
@@ -2298,6 +2717,12 @@
         const modalClose = document.getElementById('modalClose');
         const modalImage = document.getElementById('modalImage');
         const modalTitle = document.getElementById('modalTitle');
+        const modalProductName = document.getElementById('modalProductName');
+        const modalProductPrice = document.getElementById('modalProductPrice');
+        const sizeOptions = document.getElementById('sizeOptions');
+        const modalReviews = document.getElementById('modalReviews');
+        const modalAddToCart = document.getElementById('modalAddToCart');
+        const modalAddToWishlist = document.getElementById('modalAddToWishlist');
         const toastContainer = document.getElementById('toastContainer');
         const whatsappCheckout = document.getElementById('whatsappCheckout');
         const header = document.getElementById('header');
@@ -2379,6 +2804,9 @@
             
             // Setup dropdown toggle
             setupDropdownToggle();
+            
+            // Setup modal interactions
+            setupModalInteractions();
         });
 
         // ========== DROPDOWN TOGGLE ========== //
@@ -2632,68 +3060,167 @@
         }
 
         function openProductModal(product) {
-            // Set modal content
+            currentProduct = product;
+            
+            // Set product details
             modalTitle.textContent = product.name;
+            modalProductName.textContent = product.name;
+            modalProductPrice.textContent = `₦${product.price.toLocaleString()}`;
             modalImage.src = `assets/images/menfootwear/${product.image}`;
             modalImage.alt = product.name;
+            
+            // Generate UI elements
+            generateSizeOptions();
+            generateReviews();
+            
+            // Initialize analytics
+            initAnalyticsSwiper();
+            initKPIs();
             
             // Show modal
             modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            
-            // Initialize Swiper if not already done
-            if (!modalSwiper) {
-                modalSwiper = new Swiper('.swiper-container', {
-                    slidesPerView: 1,
-                    spaceBetween: 10,
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                    },
-                    on: {
-                        slideChange: function() {
-                            // Initialize charts when slide becomes active
-                            initializeCharts();
-                        }
-                    }
-                });
+        }
+
+        // Generate size options
+        function generateSizeOptions() {
+            sizeOptions.innerHTML = '';
+            const sizes = [];
+            for (let i = 36; i <= 45; i++) {
+                sizes.push(i);
             }
             
-            // Initialize charts on first slide
-            setTimeout(() => {
-                initializeCharts();
-            }, 300);
+            sizes.forEach(size => {
+                const sizeOption = document.createElement('div');
+                sizeOption.className = 'size-option';
+                sizeOption.textContent = size;
+                sizeOption.addEventListener('click', function() {
+                    document.querySelectorAll('.size-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+                sizeOptions.appendChild(sizeOption);
+            });
+            
+            // Select first size by default
+            if (sizeOptions.firstChild) {
+                sizeOptions.firstChild.classList.add('selected');
+            }
         }
 
-        function initializeCharts() {
-            if (modalChartsInitialized) return;
+        // Generate reviews
+        function generateReviews() {
+            modalReviews.innerHTML = '';
+            // Get 3 random reviews
+            const selectedReviews = [];
+            while (selectedReviews.length < 3 && fakeReviews.length > 0) {
+                const randomIndex = Math.floor(Math.random() * fakeReviews.length);
+                selectedReviews.push(fakeReviews[randomIndex]);
+                fakeReviews.splice(randomIndex, 1);
+            }
             
-            // Create purchase frequency chart
-            createPurchaseFrequencyChart();
-            
-            // Create sell out chart
-            createSellOutChart();
-            
-            // Create metrics
-            createRealTimeMetrics();
-            
-            modalChartsInitialized = true;
+            selectedReviews.forEach(review => {
+                const reviewCard = document.createElement('div');
+                reviewCard.className = 'review-card';
+                reviewCard.innerHTML = `
+                    <div class="review-header">
+                        <div class="review-user">${review.user}</div>
+                        <div class="review-rating">
+                            ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                        </div>
+                    </div>
+                    <div class="review-text">${review.text}</div>
+                `;
+                modalReviews.appendChild(reviewCard);
+            });
         }
 
+        // Get selected quantity
+        function getSelectedQuantity() {
+            const selected = document.querySelector('.quantity-option.selected');
+            return selected ? parseInt(selected.dataset.qty) : 1;
+        }
+
+        // Initialize analytics swiper
+        function initAnalyticsSwiper() {
+            modalSwiper = new Swiper('.swiper-container', {
+                direction: 'vertical',
+                slidesPerView: 1,
+                spaceBetween: 0,
+                mousewheel: true,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                on: {
+                    slideChange: function() {
+                        // Initialize charts when slide becomes active
+                        initChartForSlide(this.activeIndex);
+                    }
+                }
+            });
+        }
+
+        // Initialize chart for active slide
+        function initChartForSlide(slideIndex) {
+            switch(slideIndex) {
+                case 0:
+                    if (!modalCharts.purchaseFrequency) {
+                        createPurchaseFrequencyChart();
+                    }
+                    break;
+                case 1:
+                    if (!modalCharts.sellOut) {
+                        createSellOutChart();
+                    }
+                    break;
+                case 2:
+                    if (!modalCharts.marketShare) {
+                        createMarketShareChart();
+                    }
+                    break;
+                case 3:
+                    if (!modalCharts.orderChannel) {
+                        createOrderChannelChart();
+                    }
+                    break;
+                case 4:
+                    if (!modalCharts.returnRate) {
+                        createReturnRateChart();
+                    }
+                    break;
+                case 6:
+                    if (!modalCharts.forecast) {
+                        createForecastChart();
+                    }
+                    break;
+            }
+        }
+
+        // Create purchase frequency chart
         function createPurchaseFrequencyChart() {
             const ctx = document.getElementById('purchaseFrequencyChart').getContext('2d');
             
-            new Chart(ctx, {
+            // Generate randomized but realistic data
+            const baseData = [120, 190, 150, 220, 180, 250, 300, 280, 350, 300, 400, 450];
+            const randomizedData = baseData.map(val => val + Math.floor(Math.random() * 50) - 25);
+            
+            modalCharts.purchaseFrequency = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                     datasets: [{
                         label: 'Units Sold',
-                        data: [120, 190, 150, 220, 180, 250, 300, 280, 350, 300, 400, 450],
+                        data: randomizedData,
                         borderColor: '#d4af37',
                         backgroundColor: 'rgba(212, 175, 55, 0.1)',
                         tension: 0.4,
-                        fill: true
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#d4af37',
+                        pointHoverRadius: 6,
+                        pointRadius: 4
                     }]
                 },
                 options: {
@@ -2702,6 +3229,20 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return `Units: ${context.parsed.y}`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -2711,7 +3252,10 @@
                                 color: 'rgba(255, 255, 255, 0.1)'
                             },
                             ticks: {
-                                color: '#aaa'
+                                color: '#aaa',
+                                callback: function(value) {
+                                    return value;
+                                }
                             }
                         },
                         x: {
@@ -2722,25 +3266,39 @@
                                 color: '#aaa'
                             }
                         }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
                     }
                 }
             });
         }
 
+        // Create sell out chart
         function createSellOutChart() {
             const ctx = document.getElementById('sellOutChart').getContext('2d');
             
-            const regions = ['Lagos', 'Abuja', 'Kano', 'Port Harcourt', 'Accra', 'Nairobi', 'Johannesburg'];
-            const sales = [85, 72, 65, 58, 48, 42, 36];
+            const regions = ['Lagos', 'Abuja', 'London', 'Dubai', 'Accra', 'New York', 'Johannesburg'];
+            const baseSales = [85, 72, 65, 58, 48, 42, 36];
+            const randomizedSales = baseSales.map(val => val + Math.floor(Math.random() * 15) - 7);
             
-            new Chart(ctx, {
+            modalCharts.sellOut = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: regions,
                     datasets: [{
                         label: 'Sell-out Rate (%)',
-                        data: sales,
-                        backgroundColor: '#d4af37',
+                        data: randomizedSales,
+                        backgroundColor: [
+                            'rgba(212, 175, 55, 0.7)',
+                            'rgba(212, 175, 55, 0.6)',
+                            'rgba(212, 175, 55, 0.5)',
+                            'rgba(212, 175, 55, 0.4)',
+                            'rgba(212, 175, 55, 0.3)',
+                            'rgba(212, 175, 55, 0.2)',
+                            'rgba(212, 175, 55, 0.1)'
+                        ],
                         borderColor: '#b8972e',
                         borderWidth: 1
                     }]
@@ -2752,6 +3310,13 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Sell-out: ${context.parsed.x}%`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -2773,38 +3338,402 @@
                                 color: '#aaa'
                             }
                         }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
                     }
                 }
             });
         }
 
-        function createRealTimeMetrics() {
-            const metrics = {
-                today: Math.floor(Math.random() * 50) + 20,
-                week: Math.floor(Math.random() * 300) + 150,
-                month: Math.floor(Math.random() * 1200) + 600,
-                allTime: Math.floor(Math.random() * 5000) + 3000
+        // Create market share chart
+        function createMarketShareChart() {
+            const ctx = document.getElementById('marketShareChart').getContext('2d');
+            
+            const countries = ['Nigeria', 'UK', 'UAE', 'Ghana', 'USA', 'South Africa', 'Others'];
+            const baseShares = [40, 18, 15, 10, 8, 5, 4];
+            const randomizedShares = baseShares.map(val => val + Math.floor(Math.random() * 5) - 2);
+            
+            // Normalize to 100%
+            const total = randomizedShares.reduce((a, b) => a + b, 0);
+            const normalizedShares = randomizedShares.map(val => Math.round((val / total) * 100));
+            
+            modalCharts.marketShare = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: countries,
+                    datasets: [{
+                        data: normalizedShares,
+                        backgroundColor: [
+                            'rgba(212, 175, 55, 0.8)',
+                            'rgba(180, 150, 50, 0.8)',
+                            'rgba(160, 130, 45, 0.8)',
+                            'rgba(140, 110, 40, 0.8)',
+                            'rgba(120, 90, 35, 0.8)',
+                            'rgba(100, 70, 30, 0.8)',
+                            'rgba(80, 50, 25, 0.8)'
+                        ],
+                        borderColor: '#111',
+                        borderWidth: 2,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ccc',
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed}%`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 2000
+                    }
+                }
+            });
+        }
+
+        // Create order channel chart
+        function createOrderChannelChart() {
+            const ctx = document.getElementById('orderChannelChart').getContext('2d');
+            
+            const channels = ['Online', 'WhatsApp', 'In-Store', 'Export'];
+            const baseOrders = [45, 30, 15, 10];
+            const randomizedOrders = baseOrders.map(val => val + Math.floor(Math.random() * 10) - 5);
+            
+            modalCharts.orderChannel = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: channels,
+                    datasets: [{
+                        label: 'Order Percentage',
+                        data: randomizedOrders,
+                        backgroundColor: 'rgba(212, 175, 55, 0.7)',
+                        borderColor: '#b8972e',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Orders: ${context.parsed.y}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#aaa',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#aaa'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Create return rate chart
+        function createReturnRateChart() {
+            const ctx = document.getElementById('returnRateChart').getContext('2d');
+            
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
+            const baseReturns = [3.2, 2.8, 2.5, 2.1, 1.9, 1.8, 1.7, 1.6];
+            const baseRepeats = [25, 28, 31, 34, 36, 38, 40, 42];
+            
+            const randomizedReturns = baseReturns.map(val => val + (Math.random() * 0.4 - 0.2));
+            const randomizedRepeats = baseRepeats.map(val => val + Math.floor(Math.random() * 5) - 2);
+            
+            modalCharts.returnRate = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Return Rate',
+                            data: randomizedReturns,
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Repeat Orders',
+                            data: randomizedRepeats,
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Return Rate %',
+                                color: '#e74c3c'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#aaa'
+                            },
+                            min: 0,
+                            max: 5
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Repeat Orders %',
+                                color: '#27ae60'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            ticks: {
+                                color: '#aaa'
+                            },
+                            min: 0,
+                            max: 50
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#aaa'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Create forecast chart
+        function createForecastChart() {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            
+            const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
+            const baseSales = [420, 450, 480, 520, 580, 640, 600, 550];
+            const randomizedSales = baseSales.map(val => val + Math.floor(Math.random() * 50) - 25);
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(212, 175, 55, 0.4)');
+            gradient.addColorStop(1, 'rgba(212, 175, 55, 0.05)');
+            
+            modalCharts.forecast = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Projected Sales',
+                        data: randomizedSales,
+                        borderColor: '#d4af37',
+                        backgroundColor: gradient,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#d4af37',
+                        pointHoverRadius: 6,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Projected: ${context.parsed.y} units`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#aaa'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#aaa'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Initialize KPIs with CountUp
+        function initKPIs() {
+            const kpiValues = {
+                unitsSold: Math.floor(Math.random() * 5000) + 2500,
+                returnRate: (Math.random() * 2 + 1).toFixed(1),
+                avgOrder: Math.floor(Math.random() * 40000) + 20000,
+                reorder: Math.floor(Math.random() * 30) + 20
             };
             
-            // Animate numbers with CountUp.js
-            new CountUp('metricToday', 0, metrics.today, 0, 1.5).start();
-            new CountUp('metricWeek', 0, metrics.week, 0, 1.5).start();
-            new CountUp('metricMonth', 0, metrics.month, 0, 1.5).start();
-            new CountUp('metricAllTime', 0, metrics.allTime, 0, 1.5).start();
+            new CountUp('kpiUnitsSold', 0, kpiValues.unitsSold, 0, 2).start();
+            new CountUp('kpiReturnRate', 0, kpiValues.returnRate, 1, 2, {
+                suffix: '%'
+            }).start();
+            new CountUp('kpiAvgOrder', 0, kpiValues.avgOrder, 0, 2, {
+                prefix: '₦',
+                separator: ','
+            }).start();
+            new CountUp('kpiReorder', 0, kpiValues.reorder, 0, 2, {
+                suffix: '%'
+            }).start();
+        }
+
+        // Setup modal interactions
+        function setupModalInteractions() {
+            // Quantity selection
+            document.querySelectorAll('.quantity-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.quantity-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Add to cart from modal
+            modalAddToCart.addEventListener('click', () => {
+                if (!currentProduct) return;
+                
+                const quantity = getSelectedQuantity();
+                addToCart(currentProduct, quantity);
+                
+                // Show confirmation
+                showNotification(`${quantity} ${currentProduct.name} added to cart!`);
+            });
+            
+            // Add to wishlist from modal
+            modalAddToWishlist.addEventListener('click', () => {
+                if (!currentProduct) return;
+                
+                if (wishlist.some(item => item.id === currentProduct.id)) {
+                    removeFromWishlist(currentProduct.id);
+                    modalAddToWishlist.innerHTML = '<i class="fas fa-heart"></i> Wishlist';
+                    showNotification(`${currentProduct.name} removed from wishlist`);
+                } else {
+                    addToWishlist(currentProduct);
+                    modalAddToWishlist.innerHTML = '<i class="fas fa-check"></i> Wishlisted';
+                    showNotification(`${currentProduct.name} added to wishlist!`);
+                }
+            });
         }
 
         // Close modal
         modalClose.addEventListener('click', () => {
             modalOverlay.classList.remove('active');
             document.body.style.overflow = '';
-            modalChartsInitialized = false;
+            modalCharts = {
+                purchaseFrequency: null,
+                sellOut: null,
+                marketShare: null,
+                orderChannel: null,
+                returnRate: null,
+                forecast: null
+            };
         });
 
         modalOverlay.addEventListener('click', (e) => {
             if (e.target === modalOverlay) {
                 modalOverlay.classList.remove('active');
                 document.body.style.overflow = '';
-                modalChartsInitialized = false;
+                modalCharts = {
+                    purchaseFrequency: null,
+                    sellOut: null,
+                    marketShare: null,
+                    orderChannel: null,
+                    returnRate: null,
+                    forecast: null
+                };
             }
         });
 
