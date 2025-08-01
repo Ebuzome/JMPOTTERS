@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +7,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Swiper JS -->
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CountUp.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.0.8/countUp.min.js"></script>
     <style>
         /* === GLOBAL STYLES === */
@@ -28,6 +30,8 @@
             --success: #27ae60;
             --warning: #f39c12;
             --danger: #e74c3c;
+            --analytics-bg: #f9f9f9;
+            --analytics-border: #eaeaea;
         }
 
         * {
@@ -42,7 +46,7 @@
             background-color: var(--white);
             overflow-x: hidden;
             line-height: 1.6;
-            cursor: default; /* Changed from cursor: none */
+            cursor: none;
         }
 
         h1, h2, h3, h4 {
@@ -128,6 +132,146 @@
         .btn-gold:hover {
             background: transparent;
             color: var(--black);
+        }
+
+        /* === PRELOADER === */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .preloader-text {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--white);
+            font-family: 'Playfair Display', serif;
+            overflow: hidden;
+            height: 60px;
+        }
+
+        .preloader-text span {
+            display: inline-block;
+            transform: translateY(100%);
+            opacity: 0;
+            animation: letterAppear 0.3s forwards;
+        }
+
+        .preloader-line {
+            width: 0;
+            height: 3px;
+            background: var(--gold);
+            margin-top: 20px;
+            animation: lineGrow 2s forwards;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: sparkle 2s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes letterAppear {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes lineGrow {
+            to {
+                width: 300px;
+            }
+        }
+
+        @keyframes sparkle {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* === CUSTOM CURSOR === */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gold);
+            mix-blend-mode: difference;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s ease;
+        }
+
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.4s ease, width 0.4s ease, height 0.4s ease;
+        }
+
+        .cursor.active {
+            transform: translate(-50%, -50%) scale(0.5);
+            background: var(--white);
+        }
+
+        .cursor-follower.active {
+            transform: translate(-50%, -50%) scale(1.5);
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        .cursor.click {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .cursor-follower.click {
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+
+        .ripple {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.5);
+            transform: translate(-50%, -50%) scale(0);
+            pointer-events: none;
+            z-index: 9997;
+        }
+
+        .ripple.animate {
+            animation: rippleEffect 0.6s ease-out;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: translate(-50%, -50%) scale(10);
+                opacity: 0;
+            }
         }
 
         /* === HEADER === */
@@ -766,7 +910,7 @@
             transition: var(--transition);
             font-family: 'Montserrat', sans-serif;
             border: none;
-            cursor: pointer;
+            cursor: none;
             position: relative;
             overflow: hidden;
         }
@@ -811,7 +955,7 @@
             color: var(--gray);
             transition: var(--transition);
             border: none;
-            cursor: pointer;
+            cursor: none;
             z-index: 3;
         }
 
@@ -829,7 +973,7 @@
             display: none;
         }
 
-        /* === NEW MODAL STYLES === */
+        /* === MODAL === */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -843,7 +987,7 @@
             align-items: center;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
+            transition: var(--transition);
             backdrop-filter: blur(5px);
         }
 
@@ -853,25 +997,19 @@
         }
 
         .modal {
-            background: #111; /* Dark background for the entire modal */
-            color: var(--white);
-            width: 100vw;
-            height: 100vh;
-            max-width: none;
-            max-height: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            border-radius: 0;
-            transform: scale(0.95);
+            background: var(--white);
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(30px);
             opacity: 0;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.5s ease;
         }
 
         .modal-overlay.active .modal {
-            transform: scale(1);
+            transform: translateY(0);
             opacity: 1;
         }
 
@@ -879,19 +1017,18 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: rgba(0,0,0,0.5);
+            background: var(--black);
             color: var(--white);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
-            cursor: pointer;
+            font-size: 1.2rem;
+            cursor: none;
             transition: var(--transition);
-            z-index: 1300;
-            border: 1px solid var(--gold);
+            z-index: 10;
         }
 
         .modal-close:hover {
@@ -899,137 +1036,480 @@
             transform: rotate(90deg);
         }
 
-        .modal-body {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            height: 100%;
-        }
-
-        /* Left Panel - Product Purchase */
-        .product-purchase-panel {
-            flex-basis: 45%;
-            background: var(--white);
-            color: var(--black);
+        .modal-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
             padding: 40px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .product-purchase-panel .product-image-container {
-            height: 400px;
-            margin-bottom: 30px;
         }
 
-        .product-purchase-panel img {
+        .modal-image {
+            height: 450px;
+            overflow: hidden;
+        }
+
+        .modal-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 8px;
         }
 
-        .product-purchase-panel .product-title {
-            font-size: 2.2rem;
-            margin-bottom: 15px;
+        .modal-details {
+            display: flex;
+            flex-direction: column;
         }
-        
-        .product-purchase-panel .product-price {
+
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--black);
+        }
+
+        .modal-price {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             margin-bottom: 20px;
         }
 
-        .product-purchase-panel .product-description {
+        .modal-description {
+            margin-bottom: 25px;
+            color: var(--gray);
             line-height: 1.7;
-            margin-bottom: 30px;
         }
 
-        .product-purchase-panel .action-buttons {
+        .size-selection {
+            margin-bottom: 25px;
+        }
+
+        .size-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .sizes-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .size-option {
+            padding: 10px;
+            border: 1px solid var(--gray-light);
+            text-align: center;
+            cursor: none;
+            transition: var(--transition);
+        }
+
+        .size-option:hover, .size-option.selected {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+
+        .bulk-pricing {
+            margin-bottom: 25px;
+        }
+
+        .bulk-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bulk-table th, .bulk-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .bulk-table th {
+            font-weight: 600;
+        }
+
+        .bulk-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Bulk discount tags */
+        .bulk-tag {
+            background: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
             margin-top: auto;
         }
 
-        /* Right Panel - Analytics Dashboard */
-        .analytics-dashboard-panel {
-            flex-basis: 55%;
-            padding: 40px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            background: #1a1a1a;
-        }
-        
-        .analytics-dashboard-panel .swiper-container {
-            width: 100%;
+        /* === ANALYTICS DASHBOARD === */
+        .analytics-panel {
+            background: var(--analytics-bg);
+            border-left: 1px solid var(--analytics-border);
+            padding: 15px;
             height: 100%;
-        }
-
-        .analytics-dashboard-panel .swiper-slide {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 25px;
             display: flex;
             flex-direction: column;
-            color: var(--white);
         }
 
-        .chart-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 10px;
+        .analytics-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--analytics-border);
+        }
+
+        .analytics-title {
+            font-size: 1.5rem;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analytics-title i {
             color: var(--gold);
         }
 
-        .chart-insight {
-            font-size: 0.95rem;
-            color: #ccc;
-            margin-bottom: 25px;
-            font-style: italic;
+        .analytics-subtitle {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 5px;
         }
-        
+
+        .analytics-swiper {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .analytics-slide {
+            padding: 15px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .analytics-chart-container {
+            flex: 1;
+            position: relative;
+            min-height: 200px;
+        }
+
+        .analytics-insight {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(212, 175, 55, 0.05);
+            border-left: 3px solid var(--gold);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .analytics-kpi-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .kpi-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .analytics-swiper .swiper-pagination {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        .analytics-swiper .swiper-pagination-bullet {
+            width: 8px;
+            height: 8px;
+            background: var(--gray-light);
+            opacity: 1;
+        }
+
+        .analytics-swiper .swiper-pagination-bullet-active {
+            background: var(--gold);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism effect */
+        .modal-glass {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .reviews-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .reviews-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .review {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .review:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .review-user {
+            font-weight: 600;
+            color: white;
+        }
+
+        .review-stars {
+            color: var(--gold);
+        }
+
+        .review-text {
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        .show-more-reviews {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .show-more-reviews a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .urgency-note {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 3px solid #e74c3c;
+            font-weight: 600;
+        }
+
+        /* === STATISTICS SECTION === */
+        .statistics-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .stats-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-title i {
+            color: var(--gold);
+        }
+
+        .swiper-container {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .swiper-slide {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
         .chart-container {
             flex: 1;
             position: relative;
         }
-        
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--black);
+            text-align: center;
+        }
+
+        .stats-metric {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .stats-value {
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .metric-success {
+            color: var(--success);
+        }
+
+        .metric-warning {
+            color: var(--warning);
+        }
+
+        .metric-danger {
+            color: var(--danger);
+        }
+
         .swiper-pagination-bullet {
-            width: 12px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.3);
+            width: 8px;
+            height: 8px;
+            background: var(--gray-light);
             opacity: 1;
-            transition: var(--transition);
         }
 
         .swiper-pagination-bullet-active {
             background: var(--gold);
-            transform: scale(1.2);
+            width: 20px;
+            border-radius: 4px;
         }
-        
-        .kpi-grid {
+
+        .real-time-metrics {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            height: 100%;
-            align-content: center;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
         }
-        
-        .kpi-card {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 30px;
+
+        .metric-card {
+            background: #f8f8f8;
             border-radius: 8px;
+            padding: 15px;
             text-align: center;
+            transition: var(--transition);
         }
-        
-        .kpi-value {
-            font-size: 3rem;
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
             font-weight: 700;
-            color: var(--gold);
-            margin-bottom: 10px;
+            margin: 10px 0;
         }
-        
-        .kpi-label {
-            font-size: 1rem;
-            color: #aaa;
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .export-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .export-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .export-table th, .export-table td {
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .export-table th {
+            font-weight: 600;
+            background: #f8f8f8;
+        }
+
+        .export-table .country-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .country-flag {
+            width: 20px;
+            height: 15px;
+            background: var(--gray-light);
+            border-radius: 2px;
+        }
+
+        .volume-bar {
+            height: 10px;
+            background: var(--gray-light);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .volume-fill {
+            height: 100%;
+            background: var(--gold);
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: width 1.5s ease-out;
         }
 
         /* === PAGINATION === */
@@ -1050,7 +1530,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+            cursor: none;
             transition: var(--transition);
             font-weight: 600;
         }
@@ -1204,7 +1684,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+            cursor: none;
         }
 
         .cart-item-quantity span {
@@ -1216,7 +1696,7 @@
             color: var(--gray);
             background: none;
             border: none;
-            cursor: pointer;
+            cursor: none;
             margin-left: 15px;
             font-size: 1.2rem;
             transition: var(--transition);
@@ -1249,7 +1729,7 @@
             padding: 12px;
             border-radius: 0;
             font-weight: 600;
-            cursor: pointer;
+            cursor: none;
             transition: var(--transition);
             text-align: center;
             display: block;
@@ -1438,7 +1918,7 @@
             z-index: 100;
             animation: float 3s ease-in-out infinite;
             transition: var(--transition);
-            cursor: pointer;
+            cursor: none;
             text-decoration: none;
         }
 
@@ -1533,28 +2013,24 @@
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
+            
+            .modal-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-image {
+                height: 300px;
+            }
 
-            .modal-body {
-                flex-direction: column;
-            }
-            .product-purchase-panel, .analytics-dashboard-panel {
-                flex-basis: auto;
-                height: 50vh;
-            }
-            .analytics-dashboard-panel {
-                padding: 20px;
-            }
-            .product-purchase-panel {
-                padding: 20px;
-            }
-            .product-purchase-panel .product-image-container {
+            .swiper-container {
                 height: 250px;
             }
-            .product-purchase-panel .product-title {
-                font-size: 1.8rem;
-            }
-            .chart-title {
-                font-size: 1.2rem;
+
+            .analytics-panel {
+                border-left: none;
+                border-top: 1px solid var(--analytics-border);
+                margin-top: 30px;
+                padding-top: 30px;
             }
         }
 
@@ -1587,6 +2063,14 @@
                 width: 90%;
             }
             
+            body {
+                cursor: default;
+            }
+            
+            .cursor, .cursor-follower {
+                display: none;
+            }
+
             .chat-float {
                 right: auto;
                 left: 30px;
@@ -1595,6 +2079,14 @@
             .chat-modal {
                 right: auto;
                 left: 30px;
+            }
+
+            .swiper-container {
+                height: 220px;
+            }
+
+            .real-time-metrics {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1614,6 +2106,10 @@
             .page-btn {
                 width: 40px;
                 height: 40px;
+            }
+            
+            .sizes-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
             
             .toast-container {
@@ -1648,17 +2144,15 @@
             .mobile-toggle {
                 order: 3;
             }
-            
-            .kpi-grid {
-                grid-template-columns: 1fr;
-            }
-            .kpi-value {
-                font-size: 2.5rem;
+
+            .swiper-container {
+                height: 200px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Preloader -->
     <div class="preloader" id="preloader">
         <div class="preloader-text">
             <span>J</span>
@@ -1674,14 +2168,21 @@
         <div class="preloader-line"></div>
     </div>
 
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Header -->
     <header id="header">
         <div class="container header-container">
             <a href="index.html" class="logo">JMPOTTERS</a>
             
+            <!-- Desktop Navigation -->
             <ul class="nav-links">
                 <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
                 <li><a href="shop/products.html"><i class="fas fa-shopping-bag"></i> Shop</a></li>
                 
+                <!-- Footwear dropdown -->
                 <li class="dropdown">
                     <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
                     <div class="dropdown-content">
@@ -1719,6 +2220,7 @@
         </div>
     </header>
 
+    <!-- Mobile Navigation -->
     <div class="overlay" id="navOverlay"></div>
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
@@ -1731,6 +2233,7 @@
             <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
             <li><a href="shop/products.html"><i class="fas fa-shopping-bag"></i> Shop</a></li>
             
+            <!-- Mobile Footwear dropdown -->
             <li class="mobile-dropdown" id="mobileFootwearDropdown">
                 <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
                 <div class="mobile-dropdown-content">
@@ -1751,6 +2254,7 @@
             <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
         </ul>
     </div>
+    <!-- Hero Section with Carousel -->
     <section class="hero">
         <div class="hero-carousel">
             <div class="hero-slide active" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/mensfootwear.jpg');"></div>
@@ -1773,6 +2277,7 @@
         </div>
     </section>
 
+    <!-- Promotional Strip -->
     <section class="promo-strip">
         <div class="promo-container">
             <div class="promo-item">New Arrivals</div>
@@ -1790,111 +2295,33 @@
         </div>
     </section>
 
+    <!-- Product Gallery -->
     <section class="product-gallery" id="products">
         <div class="container">
             <div class="filter-message" id="filterMessage"></div>
             <h2 class="section-title" data-aos="fade-up">Premium Men's Footwear</h2>
             <div class="products-grid" id="productsGrid">
-                </div>
+                <!-- Products will be loaded here dynamically -->
+            </div>
             <div class="pagination" id="pagination">
-                </div>
+                <!-- Pagination will be added here dynamically -->
+            </div>
         </div>
     </section>
 
+    <!-- Modal -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="productModal">
             <button class="modal-close" id="modalClose">
                 <i class="fas fa-times"></i>
             </button>
-            <div class="modal-body">
-                <div class="product-purchase-panel">
-                    <div class="product-image-container">
-                        <img id="modalImage" src="" alt="Product Image">
-                    </div>
-                    <h3 class="product-title" id="modalTitle">Product Title</h3>
-                    <div class="product-price">
-                         <del class="price-fake" id="modalFakePrice"></del>
-                         <span class="price-real" id="modalRealPrice"></span>
-                    </div>
-                    <p class="product-description" id="modalDescription"></p>
-                    <div class="action-buttons">
-                        <button class="btn-add-cart" id="modalAddToCart">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
-                    </div>
-                </div>
-                <div class="analytics-dashboard-panel">
-                    <div class="swiper-container">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-                                <h4 class="chart-title">Purchase Frequency</h4>
-                                <p class="chart-insight" id="slide1_insight"></p>
-                                <div class="chart-container">
-                                    <canvas id="purchaseFrequencyChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <h4 class="chart-title">Regional Sell-Out Rate</h4>
-                                <p class="chart-insight" id="slide2_insight"></p>
-                                <div class="chart-container">
-                                    <canvas id="regionalSellOutChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <h4 class="chart-title">Inventory Turnover</h4>
-                                <p class="chart-insight" id="slide3_insight"></p>
-                                <div class="chart-container">
-                                    <canvas id="inventoryTurnoverChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <h4 class="chart-title">Repeat Purchase Rate</h4>
-                                <p class="chart-insight" id="slide4_insight"></p>
-                                <div class="chart-container">
-                                    <canvas id="repeatPurchaseChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <h4 class="chart-title">Revenue Source Breakdown</h4>
-                                <p class="chart-insight" id="slide5_insight"></p>
-                                <div class="chart-container">
-                                    <canvas id="revenueSourceChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <h4 class="chart-title">Live KPIs</h4>
-                                <p class="chart-insight" id="slide6_insight"></p>
-                                <div class="kpi-grid">
-                                    <div class="kpi-card">
-                                        <div class="kpi-value" id="kpiUnitsSold">0</div>
-                                        <div class="kpi-label">Units Sold (Month)</div>
-                                    </div>
-                                    <div class="kpi-card">
-                                        <div class="kpi-value" id="kpiReturnRate">0%</div>
-                                        <div class="kpi-label">Return Rate</div>
-                                    </div>
-                                    <div class="kpi-card">
-                                        <div class="kpi-value" id="kpiCartAbandonment">0%</div>
-                                        <div class="kpi-label">Cart Abandonment</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <h4 class="chart-title">Peak Buyer Activity</h4>
-                                <p class="chart-insight" id="slide7_insight"></p>
-                                <div class="chart-container">
-                                    <canvas id="hourlyActivityChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-pagination"></div>
-                    </div>
-                </div>
+            <div class="modal-content" id="modalContent">
+                <!-- Modal content will be loaded here dynamically -->
             </div>
         </div>
     </div>
 
-
+    <!-- Cart Panel -->
     <div class="overlay" id="cartOverlay"></div>
     <div class="cart-panel" id="cartPanel">
         <div class="cart-header">
@@ -1918,6 +2345,7 @@
         </div>
     </div>
 
+    <!-- Invoice Modal -->
     <div class="modal-overlay" id="invoiceOverlay">
         <div class="invoice-modal">
             <button class="modal-close" id="invoiceClose">
@@ -1941,7 +2369,8 @@
                     </tr>
                 </thead>
                 <tbody id="invoiceItems">
-                    </tbody>
+                    <!-- Invoice items will be added here -->
+                </tbody>
             </table>
             <div class="invoice-total">
                 Total: <span id="invoiceTotal">₦0</span>
@@ -1954,9 +2383,12 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer">
-        </div>
+        <!-- Toast messages will appear here -->
+    </div>
 
+    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -2009,14 +2441,17 @@
         </div>
     </footer>
 
+    <!-- WhatsApp Floating Button -->
     <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
+    <!-- Chat Support Button -->
     <div class="chat-float" id="chatFloat">
         <i class="fas fa-comments"></i>
     </div>
     
+    <!-- Chat Support Modal -->
     <div class="chat-modal" id="chatModal">
         <div class="chat-header">
             <i class="fas fa-headset"></i> Customer Support
@@ -2034,6 +2469,7 @@
         </div>
     </div>
 
+    <!-- Libraries -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     
@@ -2128,8 +2564,6 @@
         let filteredProducts = [...products];
         let currentProduct = null;
         let currentFilter = 'all';
-        let modalSwiper = null;
-        let activeCharts = {};
 
         // DOM Elements
         const preloader = document.getElementById('preloader');
@@ -2148,14 +2582,11 @@
         const mobileNav = document.getElementById('mobileNav');
         const navOverlay = document.getElementById('navOverlay');
         const closeNav = document.querySelector('.close-nav');
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
         const modalOverlay = document.getElementById('modalOverlay');
         const modalClose = document.getElementById('modalClose');
-        const modalImage = document.getElementById('modalImage');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalFakePrice = document.getElementById('modalFakePrice');
-        const modalRealPrice = document.getElementById('modalRealPrice');
-        const modalDescription = document.getElementById('modalDescription');
-        const modalAddToCart = document.getElementById('modalAddToCart');
+        const modalContent = document.getElementById('modalContent');
         const toastContainer = document.getElementById('toastContainer');
         const whatsappCheckout = document.getElementById('whatsappCheckout');
         const header = document.getElementById('header');
@@ -2172,38 +2603,81 @@
         const printInvoice = document.getElementById('printInvoice');
         const customerName = document.getElementById('customerName');
 
+        // Fake reviews data
+        const fakeReviews = [
+            { user: "ZeeKicks", rating: 5, text: "🔥🔥🔥 These boots sold out FAST. Great quality." },
+            { user: "ChiBoy44", rating: 4, text: "Sleek design, solid feel. Love it 💯" },
+            { user: "ShoeKing", rating: 5, text: "Best purchase this year! Comfortable and stylish." },
+            { user: "StyleGuru", rating: 4, text: "Perfect for both casual and formal occasions." },
+            { user: "FootwearFan", rating: 5, text: "Exceptional craftsmanship. Worth every penny!" },
+            { user: "UrbanGent", rating: 4, text: "Great fit and premium materials. Highly recommend." },
+            { user: "SneakerHead", rating: 5, text: "Attention to detail is impressive. Will buy again." },
+            { user: "FashionForward", rating: 4, text: "Elevates any outfit. Received many compliments." }
+        ];
+
         // Fake toast messages
         const toastMessages = [
             "🛍️ {name} from {location} just bought {quantity} {product} – ₦{amount} 🤑",
             "🔥 {name} from {location} ordered {quantity} {product} – ₦{amount} ({discount}% OFF)",
             "🤯 {name} in {location} just added {quantity} {product} to cart 👟",
             "💸 {name} from {location} purchased {quantity} {product} worth ₦{amount}",
+            "🚀 {name} in {location} just bought {quantity} {product} – great choice!",
+            "👑 {name} from {location} got {quantity} {product} – premium selection!",
+            "🌟 {name} in {location} ordered {quantity} {product} – luxury at its best!",
+            "💼 {name} from {location} purchased {quantity} {product} – business ready!",
+            "🎯 {name} in {location} bought {quantity} {product} – perfect fit!",
+            "✨ {name} from {location} just got {quantity} {product} – style upgrade!",
+            "🏆 {name} in {location} purchased {quantity} {product} – winning choice!"
         ];
 
         // Fake names and locations
         const fakeNames = ["Chuka", "Mariam", "Jide", "Ade", "Bola", "Emeka", "Funke", "Tunde", "Ngozi", "Kunle"];
         const fakeLocations = ["Lagos", "Abuja", "Ibadan", "Port Harcourt", "Kano", "Enugu", "Aba", "Owerri", "Benin", "Kaduna"];
-        const fakeProducts = ["Sneakers", "Loafers", "Boots", "Sandals", "Formal Shoes"];
+        const fakeProducts = ["Sneakers", "Loafers", "Boots", "Sandals", "Formal Shoes", "Designer Kicks", "Premium Footwear", "Luxury Shoes"];
 
         // ========== INITIALIZE PAGE ========== //
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize preloader
             initializePreloader();
+            
+            // Initialize header scroll effect
             initializeHeader();
+            
+            // Initialize hero carousel
             initializeCarousel();
+            
+            // Render products
             renderProducts();
+            
+            // Initialize cart and wishlist counts
             updateWishlistCount();
             updateCartCount();
             updateCartTotal();
+            
+            // Initialize custom cursor
+            if (window.innerWidth > 768) {
+                initializeCursor();
+            }
+            
+            // Setup chat support
             setupChatSupport();
+            
+            // Setup category filters
             setupCategoryFilters();
+            
+            // Setup invoice preview
             setupInvoicePreview();
+            
+            // Start toast messages
             startToastMessages();
+            
+            // Setup dropdown toggle
             setupDropdownToggle();
-            setupModalCloseEvents();
         });
 
         // ========== DROPDOWN TOGGLE ========== //
         function setupDropdownToggle() {
+            // Desktop dropdown toggle
             const desktopDropdown = document.querySelector('.nav-links .dropdown');
             if (desktopDropdown) {
                 const dropdownLink = desktopDropdown.querySelector('a');
@@ -2213,6 +2687,7 @@
                 });
             }
             
+            // Mobile dropdown toggle
             const mobileDropdown = document.querySelector('.mobile-nav .mobile-dropdown');
             if (mobileDropdown) {
                 const mobileDropdownLink = mobileDropdown.querySelector('a');
@@ -2223,29 +2698,101 @@
             }
         }
 
-        // ========== PRELOADER & HEADER & CAROUSEL ========== //
+        // ========== PRELOADER FUNCTIONS ========== //
         function initializePreloader() {
+            const letters = document.querySelectorAll('.preloader-text span');
+            letters.forEach((letter, index) => {
+                setTimeout(() => {
+                    letter.style.transform = 'translateY(0)';
+                    letter.style.opacity = '1';
+                }, index * 150);
+            });
+            
+            // Hide preloader after 3 seconds
             setTimeout(() => {
                 preloader.style.opacity = '0';
-                setTimeout(() => preloader.style.display = 'none', 500);
-            }, 2500);
+                preloader.style.visibility = 'hidden';
+            }, 3000);
         }
 
+        // ========== HEADER FUNCTIONS ========== //
         function initializeHeader() {
             window.addEventListener('scroll', () => {
-                header.classList.toggle('scrolled', window.scrollY > 50);
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
             });
         }
 
+        // ========== HERO CAROUSEL FUNCTIONS ========== //
         function initializeCarousel() {
             const slides = document.querySelectorAll('.hero-slide');
             let currentSlide = 0;
-            if (slides.length === 0) return;
+            
             setInterval(() => {
                 slides[currentSlide].classList.remove('active');
                 currentSlide = (currentSlide + 1) % slides.length;
                 slides[currentSlide].classList.add('active');
             }, 5000);
+        }
+
+        // ========== CURSOR FUNCTIONS ========== //
+        function initializeCursor() {
+            document.addEventListener('mousemove', moveCursor);
+            document.addEventListener('mousedown', cursorClick);
+            document.addEventListener('mouseup', cursorUnclick);
+            
+            // Add ripple effect on click
+            document.addEventListener('click', createRipple);
+            
+            // Add hover effects to interactive elements
+            const interactiveElements = document.querySelectorAll('a, button, .product-toggle, .size-option, .page-btn, .quantity-btn');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.classList.add('active');
+                    cursorFollower.classList.add('active');
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('active');
+                    cursorFollower.classList.remove('active');
+                });
+            });
+        }
+
+        function moveCursor(e) {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursorFollower.style.left = e.clientX + 'px';
+            cursorFollower.style.top = e.clientY + 'px';
+        }
+
+        function cursorClick() {
+            cursor.classList.add('click');
+            cursorFollower.classList.add('click');
+        }
+
+        function cursorUnclick() {
+            cursor.classList.remove('click');
+            cursorFollower.classList.remove('click');
+        }
+
+        function createRipple(e) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            ripple.style.left = e.clientX + 'px';
+            ripple.style.top = e.clientY + 'px';
+            document.body.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.classList.add('animate');
+                
+                // Remove ripple after animation
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            }, 10);
         }
 
         // ========== PRODUCT FUNCTIONS ========== //
@@ -2254,9 +2801,12 @@
             const startIndex = (currentPage - 1) * itemsPerPage;
             const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
             
+            // Clear the grid
             productsGrid.innerHTML = '';
             
+            // Add products to the grid
             paginatedProducts.forEach(product => {
+                // Generate fake price (₦5,000–₦10,000 higher than real price)
                 const fakePrice = product.price + Math.floor(Math.random() * 5000) + 5000;
                 
                 const productCard = document.createElement('div');
@@ -2282,6 +2832,21 @@
                         <div class="sizes">
                             Sizes Available: <span>28 - 45</span>
                         </div>
+                        
+                        <!-- Quantity selector -->
+                        <div class="quantity-selector">
+                            <button class="toggle-bulk-options">
+                                Bulk Options <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="quantity-options">
+                                <div class="quantity-option selected" data-qty="1">1 Unit</div>
+                                <div class="quantity-option" data-qty="10">10 Units</div>
+                                <div class="quantity-option" data-qty="25">25 Units</div>
+                                <div class="quantity-option" data-qty="50">50 Units</div>
+                                <div class="quantity-option" data-qty="100">100 Units</div>
+                            </div>
+                        </div>
+                        
                         <div class="action-buttons">
                             <button class="btn-add-cart" data-id="${product.id}">
                                 <i class="fas fa-shopping-cart"></i> Add to Cart
@@ -2295,14 +2860,16 @@
                 productsGrid.appendChild(productCard);
             });
             
+            // Setup event listeners for the new products
             setupProductInteractions();
+            
+            // Render pagination
             renderPagination(totalPages);
         }
 
         function renderPagination(totalPages) {
             pagination.innerHTML = '';
-            if (totalPages <= 1) return;
-
+            
             const maxVisiblePages = 5;
             let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
             let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
@@ -2311,6 +2878,7 @@
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
             
+            // Previous button
             if (currentPage > 1) {
                 const prevBtn = document.createElement('button');
                 prevBtn.className = 'page-btn';
@@ -2323,6 +2891,7 @@
                 pagination.appendChild(prevBtn);
             }
             
+            // Page buttons
             for (let i = startPage; i <= endPage; i++) {
                 const pageBtn = document.createElement('button');
                 pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
@@ -2335,6 +2904,7 @@
                 pagination.appendChild(pageBtn);
             }
             
+            // Next button
             if (currentPage < totalPages) {
                 const nextBtn = document.createElement('button');
                 nextBtn.className = 'page-btn';
@@ -2349,278 +2919,745 @@
         }
 
         function setupProductInteractions() {
+            // Add to Cart buttons
             document.querySelectorAll('.btn-add-cart').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const productId = parseInt(this.getAttribute('data-id'));
                     const product = products.find(p => p.id === productId);
-                    addToCart(product, 1);
+                    
+                    // Get selected quantity
+                    const card = this.closest('.product-card');
+                    const selectedQty = card.querySelector('.quantity-option.selected');
+                    const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
+                    
+                    addToCart(product, quantity);
                 });
             });
             
+            // View Details buttons
             document.querySelectorAll('.btn-view-details').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const productId = parseInt(this.getAttribute('data-id'));
                     currentProduct = products.find(p => p.id === productId);
+                    
                     openProductModal(currentProduct);
                 });
             });
             
+            // Wishlist buttons
             document.querySelectorAll('.wishlist-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const productId = parseInt(this.getAttribute('data-id'));
                     const product = products.find(p => p.id === productId);
-                    this.classList.toggle('active');
+                    
                     if (this.classList.contains('active')) {
-                        addToWishlist(product);
-                    } else {
                         removeFromWishlist(productId);
+                        this.classList.remove('active');
+                    } else {
+                        addToWishlist(product);
+                        this.classList.add('active');
                     }
                 });
             });
-        }
-
-        // ========== ANALYTICS DATA GENERATION ========== //
-        const globalCities = ['London', 'New York', 'Dubai', 'Istanbul', 'Accra', 'Casablanca', 'Berlin'];
-        const nigerianCities = ['Lagos', 'Abuja', 'Port Harcourt', 'Kano', 'Enugu', 'Ibadan'];
-        const allCities = [...globalCities, ...nigerianCities];
-        const buyerTypes = ['Retailers', 'Wholesalers', 'Online Agents', 'Corporate Buyers', 'Exporters'];
-        
-        function getRandom(arr, count) {
-            return [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
-        }
-        function getRandomNumber(min, max, isFloat = false) {
-            const val = Math.random() * (max - min) + min;
-            return isFloat ? parseFloat(val.toFixed(1)) : Math.floor(val);
-        }
-
-        function generateAnalyticsData(product) {
-            const randomCity = getRandom(allCities, 1)[0];
-            const randomBuyer = getRandom(buyerTypes, 1)[0].slice(0,-1); // "Retailer"
             
-            return {
-                slide1: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                    data: Array.from({ length: 12 }, () => getRandomNumber(50, 500)),
-                    insight: `Monthly purchase frequency shows a significant peak during the holiday season.`
-                },
-                slide2: {
-                    labels: getRandom(allCities, 5),
-                    data: Array.from({ length: 5 }, () => getRandomNumber(20, 95)),
-                    insight: `Sell-out rate in ${randomCity} surpasses others due to strong local demand from ${randomBuyer.toLowerCase()}s.`
-                },
-                slide3: {
-                    labels: ['Sold', 'In Stock', 'In Transit'],
-                    data: [getRandomNumber(60, 85), getRandomNumber(10, 25), getRandomNumber(5, 10)],
-                    insight: `A healthy turnover rate indicates efficient stock management and high product desirability.`
-                },
-                slide4: {
-                    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-                    data: Array.from({ length: 4 }, () => getRandomNumber(15, 60)),
-                    insight: `The repeat purchase rate of ${getRandomNumber(15,60)}% highlights strong customer loyalty and product satisfaction.`
-                },
-                slide5: {
-                    labels: ['2022', '2023', '2024'],
-                    datasets: buyerTypes.map(type => ({
-                        label: type,
-                        data: Array.from({ length: 3 }, () => getRandomNumber(100000, 500000))
-                    })),
-                    insight: `${randomBuyer}s consistently contribute the largest share of revenue year-over-year.`
-                },
-                slide6: {
-                    unitsSold: getRandomNumber(1500, 5000),
-                    returnRate: getRandomNumber(1, 5, true),
-                    abandonmentRate: getRandomNumber(20, 45, true),
-                    insight: `Low return rates confirm the product's high quality and accurate description.`
-                },
-                slide7: {
-                    data: Array.from({ length: 24 }, () => getRandomNumber(0, 100)),
-                    insight: `Buyer engagement peaks between 2 PM and 4 PM, suggesting this is the optimal time for promotions.`
-                }
-            };
-        }
-        
-        // ========== MODAL & CHARTS LOGIC ========== //
-        function destroyActiveCharts() {
-            Object.values(activeCharts).forEach(chart => chart.destroy());
-            activeCharts = {};
+            // Quantity option selection
+            document.querySelectorAll('.quantity-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Toggle bulk options
+            document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const options = this.nextElementSibling;
+                    options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
+                });
+            });
         }
 
         function openProductModal(product) {
-            document.body.style.overflow = 'hidden';
-            modalOverlay.classList.add('active');
-
-            // Populate Left Panel
-            modalImage.src = `assets/images/menfootwear/${product.image}`;
-            modalTitle.textContent = product.name;
-            modalFakePrice.textContent = `₦${(product.price + 5000).toLocaleString()}`;
-            modalRealPrice.textContent = `₦${product.price.toLocaleString()}`;
-            modalDescription.textContent = `Experience unmatched quality with the ${product.name}. A perfect blend of style and durability for the modern individual. Crafted from premium materials for lasting comfort.`;
-            modalAddToCart.onclick = () => addToCart(product, 1);
+            // Generate fake price (₦5,000–₦10,000 higher than real price)
+            const fakePrice = product.price + Math.floor(Math.random() * 5000) + 5000;
             
-            // Generate data and setup slides
-            const analyticsData = generateAnalyticsData(product);
-            document.getElementById('slide1_insight').textContent = analyticsData.slide1.insight;
-            document.getElementById('slide2_insight').textContent = analyticsData.slide2.insight;
-            document.getElementById('slide3_insight').textContent = analyticsData.slide3.insight;
-            document.getElementById('slide4_insight').textContent = analyticsData.slide4.insight;
-            document.getElementById('slide5_insight').textContent = analyticsData.slide5.insight;
-            document.getElementById('slide6_insight').textContent = analyticsData.slide6.insight;
-            document.getElementById('slide7_insight').textContent = analyticsData.slide7.insight;
+            // Get 3-5 random reviews
+            const reviews = [];
+            const reviewCount = Math.floor(Math.random() * 3) + 3; // 3-5 reviews
+            for (let i = 0; i < reviewCount; i++) {
+                reviews.push(fakeReviews[Math.floor(Math.random() * fakeReviews.length)]);
+            }
             
-            // Delay Swiper and Chart initialization slightly for smooth transition
-            setTimeout(() => {
-                if (modalSwiper) modalSwiper.destroy(true, true);
-                destroyActiveCharts();
-
-                modalSwiper = new Swiper('.swiper-container', {
-                    effect: 'slide',
-                    grabCursor: true,
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                    },
-                    on: {
-                        init: function () {
-                            // Defer chart creation to avoid blocking render
-                            setTimeout(() => createChartForSlide(0, analyticsData), 50);
-                        },
-                        slideChange: function () {
-                            setTimeout(() => createChartForSlide(this.activeIndex, analyticsData), 50);
-                        }
+            modalContent.innerHTML = `
+                <div class="modal-details">
+                    <div class="modal-image">
+                        <img src="assets/images/menfootwear/${product.image}" alt="${product.name}">
+                    </div>
+                    <div class="modal-details-content">
+                        <h3 class="modal-title">${product.name}</h3>
+                        <div class="modal-price">
+                            <del class="price-fake">₦${fakePrice.toLocaleString()}</del>
+                            <span class="price-real">₦${product.price.toLocaleString()}</span>
+                            <span class="discount-tag">-${product.displayDiscount}% OFF</span>
+                        </div>
+                        <p class="modal-description">
+                            Premium men's footwear crafted with the finest materials for ultimate comfort and style. 
+                            Features a durable sole, cushioned insole, and premium leather upper. Perfect for both 
+                            formal occasions and casual outings.
+                        </p>
+                        
+                        <div class="size-selection">
+                            <div class="size-title">Select Size:</div>
+                            <div class="sizes-grid">
+                                ${Array.from({length: 18}, (_, i) => i + 28).map(size => `
+                                    <div class="size-option">${size}</div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Quantity selector in modal -->
+                        <div class="quantity-selector">
+                            <button class="toggle-bulk-options">
+                                Bulk Options <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="quantity-options" style="display: none;">
+                                <div class="quantity-option selected" data-qty="1">1 Unit</div>
+                                <div class="quantity-option" data-qty="10">10 Units</div>
+                                <div class="quantity-option" data-qty="25">25 Units</div>
+                                <div class="quantity-option" data-qty="50">50 Units</div>
+                                <div class="quantity-option" data-qty="100">100 Units</div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button class="btn-add-cart" data-id="${product.id}" style="flex: 2;">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <button class="wishlist-btn ${wishlist.some(item => item.id === product.id) ? 'active' : ''}" data-id="${product.id}" style="flex: 1;">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Glassmorphism effect -->
+                        <div class="modal-glass">
+                            <div class="reviews-section">
+                                <div class="reviews-title">Customer Reviews <span class="review-count">(${reviews.length})</span></div>
+                                ${reviews.slice(0, 1).map(review => `
+                                    <div class="review">
+                                        <div class="review-header">
+                                            <div class="review-user">${review.user}</div>
+                                            <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
+                                        </div>
+                                        <p class="review-text">"${review.text}"</p>
+                                    </div>
+                                `).join('')}
+                                ${reviews.length > 1 ? `
+                                    <div class="show-more-reviews">
+                                        <a href="#" id="showAllReviews">Show all ${reviews.length} reviews</a>
+                                    </div>
+                                    <div class="all-reviews" style="display: none;">
+                                        ${reviews.slice(1).map(review => `
+                                            <div class="review">
+                                                <div class="review-header">
+                                                    <div class="review-user">${review.user}</div>
+                                                    <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
+                                                </div>
+                                                <p class="review-text">"${review.text}"</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="urgency-note">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                Bulk purchases are subject to availability. Add now to secure stock.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="analytics-panel">
+                    <div class="analytics-header">
+                        <h3 class="analytics-title"><i class="fas fa-chart-line"></i> Business Insights</h3>
+                        <p class="analytics-subtitle">Real-time analytics for wholesale buyers</p>
+                    </div>
+                    <div class="analytics-swiper">
+                        <div class="swiper-wrapper">
+                            <!-- Slide 1: Purchase Frequency -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Purchase Frequency Over Time</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="purchaseFrequencyChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight1"></div>
+                            </div>
+                            <!-- Slide 2: Regional Sell-out Rate -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Regional Sell-out Rate</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="regionalSelloutChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight2"></div>
+                            </div>
+                            <!-- Slide 3: Inventory Turnover -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Inventory Turnover</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="inventoryTurnoverChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight3"></div>
+                            </div>
+                            <!-- Slide 4: Repeat Purchase Rate -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Repeat Purchase Rate</h4>
+                                <div class="analytics-kpi-container">
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Rate</div>
+                                        <div class="kpi-value" id="repeatRateValue">0%</div>
+                                        <div class="kpi-trend trend-up">+12% vs last month</div>
+                                    </div>
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Buyers</div>
+                                        <div class="kpi-value" id="repeatBuyers">0</div>
+                                        <div class="kpi-trend trend-up">+8% vs last quarter</div>
+                                    </div>
+                                </div>
+                                <div class="analytics-chart-container">
+                                    <canvas id="repeatPurchaseChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight4"></div>
+                            </div>
+                            <!-- Slide 5: Revenue Source Breakdown -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Revenue Source Breakdown</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="revenueSourceChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight5"></div>
+                            </div>
+                            <!-- Slide 6: Live KPIs -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Live Performance Metrics</h4>
+                                <div class="analytics-kpi-container">
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Units Sold</div>
+                                        <div class="kpi-value" id="unitsSold">0</div>
+                                        <div class="kpi-trend trend-up">+18% today</div>
+                                    </div>
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Return Rate</div>
+                                        <div class="kpi-value" id="returnRate">0%</div>
+                                        <div class="kpi-trend trend-down">-3% vs last month</div>
+                                    </div>
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Cart Abandonment</div>
+                                        <div class="kpi-value" id="cartAbandonment">0%</div>
+                                        <div class="kpi-trend trend-down">-5% vs last week</div>
+                                    </div>
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Avg. Order Value</div>
+                                        <div class="kpi-value">₦<span id="avgOrderValue">0</span></div>
+                                        <div class="kpi-trend trend-up">+7% vs last quarter</div>
+                                    </div>
+                                </div>
+                                <div class="analytics-insight" id="insight6"></div>
+                            </div>
+                            <!-- Slide 7: Hourly Activity -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Buyer Engagement by Hour</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="hourlyActivityChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight7"></div>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners inside modal
+            document.querySelectorAll('.modal .btn-add-cart').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    
+                    // Get selected quantity
+                    const selectedQty = document.querySelector('.modal .quantity-option.selected');
+                    const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
+                    
+                    addToCart(product, quantity);
+                });
+            });
+            
+            document.querySelectorAll('.modal .wishlist-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    
+                    if (this.classList.contains('active')) {
+                        removeFromWishlist(productId);
+                        this.classList.remove('active');
+                    } else {
+                        addToWishlist(product);
+                        this.classList.add('active');
                     }
                 });
-            }, 100);
+            });
+            
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.size-option').forEach(el => el.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Show all reviews
+            const showAllReviews = document.getElementById('showAllReviews');
+            if (showAllReviews) {
+                showAllReviews.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector('.all-reviews').style.display = 'block';
+                    this.style.display = 'none';
+                });
+            }
+            
+            // Quantity option selection in modal
+            document.querySelectorAll('.modal .quantity-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Toggle bulk options in modal
+            document.querySelector('.modal .toggle-bulk-options').addEventListener('click', function() {
+                const options = this.nextElementSibling;
+                options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
+            });
+            
+            // Show modal
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize analytics dashboard
+            initializeAnalyticsDashboard();
         }
 
-        function createChartForSlide(index, data) {
-            const chartInitializers = {
-                0: () => createPurchaseFrequencyChart(data.slide1),
-                1: () => createRegionalSellOutChart(data.slide2),
-                2: () => createInventoryTurnoverChart(data.slide3),
-                3: () => createRepeatPurchaseChart(data.slide4),
-                4: () => createRevenueSourceChart(data.slide5),
-                5: () => createLiveKPIs(data.slide6),
-                6: () => createHourlyActivityChart(data.slide7),
-            };
+        function initializeAnalyticsDashboard() {
+            // Initialize Swiper
+            const analyticsSwiper = new Swiper('.analytics-swiper', {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                observer: true,
+                observeParents: true,
+                on: {
+                    slideChange: function() {
+                        // Initialize charts for active slide
+                        const activeSlideIndex = this.activeIndex;
+                        switch(activeSlideIndex) {
+                            case 0:
+                                createPurchaseFrequencyChart();
+                                break;
+                            case 1:
+                                createRegionalSelloutChart();
+                                break;
+                            case 2:
+                                createInventoryTurnoverChart();
+                                break;
+                            case 3:
+                                createRepeatPurchaseChart();
+                                break;
+                            case 4:
+                                createRevenueSourceChart();
+                                break;
+                            case 5:
+                                updateLiveKPIs();
+                                break;
+                            case 6:
+                                createHourlyActivityChart();
+                                break;
+                        }
+                    }
+                }
+            });
 
-            // Initialize chart if function exists for the slide index
-            if (chartInitializers[index]) {
-                chartInitializers[index]();
+            // Generate insights for all slides
+            generateInsights();
+            
+            // Initialize charts for first slide
+            createPurchaseFrequencyChart();
+        }
+
+        function generateInsights() {
+            // Data pools for insights
+            const cities = ['Lagos', 'London', 'Dubai', 'Abuja', 'New York', 'Accra', 'Johannesburg', 'Istanbul', 'Casablanca', 'Cairo'];
+            const businessTypes = ['retailers', 'wholesalers', 'online resellers', 'export agents', 'boutiques'];
+            const trends = ['increased', 'decreased', 'remained stable', 'surged', 'declined'];
+            const percentages = [12, 18, 25, 30, 42, 55, 68];
+            
+            // Insight templates
+            const insightTemplates = [
+                () => `Purchase frequency has ${trends[Math.floor(Math.random() * trends.length)]} by ${percentages[Math.floor(Math.random() * percentages.length)]}% in the last quarter.`,
+                () => `${cities[Math.floor(Math.random() * cities.length)]} shows the highest sell-out rate at ${Math.floor(Math.random() * 30) + 70}%.`,
+                () => `Inventory turnover improved by ${percentages[Math.floor(Math.random() * percentages.length)]}% compared to last year.`,
+                () => `Repeat buyers from ${cities[Math.floor(Math.random() * cities.length)]} increased by ${percentages[Math.floor(Math.random() * percentages.length)]}%.`,
+                () => `${businessTypes[Math.floor(Math.random() * businessTypes.length)]} account for the largest revenue share.`,
+                () => `Conversion rates improved by ${percentages[Math.floor(Math.random() * percentages.length)]}% this month.`,
+                () => `Peak buying hours are between ${Math.floor(Math.random() * 6) + 12}pm and ${Math.floor(Math.random() * 4) + 4}pm.`
+            ];
+            
+            // Apply insights to each slide
+            for (let i = 1; i <= 7; i++) {
+                const insightElement = document.getElementById(`insight${i}`);
+                if (insightElement) {
+                    insightElement.textContent = insightTemplates[i-1]();
+                }
             }
         }
-        
-        function setupModalCloseEvents() {
-            modalClose.addEventListener('click', closeModal);
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) closeModal();
-            });
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-                    closeModal();
+
+        function createPurchaseFrequencyChart() {
+            const ctx = document.getElementById('purchaseFrequencyChart').getContext('2d');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const data = months.map(() => Math.floor(Math.random() * 100) + 50);
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Purchases',
+                        data: data,
+                        borderColor: '#d4af37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
                 }
             });
         }
-        
-        function closeModal() {
+
+        function createRegionalSelloutChart() {
+            const ctx = document.getElementById('regionalSelloutChart').getContext('2d');
+            const regions = ['Lagos', 'Abuja', 'London', 'Dubai', 'Accra'];
+            const selloutRates = regions.map(() => Math.floor(Math.random() * 50) + 50);
+            const backgroundColors = selloutRates.map(rate => {
+                if (rate > 80) return '#27ae60'; // Green
+                if (rate > 60) return '#f39c12'; // Orange
+                return '#e74c3c'; // Red
+            });
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: regions,
+                    datasets: [{
+                        label: 'Sell-out Rate (%)',
+                        data: selloutRates,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    animation: {
+                        duration: 2000
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createInventoryTurnoverChart() {
+            const ctx = document.getElementById('inventoryTurnoverChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fast (1-2 weeks)', 'Medium (3-4 weeks)', 'Slow (5+ weeks)'],
+                    datasets: [{
+                        data: [
+                            Math.floor(Math.random() * 60) + 30,
+                            Math.floor(Math.random() * 30) + 20,
+                            Math.floor(Math.random() * 20) + 10
+                        ],
+                        backgroundColor: [
+                            '#27ae60',
+                            '#f39c12',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true
+                    }
+                }
+            });
+        }
+
+        function createRepeatPurchaseChart() {
+            const ctx = document.getElementById('repeatPurchaseChart').getContext('2d');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const data = months.map(() => Math.floor(Math.random() * 40) + 20);
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Repeat Purchase Rate',
+                        data: data,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Update KPI values
+            document.getElementById('repeatRateValue').textContent = `${data[data.length - 1]}%`;
+            document.getElementById('repeatBuyers').textContent = Math.floor(Math.random() * 500) + 250;
+        }
+
+        function createRevenueSourceChart() {
+            const ctx = document.getElementById('revenueSourceChart').getContext('2d');
+            const sources = ['Retail Stores', 'Online', 'Wholesale', 'Export', 'Corporate'];
+            const percentages = sources.map(() => Math.floor(Math.random() * 30) + 15);
+            
+            // Normalize to sum to 100
+            const total = percentages.reduce((sum, val) => sum + val, 0);
+            const normalized = percentages.map(val => Math.round((val / total) * 100));
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sources,
+                    datasets: [{
+                        label: 'Revenue Share (%)',
+                        data: normalized,
+                        backgroundColor: [
+                            '#d4af37',
+                            '#3498db',
+                            '#2ecc71',
+                            '#9b59b6',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateLiveKPIs() {
+            // Animate KPI values
+            new CountUp('unitsSold', 0, Math.floor(Math.random() * 5000) + 2500, 0, 2).start();
+            new CountUp('returnRate', 0, Math.floor(Math.random() * 10) + 2, 0, 2, {
+                suffix: '%'
+            }).start();
+            new CountUp('cartAbandonment', 0, Math.floor(Math.random() * 30) + 15, 0, 2, {
+                suffix: '%'
+            }).start();
+            new CountUp('avgOrderValue', 0, Math.floor(Math.random() * 50000) + 25000, 0, 2, {
+                prefix: '₦'
+            }).start();
+        }
+
+        function createHourlyActivityChart() {
+            const ctx = document.getElementById('hourlyActivityChart').getContext('2d');
+            const hours = Array.from({length: 24}, (_, i) => `${i}:00`);
+            const activity = hours.map(() => Math.floor(Math.random() * 100));
+            
+            // Create gradient for heatmap effect
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(212, 175, 55, 0.8)');
+            gradient.addColorStop(1, 'rgba(212, 175, 55, 0.1)');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: hours,
+                    datasets: [{
+                        label: 'Buyer Activity',
+                        data: activity,
+                        backgroundColor: gradient,
+                        borderWidth: 0,
+                        borderRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 12
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Close modal
+        modalClose.addEventListener('click', () => {
             modalOverlay.classList.remove('active');
             document.body.style.overflow = '';
-            if (modalSwiper) {
-                modalSwiper.destroy(true, true);
-                modalSwiper = null;
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
             }
-            destroyActiveCharts();
-        }
+        });
 
-        // --- Chart Creation Functions ---
-        const chartDefaultOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { color: '#aaa' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                x: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }
-            },
-            animation: {
-                duration: 1200,
-                easing: 'easeInOutQuart'
-            }
-        };
-
-        function createPurchaseFrequencyChart(d) {
-            if (activeCharts.purchase) activeCharts.purchase.destroy();
-            const ctx = document.getElementById('purchaseFrequencyChart').getContext('2d');
-            activeCharts.purchase = new Chart(ctx, {
-                type: 'line',
-                data: { labels: d.labels, datasets: [{ label: 'Units Sold', data: d.data, borderColor: var(--gold), backgroundColor: 'rgba(212, 175, 55, 0.2)', tension: 0.4, fill: true }] },
-                options: { ...chartDefaultOptions, animation: { ...chartDefaultOptions.animation, x: { type: 'number', easing: 'linear', from: (ctx) => (ctx.type === 'data' ? ctx.x - 15 : undefined), duration: 800 } } }
-            });
-        }
-
-        function createRegionalSellOutChart(d) {
-            if (activeCharts.regional) activeCharts.regional.destroy();
-            const ctx = document.getElementById('regionalSellOutChart').getContext('2d');
-            activeCharts.regional = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: d.labels, datasets: [{ label: 'Sell-out Rate (%)', data: d.data, backgroundColor: d.data.map(v => v > 75 ? var(--success) : v > 40 ? var(--warning) : var(--danger)) }] },
-                options: { ...chartDefaultOptions, animation: { ...chartDefaultOptions.animation, y: { from: 500 } } }
-            });
-        }
-        
-        function createInventoryTurnoverChart(d) {
-            if (activeCharts.inventory) activeCharts.inventory.destroy();
-            const ctx = document.getElementById('inventoryTurnoverChart').getContext('2d');
-            activeCharts.inventory = new Chart(ctx, {
-                type: 'doughnut',
-                data: { labels: d.labels, datasets: [{ data: d.data, backgroundColor: [var(--success), var(--gold), var(--warning)], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }, animation: { animateRotate: true, animateScale: true, duration: 1200 } }
-            });
-        }
-        
-        function createRepeatPurchaseChart(d) {
-            if (activeCharts.repeat) activeCharts.repeat.destroy();
-            const ctx = document.getElementById('repeatPurchaseChart').getContext('2d');
-            activeCharts.repeat = new Chart(ctx, {
-                type: 'line',
-                data: { labels: d.labels, datasets: [{ label: 'Repeat Rate %', data: d.data, borderColor: var(--success), backgroundColor: 'rgba(39, 174, 96, 0.2)', tension: 0.3, fill: true, pointRadius: 5, pointBackgroundColor: var(--success) }] },
-                options: chartDefaultOptions
-            });
-            new CountUp(document.querySelector('#repeatPurchaseChart').parentElement.previousElementSibling, d.data[d.data.length -1] + '%').start();
-        }
-        
-        function createRevenueSourceChart(d) {
-            if (activeCharts.revenue) activeCharts.revenue.destroy();
-            const ctx = document.getElementById('revenueSourceChart').getContext('2d');
-            activeCharts.revenue = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: d.labels, datasets: d.datasets.map((ds, i) => ({ ...ds, backgroundColor: ['#d4af37', '#c0392b', '#2980b9', '#27ae60', '#8e44ad'][i] })) },
-                options: { ...chartDefaultOptions, scales: { x: { stacked: true, ...chartDefaultOptions.scales.x }, y: { stacked: true, ...chartDefaultOptions.scales.y } }, plugins: { legend: { display: true, position: 'bottom', labels: { color: '#fff' } } } }
-            });
-        }
-        
-        function createLiveKPIs(d) {
-            new CountUp('kpiUnitsSold', d.unitsSold).start();
-            new CountUp('kpiReturnRate', d.returnRate, { decimalPlaces: 1, suffix: '%' }).start();
-            new CountUp('kpiCartAbandonment', d.abandonmentRate, { decimalPlaces: 1, suffix: '%' }).start();
-        }
-
-        function createHourlyActivityChart(d) {
-            if (activeCharts.hourly) activeCharts.hourly.destroy();
-            const ctx = document.getElementById('hourlyActivityChart').getContext('2d');
-            activeCharts.hourly = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: Array.from({length: 24}, (_, i) => `${i}:00`), datasets: [{ label: 'Activity Level', data: d.data, backgroundColor: var(--gold) }] },
-                options: chartDefaultOptions
-            });
-        }
-
-
-        // ========== WISHLIST & CART FUNCTIONS ========== //
+        // ========== WISHLIST FUNCTIONS ========== //
         function addToWishlist(product) {
             if (!wishlist.some(item => item.id === product.id)) {
-                wishlist.push(product);
+                wishlist.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image
+                });
+                
                 localStorage.setItem('wishlist', JSON.stringify(wishlist));
                 updateWishlistCount();
-                showNotification(`${product.name} added to wishlist!`, 'success');
+                
+                // Show confirmation
+                showNotification(`${product.name} added to wishlist!`);
             }
         }
 
@@ -2634,22 +3671,34 @@
             wishlistCount.textContent = wishlist.length;
         }
 
+        // ========== CART FUNCTIONS ========== //
         function addToCart(product, quantity) {
             const existingItem = cart.find(item => item.id === product.id);
+            
             if (existingItem) {
                 existingItem.quantity += quantity;
             } else {
-                cart.push({ ...product, quantity: quantity });
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: quantity,
+                    image: product.image
+                });
             }
+            
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
             updateCartTotal();
             renderCartItems();
-            showNotification(`${quantity}x ${product.name} added to cart!`, 'success');
+            
+            // Show confirmation
+            showNotification(`${quantity} ${product.name} added to cart!`);
         }
 
         function updateCartCount() {
-            cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = count;
         }
 
         function updateCartTotal() {
@@ -2658,14 +3707,20 @@
         }
 
         function renderCartItems() {
-            cartItems.innerHTML = cart.length === 0 ? '<div class="cart-empty">Your cart is empty</div>' : '';
-            if (cart.length === 0) return;
-
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+                return;
+            }
+            
             cart.forEach(item => {
                 const cartItem = document.createElement('div');
                 cartItem.className = 'cart-item';
                 cartItem.innerHTML = `
-                    <div class="cart-item-image"><img src="assets/images/menfootwear/${item.image}" alt="${item.name}"></div>
+                    <div class="cart-item-image">
+                        <img src="assets/images/menfootwear/${item.image}" alt="${item.name}">
+                    </div>
                     <div class="cart-item-details">
                         <div class="cart-item-name">${item.name}</div>
                         <div class="cart-item-price">₦${item.price.toLocaleString()} x ${item.quantity}</div>
@@ -2675,17 +3730,37 @@
                             <button class="increase" data-id="${item.id}">+</button>
                         </div>
                     </div>
-                    <button class="cart-item-remove" data-id="${item.id}"><i class="fas fa-trash"></i></button>`;
+                    <button class="cart-item-remove" data-id="${item.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
                 cartItems.appendChild(cartItem);
             });
-            setupCartItemInteractions();
+            
+            // Add event listeners to cart item buttons
+            document.querySelectorAll('.cart-item-remove').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    removeFromCart(productId);
+                });
+            });
+            
+            document.querySelectorAll('.decrease').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    updateCartItemQuantity(productId, -1);
+                });
+            });
+            
+            document.querySelectorAll('.increase').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    updateCartItemQuantity(productId, 1);
+                });
+            });
+            
+            // Update WhatsApp checkout link
             updateWhatsAppCheckoutLink();
-        }
-
-        function setupCartItemInteractions(){
-            document.querySelectorAll('.cart-item-remove').forEach(btn => btn.onclick = () => removeFromCart(parseInt(btn.dataset.id)));
-            document.querySelectorAll('.decrease').forEach(btn => btn.onclick = () => updateCartItemQuantity(parseInt(btn.dataset.id), -1));
-            document.querySelectorAll('.increase').forEach(btn => btn.onclick = () => updateCartItemQuantity(parseInt(btn.dataset.id), 1));
         }
 
         function removeFromCart(productId) {
@@ -2700,8 +3775,9 @@
             const item = cart.find(item => item.id === productId);
             if (item) {
                 item.quantity += change;
-                if (item.quantity < 1) removeFromCart(productId);
-                else {
+                if (item.quantity < 1) {
+                    removeFromCart(productId);
+                } else {
                     localStorage.setItem('cart', JSON.stringify(cart));
                     updateCartCount();
                     updateCartTotal();
@@ -2710,72 +3786,120 @@
             }
         }
         
+        // Generate WhatsApp message for checkout
         function updateWhatsAppCheckoutLink() {
             if (cart.length === 0) {
                 whatsappCheckout.href = "#";
                 return;
             }
-            let message = "I would like to purchase the following items from JMPOTTERS:\n\n";
+            
+            let message = "I would like to purchase the following items from JMPOTTERS Men's Footwear Collection:\n\n";
+            
             cart.forEach(item => {
-                message += `- ${item.name} (${item.quantity} x ₦${item.price.toLocaleString()}) = ₦${(item.price * item.quantity).toLocaleString()}\n`;
+                const itemTotal = item.price * item.quantity;
+                message += `- ${item.name} (${item.quantity} x ₦${item.price.toLocaleString()}) = ₦${itemTotal.toLocaleString()}\n`;
             });
+            
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            message += `\n*Total: ₦${total.toLocaleString()}*\n\nPlease confirm availability.`;
+            message += `\n*Total: ₦${total.toLocaleString()}*`;
+            message += "\n\nPlease confirm the order and provide delivery details.";
+            
             whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(message)}`;
         }
 
-        // ========== CHAT, CATEGORY, INVOICE, NOTIFICATION FUNCTIONS ========== //
+        // ========== CHAT SUPPORT FUNCTIONS ========== //
         function setupChatSupport() {
-            chatFloat.addEventListener('click', () => chatModal.classList.toggle('active'));
-            closeChat.addEventListener('click', () => chatModal.classList.remove('active'));
+            chatFloat.addEventListener('click', () => {
+                chatModal.classList.toggle('active');
+            });
+            
+            closeChat.addEventListener('click', () => {
+                chatModal.classList.remove('active');
+            });
         }
 
+        // ========== CATEGORY FILTER FUNCTIONS ========== //
         function setupCategoryFilters() {
             categoryFilters.forEach(filter => {
                 filter.addEventListener('click', function(e) {
                     e.preventDefault();
-                    currentFilter = this.dataset.category;
+                    const category = this.dataset.category;
+                    currentFilter = category;
                     
+                    // Update active state
                     categoryFilters.forEach(f => f.parentElement.classList.remove('active'));
                     this.parentElement.classList.add('active');
                     
-                    if (currentFilter === 'all') {
+                    // Filter products
+                    if (category === 'all') {
                         filteredProducts = [...products];
                         filterMessage.style.display = 'none';
                     } else {
-                        const nameMap = {
-                           sneakers: ['sneaker', 'nike', 'adidas'],
-                           loafers: ['loafer', 'slip'],
-                           boots: ['boot', 'timberland'],
-                           formal: ['sneaker', 'loafer', 'boot', 'slip']
-                        };
-                        filteredProducts = products.filter(p => {
-                            const name = p.name.toLowerCase();
-                            if (currentFilter === 'formal') return nameMap.formal.every(term => !name.includes(term));
-                            return nameMap[currentFilter].some(term => name.includes(term));
+                        filteredProducts = products.filter(product => {
+                            const name = product.name.toLowerCase();
+                            
+                            if (category === 'sneakers') {
+                                return name.includes('sneaker') || name.includes('nike') || name.includes('adidas');
+                            } else if (category === 'loafers') {
+                                return name.includes('loafer') || name.includes('slip');
+                            } else if (category === 'boots') {
+                                return name.includes('boot') || name.includes('timberland');
+                            } else if (category === 'formal') {
+                                return !name.includes('sneaker') && 
+                                       !name.includes('loafer') && 
+                                       !name.includes('boot') &&
+                                       !name.includes('slip');
+                            }
+                            return false;
                         });
-                        filterMessage.innerHTML = `Showing ${filteredProducts.length} results for <strong>${this.textContent}</strong>`;
+                        
+                        // Show filter message
+                        filterMessage.innerHTML = `
+                            Showing ${filteredProducts.length} results for 
+                            <strong>${this.textContent}</strong> 
+                            ${category === 'sneakers' ? '👟' : 
+                              category === 'loafers' ? '👞' : 
+                              category === 'boots' ? '🥾' : '👔'}
+                        `;
                         filterMessage.style.display = 'block';
                     }
+                    
+                    // Reset to first page and render
                     currentPage = 1;
                     renderProducts();
                 });
             });
         }
 
+        // ========== INVOICE FUNCTIONS ========== //
         function setupInvoicePreview() {
             previewInvoice.addEventListener('click', () => {
-                if (cart.length === 0) return showNotification('Your cart is empty!', 'warning');
+                if (cart.length === 0) {
+                    showNotification('Your cart is empty!');
+                    return;
+                }
+                
+                // Render invoice items
                 invoiceItems.innerHTML = '';
                 let total = 0;
-                cart.forEach(item => {
+                
+            cart.forEach(item => {
                     const itemTotal = item.price * item.quantity;
                     total += itemTotal;
+                    
                     const row = document.createElement('tr');
-                    row.innerHTML = `<td>${item.name}</td><td>${item.quantity}</td><td>₦${item.price.toLocaleString()}</td><td>₦${itemTotal.toLocaleString()}</td>`;
+                    row.innerHTML = `
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>₦${item.price.toLocaleString()}</td>
+                        <td>₦${itemTotal.toLocaleString()}</td>
+                    `;
                     invoiceItems.appendChild(row);
                 });
+                
                 invoiceTotal.textContent = `₦${total.toLocaleString()}`;
+                
+                // Show invoice modal
                 invoiceOverlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
             });
@@ -2786,37 +3910,84 @@
             });
             
             printInvoice.addEventListener('click', () => {
-                document.title = `JMPOTTERS Invoice - ${customerName.value || 'Customer'}`;
+                // Set customer name for printing
+                const name = customerName.value || 'Customer';
+                document.title = `JMPOTTERS Invoice - ${name}`;
                 window.print();
             });
         }
 
+        // ========== NOTIFICATION FUNCTIONS ========== //
         function showNotification(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<div class="toast-icon"><i class="fas fa-check-circle"></i></div><div class="toast-message">${message}</div>`;
-            toastContainer.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 100);
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: var(--black);
+                color: var(--white);
+                padding: 10px 20px;
+                border-radius: 4px;
+                z-index: 2000;
+                animation: fadeInOut 3s forwards;
+            `;
+            document.body.appendChild(notification);
+            
             setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 500);
+                notification.remove();
             }, 3000);
         }
 
+        // ========== TOAST MESSAGE FUNCTIONS ========== //
         function startToastMessages() {
             setInterval(() => {
-                const template = toastMessages[Math.floor(Math.random() * toastMessages.length)];
-                const message = template
-                    .replace('{name}', getRandom(fakeNames, 1)[0])
-                    .replace('{location}', getRandom(fakeLocations, 1)[0])
-                    .replace('{product}', getRandom(fakeProducts, 1)[0])
-                    .replace('{quantity}', getRandomNumber(5,50))
-                    .replace('{amount}', getRandomNumber(50000, 200000).toLocaleString());
-                showNotification(message);
-            }, 15000);
+                showFakeToast();
+            }, 15000); // Show every 15 seconds
+        }
+
+        function showFakeToast() {
+            const template = toastMessages[Math.floor(Math.random() * toastMessages.length)];
+            const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+            const location = fakeLocations[Math.floor(Math.random() * fakeLocations.length)];
+            const product = fakeProducts[Math.floor(Math.random() * fakeProducts.length)];
+            const quantity = [10, 25, 50, 100][Math.floor(Math.random() * 4)];
+            const discount = [10, 20, 35][Math.floor(Math.random() * 3)];
+            const amount = (quantity * (Math.floor(Math.random() * 50000) + 10000)).toLocaleString();
+            
+            const message = template
+                .replace('{name}', name)
+                .replace('{location}', location)
+                .replace('{product}', product)
+                .replace('{quantity}', quantity)
+                .replace('{discount}', discount)
+                .replace('{amount}', amount);
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="toast-message">${message}</div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 5000);
         }
 
         // ========== PANEL TOGGLE FUNCTIONS ========== //
+        // Cart panel toggle
         cartIcon.addEventListener('click', () => {
             cartPanel.classList.add('active');
             cartOverlay.classList.add('active');
@@ -2824,28 +3995,36 @@
             renderCartItems();
         });
 
-        const closeCartPanel = () => {
+        closeCart.addEventListener('click', () => {
             cartPanel.classList.remove('active');
             cartOverlay.classList.remove('active');
             document.body.style.overflow = '';
-        }
-        closeCart.addEventListener('click', closeCartPanel);
-        cartOverlay.addEventListener('click', closeCartPanel);
+        });
 
+        cartOverlay.addEventListener('click', () => {
+            cartPanel.classList.remove('active');
+            cartOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        // Mobile navigation toggle
         mobileToggle.addEventListener('click', function() {
             mobileNav.classList.add('active');
             navOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
         
-        const closeMobileNav = () => {
+        closeNav.addEventListener('click', function() {
             mobileNav.classList.remove('active');
             navOverlay.classList.remove('active');
             document.body.style.overflow = '';
-        };
-        closeNav.addEventListener('click', closeMobileNav);
-        navOverlay.addEventListener('click', closeMobileNav);
+        });
+        
+        navOverlay.addEventListener('click', function() {
+            mobileNav.classList.remove('active');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
     </script>
 </body>
 </html>
-```
