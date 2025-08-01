@@ -30,6 +30,8 @@
             --success: #27ae60;
             --warning: #f39c12;
             --danger: #e74c3c;
+            --analytics-bg: #f9f9f9;
+            --analytics-border: #eaeaea;
         }
 
         * {
@@ -44,7 +46,7 @@
             background-color: var(--white);
             overflow-x: hidden;
             line-height: 1.6;
-            cursor: default; /* Changed from cursor: none */
+            cursor: none;
         }
 
         h1, h2, h3, h4 {
@@ -202,6 +204,72 @@
             }
             100% {
                 transform: translate(var(--tx), var(--ty)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* === CUSTOM CURSOR === */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gold);
+            mix-blend-mode: difference;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s ease;
+        }
+
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.4s ease, width 0.4s ease, height 0.4s ease;
+        }
+
+        .cursor.active {
+            transform: translate(-50%, -50%) scale(0.5);
+            background: var(--white);
+        }
+
+        .cursor-follower.active {
+            transform: translate(-50%, -50%) scale(1.5);
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        .cursor.click {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .cursor-follower.click {
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+
+        .ripple {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.5);
+            transform: translate(-50%, -50%) scale(0);
+            pointer-events: none;
+            z-index: 9997;
+        }
+
+        .ripple.animate {
+            animation: rippleEffect 0.6s ease-out;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: translate(-50%, -50%) scale(10);
                 opacity: 0;
             }
         }
@@ -842,7 +910,7 @@
             transition: var(--transition);
             font-family: 'Montserrat', sans-serif;
             border: none;
-            cursor: pointer;
+            cursor: none;
             position: relative;
             overflow: hidden;
         }
@@ -887,7 +955,7 @@
             color: var(--gray);
             transition: var(--transition);
             border: none;
-            cursor: pointer;
+            cursor: none;
             z-index: 3;
         }
 
@@ -929,19 +997,20 @@
         }
 
         .modal {
-            background: #111; /* Dark background */
-            width: 100vw;
-            height: 100vh;
-            max-width: none;
-            max-height: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            border-radius: 0;
-            transform: none;
-            color: white;
+            background: var(--white);
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .modal-close {
@@ -957,10 +1026,9 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            cursor: pointer;
+            cursor: none;
             transition: var(--transition);
             z-index: 10;
-            border: 1px solid var(--gold);
         }
 
         .modal-close:hover {
@@ -968,64 +1036,346 @@
             transform: rotate(90deg);
         }
 
-        .modal-header {
-            padding: 20px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.8);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .modal-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .modal-image {
+            height: 450px;
+            overflow: hidden;
+        }
+
+        .modal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-details {
+            display: flex;
+            flex-direction: column;
         }
 
         .modal-title {
-            font-size: 1.8rem;
-            color: var(--gold);
-            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--black);
         }
 
-        .modal-body {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            padding: 20px;
-        }
-
-        .product-preview {
-            flex: 1;
+        .modal-price {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            margin-right: 20px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        .product-preview img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        .modal-description {
+            margin-bottom: 25px;
+            color: var(--gray);
+            line-height: 1.7;
         }
 
-        .stat-slides {
+        .size-selection {
+            margin-bottom: 25px;
+        }
+
+        .size-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .sizes-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .size-option {
+            padding: 10px;
+            border: 1px solid var(--gray-light);
+            text-align: center;
+            cursor: none;
+            transition: var(--transition);
+        }
+
+        .size-option:hover, .size-option.selected {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+
+        .bulk-pricing {
+            margin-bottom: 25px;
+        }
+
+        .bulk-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bulk-table th, .bulk-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .bulk-table th {
+            font-weight: 600;
+        }
+
+        .bulk-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Bulk discount tags */
+        .bulk-tag {
+            background: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        /* === ANALYTICS DASHBOARD === */
+        .analytics-panel {
+            background: var(--analytics-bg);
+            border-left: 1px solid var(--analytics-border);
+            padding: 15px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .analytics-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--analytics-border);
+        }
+
+        .analytics-title {
+            font-size: 1.5rem;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analytics-title i {
+            color: var(--gold);
+        }
+
+        .analytics-subtitle {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        .analytics-swiper {
             flex: 1;
-            background: rgba(30, 30, 30, 0.7);
-            border-radius: 10px;
-            padding: 20px;
             overflow: hidden;
             position: relative;
         }
 
+        .analytics-slide {
+            padding: 15px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .analytics-chart-container {
+            flex: 1;
+            position: relative;
+            min-height: 200px;
+        }
+
+        .analytics-insight {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(212, 175, 55, 0.05);
+            border-left: 3px solid var(--gold);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .analytics-kpi-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .kpi-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .analytics-swiper .swiper-pagination {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        .analytics-swiper .swiper-pagination-bullet {
+            width: 8px;
+            height: 8px;
+            background: var(--gray-light);
+            opacity: 1;
+        }
+
+        .analytics-swiper .swiper-pagination-bullet-active {
+            background: var(--gold);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism effect */
+        .modal-glass {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .reviews-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .reviews-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .review {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .review:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .review-user {
+            font-weight: 600;
+            color: white;
+        }
+
+        .review-stars {
+            color: var(--gold);
+        }
+
+        .review-text {
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        .show-more-reviews {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .show-more-reviews a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .urgency-note {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 3px solid #e74c3c;
+            font-weight: 600;
+        }
+
+        /* === STATISTICS SECTION === */
+        .statistics-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .stats-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-title i {
+            color: var(--gold);
+        }
+
         .swiper-container {
             width: 100%;
-            height: 100%;
+            height: 300px;
+            margin-bottom: 30px;
         }
 
         .swiper-slide {
-            background: transparent;
+            background: #fff;
+            border-radius: 8px;
             padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
         }
@@ -1033,110 +1383,87 @@
         .chart-container {
             flex: 1;
             position: relative;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 15px;
         }
 
         .chart-title {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--gold);
+            margin-bottom: 10px;
+            color: var(--black);
             text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .stats-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--gold);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            justify-content: center;
+        .stats-metric {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 5px;
         }
 
-        .stats-title i {
-            color: var(--gold);
+        .stats-value {
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
         }
 
-        .swiper-pagination {
-            position: absolute;
-            bottom: 10px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
+        .metric-success {
+            color: var(--success);
+        }
+
+        .metric-warning {
+            color: var(--warning);
+        }
+
+        .metric-danger {
+            color: var(--danger);
         }
 
         .swiper-pagination-bullet {
-            width: 12px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            background: var(--gray-light);
             opacity: 1;
-            transition: var(--transition);
         }
 
         .swiper-pagination-bullet-active {
             background: var(--gold);
-            transform: scale(1.2);
+            width: 20px;
+            border-radius: 4px;
         }
 
         .real-time-metrics {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 15px;
         }
 
         .metric-card {
-            background: rgba(0, 0, 0, 0.4);
+            background: #f8f8f8;
             border-radius: 8px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             transition: var(--transition);
-            border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
         .metric-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border-color: var(--gold);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .metric-value {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             margin: 10px 0;
-            color: var(--gold);
         }
 
         .metric-label {
-            font-size: 0.95rem;
-            color: #aaa;
-        }
-
-        .metric-success {
-            color: var(--success) !important;
-        }
-
-        .metric-warning {
-            color: var(--warning) !important;
-        }
-
-        .metric-danger {
-            color: var(--danger) !important;
+            font-size: 0.9rem;
+            color: var(--gray);
         }
 
         .export-table {
             width: 100%;
             overflow-x: auto;
-            margin-top: 15px;
         }
 
         .export-table table {
@@ -1147,13 +1474,12 @@
         .export-table th, .export-table td {
             padding: 10px 15px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--gray-light);
         }
 
         .export-table th {
             font-weight: 600;
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--gold);
+            background: #f8f8f8;
         }
 
         .export-table .country-cell {
@@ -1163,16 +1489,18 @@
         }
 
         .country-flag {
-            font-size: 1.2rem;
+            width: 20px;
+            height: 15px;
+            background: var(--gray-light);
+            border-radius: 2px;
         }
 
         .volume-bar {
             height: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--gray-light);
             border-radius: 5px;
             overflow: hidden;
             position: relative;
-            margin-top: 5px;
         }
 
         .volume-fill {
@@ -1182,23 +1510,6 @@
             left: 0;
             top: 0;
             transition: width 1.5s ease-out;
-        }
-
-        .size-option {
-            padding: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            color: #ccc;
-            border-radius: 4px;
-        }
-
-        .size-option:hover, .size-option.selected {
-            background: var(--gold);
-            color: var(--black);
-            border-color: var(--gold);
-            transform: scale(1.05);
         }
 
         /* === PAGINATION === */
@@ -1219,7 +1530,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+            cursor: none;
             transition: var(--transition);
             font-weight: 600;
         }
@@ -1373,7 +1684,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+            cursor: none;
         }
 
         .cart-item-quantity span {
@@ -1385,7 +1696,7 @@
             color: var(--gray);
             background: none;
             border: none;
-            cursor: pointer;
+            cursor: none;
             margin-left: 15px;
             font-size: 1.2rem;
             transition: var(--transition);
@@ -1418,7 +1729,7 @@
             padding: 12px;
             border-radius: 0;
             font-weight: 600;
-            cursor: pointer;
+            cursor: none;
             transition: var(--transition);
             text-align: center;
             display: block;
@@ -1607,7 +1918,7 @@
             z-index: 100;
             animation: float 3s ease-in-out infinite;
             transition: var(--transition);
-            cursor: pointer;
+            cursor: none;
             text-decoration: none;
         }
 
@@ -1703,18 +2014,23 @@
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
             
-            .modal-body {
-                flex-direction: column;
+            .modal-content {
+                grid-template-columns: 1fr;
             }
             
-            .product-preview {
-                margin-right: 0;
-                margin-bottom: 20px;
-                max-height: 40vh;
+            .modal-image {
+                height: 300px;
             }
-            
-            .stat-slides {
-                min-height: 50vh;
+
+            .swiper-container {
+                height: 250px;
+            }
+
+            .analytics-panel {
+                border-left: none;
+                border-top: 1px solid var(--analytics-border);
+                margin-top: 30px;
+                padding-top: 30px;
             }
         }
 
@@ -1747,6 +2063,24 @@
                 width: 90%;
             }
             
+            body {
+                cursor: default;
+            }
+            
+            .cursor, .cursor-follower {
+                display: none;
+            }
+
+            .chat-float {
+                right: auto;
+                left: 30px;
+            }
+
+            .chat-modal {
+                right: auto;
+                left: 30px;
+            }
+
             .swiper-container {
                 height: 220px;
             }
@@ -1833,6 +2167,10 @@
         </div>
         <div class="preloader-line"></div>
     </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
 
     <!-- Header -->
     <header id="header">
@@ -1977,56 +2315,8 @@
             <button class="modal-close" id="modalClose">
                 <i class="fas fa-times"></i>
             </button>
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Product Title</h3>
-            </div>
-            <div class="modal-body">
-                <div class="product-preview">
-                    <img id="modalImage" src="" alt="Product Image">
-                </div>
-                <div class="stat-slides">
-                    <div class="swiper-container">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-                                <div class="chart-title">Purchase Frequency</div>
-                                <div class="chart-container">
-                                    <canvas id="purchaseFrequencyChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="chart-title">Sell-out Rate per Region</div>
-                                <div class="chart-container">
-                                    <canvas id="sellOutChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="stats-title">
-                                    <i class="fas fa-chart-line"></i> Business Insights
-                                </div>
-                                <div class="real-time-metrics">
-                                    <div class="metric-card">
-                                        <div class="metric-value" id="metricToday">0</div>
-                                        <div class="metric-label">Today</div>
-                                    </div>
-                                    <div class="metric-card">
-                                        <div class="metric-value" id="metricWeek">0</div>
-                                        <div class="metric-label">This Week</div>
-                                    </div>
-                                    <div class="metric-card">
-                                        <div class="metric-value metric-success" id="metricMonth">0</div>
-                                        <div class="metric-label">This Month</div>
-                                    </div>
-                                    <div class="metric-card">
-                                        <div class="metric-value metric-success" id="metricAllTime">0</div>
-                                        <div class="metric-label">All Time</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Add Pagination -->
-                        <div class="swiper-pagination"></div>
-                    </div>
-                </div>
+            <div class="modal-content" id="modalContent">
+                <!-- Modal content will be loaded here dynamically -->
             </div>
         </div>
     </div>
@@ -2274,8 +2564,6 @@
         let filteredProducts = [...products];
         let currentProduct = null;
         let currentFilter = 'all';
-        let modalSwiper = null;
-        let modalChartsInitialized = false;
 
         // DOM Elements
         const preloader = document.getElementById('preloader');
@@ -2294,10 +2582,11 @@
         const mobileNav = document.getElementById('mobileNav');
         const navOverlay = document.getElementById('navOverlay');
         const closeNav = document.querySelector('.close-nav');
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
         const modalOverlay = document.getElementById('modalOverlay');
         const modalClose = document.getElementById('modalClose');
-        const modalImage = document.getElementById('modalImage');
-        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
         const toastContainer = document.getElementById('toastContainer');
         const whatsappCheckout = document.getElementById('whatsappCheckout');
         const header = document.getElementById('header');
@@ -2364,6 +2653,11 @@
             updateWishlistCount();
             updateCartCount();
             updateCartTotal();
+            
+            // Initialize custom cursor
+            if (window.innerWidth > 768) {
+                initializeCursor();
+            }
             
             // Setup chat support
             setupChatSupport();
@@ -2444,6 +2738,63 @@
             }, 5000);
         }
 
+        // ========== CURSOR FUNCTIONS ========== //
+        function initializeCursor() {
+            document.addEventListener('mousemove', moveCursor);
+            document.addEventListener('mousedown', cursorClick);
+            document.addEventListener('mouseup', cursorUnclick);
+            
+            // Add ripple effect on click
+            document.addEventListener('click', createRipple);
+            
+            // Add hover effects to interactive elements
+            const interactiveElements = document.querySelectorAll('a, button, .product-toggle, .size-option, .page-btn, .quantity-btn');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.classList.add('active');
+                    cursorFollower.classList.add('active');
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('active');
+                    cursorFollower.classList.remove('active');
+                });
+            });
+        }
+
+        function moveCursor(e) {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursorFollower.style.left = e.clientX + 'px';
+            cursorFollower.style.top = e.clientY + 'px';
+        }
+
+        function cursorClick() {
+            cursor.classList.add('click');
+            cursorFollower.classList.add('click');
+        }
+
+        function cursorUnclick() {
+            cursor.classList.remove('click');
+            cursorFollower.classList.remove('click');
+        }
+
+        function createRipple(e) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            ripple.style.left = e.clientX + 'px';
+            ripple.style.top = e.clientY + 'px';
+            document.body.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.classList.add('animate');
+                
+                // Remove ripple after animation
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            }, 10);
+        }
+
         // ========== PRODUCT FUNCTIONS ========== //
         function renderProducts() {
             const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -2479,7 +2830,7 @@
                             <i class="fas fa-check-circle"></i> In Stock
                         </div>
                         <div class="sizes">
-                            Sizes Available: <span>36 - 45</span>
+                            Sizes Available: <span>28 - 45</span>
                         </div>
                         
                         <!-- Quantity selector -->
@@ -2632,66 +2983,502 @@
         }
 
         function openProductModal(product) {
-            // Set modal content
-            modalTitle.textContent = product.name;
-            modalImage.src = `assets/images/menfootwear/${product.image}`;
-            modalImage.alt = product.name;
+            // Generate fake price (₦5,000–₦10,000 higher than real price)
+            const fakePrice = product.price + Math.floor(Math.random() * 5000) + 5000;
+            
+            // Get 3-5 random reviews
+            const reviews = [];
+            const reviewCount = Math.floor(Math.random() * 3) + 3; // 3-5 reviews
+            for (let i = 0; i < reviewCount; i++) {
+                reviews.push(fakeReviews[Math.floor(Math.random() * fakeReviews.length)]);
+            }
+            
+            modalContent.innerHTML = `
+                <div class="modal-details">
+                    <div class="modal-image">
+                        <img src="assets/images/menfootwear/${product.image}" alt="${product.name}">
+                    </div>
+                    <div class="modal-details-content">
+                        <h3 class="modal-title">${product.name}</h3>
+                        <div class="modal-price">
+                            <del class="price-fake">₦${fakePrice.toLocaleString()}</del>
+                            <span class="price-real">₦${product.price.toLocaleString()}</span>
+                            <span class="discount-tag">-${product.displayDiscount}% OFF</span>
+                        </div>
+                        <p class="modal-description">
+                            Premium men's footwear crafted with the finest materials for ultimate comfort and style. 
+                            Features a durable sole, cushioned insole, and premium leather upper. Perfect for both 
+                            formal occasions and casual outings.
+                        </p>
+                        
+                        <div class="size-selection">
+                            <div class="size-title">Select Size:</div>
+                            <div class="sizes-grid">
+                                ${Array.from({length: 18}, (_, i) => i + 28).map(size => `
+                                    <div class="size-option">${size}</div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Quantity selector in modal -->
+                        <div class="quantity-selector">
+                            <button class="toggle-bulk-options">
+                                Bulk Options <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="quantity-options" style="display: none;">
+                                <div class="quantity-option selected" data-qty="1">1 Unit</div>
+                                <div class="quantity-option" data-qty="10">10 Units</div>
+                                <div class="quantity-option" data-qty="25">25 Units</div>
+                                <div class="quantity-option" data-qty="50">50 Units</div>
+                                <div class="quantity-option" data-qty="100">100 Units</div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button class="btn-add-cart" data-id="${product.id}" style="flex: 2;">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <button class="wishlist-btn ${wishlist.some(item => item.id === product.id) ? 'active' : ''}" data-id="${product.id}" style="flex: 1;">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Glassmorphism effect -->
+                        <div class="modal-glass">
+                            <div class="reviews-section">
+                                <div class="reviews-title">Customer Reviews <span class="review-count">(${reviews.length})</span></div>
+                                ${reviews.slice(0, 1).map(review => `
+                                    <div class="review">
+                                        <div class="review-header">
+                                            <div class="review-user">${review.user}</div>
+                                            <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
+                                        </div>
+                                        <p class="review-text">"${review.text}"</p>
+                                    </div>
+                                `).join('')}
+                                ${reviews.length > 1 ? `
+                                    <div class="show-more-reviews">
+                                        <a href="#" id="showAllReviews">Show all ${reviews.length} reviews</a>
+                                    </div>
+                                    <div class="all-reviews" style="display: none;">
+                                        ${reviews.slice(1).map(review => `
+                                            <div class="review">
+                                                <div class="review-header">
+                                                    <div class="review-user">${review.user}</div>
+                                                    <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
+                                                </div>
+                                                <p class="review-text">"${review.text}"</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="urgency-note">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                Bulk purchases are subject to availability. Add now to secure stock.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="analytics-panel">
+                    <div class="analytics-header">
+                        <h3 class="analytics-title"><i class="fas fa-chart-line"></i> Business Insights</h3>
+                        <p class="analytics-subtitle">Real-time analytics for wholesale buyers</p>
+                    </div>
+                    <div class="analytics-swiper">
+                        <div class="swiper-wrapper">
+                            <!-- Slide 1: Purchase Frequency -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Purchase Frequency Over Time</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="purchaseFrequencyChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight1"></div>
+                            </div>
+                            <!-- Slide 2: Regional Sell-out Rate -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Regional Sell-out Rate</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="regionalSelloutChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight2"></div>
+                            </div>
+                            <!-- Slide 3: Inventory Turnover -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Inventory Turnover</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="inventoryTurnoverChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight3"></div>
+                            </div>
+                            <!-- Slide 4: Repeat Purchase Rate -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Repeat Purchase Rate</h4>
+                                <div class="analytics-kpi-container">
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Rate</div>
+                                        <div class="kpi-value" id="repeatRateValue">0%</div>
+                                        <div class="kpi-trend trend-up">+12% vs last month</div>
+                                    </div>
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Buyers</div>
+                                        <div class="kpi-value" id="repeatBuyers">0</div>
+                                        <div class="kpi-trend trend-up">+8% vs last quarter</div>
+                                    </div>
+                                </div>
+                                <div class="analytics-chart-container">
+                                    <canvas id="repeatPurchaseChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight4"></div>
+                            </div>
+                            <!-- Slide 5: Revenue Source Breakdown -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Revenue Source Breakdown</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="revenueSourceChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight5"></div>
+                            </div>
+                            <!-- Slide 6: Live KPIs -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Live Performance Metrics</h4>
+                                <div class="analytics-kpi-container">
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Units Sold</div>
+                                        <div class="kpi-value" id="unitsSold">0</div>
+                                        <div class="kpi-trend trend-up">+18% today</div>
+                                    </div>
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Return Rate</div>
+                                        <div class="kpi-value" id="returnRate">0%</div>
+                                        <div class="kpi-trend trend-down">-3% vs last month</div>
+                                    </div>
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Cart Abandonment</div>
+                                        <div class="kpi-value" id="cartAbandonment">0%</div>
+                                        <div class="kpi-trend trend-down">-5% vs last week</div>
+                                    </div>
+                                    <div class="kpi-card">
+                                        <div class="kpi-title">Avg. Order Value</div>
+                                        <div class="kpi-value">₦<span id="avgOrderValue">0</span></div>
+                                        <div class="kpi-trend trend-up">+7% vs last quarter</div>
+                                    </div>
+                                </div>
+                                <div class="analytics-insight" id="insight6"></div>
+                            </div>
+                            <!-- Slide 7: Hourly Activity -->
+                            <div class="swiper-slide analytics-slide">
+                                <h4 class="chart-title">Buyer Engagement by Hour</h4>
+                                <div class="analytics-chart-container">
+                                    <canvas id="hourlyActivityChart"></canvas>
+                                </div>
+                                <div class="analytics-insight" id="insight7"></div>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners inside modal
+            document.querySelectorAll('.modal .btn-add-cart').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    
+                    // Get selected quantity
+                    const selectedQty = document.querySelector('.modal .quantity-option.selected');
+                    const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
+                    
+                    addToCart(product, quantity);
+                });
+            });
+            
+            document.querySelectorAll('.modal .wishlist-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    
+                    if (this.classList.contains('active')) {
+                        removeFromWishlist(productId);
+                        this.classList.remove('active');
+                    } else {
+                        addToWishlist(product);
+                        this.classList.add('active');
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.size-option').forEach(el => el.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Show all reviews
+            const showAllReviews = document.getElementById('showAllReviews');
+            if (showAllReviews) {
+                showAllReviews.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector('.all-reviews').style.display = 'block';
+                    this.style.display = 'none';
+                });
+            }
+            
+            // Quantity option selection in modal
+            document.querySelectorAll('.modal .quantity-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Toggle bulk options in modal
+            document.querySelector('.modal .toggle-bulk-options').addEventListener('click', function() {
+                const options = this.nextElementSibling;
+                options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
+            });
             
             // Show modal
             modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
             
-            // Initialize Swiper if not already done
-            if (!modalSwiper) {
-                modalSwiper = new Swiper('.swiper-container', {
-                    slidesPerView: 1,
-                    spaceBetween: 10,
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                    },
-                    on: {
-                        slideChange: function() {
-                            // Initialize charts when slide becomes active
-                            initializeCharts();
-                        }
-                    }
-                });
-            }
-            
-            // Initialize charts on first slide
-            setTimeout(() => {
-                initializeCharts();
-            }, 300);
+            // Initialize analytics dashboard
+            initializeAnalyticsDashboard();
         }
 
-        function initializeCharts() {
-            if (modalChartsInitialized) return;
+        function initializeAnalyticsDashboard() {
+            // Initialize Swiper
+            const analyticsSwiper = new Swiper('.analytics-swiper', {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                observer: true,
+                observeParents: true,
+                on: {
+                    slideChange: function() {
+                        // Initialize charts for active slide
+                        const activeSlideIndex = this.activeIndex;
+                        switch(activeSlideIndex) {
+                            case 0:
+                                createPurchaseFrequencyChart();
+                                break;
+                            case 1:
+                                createRegionalSelloutChart();
+                                break;
+                            case 2:
+                                createInventoryTurnoverChart();
+                                break;
+                            case 3:
+                                createRepeatPurchaseChart();
+                                break;
+                            case 4:
+                                createRevenueSourceChart();
+                                break;
+                            case 5:
+                                updateLiveKPIs();
+                                break;
+                            case 6:
+                                createHourlyActivityChart();
+                                break;
+                        }
+                    }
+                }
+            });
+
+            // Generate insights for all slides
+            generateInsights();
             
-            // Create purchase frequency chart
+            // Initialize charts for first slide
             createPurchaseFrequencyChart();
+        }
+
+        function generateInsights() {
+            // Data pools for insights
+            const cities = ['Lagos', 'London', 'Dubai', 'Abuja', 'New York', 'Accra', 'Johannesburg', 'Istanbul', 'Casablanca', 'Cairo'];
+            const businessTypes = ['retailers', 'wholesalers', 'online resellers', 'export agents', 'boutiques'];
+            const trends = ['increased', 'decreased', 'remained stable', 'surged', 'declined'];
+            const percentages = [12, 18, 25, 30, 42, 55, 68];
             
-            // Create sell out chart
-            createSellOutChart();
+            // Insight templates
+            const insightTemplates = [
+                () => `Purchase frequency has ${trends[Math.floor(Math.random() * trends.length)]} by ${percentages[Math.floor(Math.random() * percentages.length)]}% in the last quarter.`,
+                () => `${cities[Math.floor(Math.random() * cities.length)]} shows the highest sell-out rate at ${Math.floor(Math.random() * 30) + 70}%.`,
+                () => `Inventory turnover improved by ${percentages[Math.floor(Math.random() * percentages.length)]}% compared to last year.`,
+                () => `Repeat buyers from ${cities[Math.floor(Math.random() * cities.length)]} increased by ${percentages[Math.floor(Math.random() * percentages.length)]}%.`,
+                () => `${businessTypes[Math.floor(Math.random() * businessTypes.length)]} account for the largest revenue share.`,
+                () => `Conversion rates improved by ${percentages[Math.floor(Math.random() * percentages.length)]}% this month.`,
+                () => `Peak buying hours are between ${Math.floor(Math.random() * 6) + 12}pm and ${Math.floor(Math.random() * 4) + 4}pm.`
+            ];
             
-            // Create metrics
-            createRealTimeMetrics();
-            
-            modalChartsInitialized = true;
+            // Apply insights to each slide
+            for (let i = 1; i <= 7; i++) {
+                const insightElement = document.getElementById(`insight${i}`);
+                if (insightElement) {
+                    insightElement.textContent = insightTemplates[i-1]();
+                }
+            }
         }
 
         function createPurchaseFrequencyChart() {
             const ctx = document.getElementById('purchaseFrequencyChart').getContext('2d');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const data = months.map(() => Math.floor(Math.random() * 100) + 50);
             
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    labels: months,
                     datasets: [{
-                        label: 'Units Sold',
-                        data: [120, 190, 150, 220, 180, 250, 300, 280, 350, 300, 400, 450],
+                        label: 'Purchases',
+                        data: data,
                         borderColor: '#d4af37',
                         backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRegionalSelloutChart() {
+            const ctx = document.getElementById('regionalSelloutChart').getContext('2d');
+            const regions = ['Lagos', 'Abuja', 'London', 'Dubai', 'Accra'];
+            const selloutRates = regions.map(() => Math.floor(Math.random() * 50) + 50);
+            const backgroundColors = selloutRates.map(rate => {
+                if (rate > 80) return '#27ae60'; // Green
+                if (rate > 60) return '#f39c12'; // Orange
+                return '#e74c3c'; // Red
+            });
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: regions,
+                    datasets: [{
+                        label: 'Sell-out Rate (%)',
+                        data: selloutRates,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    animation: {
+                        duration: 2000
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createInventoryTurnoverChart() {
+            const ctx = document.getElementById('inventoryTurnoverChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fast (1-2 weeks)', 'Medium (3-4 weeks)', 'Slow (5+ weeks)'],
+                    datasets: [{
+                        data: [
+                            Math.floor(Math.random() * 60) + 30,
+                            Math.floor(Math.random() * 30) + 20,
+                            Math.floor(Math.random() * 20) + 10
+                        ],
+                        backgroundColor: [
+                            '#27ae60',
+                            '#f39c12',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true
+                    }
+                }
+            });
+        }
+
+        function createRepeatPurchaseChart() {
+            const ctx = document.getElementById('repeatPurchaseChart').getContext('2d');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const data = months.map(() => Math.floor(Math.random() * 40) + 20);
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Repeat Purchase Rate',
+                        data: data,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
                         tension: 0.4,
                         fill: true
                     }]
@@ -2707,42 +3494,49 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            max: 100,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: '#aaa'
+                                color: 'rgba(0, 0, 0, 0.05)'
                             }
                         },
                         x: {
                             grid: {
                                 display: false
-                            },
-                            ticks: {
-                                color: '#aaa'
                             }
                         }
                     }
                 }
             });
+            
+            // Update KPI values
+            document.getElementById('repeatRateValue').textContent = `${data[data.length - 1]}%`;
+            document.getElementById('repeatBuyers').textContent = Math.floor(Math.random() * 500) + 250;
         }
 
-        function createSellOutChart() {
-            const ctx = document.getElementById('sellOutChart').getContext('2d');
+        function createRevenueSourceChart() {
+            const ctx = document.getElementById('revenueSourceChart').getContext('2d');
+            const sources = ['Retail Stores', 'Online', 'Wholesale', 'Export', 'Corporate'];
+            const percentages = sources.map(() => Math.floor(Math.random() * 30) + 15);
             
-            const regions = ['Lagos', 'Abuja', 'Kano', 'Port Harcourt', 'Accra', 'Nairobi', 'Johannesburg'];
-            const sales = [85, 72, 65, 58, 48, 42, 36];
+            // Normalize to sum to 100
+            const total = percentages.reduce((sum, val) => sum + val, 0);
+            const normalized = percentages.map(val => Math.round((val / total) * 100));
             
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: regions,
+                    labels: sources,
                     datasets: [{
-                        label: 'Sell-out Rate (%)',
-                        data: sales,
-                        backgroundColor: '#d4af37',
-                        borderColor: '#b8972e',
-                        borderWidth: 1
+                        label: 'Revenue Share (%)',
+                        data: normalized,
+                        backgroundColor: [
+                            '#d4af37',
+                            '#3498db',
+                            '#2ecc71',
+                            '#9b59b6',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 0
                     }]
                 },
                 options: {
@@ -2759,18 +3553,12 @@
                             beginAtZero: true,
                             max: 100,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: '#aaa'
+                                color: 'rgba(0, 0, 0, 0.05)'
                             }
                         },
                         y: {
                             grid: {
                                 display: false
-                            },
-                            ticks: {
-                                color: '#aaa'
                             }
                         }
                     }
@@ -2778,33 +3566,80 @@
             });
         }
 
-        function createRealTimeMetrics() {
-            const metrics = {
-                today: Math.floor(Math.random() * 50) + 20,
-                week: Math.floor(Math.random() * 300) + 150,
-                month: Math.floor(Math.random() * 1200) + 600,
-                allTime: Math.floor(Math.random() * 5000) + 3000
-            };
+        function updateLiveKPIs() {
+            // Animate KPI values
+            new CountUp('unitsSold', 0, Math.floor(Math.random() * 5000) + 2500, 0, 2).start();
+            new CountUp('returnRate', 0, Math.floor(Math.random() * 10) + 2, 0, 2, {
+                suffix: '%'
+            }).start();
+            new CountUp('cartAbandonment', 0, Math.floor(Math.random() * 30) + 15, 0, 2, {
+                suffix: '%'
+            }).start();
+            new CountUp('avgOrderValue', 0, Math.floor(Math.random() * 50000) + 25000, 0, 2, {
+                prefix: '₦'
+            }).start();
+        }
+
+        function createHourlyActivityChart() {
+            const ctx = document.getElementById('hourlyActivityChart').getContext('2d');
+            const hours = Array.from({length: 24}, (_, i) => `${i}:00`);
+            const activity = hours.map(() => Math.floor(Math.random() * 100));
             
-            // Animate numbers with CountUp.js
-            new CountUp('metricToday', 0, metrics.today, 0, 1.5).start();
-            new CountUp('metricWeek', 0, metrics.week, 0, 1.5).start();
-            new CountUp('metricMonth', 0, metrics.month, 0, 1.5).start();
-            new CountUp('metricAllTime', 0, metrics.allTime, 0, 1.5).start();
+            // Create gradient for heatmap effect
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(212, 175, 55, 0.8)');
+            gradient.addColorStop(1, 'rgba(212, 175, 55, 0.1)');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: hours,
+                    datasets: [{
+                        label: 'Buyer Activity',
+                        data: activity,
+                        backgroundColor: gradient,
+                        borderWidth: 0,
+                        borderRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 12
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Close modal
         modalClose.addEventListener('click', () => {
             modalOverlay.classList.remove('active');
             document.body.style.overflow = '';
-            modalChartsInitialized = false;
         });
 
         modalOverlay.addEventListener('click', (e) => {
             if (e.target === modalOverlay) {
                 modalOverlay.classList.remove('active');
                 document.body.style.overflow = '';
-                modalChartsInitialized = false;
             }
         });
 
@@ -3048,7 +3883,7 @@
                 invoiceItems.innerHTML = '';
                 let total = 0;
                 
-                cart.forEach(item => {
+            cart.forEach(item => {
                     const itemTotal = item.price * item.quantity;
                     total += itemTotal;
                     
