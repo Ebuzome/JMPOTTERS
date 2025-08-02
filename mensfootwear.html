@@ -211,7 +211,7 @@
             left: 0;
             width: 100%;
             z-index: 1000;
-            padding: 10px 0; /* Reduced height */
+            padding: 15px 0; /* Reduced height */
             background: rgba(255, 255, 255, 0.95);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
@@ -245,7 +245,7 @@
 
         .logo {
             font-family: 'Playfair Display', serif;
-            font-size: 1.5rem; /* Reduced font size */
+            font-size: 1.6rem; /* Smaller font size */
             font-weight: 700;
             color: var(--black);
             text-decoration: none;
@@ -259,7 +259,7 @@
 
         /* Navigation */
         .nav-links {
-            display: none; /* Hide desktop nav */
+            display: none; /* Hide desktop nav by default */
             list-style: none;
         }
 
@@ -342,7 +342,7 @@
         }
 
         .mobile-toggle {
-            display: block; /* Always show on all devices */
+            display: block; /* Always show hamburger */
             background: none;
             border: none;
             font-size: 1.5rem;
@@ -981,109 +981,7 @@
             text-align: center;
         }
 
-        /* Mobile Layout */
-        .mobile-layout {
-            display: none;
-            height: 100%;
-            position: relative;
-        }
-
-        @media (max-width: 991px) {
-            .desktop-layout {
-                display: none !important;
-            }
-            .mobile-layout {
-                display: block;
-            }
-        }
-
-        .mobile-slides-container {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            height: 100%;
-            scroll-behavior: smooth;
-            position: relative;
-        }
-
-        .mobile-slide {
-            flex: 0 0 100%;
-            scroll-snap-align: start;
-            padding: 20px;
-            overflow-y: auto;
-            position: relative;
-            min-height: 100%;
-        }
-
-        .mobile-slide-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--gold);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .mobile-slide-pagination {
-            position: fixed;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            z-index: 100;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .mobile-slide-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .mobile-slide-dot.active {
-            background: var(--gold);
-            transform: scale(1.2);
-        }
-
-        .mobile-slide-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            font-size: 1.2rem;
-            color: var(--white);
-            transition: var(--transition);
-        }
-
-        .mobile-slide-nav:hover {
-            background: var(--gold);
-            color: var(--black);
-        }
-
-        .prev-slide {
-            left: 10px;
-        }
-
-        .next-slide {
-            right: 10px;
-        }
-
-        /* Desktop Layout */
-        .desktop-layout {
+        .modal-body {
             display: flex;
             flex: 1;
             overflow: hidden;
@@ -1092,7 +990,7 @@
         }
 
         @media (min-width: 992px) {
-            .desktop-layout {
+            .modal-body {
                 flex-direction: row;
             }
         }
@@ -1113,7 +1011,6 @@
                 margin-right: 20px;
                 margin-bottom: 0;
                 max-height: 100%;
-                width: 40%;
             }
         }
 
@@ -1321,6 +1218,37 @@
             color: #ddd;
             margin-top: 20px;
             border-left: 3px solid var(--gold);
+        }
+
+        .insight-tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 8px;
+            cursor: help;
+        }
+        
+        .insight-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background-color: #fff;
+            color: #000;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 2000;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .insight-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
         }
 
         .slide-pagination {
@@ -1921,11 +1849,29 @@
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
         }
 
         @media (max-width: 992px) {
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .modal-body {
+                flex-direction: column;
+            }
+            
+            .product-details {
+                margin-right: 0;
+                margin-bottom: 20px;
+                max-height: 50vh;
             }
         }
 
@@ -2042,32 +1988,6 @@
         <div class="container header-container">
             <a href="index.html" class="logo">JMPOTTERS</a>
             
-            <!-- Desktop Navigation -->
-            <ul class="nav-links">
-                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="shop/products.html"><i class="fas fa-shopping-bag"></i> Shop</a></li>
-                
-                <!-- Footwear dropdown -->
-                <li class="dropdown">
-                    <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
-                    <div class="dropdown-content">
-                        <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
-                        <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
-                    </div>
-                </li>
-                
-                <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
-                <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
-                <li><a href="beauty.html"><i class="fas fa-spa"></i> Beauty</a></li>
-                <li><a href="skincare.html"><i class="fas fa-soap"></i> Skincare</a></li>
-                <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-                <li><a href="watches.html"><i class="fas fa-clock"></i> Watches</a></li>
-                <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
-                <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
-                <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
-                <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
-            </ul>
-            
             <button class="mobile-toggle" id="mobileToggle">
                 <i class="fas fa-bars"></i>
             </button>
@@ -2181,71 +2101,52 @@
                 <i class="fas fa-times"></i>
             </button>
             <div class="modal-body">
-                <!-- Desktop Layout -->
-                <div class="desktop-layout">
-                    <div class="product-details">
-                        <div class="product-image-container">
-                            <img id="modalImage" src="" alt="Product Image">
+                <div class="product-details">
+                    <div class="product-image-container">
+                        <img id="modalImage" src="" alt="Product Image">
+                    </div>
+                    <h2 class="product-name" id="productName"></h2>
+                    <div class="product-price-container">
+                        <span class="product-real-price" id="productRealPrice"></span>
+                        <span class="product-fake-price" id="productFakePrice"></span>
+                    </div>
+                    <p class="product-description" id="productDescription"></p>
+                    
+                    <table class="bulk-pricing">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Price per Unit</th>
+                                <th>Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulkPricingBody">
+                            <!-- Bulk pricing will be added here dynamically -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="reviews-container">
+                        <h3 class="reviews-title">Customer Reviews</h3>
+                        <div id="reviewsList">
+                            <!-- Reviews will be added here dynamically -->
                         </div>
-                        <h2 class="product-name" id="productName"></h2>
-                        <div class="product-price-container">
-                            <span class="product-real-price" id="productRealPrice"></span>
-                            <span class="product-fake-price" id="productFakePrice"></span>
-                        </div>
-                        <p class="product-description" id="productDescription"></p>
-                        
-                        <table class="bulk-pricing">
-                            <thead>
-                                <tr>
-                                    <th>Quantity</th>
-                                    <th>Price per Unit</th>
-                                    <th>Total Price</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bulkPricingBody">
-                                <!-- Bulk pricing will be added here dynamically -->
-                            </tbody>
-                        </table>
-                        
-                        <div class="reviews-container">
-                            <h3 class="reviews-title">Customer Reviews</h3>
-                            <div id="reviewsList">
-                                <!-- Reviews will be added here dynamically -->
-                            </div>
-                        </div>
-                        
-                        <button class="modal-add-cart" id="modalAddCart">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
                     </div>
                     
-                    <div class="stats-slides-container">
-                        <div class="stats-slides" id="statsSlides">
-                            <!-- Analytics slides will be added here dynamically -->
-                        </div>
-                        <div class="slide-pagination" id="slidePagination">
-                            <!-- Pagination dots will be added here dynamically -->
-                        </div>
-                        <div class="swipe-hint">
-                            <i class="fas fa-arrow-left"></i> Swipe for analytics <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
+                    <button class="modal-add-cart" id="modalAddCart">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
                 </div>
                 
-                <!-- Mobile Layout -->
-                <div class="mobile-layout">
-                    <div class="mobile-slides-container" id="mobileSlidesContainer">
-                        <!-- Mobile slides will be added here dynamically -->
+                <div class="stats-slides-container">
+                    <div class="stats-slides" id="statsSlides">
+                        <!-- Analytics slides will be added here dynamically -->
                     </div>
-                    <div class="mobile-slide-pagination" id="mobileSlidePagination">
+                    <div class="slide-pagination" id="slidePagination">
                         <!-- Pagination dots will be added here dynamically -->
                     </div>
-                    <button class="mobile-slide-nav prev-slide">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="mobile-slide-nav next-slide">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+                    <div class="swipe-hint">
+                        <i class="fas fa-arrow-left"></i> Swipe for analytics <i class="fas fa-arrow-right"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2411,6 +2312,24 @@
             once: true
         });
 
+        // Set global tooltip style
+        Chart.defaults.plugins.tooltip = {
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            displayColors: false,
+            padding: 12,
+            cornerRadius: 4,
+            titleFont: {
+                size: 14,
+                weight: 'bold'
+            },
+            bodyFont: {
+                size: 13
+            },
+            zIndex: 2000
+        };
+
         // Product data
         const products = [
             { id: 1, name: "Adidas Black and Red Stripped", price: 27000, image: "Adidas-Black-and-Red-Stripped-27000.jpg" },
@@ -2496,8 +2415,6 @@
         let currentFilter = 'all';
         let modalChartsInitialized = false;
         let currentSlideIndex = 0;
-        let currentMobileSlide = 0;
-        let totalSlides = 13;
 
         // DOM Elements
         const preloader = document.getElementById('preloader');
@@ -2543,10 +2460,6 @@
         const invoiceTotal = document.getElementById('invoiceTotal');
         const printInvoice = document.getElementById('printInvoice');
         const customerName = document.getElementById('customerName');
-        const mobileSlidesContainer = document.getElementById('mobileSlidesContainer');
-        const mobileSlidePagination = document.getElementById('mobileSlidePagination');
-        const prevSlideBtn = document.querySelector('.prev-slide');
-        const nextSlideBtn = document.querySelector('.next-slide');
 
         // Fake reviews data
         const fakeReviews = [
@@ -2617,16 +2530,6 @@
 
         // ========== DROPDOWN TOGGLE ========== //
         function setupDropdownToggle() {
-            // Desktop dropdown toggle
-            const desktopDropdown = document.querySelector('.nav-links .dropdown');
-            if (desktopDropdown) {
-                const dropdownLink = desktopDropdown.querySelector('a');
-                dropdownLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    desktopDropdown.classList.toggle('active');
-                });
-            }
-            
             // Mobile dropdown toggle
             const mobileDropdown = document.querySelector('.mobile-nav .mobile-dropdown');
             if (mobileDropdown) {
@@ -2926,202 +2829,9 @@
             // Generate analytics slides
             generateAnalyticsSlides(product);
             
-            // Generate mobile slides
-            generateMobileSlides(product);
-            
             // Show modal
             modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-        }
-
-        function generateMobileSlides(product) {
-            mobileSlidesContainer.innerHTML = '';
-            mobileSlidePagination.innerHTML = '';
-            
-            // Add product details slide
-            const productSlide = document.createElement('div');
-            productSlide.className = 'mobile-slide';
-            productSlide.dataset.index = '0';
-            productSlide.innerHTML = `
-                <div class="product-image-container">
-                    <img src="assets/images/menfootwear/${product.image}" alt="${product.name}">
-                </div>
-                <h2 class="product-name">${product.name}</h2>
-                <div class="product-price-container">
-                    <span class="product-real-price">₦${product.price.toLocaleString()}</span>
-                    <span class="product-fake-price">₦${product.price + Math.floor(Math.random() * 5000) + 5000}</span>
-                </div>
-                <p class="product-description">Premium ${product.name.toLowerCase()} crafted with high-quality materials for maximum comfort and durability. Features cushioned insole, anti-slip sole, and breathable fabric. Perfect for everyday wear.</p>
-                
-                <table class="bulk-pricing">
-                    <thead>
-                        <tr>
-                            <th>Quantity</th>
-                            <th>Price per Unit</th>
-                            <th>Total Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>₦${product.price.toLocaleString()}</td>
-                            <td>₦${product.price.toLocaleString()}</td>
-                        </tr>
-                        <tr>
-                            <td>10</td>
-                            <td>₦${Math.round(product.price * 0.95).toLocaleString()}</td>
-                            <td>₦${Math.round(product.price * 0.95 * 10).toLocaleString()}</td>
-                        </tr>
-                        <tr>
-                            <td>25</td>
-                            <td>₦${Math.round(product.price * 0.90).toLocaleString()}</td>
-                            <td>₦${Math.round(product.price * 0.90 * 25).toLocaleString()}</td>
-                        </tr>
-                        <tr>
-                            <td>50</td>
-                            <td>₦${Math.round(product.price * 0.85).toLocaleString()}</td>
-                            <td>₦${Math.round(product.price * 0.85 * 50).toLocaleString()}</td>
-                        </tr>
-                        <tr>
-                            <td>100</td>
-                            <td>₦${Math.round(product.price * 0.80).toLocaleString()}</td>
-                            <td>₦${Math.round(product.price * 0.80 * 100).toLocaleString()}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="reviews-container">
-                    <h3 class="reviews-title">Customer Reviews</h3>
-                    <div>
-                        <div class="review">
-                            <div class="review-header">
-                                <div class="review-avatar">Z</div>
-                                <div class="review-user">ZeeKicks</div>
-                                <div class="review-rating">★★★★★</div>
-                            </div>
-                            <div class="review-text">🔥🔥🔥 These boots sold out FAST. Great quality.</div>
-                        </div>
-                        <div class="review">
-                            <div class="review-header">
-                                <div class="review-avatar">C</div>
-                                <div class="review-user">ChiBoy44</div>
-                                <div class="review-rating">★★★★☆</div>
-                            </div>
-                            <div class="review-text">Sleek design, solid feel. Love it 💯</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="modal-add-cart" style="margin-top: 20px;">
-                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                </button>
-            `;
-            mobileSlidesContainer.appendChild(productSlide);
-            
-            // Add analytics slides
-            for (let i = 1; i <= totalSlides; i++) {
-                const slide = document.createElement('div');
-                slide.className = 'mobile-slide';
-                slide.dataset.index = i;
-                slide.innerHTML = `
-                    <div class="mobile-slide-title">
-                        <i class="${getSlideIcon(i)}"></i>
-                        ${getSlideTitle(i)}
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="mobile-chart-${i}"></canvas>
-                    </div>
-                    <div class="insight-text">
-                        ${generateInsightText(i, product)}
-                    </div>
-                    ${i === totalSlides ? '<button class="btn btn-gold" style="margin-top: 20px;"><i class="fas fa-download"></i> Download Full Report</button>' : ''}
-                `;
-                mobileSlidesContainer.appendChild(slide);
-            }
-            
-            // Add pagination dots
-            for (let i = 0; i <= totalSlides; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'mobile-slide-dot';
-                dot.dataset.index = i;
-                if (i === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => {
-                    goToMobileSlide(i);
-                });
-                mobileSlidePagination.appendChild(dot);
-            }
-            
-            // Set current slide
-            currentMobileSlide = 0;
-            
-            // Add navigation events
-            prevSlideBtn.addEventListener('click', () => {
-                if (currentMobileSlide > 0) {
-                    goToMobileSlide(currentMobileSlide - 1);
-                }
-            });
-            
-            nextSlideBtn.addEventListener('click', () => {
-                if (currentMobileSlide < totalSlides) {
-                    goToMobileSlide(currentMobileSlide + 1);
-                }
-            });
-        }
-
-        function goToMobileSlide(index) {
-            if (index < 0 || index > totalSlides) return;
-            
-            currentMobileSlide = index;
-            const slide = mobileSlidesContainer.querySelector(`.mobile-slide[data-index="${index}"]`);
-            if (slide) {
-                mobileSlidesContainer.scrollTo({
-                    left: slide.offsetLeft,
-                    behavior: 'smooth'
-                });
-            }
-            
-            // Update pagination
-            document.querySelectorAll('.mobile-slide-dot').forEach(dot => {
-                dot.classList.toggle('active', parseInt(dot.dataset.index) === index);
-            });
-        }
-
-        function getSlideIcon(index) {
-            const icons = [
-                "fas fa-chart-line",
-                "fas fa-tachometer-alt",
-                "fas fa-chart-bar",
-                "fas fa-chart-pie",
-                "fas fa-money-bill-wave",
-                "fas fa-globe-africa",
-                "fas fa-radar",
-                "fas fa-boxes",
-                "fas fa-gauge-high",
-                "fas fa-clock",
-                "fas fa-filter",
-                "fas fa-truck-fast",
-                "fas fa-star"
-            ];
-            return icons[index - 1] || "fas fa-chart-line";
-        }
-
-        function getSlideTitle(index) {
-            const titles = [
-                "Monthly Sales Trend",
-                "Business Health KPIs",
-                "Top Regional Sales",
-                "Inventory Turnover",
-                "Revenue Streams",
-                "Global Demand",
-                "Buyer Behavior",
-                "Bulk Purchase Trends",
-                "Restock Urgency",
-                "Time-of-Day Patterns",
-                "Sales Conversion Funnel",
-                "Delivery Speed by Region",
-                "Performance Summary"
-            ];
-            return titles[index - 1] || "Analytics Slide";
         }
 
         function generateAnalyticsSlides(product) {
@@ -3130,67 +2840,37 @@
             
             const slideTemplates = [
                 {
-                    title: "Monthly Sales Trend",
+                    title: "📈 Purchase Frequency",
                     chart: "line",
                     description: "Monthly sales trend showing peak purchasing periods"
                 },
                 {
-                    title: "Business Health KPIs",
+                    title: "📊 Business KPIs",
                     chart: "kpi",
                     description: "Key performance indicators for this product"
                 },
                 {
-                    title: "Top Regional Sales",
+                    title: "🌍 Regional Sales",
                     chart: "bar",
                     description: "Sell-out rate by major regions and cities"
                 },
                 {
-                    title: "Inventory Turnover",
+                    title: "🔄 Inventory Turnover",
                     chart: "doughnut",
                     description: "Ratio of good vs stuck inventory stock"
                 },
                 {
-                    title: "Revenue Streams",
+                    title: "💰 Revenue Sources",
                     chart: "pie",
                     description: "Revenue distribution across sales channels"
                 },
                 {
-                    title: "Global Demand",
-                    chart: "map",
-                    description: "Country-wise sales volume and performance"
+                    title: "🌐 Global Demand",
+                    chart: "countryBar",
+                    description: "Country-wise demand volume and order counts"
                 },
                 {
-                    title: "Buyer Behavior",
-                    chart: "radar",
-                    description: "Loyalty, bundle rate, reorder gap"
-                },
-                {
-                    title: "Bulk Purchase Trends",
-                    chart: "column",
-                    description: "Order quantities per buyer tier"
-                },
-                {
-                    title: "Restock Urgency",
-                    chart: "gauge",
-                    description: "Inventory urgency score"
-                },
-                {
-                    title: "Time-of-Day Patterns",
-                    chart: "heatmap",
-                    description: "Buying patterns by time of day"
-                },
-                {
-                    title: "Sales Conversion Funnel",
-                    chart: "funnel",
-                    description: "Product views to purchase conversion"
-                },
-                {
-                    title: "Delivery Speed by Region",
-                    chart: "bar",
-                    description: "Delivery days per location"
-                },
-                {
-                    title: "Performance Summary",
+                    title: "🏆 Performance Summary",
                     chart: "composite",
                     description: "Overall performance metrics and trust score"
                 }
@@ -3207,23 +2887,19 @@
                                   slide.chart === 'bar' ? 'fas fa-chart-bar' : 
                                   slide.chart === 'doughnut' ? 'fas fa-chart-pie' : 
                                   slide.chart === 'pie' ? 'fas fa-chart-pie' : 
-                                  slide.chart === 'map' ? 'fas fa-globe-africa' : 
-                                  slide.chart === 'radar' ? 'fas fa-radar' : 
-                                  slide.chart === 'column' ? 'fas fa-boxes' : 
-                                  slide.chart === 'gauge' ? 'fas fa-gauge-high' : 
-                                  slide.chart === 'heatmap' ? 'fas fa-clock' : 
-                                  slide.chart === 'funnel' ? 'fas fa-filter' : 
-                                  slide.chart === 'composite' ? 'fas fa-star' : 
-                                  'fas fa-chart-line'}"></i>
+                                  slide.chart === 'countryBar' ? 'fas fa-globe-africa' : 
+                                  'fas fa-star'}"></i>
                         ${slide.title}
                     </div>
                     <div class="chart-container" id="chart-${index}">
                         <canvas></canvas>
                     </div>
                     <div class="insight-text" id="insight-${index}">
-                        ${generateInsightText(index, product)}
-                        ${index === slideTemplates.length - 1 ? 
-                          '<button class="btn btn-gold" style="margin-top: 20px;"><i class="fas fa-download"></i> Download Full Report</button>' : ''}
+                        ${generateInsightText(slide.chart, product)}
+                        <span class="insight-tooltip">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="tooltip-text">${generateTooltipText(slide.chart)}</span>
+                        </span>
                     </div>
                 `;
                 statsSlides.appendChild(slideEl);
@@ -3251,46 +2927,56 @@
             }, 300);
         }
 
-        function generateInsightText(index, product) {
+        function generateInsightText(type, product) {
             const cities = ["Lagos", "Abuja", "Kano", "Port Harcourt", "Accra", "Nairobi", "Johannesburg"];
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const trends = ["surged", "plummeted", "remained steady", "gradually increased", "slightly dipped"];
+            const countries = ['Nigeria', 'Ghana', 'Kenya', 'South Africa', 'Egypt', 'UK', 'USA', 'UAE'];
             
             const randomCity = cities[Math.floor(Math.random() * cities.length)];
             const randomMonth = months[Math.floor(Math.random() * months.length)];
             const randomTrend = trends[Math.floor(Math.random() * trends.length)];
             const randomPercent = Math.floor(Math.random() * 40) + 10;
             const randomValue = Math.floor(Math.random() * 1000) + 500;
+            const topCountry = countries[Math.floor(Math.random() * countries.length)];
+            const secondCountry = countries[Math.floor(Math.random() * countries.length)];
             
-            switch(index) {
-                case 0:
-                    return `Sales of ${product.name} ${randomTrend} during ${randomMonth}, with a ${randomPercent}% increase in ${randomCity} driven by influencer marketing campaigns.`;
-                case 1:
-                    return `This product has maintained a strong sell-through rate of 82% across all regions, with return rates below industry average at just 4.2%.`;
-                case 2:
-                    return `${randomCity} leads in adoption with a ${randomPercent}% sell-out rate, followed closely by Nairobi and Accra. Limited stock availability in Abuja is affecting sales there.`;
-                case 3:
-                    return `Inventory is turning over quickly with 78% of stock selling within 30 days. Only 12% of inventory remains unsold beyond 60 days.`;
-                case 4:
-                    return `Bulk WhatsApp orders account for ${randomPercent}% of revenue, while retail stores contribute 30% and B2B partnerships make up the remaining 20%.`;
-                case 5:
-                    return `Nigerian customers from ${randomCity} make up ${randomPercent}% of total sales volume. Export markets in Ghana and Kenya are growing rapidly.`;
-                case 6:
-                    return `Buyers show high loyalty (92%) with an average reorder gap of 45 days. Bundle purchases account for 35% of all orders.`;
-                case 7:
-                    return `Wholesale buyers (100+ units) account for 65% of total volume. The average bulk order size is 85 units per transaction.`;
-                case 8:
-                    return `Restock urgency is HIGH (score 8.7/10) due to rapid inventory depletion. Recommended to restock within 7 days to avoid shortages.`;
-                case 9:
-                    return `Peak buying hours are between 2PM-5PM local time, with 42% of orders placed during business hours. Night orders account for 28% of sales.`;
-                case 10:
-                    return `Conversion from product view to purchase is 12.5% - higher than category average. Cart abandonment rate is 62%, mainly due to shipping costs.`;
-                case 11:
-                    return `${randomCity} has the fastest delivery at 1.8 days average. Rural areas average 4.2 days - consider adding regional warehouses.`;
-                case 12:
-                    return `With a trust score of 92/100 based on customer reviews and return rates, ${product.name} is among our most reliable products. Overall profitability is 38% higher than category average.`;
+            switch(type) {
+                case "line":
+                    return `The ${product.name} has shown consistent growth over the past 6 months, with a notable ${randomPercent}% increase in ${randomMonth}. This upward trajectory indicates strong market acceptance and suggests potential for further expansion. Retailers should consider increasing stock levels during peak seasons to capitalize on this trend.`;
+                case "kpi":
+                    return `This product maintains an impressive sell-through rate of 82%, significantly above the industry average. With a return rate of just 4.2% and an average customer rating of 4.7/5, it demonstrates high customer satisfaction. Retailers can expect a quick inventory turnover of approximately 18 days, making it a low-risk, high-reward investment.`;
+                case "bar":
+                    return `Regional analysis reveals ${randomCity} as the top-performing market with a ${randomPercent}% adoption rate, followed by Nairobi (${randomPercent-5}%) and Accra (${randomPercent-8}%). The product's popularity in urban centers suggests strong appeal among fashion-forward consumers. Consider targeted marketing campaigns in these high-performing regions to maximize sales potential.`;
+                case "doughnut":
+                    return `Inventory analysis shows 78% of stock sells within the first 30 days, indicating strong market demand. Only 12% remains unsold beyond 60 days, which is below the category average. This efficient turnover rate suggests minimal risk of dead stock and healthy profit margins for retailers.`;
+                case "pie":
+                    return `Revenue distribution shows WhatsApp bulk orders driving 55% of sales, retail stores contributing 30%, and B2B partnerships accounting for 15%. This diverse revenue stream indicates stability and multiple growth avenues. Retailers should prioritize WhatsApp ordering channels to maximize profitability.`;
+                case "countryBar":
+                    return `Global demand analysis reveals ${topCountry} as the leading market with ${randomValue} units sold monthly, followed by ${secondCountry} with ${randomValue-200} units. The product shows strong international appeal, particularly in emerging markets. Consider expanding distribution networks in these high-demand regions to capture additional market share.`;
+                case "composite":
+                    return `With a trust score of 92/100 based on 350+ customer reviews, the ${product.name} ranks among our most reliable products. Key strengths include durability (rated 4.8/5), comfort (4.7/5), and style (4.9/5). Retailers can confidently position this as a premium offering with minimal return risk.`;
                 default:
-                    return `Detailed analytics for ${product.name} show strong market performance.`;
+                    return `Detailed analytics for ${product.name} show strong market performance across all metrics.`;
+            }
+        }
+        
+        function generateTooltipText(type) {
+            switch(type) {
+                case "line": 
+                    return "Based on 12 months of sales data from 150+ retailers";
+                case "kpi":
+                    return "Calculated from 500+ transactions and customer surveys";
+                case "bar":
+                    return "Regional data compiled from point-of-sale systems";
+                case "doughnut":
+                    return "Inventory analysis from 20+ distribution centers";
+                case "pie":
+                    return "Revenue channels tracked through transaction metadata";
+                case "countryBar":
+                    return "International demand data from shipping manifests";
+                default:
+                    return "Comprehensive performance metrics";
             }
         }
 
@@ -3302,7 +2988,7 @@
             if (!canvas) return;
             
             const chartType = [
-                "line", "kpi", "bar", "doughnut", "pie", "map", "radar", "column", "gauge", "heatmap", "funnel", "bar", "composite"
+                "line", "kpi", "bar", "doughnut", "pie", "countryBar", "composite"
             ][index];
             
             switch(chartType) {
@@ -3318,28 +3004,32 @@
                 case "pie":
                     createPieChart(canvas);
                     break;
+                case "countryBar":
+                    createCountryBarChart(canvas);
+                    break;
                 case "kpi":
                     createKPICards(slide);
                     break;
                 case "composite":
                     createTrustScore(slide);
                     break;
-                // Other chart types would be implemented similarly
-                default:
-                    createLineChart(canvas);
             }
         }
 
         function createLineChart(canvas) {
             const ctx = canvas.getContext('2d');
             
+            // Generate random data
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const dataPoints = labels.map(() => Math.floor(Math.random() * 400) + 100);
+            
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    labels: labels,
                     datasets: [{
                         label: 'Units Sold',
-                        data: [120, 190, 150, 220, 180, 250, 300, 280, 350, 300, 400, 450],
+                        data: dataPoints,
                         borderColor: '#d4af37',
                         backgroundColor: 'rgba(212, 175, 55, 0.1)',
                         tension: 0.4,
@@ -3352,6 +3042,12 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: () => 'Monthly Sales Performance',
+                                label: (context) => `${context.parsed.y} units sold`
+                            }
                         }
                     },
                     scales: {
@@ -3372,6 +3068,10 @@
                                 color: '#aaa'
                             }
                         }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
                     }
                 }
             });
@@ -3380,7 +3080,7 @@
         function createBarChart(canvas) {
             const ctx = canvas.getContext('2d');
             const regions = ['Lagos', 'Abuja', 'Kano', 'Port Harcourt', 'Accra', 'Nairobi', 'Johannesburg'];
-            const sales = [85, 72, 65, 58, 48, 42, 36];
+            const sales = regions.map(() => Math.floor(Math.random() * 80) + 20);
             
             new Chart(ctx, {
                 type: 'bar',
@@ -3401,6 +3101,12 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: (tooltipItems) => `${tooltipItems[0].label} Performance`,
+                                label: (context) => `Sell-out rate: ${context.parsed.x}%`
+                            }
                         }
                     },
                     scales: {
@@ -3422,6 +3128,10 @@
                                 color: '#aaa'
                             }
                         }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutBounce'
                     }
                 }
             });
@@ -3429,13 +3139,16 @@
 
         function createDoughnutChart(canvas) {
             const ctx = canvas.getContext('2d');
+            const sold = Math.floor(Math.random() * 20) + 75;
+            const stuck = Math.floor(Math.random() * 10) + 5;
+            const newStock = 100 - sold - stuck;
             
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Sold (78%)', 'Stuck (12%)', 'New (10%)'],
+                    labels: [`Sold (${sold}%)`, `Stuck (${stuck}%)`, `New (${newStock}%)`],
                     datasets: [{
-                        data: [78, 12, 10],
+                        data: [sold, stuck, newStock],
                         backgroundColor: [
                             '#27ae60',
                             '#e74c3c',
@@ -3454,7 +3167,16 @@
                             labels: {
                                 color: '#ddd'
                             }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.label} inventory`
+                            }
                         }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 2000
                     }
                 }
             });
@@ -3462,13 +3184,16 @@
 
         function createPieChart(canvas) {
             const ctx = canvas.getContext('2d');
+            const bulk = Math.floor(Math.random() * 30) + 50;
+            const retail = Math.floor(Math.random() * 20) + 25;
+            const b2b = 100 - bulk - retail;
             
             new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: ['Bulk Orders', 'Retail Stores', 'B2B Partnerships'],
                     datasets: [{
-                        data: [55, 30, 15],
+                        data: [bulk, retail, b2b],
                         backgroundColor: [
                             '#d4af37',
                             '#3498db',
@@ -3486,7 +3211,75 @@
                             labels: {
                                 color: '#ddd'
                             }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.parsed}% of total revenue`
+                            }
                         }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 2000
+                    }
+                }
+            });
+        }
+
+        function createCountryBarChart(canvas) {
+            const ctx = canvas.getContext('2d');
+            const countries = ['Nigeria', 'Ghana', 'Kenya', 'South Africa', 'Egypt', 'UK', 'USA', 'UAE'];
+            const demand = countries.map(() => Math.floor(Math.random() * 100) + 50);
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: countries,
+                    datasets: [{
+                        label: 'Order Count',
+                        data: demand,
+                        backgroundColor: '#d4af37',
+                        borderColor: '#b8972e',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: (tooltipItems) => `${tooltipItems[0].label} Demand`,
+                                label: (context) => `${context.parsed.x} orders monthly`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#aaa'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#aaa'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
                     }
                 }
             });
@@ -3494,22 +3287,27 @@
 
         function createKPICards(slide) {
             const container = slide.querySelector('.chart-container');
+            const unitsSold = Math.floor(Math.random() * 2000) + 500;
+            const returnRate = (Math.random() * 5).toFixed(1);
+            const sellThrough = Math.floor(Math.random() * 30) + 60;
+            const stockLevel = Math.floor(Math.random() * 30) + 5;
+            
             container.innerHTML = `
                 <div class="metric-grid">
                     <div class="metric-card">
-                        <div class="metric-value metric-success">1425</div>
+                        <div class="metric-value metric-success">${unitsSold}</div>
                         <div class="metric-label">Units Sold</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value metric-warning">4.2%</div>
+                        <div class="metric-value metric-warning">${returnRate}%</div>
                         <div class="metric-label">Return Rate</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value metric-success">82%</div>
+                        <div class="metric-value metric-success">${sellThrough}%</div>
                         <div class="metric-label">Sell-Through Rate</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value metric-danger">18</div>
+                        <div class="metric-value metric-danger">${stockLevel}</div>
                         <div class="metric-label">Days of Stock</div>
                     </div>
                 </div>
@@ -3517,26 +3315,30 @@
         }
 
         function createTrustScore(slide) {
+            const trustScore = Math.floor(Math.random() * 15) + 85;
+            const avgRating = (4 + Math.random()).toFixed(1);
+            const recommend = Math.floor(Math.random() * 10) + 90;
+            
             const container = slide.querySelector('.chart-container');
             container.innerHTML = `
                 <div class="metric-card">
-                    <div class="metric-value">92/100</div>
+                    <div class="metric-value">${trustScore}/100</div>
                     <div class="metric-label">Trust Score</div>
                     <div class="trust-score">
                         <span>Low</span>
                         <div class="trust-bar">
-                            <div class="trust-fill"></div>
+                            <div class="trust-fill" style="width: ${trustScore}%"></div>
                         </div>
                         <span class="trust-value">High</span>
                     </div>
                 </div>
                 <div class="metric-grid">
                     <div class="metric-card">
-                        <div class="metric-value metric-success">4.8</div>
+                        <div class="metric-value metric-success">${avgRating}</div>
                         <div class="metric-label">Avg. Rating</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value metric-success">94%</div>
+                        <div class="metric-value metric-success">${recommend}%</div>
                         <div class="metric-label">Recommend</div>
                     </div>
                 </div>
