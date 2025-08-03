@@ -7,8 +7,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Swiper JS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CountUp.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.0.8/countUp.min.js"></script>
     <style>
         /* === GLOBAL STYLES === */
         :root {
@@ -130,7 +134,79 @@
             color: var(--black);
         }
 
-    
+        /* === PRELOADER === */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .preloader-text {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--white);
+            font-family: 'Playfair Display', serif;
+            overflow: hidden;
+            height: 60px;
+        }
+
+        .preloader-text span {
+            display: inline-block;
+            transform: translateY(100%);
+            opacity: 0;
+            animation: letterAppear 0.3s forwards;
+        }
+
+        .preloader-line {
+            width: 0;
+            height: 3px;
+            background: var(--gold);
+            margin-top: 20px;
+            animation: lineGrow 2s forwards;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: sparkle 2s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes letterAppear {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes lineGrow {
+            to {
+                width: 300px;
+            }
+        }
+
+        @keyframes sparkle {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1);
+                opacity: 0;
+            }
+        }
 
         /* === CUSTOM CURSOR === */
         .cursor {
@@ -923,7 +999,7 @@
         .modal {
             background: var(--white);
             width: 90%;
-            max-width: 900px;
+            max-width: 1400px;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
@@ -967,6 +1043,115 @@
             padding: 40px;
         }
 
+        /* New analytics panel styles */
+        .analytics-panel {
+            background: var(--analytics-bg);
+            border-left: 1px solid var(--analytics-border);
+            padding: 15px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .analytics-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--analytics-border);
+        }
+
+        .analytics-title {
+            font-size: 1.5rem;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analytics-title i {
+            color: var(--gold);
+        }
+
+        .analytics-subtitle {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        /* Stats slides container */
+        .stats-slides {
+            flex: 1;
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            gap: 20px;
+            padding: 10px 0;
+        }
+
+        .stats-slide {
+            scroll-snap-align: start;
+            min-width: 100%;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+
+        .insight-content {
+            padding: 15px;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+        }
+
+        .insight-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .insight-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            list-style: none;
+        }
+
+        .insight-topics li {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .analytics-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+        }
+
+        .analytics-nav button {
+            background: var(--black);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal-details {
+            display: flex;
+            flex-direction: column;
+        }
+
         .modal-image {
             height: 450px;
             overflow: hidden;
@@ -976,11 +1161,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-
-        .modal-details {
-            display: flex;
-            flex-direction: column;
         }
 
         .modal-title {
@@ -1071,138 +1251,21 @@
             margin-top: auto;
         }
 
-        /* === ANALYTICS DASHBOARD === */
-        .analytics-panel {
-            background: var(--analytics-bg);
-            border-left: 1px solid var(--analytics-border);
-            padding: 15px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-        
-        .stats-slides {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            height: 100%;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        
-        .stats-slides::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .stats-slide {
-            flex: 0 0 100%;
-            scroll-snap-align: start;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100%;
-        }
-        
-        .analytics-chart-container {
-            flex: 1;
-            min-height: 200px;
-            position: relative;
-        }
-        
-        .analytics-insight {
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(212, 175, 55, 0.05);
-            border-left: 3px solid var(--gold);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-        
-        .insight-topics {
-            margin-top: 15px;
-        }
-        
-        .insight-topics h4 {
-            margin: 8px 0;
-            font-weight: 600;
-            color: var(--black);
-            position: relative;
-            padding-left: 15px;
-        }
-        
-        .insight-topics h4:before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: var(--gold);
-        }
-        
-        .analytics-header {
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--analytics-border);
-        }
-        
-        .analytics-title {
-            font-size: 1.5rem;
-            color: var(--black);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .analytics-title i {
-            color: var(--gold);
-        }
-        
-        .analytics-subtitle {
-            font-size: 0.9rem;
-            color: var(--gray);
-            margin-top: 5px;
-        }
-        
-        .back-btn {
-            display: none;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: var(--black);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            z-index: 10;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
-        }
-
-        /* Glassmorphism effect */
-        .modal-glass {
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            color: white;
-        }
-
         .reviews-section {
             margin-top: 30px;
             padding-top: 30px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(0,0,0,0.1);
         }
 
         .reviews-title {
             font-weight: 600;
             margin-bottom: 20px;
-            color: white;
         }
 
         .review {
             margin-bottom: 25px;
             padding-bottom: 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
 
         .review:last-child {
@@ -1220,7 +1283,6 @@
 
         .review-user {
             font-weight: 600;
-            color: white;
         }
 
         .review-stars {
@@ -1228,7 +1290,7 @@
         }
 
         .review-text {
-            color: #ddd;
+            color: var(--gray);
             line-height: 1.6;
         }
 
@@ -1248,6 +1310,17 @@
             background: rgba(231, 76, 60, 0.2);
             border-left: 3px solid #e74c3c;
             font-weight: 600;
+        }
+
+        /* Back button for mobile */
+        .back-to-info {
+            display: none;
+            background: var(--black);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 15px;
         }
 
         /* === STATISTICS SECTION === */
@@ -1938,10 +2011,6 @@
                 margin-top: 30px;
                 padding-top: 30px;
             }
-            
-            .back-btn {
-                display: block;
-            }
         }
 
         @media (max-width: 768px) {
@@ -1997,6 +2066,20 @@
 
             .real-time-metrics {
                 grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                display: block;
+            }
+
+            .analytics-panel {
+                margin-top: 30px;
+                border-top: 1px solid var(--analytics-border);
+                border-left: none;
+            }
+
+            .back-to-info {
+                display: block;
             }
         }
 
@@ -2057,6 +2140,14 @@
 
             .swiper-container {
                 height: 200px;
+            }
+
+            .stats-slides {
+                gap: 15px;
+            }
+
+            .stats-slide {
+                padding: 15px;
             }
         }
     </style>
@@ -2381,6 +2472,7 @@
 
     <!-- Libraries -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     
     <script>
         // ========== INITIALIZATION ========== //
@@ -2583,18 +2675,14 @@
             // Setup dropdown toggle
             setupDropdownToggle();
             
-            // Add escape key support
+            // Handle ESC key for modal close
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    closeModal();
+                    modalOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
                 }
             });
         });
-
-        function closeModal() {
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
 
         // ========== DROPDOWN TOGGLE ========== //
         function setupDropdownToggle() {
@@ -2932,6 +3020,36 @@
                             formal occasions and casual outings.
                         </p>
                         
+                        <div class="bulk-pricing">
+                            <div class="size-title">Bulk Pricing</div>
+                            <table class="bulk-table">
+                                <thead>
+                                    <tr>
+                                        <th>Quantity</th>
+                                        <th>Price Per Unit</th>
+                                        <th>Total Savings</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1-10 units</td>
+                                        <td>₦${product.price.toLocaleString()}</td>
+                                        <td>₦0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>11-50 units</td>
+                                        <td>₦${(product.price * 0.9).toLocaleString()} <span class="bulk-tag">10% OFF</span></td>
+                                        <td>Up to ₦${(product.price * 0.1 * 50).toLocaleString()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>51+ units</td>
+                                        <td>₦${(product.price * 0.85).toLocaleString()} <span class="bulk-tag">15% OFF</span></td>
+                                        <td>Up to ₦${(product.price * 0.15 * 100).toLocaleString()}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
                         <div class="size-selection">
                             <div class="size-title">Select Size:</div>
                             <div class="sizes-grid">
@@ -2964,58 +3082,58 @@
                             </button>
                         </div>
                         
-                        <!-- Glassmorphism effect -->
-                        <div class="modal-glass">
-                            <div class="reviews-section">
-                                <div class="reviews-title">Customer Reviews <span class="review-count">(${reviews.length})</span></div>
-                                ${reviews.slice(0, 1).map(review => `
-                                    <div class="review">
-                                        <div class="review-header">
-                                            <div class="review-user">${review.user}</div>
-                                            <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
-                                        </div>
-                                        <p class="review-text">"${review.text}"</p>
+                        <div class="reviews-section">
+                            <div class="reviews-title">Customer Reviews <span class="review-count">(${reviews.length})</span></div>
+                            ${reviews.slice(0, 1).map(review => `
+                                <div class="review">
+                                    <div class="review-header">
+                                        <div class="review-user">${review.user}</div>
+                                        <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
                                     </div>
-                                `).join('')}
-                                ${reviews.length > 1 ? `
-                                    <div class="show-more-reviews">
-                                        <a href="#" id="showAllReviews">Show all ${reviews.length} reviews</a>
-                                    </div>
-                                    <div class="all-reviews" style="display: none;">
-                                        ${reviews.slice(1).map(review => `
-                                            <div class="review">
-                                                <div class="review-header">
-                                                    <div class="review-user">${review.user}</div>
-                                                    <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
-                                                </div>
-                                                <p class="review-text">"${review.text}"</p>
+                                    <p class="review-text">"${review.text}"</p>
+                                </div>
+                            `).join('')}
+                            ${reviews.length > 1 ? `
+                                <div class="show-more-reviews">
+                                    <a href="#" id="showAllReviews">Show all ${reviews.length} reviews</a>
+                                </div>
+                                <div class="all-reviews" style="display: none;">
+                                    ${reviews.slice(1).map(review => `
+                                        <div class="review">
+                                            <div class="review-header">
+                                                <div class="review-user">${review.user}</div>
+                                                <div class="review-stars">${'⭐'.repeat(review.rating)}</div>
                                             </div>
-                                        `).join('')}
-                                    </div>
-                                ` : ''}
-                            </div>
-                            
-                            <div class="urgency-note">
-                                <i class="fas fa-exclamation-triangle"></i> 
-                                Bulk purchases are subject to availability. Add now to secure stock.
-                            </div>
+                                            <p class="review-text">"${review.text}"</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="urgency-note">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Bulk purchases are subject to availability. Add now to secure stock.
                         </div>
                     </div>
                 </div>
                 <div class="analytics-panel">
-                    <button class="back-btn">← Back to Product</button>
                     <div class="analytics-header">
                         <h3 class="analytics-title"><i class="fas fa-chart-line"></i> Business Insights</h3>
                         <p class="analytics-subtitle">Real-time analytics for wholesale buyers</p>
                     </div>
-                    <div class="stats-slides">
-                        <!-- 7 slides will be generated here -->
+                    <div class="stats-slides" id="statsSlides">
+                        <!-- Stats slides will be generated here -->
                     </div>
+                    <div class="analytics-nav">
+                        <button id="prevSlide"><i class="fas fa-chevron-left"></i> Previous</button>
+                        <button id="nextSlide">Next <i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <button class="back-to-info" id="backToInfo">
+                        <i class="fas fa-arrow-left"></i> Back to Product Info
+                    </button>
                 </div>
             `;
-            
-            // Generate analytics slides
-            generateAnalyticsSlides();
             
             // Add event listeners inside modal
             document.querySelectorAll('.modal .btn-add-cart').forEach(btn => {
@@ -3082,9 +3200,15 @@
                 options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
             });
             
-            // Back button functionality
-            document.querySelector('.back-btn').addEventListener('click', function() {
-                document.querySelector('.modal').scrollTo(0, 0);
+            // Generate analytics slides
+            generateAnalyticsSlides();
+            
+            // Setup slide navigation
+            setupSlideNavigation();
+            
+            // Back to product info button
+            document.getElementById('backToInfo').addEventListener('click', function() {
+                document.querySelector('.analytics-panel').scrollIntoView({ behavior: 'smooth' });
             });
             
             // Show modal
@@ -3093,164 +3217,174 @@
         }
 
         function generateAnalyticsSlides() {
-            const statsSlides = document.querySelector('.stats-slides');
+            const statsSlides = document.getElementById('statsSlides');
             statsSlides.innerHTML = '';
             
+            // Generate 7 slides
             for (let i = 0; i < 7; i++) {
                 const slide = document.createElement('div');
                 slide.className = 'stats-slide';
-                
-                // Generate random chart
-                const chartId = `analytics-chart-${i}`;
-                const insight = generateInsightParagraph();
-                const topics = generateInsightTopics();
-                
                 slide.innerHTML = `
-                    <h4 class="chart-title">${generateChartTitle()}</h4>
-                    <div class="analytics-chart-container">
-                        <canvas id="${chartId}"></canvas>
+                    <div class="chart-container">
+                        <canvas id="chart-${i}"></canvas>
                     </div>
-                    <div class="analytics-insight">
-                        ${insight}
-                    </div>
-                    <div class="insight-topics">
-                        ${topics}
+                    <div class="insight-content">
+                        <p id="insight-${i}"></p>
+                        <ul class="insight-topics" id="topics-${i}"></ul>
                     </div>
                 `;
-                
                 statsSlides.appendChild(slide);
+            }
+            
+            // Generate insights and charts
+            generateInsights();
+            
+            // Setup IntersectionObserver for charts
+            setupChartObserver();
+        }
+
+        function generateInsights() {
+            // Data for insight generation
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const regions = ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt'];
+            const actions = ['spiked', 'dipped', 'remained stable', 'surged', 'declined'];
+            const reasons = ['seasonal demand', 'promotional campaigns', 'supply chain improvements', 
+                             'new competitor entries', 'economic factors', 'fashion trends'];
+            const responses = ['repeat purchases increased', 'wholesale orders doubled', 
+                              'retailers stocked up', 'export demand grew', 'inventory turnover improved'];
+            
+            // Generate unique insights for each slide
+            for (let i = 0; i < 7; i++) {
+                const month = months[Math.floor(Math.random() * months.length)];
+                const region = regions[Math.floor(Math.random() * regions.length)];
+                const action = actions[Math.floor(Math.random() * actions.length)];
+                const reason = reasons[Math.floor(Math.random() * reasons.length)];
+                const response = responses[Math.floor(Math.random() * responses.length)];
                 
-                // Generate the chart after the element is in DOM
-                setTimeout(() => {
-                    generateRandomChart(chartId);
-                }, 100);
+                // Insight paragraph
+                const insightParagraph = `In ${month}, sales ${action} significantly in ${region} due to ${reason}. 
+                This trend was primarily driven by bulk orders from local retailers. ${response} as a result, 
+                indicating strong market acceptance and potential for future growth.`;
+                
+                document.getElementById(`insight-${i}`).textContent = insightParagraph;
+                
+                // Insight topics
+                const topics = [
+                    `${region} Demand ${action === 'surged' || action === 'spiked' ? 'Peak' : 'Shift'}`,
+                    `${month} Performance Insights`,
+                    `Strategic Order Recommendations`
+                ];
+                
+                const topicsList = document.getElementById(`topics-${i}`);
+                topics.forEach(topic => {
+                    const li = document.createElement('li');
+                    li.textContent = topic;
+                    topicsList.appendChild(li);
+                });
             }
         }
 
-        function generateInsightParagraph() {
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            const actions = ['surged', 'dropped', 'spiked', 'increased', 'decreased', 'remained stable', 'jumped', 'plummeted'];
-            const reasons = ['due to rising demand', 'because of seasonal promotions', 'following a marketing campaign', 'due to supply chain issues', 'as a result of competitor pricing', 'because of new store openings'];
-            const locations = ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt', 'Accra', 'Nairobi', 'Johannesburg'];
-            const percentages = [12, 18, 25, 30, 42, 55, 68];
-            
-            const month = months[Math.floor(Math.random() * months.length)];
-            const action = actions[Math.floor(Math.random() * actions.length)];
-            const reason = reasons[Math.floor(Math.random() * reasons.length)];
-            const location = locations[Math.floor(Math.random() * locations.length)];
-            const percentage = percentages[Math.floor(Math.random() * percentages.length)];
-            
-            return `In ${month}, sales ${action} by ${percentage}% ${reason} in ${location}.`;
-        }
-
-        function generateInsightTopics() {
-            const topics = [
-                `Sales ${['Trend', 'Pattern', 'Movement', 'Performance'][Math.floor(Math.random()*4)]} in ${['Q1', 'Q2', 'Q3', 'Q4'][Math.floor(Math.random()*4)]}`,
-                `${['Retailers', 'Wholesalers', 'Distributors', 'Agents'][Math.floor(Math.random()*4)]} ${['Reorder', 'Purchase', 'Acquisition'][Math.floor(Math.random()*3)]} ${['Volume', 'Frequency', 'Rate'][Math.floor(Math.random()*3)]} ${['Surged', 'Increased', 'Dropped'][Math.floor(Math.random()*3)]}`,
-                `Stock Up Now to ${['Avoid Shortages', 'Meet Demand', 'Capitalize on Trends', 'Maximize Profits'][Math.floor(Math.random()*4]}`
-            ];
-            
-            return topics.map(topic => `<h4>${topic}</h4>`).join('');
-        }
-
-        function generateChartTitle() {
-            const prefixes = ['Regional', 'Seasonal', 'Monthly', 'Annual', 'Quarterly', 'Performance'];
-            const suffixes = ['Sales', 'Revenue', 'Growth', 'Trends', 'Projections', 'Metrics'];
-            return `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
-        }
-
-        function generateRandomChart(canvasId) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            const chartTypes = ['line', 'bar', 'pie', 'doughnut'];
-            const type = chartTypes[Math.floor(Math.random() * chartTypes.length)];
-            
-            let data, options;
-            
-            switch(type) {
-                case 'line':
-                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                    data = {
-                        labels: months,
-                        datasets: [{
-                            label: 'Sales',
-                            data: months.map(() => Math.floor(Math.random() * 100)),
-                            borderColor: '#d4af37',
-                            backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    };
-                    break;
-                    
-                case 'bar':
-                    const countries = [
-                        { name: 'Nigeria', flag: '🇳🇬' },
-                        { name: 'Ghana', flag: '🇬🇭' },
-                        { name: 'Kenya', flag: '🇰🇪' },
-                        { name: 'South Africa', flag: '🇿🇦' },
-                        { name: 'Egypt', flag: '🇪🇬' }
-                    ];
-                    data = {
-                        labels: countries.map(c => `${c.flag} ${c.name}`),
-                        datasets: [{
-                            label: 'Revenue',
-                            data: countries.map(() => Math.floor(Math.random() * 100)),
-                            backgroundColor: '#d4af37'
-                        }]
-                    };
-                    break;
-                    
-                case 'pie':
-                    const pieLabels = ['Online', 'Retail', 'Wholesale', 'Export'];
-                    data = {
-                        labels: pieLabels,
-                        datasets: [{
-                            data: pieLabels.map(() => Math.floor(Math.random() * 100)),
-                            backgroundColor: ['#d4af37', '#3498db', '#2ecc71', '#9b59b6']
-                        }]
-                    };
-                    break;
-                    
-                case 'doughnut':
-                    const donutLabels = ['New Customers', 'Repeat Customers', 'Corporate'];
-                    data = {
-                        labels: donutLabels,
-                        datasets: [{
-                            data: donutLabels.map(() => Math.floor(Math.random() * 100)),
-                            backgroundColor: ['#d4af37', '#3498db', '#2ecc71']
-                        }]
-                    };
-                    break;
-            }
-            
-            options = {
-                animation: {
-                    duration: 1500,
-                    easing: 'easeOutBounce'
-                },
-                plugins: {
-                    tooltip: {
-                        enabled: true
-                    },
-                    legend: {
-                        display: type === 'pie' || type === 'doughnut'
+        function setupChartObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const slideIndex = parseInt(entry.target.id.split('-')[1]);
+                        createChartForSlide(slideIndex);
+                        observer.unobserve(entry.target);
                     }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
-                }
-            };
+                });
+            }, { threshold: 0.1 });
             
-            new Chart(ctx, {
-                type: type,
-                data: data,
-                options: options
+            // Observe each chart container
+            document.querySelectorAll('.chart-container').forEach(container => {
+                observer.observe(container);
             });
         }
+
+        function createChartForSlide(slideIndex) {
+            const ctx = document.getElementById(`chart-${slideIndex}`).getContext('2d');
+            const chartTypes = ['bar', 'line', 'pie', 'doughnut', 'radar'];
+            const chartType = chartTypes[Math.floor(Math.random() * chartTypes.length)];
+            
+            // Countries for comparison
+            const countries = [
+                { name: 'Nigeria', flag: '🇳🇬' },
+                { name: 'Ghana', flag: '🇬🇭' },
+                { name: 'Kenya', flag: '🇰🇪' },
+                { name: 'South Africa', flag: '🇿🇦' },
+                { name: 'Uganda', flag: '🇺🇬' }
+            ];
+            
+            // Generate random data
+            const labels = countries.map(c => `${c.flag} ${c.name}`);
+            const data = Array.from({length: countries.length}, () => Math.floor(Math.random() * 100) + 20);
+            const backgroundColors = [
+                'rgba(212, 175, 55, 0.7)',
+                'rgba(52, 152, 219, 0.7)',
+                'rgba(46, 204, 113, 0.7)',
+                'rgba(155, 89, 182, 0.7)',
+                'rgba(231, 76, 60, 0.7)'
+            ];
+            
+            // Create chart
+            new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Market Performance',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1200,
+                        easing: 'easeOutCubic'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            enabled: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function setupSlideNavigation() {
+            const statsSlides = document.getElementById('statsSlides');
+            const prevBtn = document.getElementById('prevSlide');
+            const nextBtn = document.getElementById('nextSlide');
+            const slideWidth = statsSlides.children[0].offsetWidth + 20; // Slide width + gap
+            
+            prevBtn.addEventListener('click', () => {
+                statsSlides.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                statsSlides.scrollBy({ left: slideWidth, behavior: 'smooth' });
+            });
+        }
+
+        // Close modal
+        modalClose.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
 
         // ========== WISHLIST FUNCTIONS ========== //
         function addToWishlist(product) {
