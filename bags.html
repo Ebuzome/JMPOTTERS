@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bags Collection | JMPOTTERS</title>
+    <title>Premium Bags Collection | JMPOTTERS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -34,7 +34,6 @@
             background-color: #fff;
             overflow-x: hidden;
             line-height: 1.6;
-            cursor: none;
         }
 
         h1, h2, h3, h4 {
@@ -163,16 +162,6 @@
             animation: lineGrow 2s forwards;
         }
 
-        .sparkle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--gold-ochre);
-            border-radius: 50%;
-            animation: sparkle 2s ease-out forwards;
-            opacity: 0;
-        }
-
         @keyframes letterAppear {
             to {
                 transform: translateY(0);
@@ -184,61 +173,6 @@
             to {
                 width: 300px;
             }
-        }
-
-        @keyframes sparkle {
-            0% {
-                transform: translate(0, 0) scale(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--tx), var(--ty)) scale(1);
-                opacity: 0;
-            }
-        }
-
-        /* === GOLDEN ORB CURSOR === */
-        .cursor {
-            position: fixed;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--gold-ochre) 0%, #e6a905 100%);
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            transition: transform 0.1s ease;
-            box-shadow: 0 0 15px var(--gold-ochre);
-        }
-
-        .cursor-trail {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9998;
-            transform: translate(-50%, -50%);
-            opacity: 0.7;
-            box-shadow: 0 0 10px var(--gold-ochre);
-            transition: transform 0.2s ease, opacity 0.2s ease;
-        }
-
-        .cursor.active {
-            transform: translate(-50%, -50%) scale(1.5);
-            background: radial-gradient(circle, #e6a905 0%, var(--gold-ochre) 100%);
-        }
-
-        .cursor.click {
-            transform: translate(-50%, -50%) scale(0.5);
-            box-shadow: 0 0 30px #e6a905;
-        }
-
-        .orb-particle {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9997;
-            opacity: 0;
-            box-shadow: 0 0 8px #e6a905;
         }
 
         /* === HEADER === */
@@ -768,26 +702,6 @@
             line-height: 1.5;
         }
 
-        .masonry-btn {
-            background: var(--gold-ochre);
-            color: var(--plum-burgundy);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-block;
-            text-decoration: none;
-        }
-
-        .masonry-btn:hover {
-            background: var(--plum-burgundy);
-            color: var(--soft-blush);
-            transform: translateY(-3px);
-            box-shadow: var(--glow);
-        }
-
         /* Wishlist button */
         .wishlist-btn {
             position: absolute;
@@ -804,8 +718,8 @@
             color: var(--charcoal);
             transition: var(--transition);
             border: none;
-            cursor: none;
             z-index: 3;
+            cursor: pointer;
         }
 
         .wishlist-btn:hover, .wishlist-btn.active {
@@ -830,10 +744,14 @@
             transition: var(--transition);
             font-family: 'Montserrat', sans-serif;
             border: none;
-            cursor: none;
             position: relative;
             overflow: hidden;
             border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-add-cart {
@@ -953,8 +871,8 @@
             color: var(--charcoal);
             transition: var(--transition);
             border: none;
-            cursor: none;
             z-index: 3;
+            cursor: pointer;
         }
 
         .arrival-wishlist:hover, .arrival-wishlist.active {
@@ -999,10 +917,14 @@
             transition: var(--transition);
             font-family: 'Montserrat', sans-serif;
             border: none;
-            cursor: none;
             position: relative;
             overflow: hidden;
             border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .arrival-cart {
@@ -1133,10 +1055,10 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            cursor: none;
             transition: var(--transition);
             z-index: 10;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
         }
 
         .modal-close:hover {
@@ -1262,10 +1184,14 @@
             transition: var(--transition);
             font-family: 'Montserrat', sans-serif;
             border: none;
-            cursor: none;
             position: relative;
             overflow: hidden;
             border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .modal-cart {
@@ -1457,7 +1383,6 @@
             z-index: 100;
             animation: float 3s ease-in-out infinite;
             transition: var(--transition);
-            cursor: none;
             text-decoration: none;
         }
 
@@ -1470,6 +1395,39 @@
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
+        }
+
+        /* === NOTIFICATIONS === */
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
+            border-radius: 8px;
+            box-shadow: var(--shadow-dark);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* === HEART EXPLOSION === */
+        .heart-particle {
+            position: fixed;
+            font-size: 24px;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
         }
 
         /* === RESPONSIVE DESIGN === */
@@ -1520,19 +1478,6 @@
             
             .footer-content {
                 grid-template-columns: 1fr;
-            }
-            
-            body {
-                cursor: default;
-            }
-            
-            .cursor, .cursor-trail, .orb-particle {
-                display: none;
-            }
-
-            .whatsapp-float {
-                right: auto;
-                left: 30px;
             }
         }
 
@@ -1590,9 +1535,6 @@
         </div>
         <div class="preloader-line"></div>
     </div>
-
-    <!-- Golden Orb Cursor -->
-    <div class="cursor" id="cursor"></div>
 
     <!-- Header -->
     <header id="header">
@@ -1798,7 +1740,7 @@
                     
                     <div class="modal-actions">
                         <button class="modal-btn modal-cart" id="modalAddCart">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
                         </button>
                         <button class="modal-btn modal-wishlist" id="modalWishlist">
                             <i class="fas fa-heart"></i> Add to Wishlist
@@ -1819,6 +1761,12 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
     </div>
 
     <!-- Footer -->
@@ -1962,7 +1910,6 @@
         const mobileNav = document.getElementById('mobileNav');
         const navOverlay = document.getElementById('navOverlay');
         const closeNav = document.querySelector('.close-nav');
-        const cursor = document.getElementById('cursor');
         const modalOverlay = document.getElementById('modalOverlay');
         const modalClose = document.getElementById('modalClose');
         const modalImage = document.getElementById('modalImage');
@@ -1976,6 +1923,8 @@
         const arrivalsNext = document.getElementById('arrivalsNext');
         const mobileFootwearDropdown = document.getElementById('mobileFootwearDropdown');
         const statsGrid = document.getElementById('statsGrid');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
 
         // Initialize Swiper carousels
         let heroSwiper = null;
@@ -1996,11 +1945,6 @@
             // Initialize cart and wishlist counts
             updateWishlistCount();
             updateCartCount();
-            
-            // Initialize custom cursor
-            if (window.innerWidth > 768) {
-                initializeCursor();
-            }
             
             // Setup Swiper carousels
             setupSwipers();
@@ -2118,7 +2062,7 @@
                         
                         <div class="action-buttons">
                             <button class="btn-add-cart" data-id="${product.id}">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                                <i class="fas fa-shopping-bag"></i> Add to Cart
                             </button>
                             <button class="btn-view-details" data-id="${product.id}">
                                 <i class="fas fa-eye"></i> View Details
@@ -2170,7 +2114,7 @@
                             
                             <div class="arrival-actions">
                                 <button class="arrival-btn arrival-cart" data-id="${product.id}">
-                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                    <i class="fas fa-shopping-bag"></i> Add to Cart
                                 </button>
                                 <button class="arrival-btn arrival-view" data-id="${product.id}">
                                     <i class="fas fa-eye"></i> View Details
@@ -2228,6 +2172,7 @@
                     } else {
                         addToWishlist(product);
                         this.classList.add('active');
+                        createHeartExplosion(this);
                     }
                 });
             });
@@ -2291,6 +2236,7 @@
                     } else {
                         addToWishlist(product);
                         this.classList.add('active');
+                        createHeartExplosion(this);
                     }
                 });
             });
@@ -2445,35 +2391,41 @@
             wishlistCount.textContent = wishlist.length;
         }
 
-        // ========== CURSOR FUNCTIONS ========== //
-        function initializeCursor() {
-            document.addEventListener('mousemove', moveCursor);
-            document.addEventListener('mousedown', cursorClick);
-            document.addEventListener('mouseup', cursorUnclick);
-            
-            // Add hover effects to interactive elements
-            const interactiveElements = document.querySelectorAll('a, button, .view-details');
-            interactiveElements.forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    cursor.classList.add('active');
+        // ========== HEART EXPLOSION EFFECT ========== //
+        function createHeartExplosion(button) {
+            for (let i = 0; i < 7; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-particle';
+                heart.innerHTML = '❤️';
+                
+                // Position at button
+                const rect = button.getBoundingClientRect();
+                heart.style.left = (rect.left + rect.width / 2) + 'px';
+                heart.style.top = (rect.top + rect.height / 2) + 'px';
+                
+                document.body.appendChild(heart);
+                
+                // Random movement (float up and maybe left/right a bit)
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 100;
+                const tx = Math.cos(angle) * distance;
+                const ty = -Math.abs(Math.sin(angle) * distance * 2); // mostly upward
+                
+                // Animate
+                heart.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${tx}px, ${ty}px) scale(1.5)`, opacity: 0 }
+                ], {
+                    duration: 1500 + Math.random() * 1000,
+                    easing: 'ease-out',
+                    fill: 'forwards'
                 });
-                el.addEventListener('mouseleave', () => {
-                    cursor.classList.remove('active');
-                });
-            });
-        }
-
-        function moveCursor(e) {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        }
-
-        function cursorClick() {
-            cursor.classList.add('click');
-        }
-
-        function cursorUnclick() {
-            cursor.classList.remove('click');
+                
+                // Remove after animation
+                setTimeout(() => {
+                    heart.remove();
+                }, 2500);
+            }
         }
 
         // ========== MODAL BUTTON HANDLERS ========== //
@@ -2504,40 +2456,17 @@
                 addToWishlist(product);
                 this.classList.add('active');
                 this.innerHTML = '<i class="fas fa-check"></i> Added to Wishlist';
+                createHeartExplosion(this);
             }
         });
 
         // ========== NOTIFICATION FUNCTION ========== //
         function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 30px;
-                right: 30px;
-                background: var(--plum-burgundy);
-                color: var(--soft-blush);
-                padding: 15px 25px;
-                border-radius: 8px;
-                z-index: 2000;
-                box-shadow: var(--shadow-dark);
-                transform: translateY(100px);
-                opacity: 0;
-                transition: all 0.5s ease;
-            `;
-            document.body.appendChild(notification);
+            notificationText.textContent = message;
+            notification.classList.add('show');
             
             setTimeout(() => {
-                notification.style.transform = 'translateY(0)';
-                notification.style.opacity = '1';
-            }, 10);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateY(100px)';
-                setTimeout(() => {
-                    notification.remove();
-                }, 500);
+                notification.classList.remove('show');
             }, 3000);
         }
 
