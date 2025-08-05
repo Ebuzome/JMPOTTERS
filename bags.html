@@ -788,6 +788,80 @@
             box-shadow: var(--glow);
         }
 
+        /* Wishlist button */
+        .wishlist-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--charcoal);
+            transition: var(--transition);
+            border: none;
+            cursor: none;
+            z-index: 3;
+        }
+
+        .wishlist-btn:hover, .wishlist-btn.active {
+            background: #ff4757;
+            color: var(--white);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-add-cart, .btn-view-details {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+            border: none;
+            cursor: none;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .btn-add-cart {
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
+        }
+
+        .btn-view-details {
+            background: var(--soft-blush);
+            color: var(--plum-burgundy);
+            border: 1px solid var(--plum-burgundy);
+        }
+
+        .btn-add-cart:hover, .btn-view-details:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+
+        .btn-add-cart:hover {
+            background: var(--gold-ochre);
+            color: var(--plum-burgundy);
+        }
+
+        .btn-view-details:hover {
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
+        }
+
         /* === NEW ARRIVALS SECTION === */
         .new-arrivals {
             background-color: var(--soft-blush);
@@ -861,6 +935,33 @@
             width: 100%;
             height: 300px;
             object-fit: cover;
+            position: relative;
+        }
+
+        .arrival-wishlist {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--charcoal);
+            transition: var(--transition);
+            border: none;
+            cursor: none;
+            z-index: 3;
+        }
+
+        .arrival-wishlist:hover, .arrival-wishlist.active {
+            background: #ff4757;
+            color: var(--white);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
         }
 
         .arrival-details {
@@ -884,25 +985,50 @@
             padding-top: 10px;
         }
 
-        .arrival-btn {
+        .arrival-actions {
+            display: flex;
+            gap: 10px;
             margin-top: 15px;
+        }
+
+        .arrival-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+            border: none;
+            cursor: none;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .arrival-cart {
             background: var(--plum-burgundy);
             color: var(--soft-blush);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            text-decoration: none;
-            display: block;
+        }
+
+        .arrival-view {
+            background: var(--soft-blush);
+            color: var(--plum-burgundy);
+            border: 1px solid var(--plum-burgundy);
         }
 
         .arrival-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+
+        .arrival-cart:hover {
             background: var(--gold-ochre);
             color: var(--plum-burgundy);
-            transform: translateY(-3px);
+        }
+
+        .arrival-view:hover {
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
         }
 
         /* === BULK ORDER CTA === */
@@ -1067,6 +1193,107 @@
             line-height: 1.7;
         }
 
+        .color-note {
+            background: rgba(124, 58, 102, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--plum-burgundy);
+        }
+
+        /* Quantity selector */
+        .quantity-selector {
+            margin-bottom: 25px;
+        }
+
+        .quantity-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            display: none; /* Initially hidden */
+        }
+
+        .quantity-option {
+            padding: 8px 15px;
+            border: 1px solid var(--muted-rose);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            border-radius: 20px;
+        }
+
+        .quantity-option:hover, 
+        .quantity-option.selected {
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
+            border-color: var(--plum-burgundy);
+        }
+
+        .toggle-bulk-options {
+            background: none;
+            border: 1px solid var(--muted-rose);
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            width: 100%;
+            border-radius: 20px;
+        }
+
+        .toggle-bulk-options:hover {
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+            border: none;
+            cursor: none;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .modal-cart {
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
+        }
+
+        .modal-wishlist {
+            background: var(--soft-blush);
+            color: var(--plum-burgundy);
+            border: 1px solid var(--plum-burgundy);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+
+        .modal-cart:hover {
+            background: var(--gold-ochre);
+            color: var(--plum-burgundy);
+        }
+
+        .modal-wishlist:hover {
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
+        }
+
         .stats-slide {
             background: white;
             border-radius: 12px;
@@ -1115,12 +1342,6 @@
         .stat-label {
             font-size: 0.9rem;
             color: var(--charcoal);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
         }
 
         /* === FOOTER === */
@@ -1553,14 +1774,33 @@
                     <p class="modal-description">
                         Crafted with premium materials and meticulous attention to detail, this bag combines 
                         timeless elegance with modern functionality. Perfect for both everyday use and special 
-                        occasions, it features ample storage space, durable hardware, and a comfortable strap.
+                        occasions.
                     </p>
                     
+                    <div class="color-note">
+                        <strong>Color:</strong> The product color is as shown in the image above. 
+                        Please note that colors may vary slightly due to monitor settings.
+                    </div>
+                    
+                    <!-- Quantity selector -->
+                    <div class="quantity-selector">
+                        <button class="toggle-bulk-options">
+                            Bulk Options <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="quantity-options">
+                            <div class="quantity-option selected" data-qty="1">1 Unit</div>
+                            <div class="quantity-option" data-qty="10">10 Units</div>
+                            <div class="quantity-option" data-qty="25">25 Units</div>
+                            <div class="quantity-option" data-qty="50">50 Units</div>
+                            <div class="quantity-option" data-qty="100">100 Units</div>
+                        </div>
+                    </div>
+                    
                     <div class="modal-actions">
-                        <button class="btn-add-cart" id="modalAddCart">
+                        <button class="modal-btn modal-cart" id="modalAddCart">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
-                        <button class="wishlist-btn" id="modalWishlist">
+                        <button class="modal-btn modal-wishlist" id="modalWishlist">
                             <i class="fas fa-heart"></i> Add to Wishlist
                         </button>
                     </div>
@@ -1568,23 +1808,8 @@
             </div>
             <div class="stats-slide">
                 <h3 class="stats-title">Product Insights</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-value">92%</div>
-                        <div class="stat-label">Customer Satisfaction</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">4.8/5</div>
-                        <div class="stat-label">Average Rating</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">28</div>
-                        <div class="stat-label">Units Sold Today</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">98%</div>
-                        <div class="stat-label">Recommend to Friends</div>
-                    </div>
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Stats will be loaded here dynamically -->
                 </div>
                 <div class="modal-description">
                     <p><strong>Material:</strong> Premium genuine leather with brass hardware</p>
@@ -1711,7 +1936,8 @@
                 id: index + 1,
                 name,
                 price,
-                image: filename
+                image: filename,
+                inWishlist: false
             };
         });
 
@@ -1719,6 +1945,11 @@
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         let currentProduct = null;
+
+        // Update wishlist status
+        products.forEach(product => {
+            product.inWishlist = wishlist.some(item => item.id === product.id);
+        });
 
         // DOM Elements
         const preloader = document.getElementById('preloader');
@@ -1744,6 +1975,7 @@
         const arrivalsPrev = document.getElementById('arrivalsPrev');
         const arrivalsNext = document.getElementById('arrivalsNext');
         const mobileFootwearDropdown = document.getElementById('mobileFootwearDropdown');
+        const statsGrid = document.getElementById('statsGrid');
 
         // Initialize Swiper carousels
         let heroSwiper = null;
@@ -1861,27 +2093,44 @@
                 productCard.className = 'masonry-item';
                 productCard.setAttribute('data-aos', 'fade-up');
                 productCard.innerHTML = `
+                    <button class="wishlist-btn ${product.inWishlist ? 'active' : ''}" data-id="${product.id}">
+                        <i class="fas fa-heart"></i>
+                    </button>
                     <img src="assets/images/${product.image}" alt="${product.name}" class="masonry-image">
                     <div class="masonry-overlay">
                         <h3 class="masonry-title">${product.name}</h3>
                         <div class="masonry-price">₦${product.price.toLocaleString()}</div>
                         <p class="masonry-desc">Premium handcrafted bag with elegant design and durable materials.</p>
-                        <button class="masonry-btn view-details" data-id="${product.id}">
-                            View Details
-                        </button>
+                        
+                        <!-- Quantity selector -->
+                        <div class="quantity-selector">
+                            <button class="toggle-bulk-options">
+                                Bulk Options <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="quantity-options">
+                                <div class="quantity-option selected" data-qty="1">1 Unit</div>
+                                <div class="quantity-option" data-qty="10">10 Units</div>
+                                <div class="quantity-option" data-qty="25">25 Units</div>
+                                <div class="quantity-option" data-qty="50">50 Units</div>
+                                <div class="quantity-option" data-qty="100">100 Units</div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn-add-cart" data-id="${product.id}">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <button class="btn-view-details" data-id="${product.id}">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
                     </div>
                 `;
                 productsGrid.appendChild(productCard);
             });
             
             // Setup event listeners for the new products
-            document.querySelectorAll('.view-details').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    currentProduct = products.find(p => p.id === productId);
-                    openProductModal(currentProduct);
-                });
-            });
+            setupProductInteractions();
         }
 
         function renderArrivals() {
@@ -1897,13 +2146,36 @@
                 arrivalCard.className = 'swiper-slide';
                 arrivalCard.innerHTML = `
                     <div class="arrival-card">
+                        <button class="arrival-wishlist ${product.inWishlist ? 'active' : ''}" data-id="${product.id}">
+                            <i class="fas fa-heart"></i>
+                        </button>
                         <img src="assets/images/${product.image}" alt="${product.name}" class="arrival-image">
                         <div class="arrival-details">
                             <h3 class="arrival-title">${product.name}</h3>
                             <div class="arrival-price">₦${product.price.toLocaleString()}</div>
-                            <button class="arrival-btn view-details" data-id="${product.id}">
-                                View Details
-                            </button>
+                            
+                            <!-- Quantity selector -->
+                            <div class="quantity-selector">
+                                <button class="toggle-bulk-options">
+                                    Bulk Options <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="quantity-options">
+                                    <div class="quantity-option selected" data-qty="1">1 Unit</div>
+                                    <div class="quantity-option" data-qty="10">10 Units</div>
+                                    <div class="quantity-option" data-qty="25">25 Units</div>
+                                    <div class="quantity-option" data-qty="50">50 Units</div>
+                                    <div class="quantity-option" data-qty="100">100 Units</div>
+                                </div>
+                            </div>
+                            
+                            <div class="arrival-actions">
+                                <button class="arrival-btn arrival-cart" data-id="${product.id}">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button class="arrival-btn arrival-view" data-id="${product.id}">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1911,7 +2183,32 @@
             });
             
             // Setup event listeners for arrivals
-            document.querySelectorAll('.arrival-btn.view-details').forEach(btn => {
+            setupArrivalsInteractions();
+            
+            // Update Swiper if it exists
+            if (arrivalsSwiper) {
+                arrivalsSwiper.update();
+            }
+        }
+
+        function setupProductInteractions() {
+            // Add to Cart buttons
+            document.querySelectorAll('.btn-add-cart').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    
+                    // Get selected quantity
+                    const card = this.closest('.masonry-item');
+                    const selectedQty = card.querySelector('.quantity-option.selected');
+                    const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
+                    
+                    addToCart(product, quantity);
+                });
+            });
+            
+            // View Details buttons
+            document.querySelectorAll('.btn-view-details').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const productId = parseInt(this.getAttribute('data-id'));
                     currentProduct = products.find(p => p.id === productId);
@@ -1919,10 +2216,105 @@
                 });
             });
             
-            // Update Swiper if it exists
-            if (arrivalsSwiper) {
-                arrivalsSwiper.update();
-            }
+            // Wishlist buttons
+            document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    
+                    if (this.classList.contains('active')) {
+                        removeFromWishlist(productId);
+                        this.classList.remove('active');
+                    } else {
+                        addToWishlist(product);
+                        this.classList.add('active');
+                    }
+                });
+            });
+            
+            // Quantity option selection
+            document.querySelectorAll('.quantity-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Toggle bulk options
+            document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const options = this.nextElementSibling;
+                    options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
+                });
+            });
+        }
+
+        function setupArrivalsInteractions() {
+            // Add to Cart buttons
+            document.querySelectorAll('.arrival-cart').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    
+                    // Get selected quantity
+                    const card = this.closest('.arrival-details');
+                    const selectedQty = card.querySelector('.quantity-option.selected');
+                    const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
+                    
+                    addToCart(product, quantity);
+                });
+            });
+            
+            // View Details buttons
+            document.querySelectorAll('.arrival-view').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    currentProduct = products.find(p => p.id === productId);
+                    openProductModal(currentProduct);
+                });
+            });
+            
+            // Wishlist buttons
+            document.querySelectorAll('.arrival-wishlist').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    
+                    if (this.classList.contains('active')) {
+                        removeFromWishlist(productId);
+                        this.classList.remove('active');
+                    } else {
+                        addToWishlist(product);
+                        this.classList.add('active');
+                    }
+                });
+            });
+            
+            // Quantity option selection
+            document.querySelectorAll('.arrival-details .quantity-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Toggle bulk options
+            document.querySelectorAll('.arrival-details .toggle-bulk-options').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const options = this.nextElementSibling;
+                    options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
+                });
+            });
         }
 
         function openProductModal(product) {
@@ -1934,9 +2326,47 @@
             modalAddCart.setAttribute('data-id', product.id);
             modalWishlist.setAttribute('data-id', product.id);
             
+            // Generate random stats
+            generateRandomStats();
+            
             // Show modal
             modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+        }
+
+        function generateRandomStats() {
+            statsGrid.innerHTML = '';
+            
+            // Generate random stats for each product
+            const stats = [
+                { 
+                    label: "Customer Satisfaction", 
+                    value: `${Math.floor(Math.random() * 14) + 85}%` 
+                },
+                { 
+                    label: "Average Rating", 
+                    value: `${(Math.floor(Math.random() * 6) + 45) / 10}/5`
+                },
+                { 
+                    label: "Units Sold This Week", 
+                    value: Math.floor(Math.random() * 50) + 20
+                },
+                { 
+                    label: "Recommend to Friends", 
+                    value: `${Math.floor(Math.random() * 10) + 90}%` 
+                }
+            ];
+            
+            // Add stats to the grid
+            stats.forEach(stat => {
+                const statItem = document.createElement('div');
+                statItem.className = 'stat-item';
+                statItem.innerHTML = `
+                    <div class="stat-value">${stat.value}</div>
+                    <div class="stat-label">${stat.label}</div>
+                `;
+                statsGrid.appendChild(statItem);
+            });
         }
 
         // Close modal
@@ -1970,6 +2400,9 @@
             
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
+            
+            // Show notification
+            showNotification(`${quantity} ${product.name} added to cart!`);
         }
 
         function updateCartCount() {
@@ -1989,6 +2422,12 @@
                 
                 localStorage.setItem('wishlist', JSON.stringify(wishlist));
                 updateWishlistCount();
+                
+                // Update product status
+                product.inWishlist = true;
+                
+                // Show notification
+                showNotification(`${product.name} added to wishlist!`);
             }
         }
 
@@ -1996,6 +2435,10 @@
             wishlist = wishlist.filter(item => item.id !== productId);
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
             updateWishlistCount();
+            
+            // Update product status
+            const product = products.find(p => p.id === productId);
+            if (product) product.inWishlist = false;
         }
 
         function updateWishlistCount() {
@@ -2037,7 +2480,12 @@
         modalAddCart.addEventListener('click', function() {
             const productId = parseInt(this.getAttribute('data-id'));
             const product = products.find(p => p.id === productId);
-            addToCart(product);
+            
+            // Get selected quantity
+            const selectedQty = document.querySelector('.modal .quantity-option.selected');
+            const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
+            
+            addToCart(product, quantity);
             
             // Close modal
             modalOverlay.classList.remove('active');
@@ -2047,14 +2495,51 @@
         modalWishlist.addEventListener('click', function() {
             const productId = parseInt(this.getAttribute('data-id'));
             const product = products.find(p => p.id === productId);
-            addToWishlist(product);
             
-            // Visual feedback
-            this.innerHTML = '<i class="fas fa-check"></i> Added to Wishlist';
-            setTimeout(() => {
+            if (this.classList.contains('active')) {
+                removeFromWishlist(productId);
+                this.classList.remove('active');
                 this.innerHTML = '<i class="fas fa-heart"></i> Add to Wishlist';
-            }, 2000);
+            } else {
+                addToWishlist(product);
+                this.classList.add('active');
+                this.innerHTML = '<i class="fas fa-check"></i> Added to Wishlist';
+            }
         });
+
+        // ========== NOTIFICATION FUNCTION ========== //
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: var(--plum-burgundy);
+                color: var(--soft-blush);
+                padding: 15px 25px;
+                border-radius: 8px;
+                z-index: 2000;
+                box-shadow: var(--shadow-dark);
+                transform: translateY(100px);
+                opacity: 0;
+                transition: all 0.5s ease;
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateY(0)';
+                notification.style.opacity = '1';
+            }, 10);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(100px)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 3000);
+        }
 
         // ========== PANEL TOGGLE FUNCTIONS ========== //
         // Mobile navigation toggle
