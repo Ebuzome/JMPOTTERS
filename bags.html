@@ -182,7 +182,7 @@
             left: 0;
             width: 100%;
             z-index: 1000;
-            padding: 20px 0;
+            padding: 10px 0;
             background: rgba(255, 255, 255, 0.95);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
@@ -333,6 +333,7 @@
             font-size: 1.4rem;
             color: var(--plum-burgundy);
             transition: var(--transition);
+            cursor: pointer;
         }
 
         .header-icon:hover {
@@ -487,7 +488,7 @@
             display: block;
         }
 
-        /* === HERO SECTION WITH CAROUSEL === */
+        /* === HERO SECTION WITH CUSTOM CAROUSEL === */
         .hero {
             height: 100vh;
             display: flex;
@@ -503,13 +504,24 @@
             width: 100%;
             height: 100%;
             z-index: -1;
+            overflow: hidden;
         }
 
-        .swiper-slide {
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            position: relative;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
         }
 
         .hero-content {
@@ -1270,6 +1282,211 @@
             color: var(--charcoal);
         }
 
+        /* === CART & WISHLIST PANELS === */
+        .panel-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .panel-overlay.active {
+            display: block;
+        }
+        
+        .cart-panel, .wishlist-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: white;
+            z-index: 1100;
+            transition: var(--transition);
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cart-panel.active, .wishlist-panel.active {
+            right: 0;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            color: var(--plum-burgundy);
+        }
+        
+        .close-panel {
+            background: none;
+            border: none;
+            color: var(--plum-burgundy);
+            font-size: 1.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .close-panel:hover {
+            color: var(--gold-ochre);
+            transform: rotate(90deg);
+        }
+        
+        .panel-items {
+            min-height: 300px;
+            max-height: 60vh;
+            overflow-y: auto;
+            margin-bottom: 30px;
+        }
+        
+        .panel-empty {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--charcoal);
+        }
+        
+        .panel-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .panel-item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .panel-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .panel-item-details {
+            flex-grow: 1;
+        }
+        
+        .panel-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--plum-burgundy);
+        }
+        
+        .panel-item-price {
+            color: var(--gold-ochre);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .panel-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--soft-blush);
+            color: var(--plum-burgundy);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .quantity-btn:hover {
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
+        }
+        
+        .remove-item {
+            background: none;
+            border: none;
+            color: #ff4757;
+            cursor: pointer;
+            transition: var(--transition);
+            align-self: flex-start;
+        }
+        
+        .remove-item:hover {
+            transform: scale(1.2);
+        }
+        
+        .panel-footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            padding-top: 20px;
+        }
+        
+        .panel-total {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .panel-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .panel-btn {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .whatsapp-checkout {
+            background: #25d366;
+            color: white;
+        }
+        
+        .whatsapp-checkout:hover {
+            background: #128C7E;
+            transform: translateY(-3px);
+        }
+        
+        .view-cart {
+            background: var(--plum-burgundy);
+            color: var(--soft-blush);
+        }
+        
+        .view-cart:hover {
+            background: #5a2d4d;
+            transform: translateY(-3px);
+        }
+
         /* === FOOTER === */
         footer {
             background: linear-gradient(135deg, var(--plum-burgundy), #5a2d4d);
@@ -1453,6 +1670,10 @@
             .modal-image {
                 height: 300px;
             }
+            
+            .cart-panel, .wishlist-panel {
+                max-width: 350px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1478,6 +1699,11 @@
             
             .footer-content {
                 grid-template-columns: 1fr;
+            }
+            
+            .cart-panel, .wishlist-panel {
+                max-width: 100%;
+                width: 85%;
             }
         }
 
@@ -1619,20 +1845,17 @@
         </ul>
     </div>
 
-    <!-- Hero Section with Carousel -->
+    <!-- Hero Section with Custom Carousel -->
     <section class="hero">
-        <div class="hero-carousel swiper">
-            <div class="swiper-wrapper">
-                <!-- Slides -->
-                <div class="swiper-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), url('assets/images/bags1.jpg');"></div>
-                <div class="swiper-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), url('assets/images/bags2.jpg');"></div>
-                <div class="swiper-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), url('assets/images/bags3.jpg');"></div>
-                <div class="swiper-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), url('assets/images/bags4.jpg');"></div>
-                <div class="swiper-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), url('assets/images/bags5.jpg');"></div>
-                <div class="swiper-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), url('assets/images/bags6.jpg');"></div>
-                <div class="swiper-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), url('assets/images/bags7.jpg');"></div>
-            </div>
-            <div class="swiper-pagination"></div>
+        <div class="hero-carousel" id="heroCarousel">
+            <!-- Slides without Swiper -->
+            <div class="hero-slide active" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/bags1.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/bags2.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/bags3.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/bags4.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/bags5.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/bags6.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/bags7.jpg');"></div>
         </div>
         <div class="container">
             <div class="hero-content">
@@ -1699,6 +1922,55 @@
             </div>
         </div>
     </section>
+
+    <!-- Cart Panel -->
+    <div class="panel-overlay" id="cartOverlay"></div>
+    <div class="cart-panel" id="cartPanel">
+        <div class="panel-header">
+            <h3 class="panel-title">Your Cart</h3>
+            <button class="close-panel" id="closeCart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="panel-items" id="cartItems">
+            <!-- Cart items will be loaded here dynamically -->
+        </div>
+        <div class="panel-footer">
+            <div class="panel-total">
+                <span>Total:</span>
+                <span id="cartTotal">₦0.00</span>
+            </div>
+            <div class="panel-actions">
+                <a href="https://wa.me/2348139583320" class="panel-btn whatsapp-checkout" id="whatsappCheckout" target="_blank">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Checkout
+                </a>
+                <button class="panel-btn view-cart" id="viewCart">
+                    <i class="fas fa-shopping-bag"></i> View Full Cart
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wishlist Panel -->
+    <div class="panel-overlay" id="wishlistOverlay"></div>
+    <div class="wishlist-panel" id="wishlistPanel">
+        <div class="panel-header">
+            <h3 class="panel-title">Your Wishlist</h3>
+            <button class="close-panel" id="closeWishlist">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="panel-items" id="wishlistItems">
+            <!-- Wishlist items will be loaded here dynamically -->
+        </div>
+        <div class="panel-footer">
+            <div class="panel-actions">
+                <button class="panel-btn view-cart" id="wishlistContinue">
+                    <i class="fas fa-shopping-bag"></i> Continue Shopping
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal -->
     <div class="modal-overlay" id="modalOverlay">
@@ -1893,6 +2165,8 @@
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         let currentProduct = null;
+        let currentSlide = 0;
+        let heroSlides = [];
 
         // Update wishlist status
         products.forEach(product => {
@@ -1925,9 +2199,19 @@
         const statsGrid = document.getElementById('statsGrid');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
+        const heroCarousel = document.getElementById('heroCarousel');
+        const cartPanel = document.getElementById('cartPanel');
+        const cartOverlay = document.getElementById('cartOverlay');
+        const closeCart = document.getElementById('closeCart');
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        const wishlistPanel = document.getElementById('wishlistPanel');
+        const wishlistOverlay = document.getElementById('wishlistOverlay');
+        const closeWishlist = document.getElementById('closeWishlist');
+        const wishlistItems = document.getElementById('wishlistItems');
+        const whatsappCheckout = document.getElementById('whatsappCheckout');
 
         // Initialize Swiper carousels
-        let heroSwiper = null;
         let arrivalsSwiper = null;
 
         // ========== INITIALIZE PAGE ========== //
@@ -1949,12 +2233,23 @@
             // Setup Swiper carousels
             setupSwipers();
             
+            // Setup custom hero carousel
+            setupHeroCarousel();
+            
             // Mobile dropdown toggle
             mobileFootwearDropdown.addEventListener('click', function(e) {
                 if (!e.target.closest('a')) {
                     this.classList.toggle('active');
                 }
             });
+            
+            // Cart and wishlist panel toggles
+            cartIcon.addEventListener('click', toggleCartPanel);
+            wishlistIcon.addEventListener('click', toggleWishlistPanel);
+            closeCart.addEventListener('click', closeCartPanel);
+            closeWishlist.addEventListener('click', closeWishlistPanel);
+            cartOverlay.addEventListener('click', closeCartPanel);
+            wishlistOverlay.addEventListener('click', closeWishlistPanel);
         });
 
         // ========== PRELOADER FUNCTIONS ========== //
@@ -1985,24 +2280,29 @@
             });
         }
 
+        // ========== CUSTOM HERO CAROUSEL (Task 4) ========== //
+        function setupHeroCarousel() {
+            heroSlides = document.querySelectorAll('.hero-slide');
+            
+            // Start the carousel
+            if (heroSlides.length > 0) {
+                setInterval(rotateHeroSlides, 5000);
+            }
+        }
+
+        function rotateHeroSlides() {
+            // Hide current slide
+            heroSlides[currentSlide].classList.remove('active');
+            
+            // Move to next slide
+            currentSlide = (currentSlide + 1) % heroSlides.length;
+            
+            // Show next slide
+            heroSlides[currentSlide].classList.add('active');
+        }
+
         // ========== SWIPER FUNCTIONS ========== //
         function setupSwipers() {
-            // Hero carousel
-            heroSwiper = new Swiper('.hero-carousel', {
-                loop: true,
-                autoplay: {
-                    delay: 5000,
-                },
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true,
-                },
-                effect: 'fade',
-                fadeEffect: {
-                    crossFade: true
-                }
-            });
-            
             // New arrivals carousel
             arrivalsSwiper = new Swiper('.arrivals-swiper', {
                 slidesPerView: 1,
@@ -2023,6 +2323,174 @@
                         slidesPerView: 4,
                     }
                 }
+            });
+        }
+
+        // ========== CART & WISHLIST PANELS (Tasks 1-3) ========== //
+        function toggleCartPanel() {
+            cartPanel.classList.toggle('active');
+            cartOverlay.classList.toggle('active');
+            document.body.style.overflow = cartPanel.classList.contains('active') ? 'hidden' : '';
+            renderCartItems();
+        }
+
+        function closeCartPanel() {
+            cartPanel.classList.remove('active');
+            cartOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function toggleWishlistPanel() {
+            wishlistPanel.classList.toggle('active');
+            wishlistOverlay.classList.toggle('active');
+            document.body.style.overflow = wishlistPanel.classList.contains('active') ? 'hidden' : '';
+            renderWishlistItems();
+        }
+
+        function closeWishlistPanel() {
+            wishlistPanel.classList.remove('active');
+            wishlistOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function renderCartItems() {
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="panel-empty">Your cart is empty</div>';
+                cartTotal.textContent = '₦0.00';
+                return;
+            }
+            
+            let total = 0;
+            
+            cart.forEach((item, index) => {
+                total += item.price * item.quantity;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'panel-item';
+                cartItem.innerHTML = `
+                    <div class="panel-item-image">
+                        <img src="assets/images/${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="panel-item-details">
+                        <h4 class="panel-item-name">${item.name}</h4>
+                        <div class="panel-item-price">₦${item.price.toLocaleString()}</div>
+                        <div class="panel-item-quantity">
+                            <button class="quantity-btn decrease-quantity" data-index="${index}">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn increase-quantity" data-index="${index}">+</button>
+                        </div>
+                    </div>
+                    <button class="remove-item" data-index="${index}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+            
+            // Format total with 2 decimal places
+            cartTotal.textContent = `₦${total.toLocaleString()}`;
+            
+            // Setup event listeners for quantity buttons
+            document.querySelectorAll('.decrease-quantity').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    if (cart[index].quantity > 1) {
+                        cart[index].quantity--;
+                        localStorage.setItem('cart', JSON.stringify(cart));
+                        renderCartItems();
+                        updateCartCount();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.increase-quantity').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    cart[index].quantity++;
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    renderCartItems();
+                    updateCartCount();
+                });
+            });
+            
+            // Setup event listeners for remove buttons
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    cart.splice(index, 1);
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    renderCartItems();
+                    updateCartCount();
+                    showNotification('Item removed from cart');
+                });
+            });
+            
+            // Update WhatsApp checkout link with cart items
+            let whatsappMessage = "Hello! I'd like to purchase the following items:\n\n";
+            cart.forEach(item => {
+                whatsappMessage += `${item.name} - ₦${item.price.toLocaleString()} x ${item.quantity}\n`;
+            });
+            whatsappMessage += `\nTotal: ₦${total.toLocaleString()}\n\nPlease confirm availability and provide payment details.`;
+            
+            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(whatsappMessage)}`;
+        }
+
+        function renderWishlistItems() {
+            wishlistItems.innerHTML = '';
+            
+            if (wishlist.length === 0) {
+                wishlistItems.innerHTML = '<div class="panel-empty">Your wishlist is empty</div>';
+                return;
+            }
+            
+            wishlist.forEach((item, index) => {
+                const wishlistItem = document.createElement('div');
+                wishlistItem.className = 'panel-item';
+                wishlistItem.innerHTML = `
+                    <div class="panel-item-image">
+                        <img src="assets/images/${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="panel-item-details">
+                        <h4 class="panel-item-name">${item.name}</h4>
+                        <div class="panel-item-price">₦${item.price.toLocaleString()}</div>
+                        <button class="btn-add-cart" data-id="${item.id}" style="margin-top: 10px;">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                    </div>
+                    <button class="remove-item" data-id="${item.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                wishlistItems.appendChild(wishlistItem);
+            });
+            
+            // Setup event listeners for add to cart buttons
+            document.querySelectorAll('.wishlist-panel .btn-add-cart').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    const product = products.find(p => p.id === productId);
+                    addToCart(product);
+                    showNotification(`${product.name} added to cart!`);
+                });
+            });
+            
+            // Setup event listeners for remove buttons
+            document.querySelectorAll('.wishlist-panel .remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    removeFromWishlist(productId);
+                    renderWishlistItems();
+                    updateWishlistCount();
+                    showNotification('Item removed from wishlist');
+                    
+                    // Update wishlist button in products grid
+                    const wishlistBtn = document.querySelector(`.wishlist-btn[data-id="${productId}"]`);
+                    if (wishlistBtn) {
+                        wishlistBtn.classList.remove('active');
+                    }
+                });
             });
         }
 
@@ -2271,6 +2739,12 @@
             // Set data-id for buttons
             modalAddCart.setAttribute('data-id', product.id);
             modalWishlist.setAttribute('data-id', product.id);
+            
+            // Update wishlist button state
+            modalWishlist.classList.toggle('active', product.inWishlist);
+            modalWishlist.innerHTML = product.inWishlist 
+                ? '<i class="fas fa-check"></i> Added to Wishlist' 
+                : '<i class="fas fa-heart"></i> Add to Wishlist';
             
             // Generate random stats
             generateRandomStats();
