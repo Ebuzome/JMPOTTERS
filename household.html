@@ -32,7 +32,7 @@
             background-color: var(--cream-light);
             overflow-x: hidden;
             line-height: 1.6;
-            cursor: none;
+            cursor: default; /* Changed to default cursor */
         }
 
         h1, h2, h3, h4 {
@@ -84,7 +84,6 @@
             text-transform: uppercase;
             font-size: 0.9rem;
             border: 2px solid transparent;
-            cursor: none;
         }
 
         .btn:hover {
@@ -95,58 +94,14 @@
             box-shadow: var(--shadow-gold);
         }
 
-        /* Custom Cursor */
-        .cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--gold-primary);
-            mix-blend-mode: difference;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            transition: transform 0.2s ease;
-        }
-
-        .cursor-follower {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            border: 2px solid var(--gold-primary);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9998;
-            transform: translate(-50%, -50%);
-            transition: transform 0.4s ease, width 0.4s ease, height 0.4s ease;
-        }
-
-        .cursor.active {
-            transform: translate(-50%, -50%) scale(0.5);
-            background: white;
-        }
-
-        .cursor-follower.active {
-            transform: translate(-50%, -50%) scale(1.5);
-            background: rgba(212, 175, 55, 0.2);
-        }
-
-        .cursor.click {
-            transform: translate(-50%, -50%) scale(1.2);
-        }
-
-        .cursor-follower.click {
-            transform: translate(-50%, -50%) scale(0.8);
-        }
-
-        /* Header */
+        /* Header - Reduced height */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 1000;
-            padding: 20px 0;
+            padding: 10px 0; /* Reduced padding */
             background: rgba(254, 250, 240, 0.95);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
@@ -164,32 +119,9 @@
             gap: 15px;
         }
 
-        .logo-img-container {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--gold-light);
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .logo-img-container:hover {
-            transform: rotate(15deg);
-            border-color: var(--gold-primary);
-        }
-
-        .logo-img {
-            height: 60px;
-        }
-
         .logo {
             font-family: 'Playfair Display', serif;
-            /* Reduced font size from 1.8rem to 1.6rem */
-            font-size: 1.6rem;
+            font-size: 1.8rem; /* Slightly increased font size */
             font-weight: 700;
             color: var(--gold-dark);
             text-decoration: none;
@@ -206,63 +138,6 @@
             color: var(--gold-primary);
         }
 
-        /* Navigation */
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-left: 15px;
-        }
-
-        .nav-links a {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--charcoal);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            position: relative;
-            transition: var(--transition);
-            padding: 8px 15px;
-            border-radius: 30px;
-            cursor: none;
-        }
-
-        .nav-links a i {
-            color: var(--gold-primary);
-            transition: var(--transition);
-            font-size: 1.1rem;
-        }
-
-        .nav-links a:hover {
-            background: rgba(212, 175, 55, 0.1);
-            color: var(--gold-dark);
-        }
-
-        .nav-links a:hover i {
-            transform: translateY(-3px);
-            color: var(--gold-dark);
-        }
-
-        .nav-links a:after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: var(--gold-primary);
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover:after {
-            width: 100%;
-        }
-
         .header-icons {
             display: flex;
             align-items: center;
@@ -274,7 +149,6 @@
             font-size: 1.4rem;
             color: var(--charcoal);
             transition: var(--transition);
-            cursor: none;
         }
 
         .header-icon:hover {
@@ -300,12 +174,11 @@
         }
 
         .mobile-toggle {
-            display: none;
+            display: block; /* Always visible */
             background: none;
             border: none;
             font-size: 1.5rem;
             color: var(--charcoal);
-            cursor: none;
             transition: var(--transition);
         }
 
@@ -350,7 +223,6 @@
             border: none;
             color: var(--charcoal);
             font-size: 1.5rem;
-            cursor: none;
             transition: var(--transition);
         }
 
@@ -377,7 +249,6 @@
             padding: 12px 15px;
             border-radius: 8px;
             transition: var(--transition);
-            cursor: none;
         }
 
         .mobile-nav-links a i {
@@ -508,7 +379,6 @@
             font-family: 'Montserrat', sans-serif;
             font-size: 1rem;
             min-width: 200px;
-            cursor: none;
         }
 
         .price-range {
@@ -523,7 +393,6 @@
             border: 1px solid var(--gold-light);
             border-radius: 4px;
             text-align: center;
-            cursor: none;
         }
 
         .search-container {
@@ -542,7 +411,6 @@
             outline: none;
             transition: var(--transition);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            cursor: none;
         }
 
         .search-bar:focus {
@@ -670,7 +538,6 @@
             padding: 12px;
             margin-top: 15px;
             font-weight: 600;
-            cursor: none;
             transition: var(--transition);
             font-family: 'Montserrat', sans-serif;
             border-radius: 4px;
@@ -712,37 +579,25 @@
 
         .quantity-controls {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 10px;
             margin-bottom: 20px;
         }
 
-        .quantity-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 1px solid #ddd;
-            background: white;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: none;
-            transition: var(--transition);
-        }
-
-        .quantity-btn:hover {
-            background: var(--gold-primary);
-            color: white;
-            border-color: var(--gold-primary);
-            transform: scale(1.1);
-        }
-
-        .quantity {
-            font-size: 1.1rem;
+        .bulk-label {
             font-weight: 600;
-            min-width: 30px;
-            text-align: center;
+            font-size: 0.95rem;
+            color: var(--gold-dark);
+        }
+
+        .bulk-quantity {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            background: white;
+            width: 100%;
         }
 
         .action-buttons {
@@ -758,7 +613,6 @@
             padding: 12px;
             border-radius: 4px;
             font-weight: 600;
-            cursor: none;
             transition: var(--transition);
             font-family: 'Montserrat', sans-serif;
         }
@@ -775,7 +629,6 @@
             padding: 12px;
             border-radius: 4px;
             font-weight: 600;
-            cursor: none;
             transition: var(--transition);
             font-family: 'Montserrat', sans-serif;
             display: flex;
@@ -799,13 +652,13 @@
             padding: 12px;
             border-radius: 4px;
             font-weight: 600;
-            cursor: none;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             font-family: 'Montserrat', sans-serif;
+            text-decoration: none;
         }
 
         .whatsapp-btn:hover {
@@ -831,7 +684,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: none;
             transition: var(--transition);
             font-weight: 600;
         }
@@ -883,7 +735,6 @@
             border: none;
             color: var(--charcoal);
             font-size: 1.5rem;
-            cursor: none;
             transition: var(--transition);
         }
 
@@ -953,7 +804,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: none;
         }
 
         .cart-item-quantity span {
@@ -965,7 +815,6 @@
             color: #e74c3c;
             background: none;
             border: none;
-            cursor: none;
             margin-left: 15px;
             font-size: 1.2rem;
             transition: var(--transition);
@@ -991,7 +840,6 @@
             gap: 10px;
         }
 
-        /* REMOVED: Continue Shopping button */
         .checkout-btn {
             background: var(--gold-primary);
             color: white;
@@ -999,7 +847,6 @@
             padding: 12px;
             border-radius: 4px;
             font-weight: 600;
-            cursor: none;
             transition: var(--transition);
             text-align: center;
             display: block;
@@ -1051,7 +898,6 @@
             border: none;
             color: var(--charcoal);
             font-size: 1.5rem;
-            cursor: none;
             transition: var(--transition);
         }
 
@@ -1109,7 +955,6 @@
             color: #e74c3c;
             background: none;
             border: none;
-            cursor: none;
             margin-left: 15px;
             font-size: 1.2rem;
             transition: var(--transition);
@@ -1223,7 +1068,6 @@
             z-index: 100;
             animation: float 3s ease-in-out infinite;
             transition: var(--transition);
-            cursor: none;
         }
 
         .whatsapp-float:hover {
@@ -1272,14 +1116,6 @@
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .mobile-toggle {
-                display: block;
-            }
         }
 
         @media (max-width: 992px) {
@@ -1322,14 +1158,6 @@
             .hero h1 {
                 font-size: 2.5rem;
             }
-            
-            body {
-                cursor: default;
-            }
-            
-            .cursor, .cursor-follower {
-                display: none;
-            }
         }
 
         @media (max-width: 576px) {
@@ -1370,37 +1198,14 @@
     </style>
 </head>
 <body>
-    <!-- Custom Cursor -->
-    <div class="cursor"></div>
-    <div class="cursor-follower"></div>
-
     <!-- Header -->
     <header id="header">
         <div class="container header-container">
             <div class="logo-container">
-                <div class="logo-img-container">
-                    <img src="assets/images/logo-1.jpg" alt="JM POTTERS Logo" class="logo-img">
-                </div>
                 <a href="index.html" class="logo">JMPOTTERS<span>.</span></a>
             </div>
             
-            <!-- Desktop Navigation -->
-            <ul class="nav-links">
-                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="shop/products.html"><i class="fas fa-shopping-bag"></i> Shop</a></li>
-                <li><a href="footwear.html"><i class="fas fa-shoe-prints"></i> Footwear</a></li>
-                <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
-                <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
-                <li><a href="beauty.html"><i class="fas fa-spa"></i> Beauty</a></li>
-                <li><a href="skincare.html"><i class="fas fa-soap"></i> Skincare</a></li>
-                <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-                <li><a href="watches.html"><i class="fas fa-clock"></i> Watches</a></li>
-                <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
-                <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
-                <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
-                <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
-            </ul>
-            
+            <!-- Hamburger Menu -->
             <button class="mobile-toggle" id="mobileToggle">
                 <i class="fas fa-bars"></i>
             </button>
@@ -1519,7 +1324,6 @@
             <span id="cartTotal">₦0</span>
         </div>
         <div class="cart-actions">
-            <!-- Removed: Continue Shopping button -->
             <a href="#" class="checkout-btn" id="whatsappCheckout">Proceed to Checkout</a>
         </div>
     </div>
@@ -1737,8 +1541,6 @@
         const mobileNav = document.getElementById('mobileNav');
         const navOverlay = document.getElementById('navOverlay');
         const closeNav = document.querySelector('.close-nav');
-        const cursor = document.querySelector('.cursor');
-        const cursorFollower = document.querySelector('.cursor-follower');
         const whatsappCheckout = document.getElementById('whatsappCheckout');
 
         // Initialize the page
@@ -1747,45 +1549,7 @@
             updateWishlistCount();
             updateCartCount();
             updateCartTotal();
-            
-            // Initialize custom cursor
-            if (window.innerWidth > 768) {
-                document.addEventListener('mousemove', moveCursor);
-                document.addEventListener('mousedown', cursorClick);
-                document.addEventListener('mouseup', cursorUnclick);
-                
-                // Add hover effects to interactive elements
-                const interactiveElements = document.querySelectorAll('a, button, .product-toggle, input, select, .page-btn, .quantity-btn');
-                interactiveElements.forEach(el => {
-                    el.addEventListener('mouseenter', () => {
-                        cursor.classList.add('active');
-                        cursorFollower.classList.add('active');
-                    });
-                    el.addEventListener('mouseleave', () => {
-                        cursor.classList.remove('active');
-                        cursorFollower.classList.remove('active');
-                    });
-                });
-            }
         });
-
-        // Custom cursor functions
-        function moveCursor(e) {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorFollower.style.left = e.clientX + 'px';
-            cursorFollower.style.top = e.clientY + 'px';
-        }
-
-        function cursorClick() {
-            cursor.classList.add('click');
-            cursorFollower.classList.add('click');
-        }
-
-        function cursorUnclick() {
-            cursor.classList.remove('click');
-            cursorFollower.classList.remove('click');
-        }
 
         // Render products to the grid
         function renderProducts() {
@@ -1823,7 +1587,6 @@
             paginatedProducts.forEach(product => {
                 const fakePrice = Math.round(product.price * (1 + 0.1 + Math.random() * 0.4));
                 const isInWishlist = wishlist.some(item => item.id === product.id);
-                const availability = Math.random() > 0.7 ? 'In Stock' : `Only ${Math.floor(Math.random() * 5) + 1} left!`;
                 
                 const productCard = document.createElement('div');
                 productCard.className = 'product-card';
@@ -1843,12 +1606,18 @@
                     <div class="product-details">
                         <p class="product-description">Premium quality household essential designed for durability and style. Perfect addition to elevate your home decor.</p>
                         <div class="availability">
-                            <i class="fas fa-check-circle"></i> ${availability}
+                            <i class="fas fa-check-circle"></i> In Stock
                         </div>
                         <div class="quantity-controls">
-                            <button class="quantity-btn minus">-</button>
-                            <span class="quantity">1</span>
-                            <button class="quantity-btn plus">+</button>
+                            <span class="bulk-label">Bulk Purchase:</span>
+                            <select class="bulk-quantity">
+                                <option value="1">1 Unit</option>
+                                <option value="5">5 Units (5% off)</option>
+                                <option value="10">10 Units (10% off)</option>
+                                <option value="25">25 Units (15% off)</option>
+                                <option value="50">50 Units (20% off)</option>
+                                <option value="100">100 Units (25% off)</option>
+                            </select>
                         </div>
                         <div class="action-buttons">
                             <button class="cart-btn" data-id="${product.id}">
@@ -1936,28 +1705,12 @@
                 });
             });
             
-            // Quantity controls
-            document.querySelectorAll('.quantity-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const quantityElement = this.parentElement.querySelector('.quantity');
-                    let quantity = parseInt(quantityElement.textContent);
-                    
-                    if (this.classList.contains('minus') && quantity > 1) {
-                        quantity--;
-                    } else if (this.classList.contains('plus') && quantity < 10) {
-                        quantity++;
-                    }
-                    
-                    quantityElement.textContent = quantity;
-                });
-            });
-            
             // Add to Cart buttons
             document.querySelectorAll('.cart-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const productId = parseInt(this.getAttribute('data-id'));
                     const product = products.find(p => p.id === productId);
-                    const quantity = parseInt(this.closest('.product-details').querySelector('.quantity').textContent);
+                    const quantity = parseInt(this.closest('.product-details').querySelector('.bulk-quantity').value);
                     
                     addToCart(product, quantity);
                 });
