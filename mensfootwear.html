@@ -1031,33 +1031,6 @@
             margin-top: 5px;
         }
 
-        /* Ensure modal takes full screen on mobile */
-        @media (max-width: 768px) {
-            .modal-body {
-                padding: 10px;
-            }
-            
-            .product-details.active {
-                display: block;
-                width: 100%;
-                height: 100%;
-            }
-            
-            .product-details:not(.active) {
-                display: none;
-            }
-            
-            .stats-slides-container.active {
-                display: flex;
-                width: 100%;
-                height: 100%;
-            }
-            
-            .stats-slides-container:not(.active) {
-                display: none;
-            }
-        }
-
         /* === MODAL === */
         .modal-overlay {
             position: fixed;
@@ -2028,6 +2001,39 @@
             .metric-grid {
                 grid-template-columns: 1fr;
             }
+            
+            /* Mobile modal full screen fixes */
+            .modal-body {
+                padding: 10px;
+                flex-direction: column;
+            }
+            
+            .product-details {
+                width: 100%;
+                height: 100%;
+                margin-right: 0;
+                margin-bottom: 0;
+                max-height: 100%;
+                display: block;
+            }
+            
+            .stats-slides-container {
+                width: 100%;
+                height: 100%;
+                display: none;
+            }
+            
+            .stats-slides-container.active {
+                display: flex;
+            }
+            
+            .product-details.active {
+                display: block;
+            }
+            
+            .product-details:not(.active) {
+                display: none;
+            }
         }
 
         @media (max-width: 576px) {
@@ -2146,22 +2152,6 @@
         @media (max-width: 768px) {
             .modal-pagination {
                 display: flex;
-            }
-            
-            .stats-slides-container {
-                display: none;
-            }
-            
-            .stats-slides-container.active {
-                display: flex;
-            }
-            
-            .product-details.active {
-                display: block;
-            }
-            
-            .product-details:not(.active) {
-                display: none;
             }
         }
 
@@ -3729,9 +3719,98 @@
             whatsappCheckout.href = `https://wa.me/2348139583320?text=${message}`;
         });
 
-        // ========== ANALYTICS FUNCTIONS (Placeholders) ========== //
+        // ========== ANALYTICS FUNCTIONS ========== //
         function generateAnalyticsSlides(product) {
-            // Simplified analytics slides generation
+            // Central data storage for analytics
+            const analyticsData = {
+                line: null,
+                countryBar: null,
+                doughnut: null,
+                pie: null,
+                kpi: null,
+                composite: null
+            };
+            
+            // Generate all analytics data for a product
+            function generateAllAnalyticsData(product) {
+                // Unique seed based on product ID for consistent randomness
+                const seed = product.id;
+                
+                // Line chart data
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const lineData = Array.from({ length: 12 }, (_, i) => {
+                    // Base value with seasonal fluctuations
+                    let value = 200 + Math.sin(i * 0.5) * 150;
+                    
+                    // Add randomness based on product ID
+                    value += (seed % 100) + (i * (seed % 10));
+                    
+                    // Ensure positive values
+                    return Math.max(100, Math.round(value));
+                });
+                
+                analyticsData.line = { 
+                    labels: months, 
+                    data: lineData
+                };
+                
+                // Country bar data
+                const countries = [
+                    { flag: '🇳🇬', name: 'Nigeria' },
+                    { flag: '🇰🇪', name: 'Kenya' },
+                    { flag: '🇬🇭', name: 'Ghana' },
+                    { flag: '🇺🇬', name: 'Uganda' },
+                    { flag: '🇿🇦', name: 'South Africa' },
+                    { flag: '🇹🇿', name: 'Tanzania' },
+                    { flag: '🇷🇼', name: 'Rwanda' }
+                ];
+                
+                const salesData = countries.map((_, i) => {
+                    // Base sales with country bias
+                    let sales = 200 + Math.cos(i * 0.8) * 150;
+                    
+                    // Add product-specific randomness
+                    sales += (seed % 50) + (i * (seed % 5));
+                    
+                    return Math.max(80, Math.round(sales));
+                });
+                
+                analyticsData.countryBar = { 
+                    countries, 
+                    sales: salesData 
+                };
+                
+                // Doughnut chart data
+                const sold = 60 + (seed % 25);
+                const stuck = 15 + (seed % 10);
+                const newStock = 100 - sold - stuck;
+                analyticsData.doughnut = { sold, stuck, newStock };
+                
+                // Pie chart data
+                const bulk = 40 + (seed % 30);
+                const retail = 25 + (seed % 20);
+                const b2b = 100 - bulk - retail;
+                analyticsData.pie = { bulk, retail, b2b };
+                
+                // KPI data
+                analyticsData.kpi = {
+                    unitsSold: 1500 + (seed % 1000),
+                    returnRate: (1 + (seed % 30)/10).toFixed(1),
+                    sellThrough: 70 + (seed % 25),
+                    stockLevel: 15 + (seed % 20)
+                };
+                
+                // Composite data
+                analyticsData.composite = {
+                    trustScore: 85 + (seed % 15),
+                    avgRating: (4.0 + (seed % 10)/10).toFixed(1),
+                    recommendRate: 85 + (seed % 15)
+                };
+            }
+            
+            // Generate all analytics data for this product
+            generateAllAnalyticsData(product);
+            
             statsSlides.innerHTML = '';
             slidePagination.innerHTML = '';
             
@@ -3805,6 +3884,182 @@
             
             // Initialize first slide
             currentSlideIndex = 0;
+            
+            // Setup scroll events
+            statsSlides.addEventListener('scroll', handleSlideScroll);
+            
+            // Initialize charts for first slide
+            setTimeout(() => {
+                initializeChartForSlide(0);
+            }, 300);
+        }
+        
+        function initializeChartForSlide(index) {
+            const slide = statsSlides.querySelector(`.stats-slide[data-index="${index}"]`);
+            if (!slide) return;
+            
+            const canvas = slide.querySelector('canvas');
+            if (!canvas) return;
+            
+            const chartType = [
+                "line", "kpi", "countryBar", "doughnut", "pie", "composite"
+            ][index];
+            
+            // For demo purposes, we'll create simple charts
+            // In a real implementation, you would use the analyticsData to create proper charts
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Create a simple chart based on type
+            switch(chartType) {
+                case "line":
+                    // Create a simple line chart
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                            datasets: [{
+                                label: 'Sales',
+                                data: [65, 59, 80, 81, 56, 55, 40, 45, 60, 70, 75, 80],
+                                borderColor: '#d4af37',
+                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                    break;
+                    
+                case "kpi":
+                    // Create KPI cards instead of a chart
+                    const container = slide.querySelector('.chart-container');
+                    container.innerHTML = `
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="metric-value metric-success">1,500</div>
+                                <div class="metric-label">Units Sold</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value metric-warning">2.5%</div>
+                                <div class="metric-label">Return Rate</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value metric-success">75%</div>
+                                <div class="metric-label">Sell-Through Rate</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value metric-danger">18</div>
+                                <div class="metric-label">Days of Stock</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "countryBar":
+                    // Create a simple bar chart
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Nigeria', 'Kenya', 'Ghana', 'Uganda', 'South Africa', 'Tanzania', 'Rwanda'],
+                            datasets: [{
+                                label: 'Sales',
+                                data: [65, 59, 80, 81, 56, 55, 40],
+                                backgroundColor: '#d4af37'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                    break;
+                    
+                case "doughnut":
+                    // Create a simple doughnut chart
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Sold', 'Stuck', 'New'],
+                            datasets: [{
+                                data: [60, 15, 25],
+                                backgroundColor: [
+                                    '#27ae60',
+                                    '#e74c3c',
+                                    '#f39c12'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                    break;
+                    
+                case "pie":
+                    // Create a simple pie chart
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Bulk Orders', 'Retail Stores', 'B2B Partnerships'],
+                            datasets: [{
+                                data: [40, 35, 25],
+                                backgroundColor: [
+                                    '#d4af37',
+                                    '#3498db',
+                                    '#9b59b6'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                    break;
+                    
+                case "composite":
+                    // Create trust score visualization
+                    const compositeContainer = slide.querySelector('.chart-container');
+                    compositeContainer.innerHTML = `
+                        <div class="metric-card">
+                            <div class="metric-value">88/100</div>
+                            <div class="metric-label">Trust Score</div>
+                            <div class="trust-score">
+                                <span>Low</span>
+                                <div class="trust-bar">
+                                    <div class="trust-fill" style="width: 88%"></div>
+                                </div>
+                                <span class="trust-value">High</span>
+                            </div>
+                        </div>
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="metric-value metric-success">4.5</div>
+                                <div class="metric-label">Avg. Rating</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value metric-success">92%</div>
+                                <div class="metric-label">Recommend</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
         }
         
         function scrollToSlide(index) {
@@ -3815,6 +4070,44 @@
                     behavior: 'smooth'
                 });
             }
+        }
+        
+        function handleSlideScroll() {
+            const slides = statsSlides.querySelectorAll('.stats-slide');
+            const scrollPosition = statsSlides.scrollLeft + statsSlides.offsetWidth / 2;
+            
+            let closestSlide = null;
+            let closestDistance = Infinity;
+            
+            slides.forEach(slide => {
+                const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+                const distance = Math.abs(scrollPosition - slideCenter);
+                
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestSlide = slide;
+                }
+            });
+            
+            if (closestSlide) {
+                const newIndex = parseInt(closestSlide.dataset.index);
+                if (newIndex !== currentSlideIndex) {
+                    currentSlideIndex = newIndex;
+                    updateSlidePagination();
+                    initializeChartForSlide(newIndex);
+                }
+            }
+        }
+        
+        function updateSlidePagination() {
+            const dots = slidePagination.querySelectorAll('.slide-dot');
+            dots.forEach((dot, index) => {
+                if (index === currentSlideIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
         }
     </script>
 </body>
