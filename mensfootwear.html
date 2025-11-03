@@ -903,6 +903,161 @@
             display: none;
         }
 
+        /* === MODAL LAYOUT FIXES === */
+        .modal-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 20px;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        @media (min-width: 992px) {
+            .modal-body {
+                flex-direction: row;
+            }
+        }
+
+        .product-details {
+            flex: 1;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-right: 0;
+            margin-bottom: 20px;
+            max-height: none;
+            overflow-y: auto;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (min-width: 992px) {
+            .product-details {
+                margin-right: 20px;
+                margin-bottom: 0;
+                max-height: 100%;
+                width: 50%;
+            }
+        }
+
+        .stats-slides-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (min-width: 992px) {
+            .stats-slides-container {
+                width: 50%;
+            }
+        }
+
+        /* === BULK QUANTITY SELECTOR STYLES === */
+        .quantity-selection-modal {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .quantity-selection-modal h4 {
+            margin-bottom: 15px;
+            color: var(--gold);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-options-modal {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 576px) {
+            .quantity-options-modal {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .quantity-option-modal {
+            padding: 12px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .quantity-option-modal:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .quantity-option-modal.selected {
+            background: var(--gold);
+            color: var(--black);
+            border-color: var(--gold);
+            font-weight: 600;
+        }
+
+        .quantity-price-display {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 4px;
+            text-align: center;
+            border-left: 3px solid var(--gold);
+        }
+
+        .quantity-total-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-top: 5px;
+        }
+
+        /* Ensure modal takes full screen on mobile */
+        @media (max-width: 768px) {
+            .modal-body {
+                padding: 10px;
+            }
+            
+            .product-details.active {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+            
+            .product-details:not(.active) {
+                display: none;
+            }
+            
+            .stats-slides-container.active {
+                display: flex;
+                width: 100%;
+                height: 100%;
+            }
+            
+            .stats-slides-container:not(.active) {
+                display: none;
+            }
+        }
+
         /* === MODAL === */
         .modal-overlay {
             position: fixed;
@@ -979,39 +1134,6 @@
             font-size: 1.8rem;
             color: var(--gold);
             text-align: center;
-        }
-
-        .modal-body {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            padding: 20px;
-            flex-direction: column;
-        }
-
-        @media (min-width: 992px) {
-            .modal-body {
-                flex-direction: row;
-            }
-        }
-
-        .product-details {
-            flex: 1;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            margin-right: 0;
-            margin-bottom: 20px;
-            max-height: none;
-            overflow-y: auto;
-        }
-
-        @media (min-width: 992px) {
-            .product-details {
-                margin-right: 20px;
-                margin-bottom: 0;
-                max-height: 100%;
-            }
         }
 
         .product-image-container {
@@ -1209,16 +1331,6 @@
         }
 
         /* Stats slides */
-        .stats-slides-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: rgba(30, 30, 30, 0.7);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
         .stats-slides {
             display: flex;
             overflow-x: auto;
@@ -2262,6 +2374,18 @@
                         </div>
                     </div>
                     
+                    <!-- Bulk Quantity Selector -->
+                    <div class="quantity-selection-modal">
+                        <h4><i class="fas fa-boxes"></i> Select Quantity</h4>
+                        <div class="quantity-options-modal" id="quantityOptionsModal">
+                            <!-- Quantity options will be added here dynamically -->
+                        </div>
+                        <div class="quantity-price-display">
+                            <div>Total Price:</div>
+                            <div class="quantity-total-price" id="quantityTotalPrice">₦0</div>
+                        </div>
+                    </div>
+                    
                     <table class="bulk-pricing">
                         <thead>
                             <tr>
@@ -2481,7 +2605,7 @@
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     
     <script>
-              // ========== INITIALIZATION ========== //
+        // ========== INITIALIZATION ========== //
         // Initialize AOS
         AOS.init({
             duration: 800,
@@ -2568,7 +2692,7 @@
             { id: 75, name: "Nike AIR", price: 13000, image: "Nike-AIR-13000.jpg" },
             { id: 76, name: "Nike AIR Black", price: 13000, image: "Nike-AIR-Black-13000.jpg" },
             { id: 77, name: "Premium Slip in loafers", price: 7800, image: "Premium-Slip-in-loafers-7800.jpg" },
-            { id: 78, name: "PUMA Sandals", price: 6500, image: "PUMA-Samdals-6500.jpg" },
+            { id: 78, name: "PUMA Sandals", price: 6500, image: "PUMA-Sandals-6500.jpg" },
             { id: 79, name: "Silo Loafers VVF", price: 6000, image: "Silo-Loafers-VVF-6000.jpg" },
             { id: 80, name: "Sport BCX", price: 9500, image: "Sport-BCX-9500.jpg" },
             { id: 81, name: "Vangelo GHY", price: 11000, image: "Vangelo-GHY-11000.jpg" },
@@ -2593,6 +2717,8 @@
         let currentSlideIndex = 0;
         let selectedSize = null;
         let isMobileView = window.innerWidth <= 768;
+        let currentSelectedQuantity = 1;
+        let currentSelectedUnitPrice = 0;
 
         // DOM Elements
         const preloader = document.getElementById('preloader');
@@ -2649,6 +2775,10 @@
         const currentPageIndicator = document.getElementById('currentPage');
         const currentPageIndicator2 = document.getElementById('currentPage2');
         const sizeGrid = document.getElementById('sizeGrid');
+        
+        // Bulk quantity selector elements
+        const quantityOptionsModal = document.getElementById('quantityOptionsModal');
+        const quantityTotalPrice = document.getElementById('quantityTotalPrice');
 
         // Fake reviews data
         const fakeReviews = [
@@ -2682,784 +2812,61 @@
         const fakeLocations = ["Lagos", "Abuja", "Ibadan", "Port Harcourt", "Kano", "Enugu", "Aba", "Owerri", "Benin", "Kaduna"];
         const fakeProducts = ["Sneakers", "Loafers", "Boots", "Sandals", "Formal Shoes", "Designer Kicks", "Premium Footwear", "Luxury Shoes"];
 
-        // ======================== ANALYTICS DATA MANAGEMENT ======================== //
-        
-        // Central data storage for analytics
-        const analyticsData = {
-            line: null,
-            countryBar: null,
-            doughnut: null,
-            pie: null,
-            kpi: null,
-            composite: null
-        };
-        
-        // Pattern detection engine
-        function detectPatterns(data) {
-            const patterns = {
-                dips: [],
-                peaks: [],
-                plateaus: [],
-                trends: []
-            };
+        // ========== BULK QUANTITY SELECTOR FUNCTIONS ========== //
+        function generateQuantityOptions(product) {
+            quantityOptionsModal.innerHTML = '';
             
-            // Detect dips (significant drops)
-            for (let i = 1; i < data.length; i++) {
-                const drop = ((data[i-1] - data[i]) / data[i-1]) * 100;
-                if (drop > 25) {
-                    patterns.dips.push({
-                        index: i,
-                        value: data[i],
-                        dropPercent: Math.round(drop),
-                        prevValue: data[i-1]
-                    });
-                }
-            }
-            
-            // Detect peaks (significant highs)
-            for (let i = 1; i < data.length - 1; i++) {
-                const increaseFromPrev = ((data[i] - data[i-1]) / data[i-1]) * 100;
-                const decreaseToNext = ((data[i] - data[i+1]) / data[i]) * 100;
-                
-                if (increaseFromPrev > 30 && decreaseToNext > 15) {
-                    patterns.peaks.push({
-                        index: i,
-                        value: data[i],
-                        increasePercent: Math.round(increaseFromPrev)
-                    });
-                }
-            }
-            
-            // Detect plateaus (consistent periods)
-            let currentPlateau = { start: 0, end: 0, values: [] };
-            for (let i = 1; i < data.length; i++) {
-                const variance = Math.abs(data[i] - data[i-1]) / data[i-1];
-                
-                if (variance < 0.15) { // Less than 15% variance
-                    if (currentPlateau.values.length === 0) {
-                        currentPlateau.start = i-1;
-                        currentPlateau.values.push(data[i-1]);
-                    }
-                    currentPlateau.values.push(data[i]);
-                    currentPlateau.end = i;
-                } else {
-                    if (currentPlateau.values.length >= 3) { // Minimum 3 months for plateau
-                        const avg = Math.round(currentPlateau.values.reduce((a, b) => a + b, 0) / currentPlateau.values.length);
-                        const duration = currentPlateau.end - currentPlateau.start + 1;
-                        patterns.plateaus.push({
-                            start: currentPlateau.start,
-                            end: currentPlateau.end,
-                            duration: duration,
-                            avgValue: avg,
-                            values: [...currentPlateau.values]
-                        });
-                    }
-                    currentPlateau = { start: 0, end: 0, values: [] };
-                }
-            }
-            
-            // Detect overall trend
-            const startAvg = (data[0] + data[1] + data[2]) / 3;
-            const endAvg = (data[data.length-3] + data[data.length-2] + data[data.length-1]) / 3;
-            patterns.trend = endAvg > startAvg ? 'upward' : 'downward';
-            patterns.trendStrength = Math.abs((endAvg - startAvg) / startAvg * 100);
-            
-            return patterns;
-        }
-
-        // Generate all analytics data for a product
-        function generateAllAnalyticsData(product) {
-            // Unique seed based on product ID for consistent randomness
-            const seed = product.id;
-            
-            // Line chart data
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const lineData = Array.from({ length: 12 }, (_, i) => {
-                // Base value with seasonal fluctuations
-                let value = 200 + Math.sin(i * 0.5) * 150;
-                
-                // Add randomness based on product ID
-                value += (seed % 100) + (i * (seed % 10));
-                
-                // Ensure positive values
-                return Math.max(100, Math.round(value));
-            });
-            
-            analyticsData.line = { 
-                labels: months, 
-                data: lineData,
-                patterns: detectPatterns(lineData)
-            };
-            
-            // Country bar data
-            const countries = [
-                { flag: '🇳🇬', name: 'Nigeria' },
-                { flag: '🇰🇪', name: 'Kenya' },
-                { flag: '🇬🇭', name: 'Ghana' },
-                { flag: '🇺🇬', name: 'Uganda' },
-                { flag: '🇿🇦', name: 'South Africa' },
-                { flag: '🇹🇿', name: 'Tanzania' },
-                { flag: '🇷🇼', name: 'Rwanda' }
+            const quantities = [
+                { value: 1, label: '1 Unit' },
+                { value: 5, label: '5 Units' },
+                { value: 10, label: '10 Units' },
+                { value: 25, label: '25 Units' },
+                { value: 50, label: '50 Units' },
+                { value: 100, label: '100 Units' }
             ];
             
-            const salesData = countries.map((_, i) => {
-                // Base sales with country bias
-                let sales = 200 + Math.cos(i * 0.8) * 150;
+            quantities.forEach((qty, index) => {
+                const discount = qty.value === 1 ? 0 : Math.min(30, Math.floor(qty.value / 10) * 5);
+                const unitPrice = Math.round(product.price * (1 - discount / 100));
+                const totalPrice = unitPrice * qty.value;
                 
-                // Add product-specific randomness
-                sales += (seed % 50) + (i * (seed % 5));
+                const option = document.createElement('button');
+                option.className = `quantity-option-modal ${index === 0 ? 'selected' : ''}`;
+                option.dataset.quantity = qty.value;
+                option.dataset.unitPrice = unitPrice;
+                option.dataset.totalPrice = totalPrice;
                 
-                return Math.max(80, Math.round(sales));
-            });
-            
-            analyticsData.countryBar = { 
-                countries, 
-                sales: salesData 
-            };
-            
-            // Doughnut chart data
-            const sold = 60 + (seed % 25);
-            const stuck = 15 + (seed % 10);
-            const newStock = 100 - sold - stuck;
-            analyticsData.doughnut = { sold, stuck, newStock };
-            
-            // Pie chart data
-            const bulk = 40 + (seed % 30);
-            const retail = 25 + (seed % 20);
-            const b2b = 100 - bulk - retail;
-            analyticsData.pie = { bulk, retail, b2b };
-            
-            // KPI data
-            analyticsData.kpi = {
-                unitsSold: 1500 + (seed % 1000),
-                returnRate: (1 + (seed % 30)/10).toFixed(1),
-                sellThrough: 70 + (seed % 25),
-                stockLevel: 15 + (seed % 20)
-            };
-            
-            // Composite data
-            analyticsData.composite = {
-                trustScore: 85 + (seed % 15),
-                avgRating: (4.0 + (seed % 10)/10).toFixed(1),
-                recommendRate: 85 + (seed % 15)
-            };
-        }
-
-        // ======================== NARRATIVE GENERATION ======================== //
-        
-        // Generate insight text for each chart type
-        function generateInsightText(type, product) {
-            switch(type) {
-                case "line":
-                    if (!analyticsData.line.patterns.dips.length) {
-                        return `Sales of ${product.name} have shown consistent growth throughout the year with no significant dips.`;
-                    }
-                    
-                    const maxMonthIndex = analyticsData.line.data.indexOf(Math.max(...analyticsData.line.data));
-                    const maxMonth = analyticsData.line.labels[maxMonthIndex];
-                    const maxSales = analyticsData.line.data[maxMonthIndex];
-                    return `Sales peaked in <span class="insight-highlight">${maxMonth}</span> with <span class="insight-highlight">${maxSales} units</span> sold. This represents a <span class="insight-highlight">${Math.round((maxSales / Math.min(...analyticsData.line.data) - 1) * 100)}% increase</span> from the lowest sales month.`;
-                    
-                case "kpi":
-                    return `This product maintains a strong <span class="insight-highlight">${analyticsData.kpi.sellThrough}% sell-through rate</span> with return rates of just <span class="insight-highlight">${analyticsData.kpi.returnRate}%</span>. Current stock will last approximately <span class="insight-highlight">${analyticsData.kpi.stockLevel} days</span> at current sales velocity.`;
-                    
-                case "countryBar":
-                    const maxSalesIndex = analyticsData.countryBar.sales.indexOf(Math.max(...analyticsData.countryBar.sales));
-                    const topCountry = analyticsData.countryBar.countries[maxSalesIndex].name;
-                    const topSales = analyticsData.countryBar.sales[maxSalesIndex];
-                    const minSales = Math.min(...analyticsData.countryBar.sales);
-                    const minSalesIndex = analyticsData.countryBar.sales.indexOf(minSales);
-                    const weakestCountry = analyticsData.countryBar.countries[minSalesIndex].name;
-                    
-                    return `<span class="insight-highlight">${topCountry}</span> leads in sales with <span class="insight-highlight">${topSales} units</span> sold, while <span class="insight-highlight">${weakestCountry}</span> shows the lowest adoption with only <span class="insight-highlight">${minSales} units</span>.`;
-                    
-                case "doughnut":
-                    return `<span class="insight-highlight">${analyticsData.doughnut.sold}% of stock</span> sells within 30 days, while <span class="insight-highlight">${analyticsData.doughnut.stuck}% remains unsold beyond 60 days</span>.`;
-                    
-                case "pie":
-                    return `Revenue primarily comes from <span class="insight-highlight">bulk orders (${analyticsData.pie.bulk}%)</span>, with retail stores contributing <span class="insight-highlight">${analyticsData.pie.retail}%</span> and B2B partnerships making up the remaining <span class="insight-highlight">${analyticsData.pie.b2b}%</span>.`;
-                    
-                case "composite":
-                    return `With a trust score of <span class="insight-highlight">${analyticsData.composite.trustScore}/100</span>, customers rate it <span class="insight-highlight">${analyticsData.composite.avgRating}/5 stars</span> on average, and <span class="insight-highlight">${analyticsData.composite.recommendRate}% would recommend</span> it to others.`;
-                    
-                default:
-                    return `Detailed analytics for ${product.name} show strong market performance.`;
-            }
-        }
-        
-        // Generate topics for line chart
-        function generateLineTopics(patterns, product) {
-            const topics = [];
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                           'July', 'August', 'September', 'October', 'November', 'December'];
-            
-            // Generate topics for dips
-            patterns.dips.forEach(dip => {
-                const dipMonth = months[dip.index];
-                const reasons = [
-                    `seasonal changes affecting footwear preferences`,
-                    `increased market competition during this period`,
-                    `supply chain disruptions impacting availability`,
-                    `economic factors reducing consumer spending`,
-                    `weather conditions reducing demand`
-                ];
-                
-                const recoveryTips = [
-                    "consider promotional pricing to boost sales during similar periods next year",
-                    "plan targeted marketing campaigns for this season",
-                    "adjust inventory levels based on historical trends"
-                ];
-                
-                topics.push({
-                    icon: 'fas fa-chart-line',
-                    title: `The ${dipMonth} Sales Dip`,
-                    content: `In ${dipMonth}, sales dropped <span class="topic-highlight">${dip.dropPercent}%</span> compared to the previous month. This was likely due to ${reasons[product.id % reasons.length]}. To mitigate this in the future, ${recoveryTips[product.id % recoveryTips.length]}.`
-                });
-            });
-            
-            // Generate topics for peaks
-            patterns.peaks.forEach(peak => {
-                const peakMonth = months[peak.index];
-                const reasons = [
-                    `seasonal demand for this style of footwear`,
-                    `successful marketing campaigns driving interest`,
-                    `social media influencers promoting the product`,
-                    `holiday shopping trends boosting sales`,
-                    `exclusive partnerships increasing visibility`
-                ];
-                
-                const capitalizeTips = [
-                    "stock up in advance for this peak season next year",
-                    "consider creating special editions for this period",
-                    "leverage this success in your marketing materials"
-                ];
-                
-                topics.push({
-                    icon: 'fas fa-rocket',
-                    title: `${peakMonth} Sales Surge`,
-                    content: `${peakMonth} saw sales skyrocket by <span class="topic-highlight">${peak.increasePercent}%</span> from the previous month. This surge was likely driven by ${reasons[product.id % reasons.length]}. To capitalize on this trend, ${capitalizeTips[product.id % capitalizeTips.length]}.`
-                });
-            });
-            
-            // Generate topics for plateaus
-            patterns.plateaus.forEach(plateau => {
-                const startMonth = months[plateau.start];
-                const endMonth = months[plateau.end];
-                const duration = plateau.end - plateau.start + 1;
-                
-                topics.push({
-                    icon: 'fas fa-balance-scale',
-                    title: `${duration} Months of Steady Demand`,
-                    content: `From ${startMonth} to ${endMonth}, sales remained remarkably consistent, averaging <span class="topic-highlight">${plateau.avgValue} units</span> per month. This stability indicates strong ongoing demand and makes this product ideal for reliable inventory planning. Consider maintaining consistent stock levels during these periods.`
-                });
-            });
-            
-            // Generate topic for overall trend
-            const trendDirection = patterns.trend === 'upward' ? 'increased' : 'decreased';
-            
-            topics.push({
-                icon: patterns.trend === 'upward' ? 'fas fa-arrow-up' : 'fas fa-arrow-down',
-                title: `Overall ${patterns.trend === 'upward' ? 'Growth' : 'Decline'} Trend`,
-                content: `Throughout the year, sales have ${trendDirection} by approximately <span class="topic-highlight">${Math.round(patterns.trendStrength)}%</span>. This ${patterns.trend} trend suggests ${patterns.trend === 'upward' ? 'growing popularity' : 'declining interest'} in this product line. ${patterns.trend === 'upward' ? 'Continue investing in this successful product' : 'Consider promotional strategies to revitalize interest'}.`
-            });
-            
-            return topics;
-        }
-        
-        // ======================== MODIFIED ANALYTICS SLIDES ======================== //
-        
-        function generateAnalyticsSlides(product) {
-            // Generate all analytics data for this product
-            generateAllAnalyticsData(product);
-            
-            statsSlides.innerHTML = '';
-            slidePagination.innerHTML = '';
-            
-            const slideTemplates = [
-                {
-                    title: "📈 Purchase Frequency",
-                    chart: "line",
-                    description: "Monthly sales trend showing peak purchasing periods"
-                },
-                {
-                    title: "📊 Business KPIs",
-                    chart: "kpi",
-                    description: "Key performance indicators for this product"
-                },
-                {
-                    title: "🌍 Country Sales",
-                    chart: "countryBar",
-                    description: "Sales volume by country"
-                },
-                {
-                    title: "🔄 Inventory Turnover",
-                    chart: "doughnut",
-                    description: "Ratio of good vs stuck inventory stock"
-                },
-                {
-                    title: "💰 Revenue Sources",
-                    chart: "pie",
-                    description: "Revenue distribution across sales channels"
-                },
-                {
-                    title: "🏆 Performance Summary",
-                    chart: "composite",
-                    description: "Overall performance metrics and trust score"
-                }
-            ];
-            
-            slideTemplates.forEach((slide, index) => {
-                const slideEl = document.createElement('div');
-                slideEl.className = 'stats-slide';
-                slideEl.dataset.index = index;
-                
-                // Generate topics only for line chart (index 0)
-                const topics = index === 0 ? generateLineTopics(analyticsData.line.patterns, product) : [];
-                
-                slideEl.innerHTML = `
-                    <div class="slide-title">
-                        <i class="${slide.chart === 'line' ? 'fas fa-chart-line' : 
-                                  slide.chart === 'kpi' ? 'fas fa-tachometer-alt' : 
-                                  slide.chart === 'countryBar' ? 'fas fa-globe-africa' : 
-                                  slide.chart === 'doughnut' ? 'fas fa-chart-pie' : 
-                                  slide.chart === 'pie' ? 'fas fa-chart-pie' : 
-                                  'fas fa-star'}"></i>
-                        ${slide.title}
-                    </div>
-                    <div class="chart-container" id="chart-${index}">
-                        <canvas></canvas>
-                    </div>
-                    <div class="insight-text" id="insight-${index}">
-                        ${generateInsightText(slide.chart, product)}
-                    </div>
-                    
-                    ${topics.length ? `
-                    <div class="analytics-topics">
-                        ${topics.map(topic => `
-                            <div class="topic-card">
-                                <div class="topic-title">
-                                    <i class="${topic.icon}"></i> ${topic.title}
-                                </div>
-                                <div class="topic-content">${topic.content}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    ` : ''}
+                option.innerHTML = `
+                    <div>${qty.label}</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">₦${unitPrice.toLocaleString()}/unit</div>
                 `;
-                statsSlides.appendChild(slideEl);
                 
-                // Create pagination dot
-                const dot = document.createElement('div');
-                dot.className = 'slide-dot';
-                dot.dataset.index = index;
-                if (index === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => {
-                    scrollToSlide(index);
-                });
-                slidePagination.appendChild(dot);
-            });
-            
-            // Initialize first slide
-            currentSlideIndex = 0;
-            
-            // Setup scroll events
-            statsSlides.addEventListener('scroll', handleSlideScroll);
-            
-            // Initialize charts for first slide
-            setTimeout(() => {
-                initializeChartForSlide(0);
-            }, 300);
-        }
-        
-        // ======================== UPDATED CHART FUNCTIONS ======================== //
-        
-        function createLineChart(canvas) {
-            const ctx = canvas.getContext('2d');
-            const { labels, data } = analyticsData.line;
-            
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Units Sold',
-                        data: data,
-                        borderColor: '#d4af37',
-                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: '#aaa'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#aaa'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createCountryBarChart(canvas) {
-            const ctx = canvas.getContext('2d');
-            const { countries, sales } = analyticsData.countryBar;
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: countries.map(c => `${c.flag} ${c.name}`),
-                    datasets: [{
-                        label: 'Units Sold',
-                        data: sales,
-                        backgroundColor: '#d4af37',
-                        borderColor: '#b8972e',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: '#aaa'
-                            }
-                        },
-                        y: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#aaa'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createDoughnutChart(canvas) {
-            const ctx = canvas.getContext('2d');
-            const { sold, stuck, newStock } = analyticsData.doughnut;
-            
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Sold', 'Stuck', 'New'],
-                    datasets: [{
-                        data: [sold, stuck, newStock],
-                        backgroundColor: [
-                            '#27ae60',
-                            '#e74c3c',
-                            '#f39c12'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#ddd'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createPieChart(canvas) {
-            const ctx = canvas.getContext('2d');
-            const { bulk, retail, b2b } = analyticsData.pie;
-            
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Bulk Orders', 'Retail Stores', 'B2B Partnerships'],
-                    datasets: [{
-                        data: [bulk, retail, b2b],
-                        backgroundColor: [
-                            '#d4af37',
-                            '#3498db',
-                            '#9b59b6'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#ddd'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createKPICards(slide) {
-            const container = slide.querySelector('.chart-container');
-            const { unitsSold, returnRate, sellThrough, stockLevel } = analyticsData.kpi;
-            
-            container.innerHTML = `
-                <div class="metric-grid">
-                    <div class="metric-card">
-                        <div class="metric-value metric-success">${unitsSold.toLocaleString()}</div>
-                        <div class="metric-label">Units Sold</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value metric-warning">${returnRate}%</div>
-                        <div class="metric-label">Return Rate</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value metric-success">${sellThrough}%</div>
-                        <div class="metric-label">Sell-Through Rate</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value metric-danger">${stockLevel}</div>
-                        <div class="metric-label">Days of Stock</div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        function createTrustScore(slide) {
-            const container = slide.querySelector('.chart-container');
-            const { trustScore, avgRating, recommendRate } = analyticsData.composite;
-            
-            container.innerHTML = `
-                <div class="metric-card">
-                    <div class="metric-value">${trustScore}/100</div>
-                    <div class="metric-label">Trust Score</div>
-                    <div class="trust-score">
-                        <span>Low</span>
-                        <div class="trust-bar">
-                            <div class="trust-fill" style="width: ${trustScore}%"></div>
-                        </div>
-                        <span class="trust-value">High</span>
-                    </div>
-                </div>
-                <div class="metric-grid">
-                    <div class="metric-card">
-                        <div class="metric-value metric-success">${avgRating}</div>
-                        <div class="metric-label">Avg. Rating</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value metric-success">${recommendRate}%</div>
-                        <div class="metric-label">Recommend</div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // ======================== HELPER FUNCTIONS ======================== //
-        
-        function initializeChartForSlide(index) {
-            const slide = statsSlides.querySelector(`.stats-slide[data-index="${index}"]`);
-            if (!slide) return;
-            
-            const canvas = slide.querySelector('canvas');
-            if (!canvas) return;
-            
-            const chartType = [
-                "line", "kpi", "countryBar", "doughnut", "pie", "composite"
-            ][index];
-            
-            switch(chartType) {
-                case "line":
-                    createLineChart(canvas);
-                    break;
-                case "countryBar":
-                    createCountryBarChart(canvas);
-                    break;
-                case "doughnut":
-                    createDoughnutChart(canvas);
-                    break;
-                case "pie":
-                    createPieChart(canvas);
-                    break;
-                case "kpi":
-                    createKPICards(slide);
-                    break;
-                case "composite":
-                    createTrustScore(slide);
-                    break;
-            }
-        }
-        
-        function scrollToSlide(index) {
-            const slide = statsSlides.querySelector(`.stats-slide[data-index="${index}"]`);
-            if (slide) {
-                statsSlides.scrollTo({
-                    left: slide.offsetLeft,
-                    behavior: 'smooth'
-                });
-            }
-        }
-        
-        function handleSlideScroll() {
-            const slides = statsSlides.querySelectorAll('.stats-slide');
-            const scrollPosition = statsSlides.scrollLeft + statsSlides.offsetWidth / 2;
-            
-            let closestSlide = null;
-            let closestDistance = Infinity;
-            
-            slides.forEach(slide => {
-                const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-                const distance = Math.abs(scrollPosition - slideCenter);
-                
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestSlide = slide;
-                }
-            });
-            
-            if (closestSlide) {
-                const newIndex = parseInt(closestSlide.dataset.index);
-                if (newIndex !== currentSlideIndex) {
-                    currentSlideIndex = newIndex;
-                    updateSlidePagination();
-                    initializeChartForSlide(newIndex);
-                }
-            }
-        }
-        
-        function updateSlidePagination() {
-            const dots = slidePagination.querySelectorAll('.slide-dot');
-            dots.forEach((dot, index) => {
-                if (index === currentSlideIndex) {
-                    dot.classList.add('active');
-                } else {
-                    dot.classList.remove('active');
-                }
-            });
-        }
-
-        // ========== SIZE SELECTION FUNCTIONS ========== //
-        function generateSizeGrid() {
-            sizeGrid.innerHTML = '';
-            const sizes = [38, 39, 40, 41, 42, 43, 44, 45, 46];
-            
-            sizes.forEach(size => {
-                const sizeOption = document.createElement('button');
-                sizeOption.className = 'size-option';
-                sizeOption.textContent = size;
-                sizeOption.dataset.size = size;
-                
-                sizeOption.addEventListener('click', function() {
-                    // Remove selected class from all size options
-                    sizeGrid.querySelectorAll('.size-option').forEach(option => {
-                        option.classList.remove('selected');
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    quantityOptionsModal.querySelectorAll('.quantity-option-modal').forEach(opt => {
+                        opt.classList.remove('selected');
                     });
                     
                     // Add selected class to clicked option
                     this.classList.add('selected');
-                    selectedSize = size;
+                    
+                    // Update total price display
+                    quantityTotalPrice.textContent = `₦${totalPrice.toLocaleString()}`;
+                    
+                    // Store selected quantity for add to cart
+                    currentSelectedQuantity = qty.value;
+                    currentSelectedUnitPrice = unitPrice;
                 });
                 
-                sizeGrid.appendChild(sizeOption);
+                quantityOptionsModal.appendChild(option);
+                
+                // Set initial selected quantity and price
+                if (index === 0) {
+                    quantityTotalPrice.textContent = `₦${totalPrice.toLocaleString()}`;
+                    currentSelectedQuantity = qty.value;
+                    currentSelectedUnitPrice = unitPrice;
+                }
             });
-        }
-
-        // ========== MODAL PAGINATION FUNCTIONS ========== //
-        function setupModalPagination() {
-            // Check if we're in mobile view
-            isMobileView = window.innerWidth <= 768;
-            
-            if (isMobileView) {
-                // Hide analytics page initially
-                analyticsPage.classList.remove('active');
-                productDetailsPage.classList.add('active');
-                
-                // Reset to page 1 when modal opens
-                currentPageIndicator.textContent = '1';
-                currentPageIndicator2.textContent = '2';
-                
-                // Setup navigation buttons
-                modalNextBtn.addEventListener('click', goToAnalyticsPage);
-                modalNextBtn2.addEventListener('click', goToAnalyticsPage);
-                modalBackBtn.addEventListener('click', goToProductDetailsPage);
-                modalBackBtn2.addEventListener('click', goToProductDetailsPage);
-                
-                // Enable/disable buttons appropriately
-                modalBackBtn.disabled = true;
-                modalBackBtn2.disabled = false;
-                modalNextBtn.disabled = false;
-                modalNextBtn2.disabled = true;
-            } else {
-                // Desktop view - show both pages
-                analyticsPage.classList.add('active');
-                productDetailsPage.classList.add('active');
-            }
-        }
-        
-        function goToAnalyticsPage() {
-            if (!isMobileView) return;
-            
-            productDetailsPage.classList.remove('active');
-            analyticsPage.classList.add('active');
-            
-            currentPageIndicator.textContent = '2';
-            currentPageIndicator2.textContent = '2';
-            
-            modalBackBtn.disabled = false;
-            modalBackBtn2.disabled = false;
-            modalNextBtn.disabled = true;
-            modalNextBtn2.disabled = true;
-        }
-        
-        function goToProductDetailsPage() {
-            if (!isMobileView) return;
-            
-            analyticsPage.classList.remove('active');
-            productDetailsPage.classList.add('active');
-            
-            currentPageIndicator.textContent = '1';
-            currentPageIndicator2.textContent = '1';
-            
-            modalBackBtn.disabled = true;
-            modalBackBtn2.disabled = true;
-            modalNextBtn.disabled = false;
-            modalNextBtn2.disabled = false;
         }
 
         // ========== INITIALIZE PAGE ========== //
@@ -3788,6 +3195,9 @@
                 bulkPricingBody.appendChild(row);
             });
             
+            // Generate quantity options
+            generateQuantityOptions(product);
+            
             // Generate reviews
             reviewsList.innerHTML = '';
             const numReviews = 3 + (product.id % 3); // 3-5 reviews per product
@@ -3823,9 +3233,98 @@
             document.body.style.overflow = 'hidden';
         }
 
+        // ========== SIZE SELECTION FUNCTIONS ========== //
+        function generateSizeGrid() {
+            sizeGrid.innerHTML = '';
+            const sizes = [38, 39, 40, 41, 42, 43, 44, 45, 46];
+            
+            sizes.forEach(size => {
+                const sizeOption = document.createElement('button');
+                sizeOption.className = 'size-option';
+                sizeOption.textContent = size;
+                sizeOption.dataset.size = size;
+                
+                sizeOption.addEventListener('click', function() {
+                    // Remove selected class from all size options
+                    sizeGrid.querySelectorAll('.size-option').forEach(option => {
+                        option.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    selectedSize = size;
+                });
+                
+                sizeGrid.appendChild(sizeOption);
+            });
+        }
+
+        // ========== MODAL PAGINATION FUNCTIONS ========== //
+        function setupModalPagination() {
+            // Check if we're in mobile view
+            isMobileView = window.innerWidth <= 768;
+            
+            if (isMobileView) {
+                // Hide analytics page initially
+                analyticsPage.classList.remove('active');
+                productDetailsPage.classList.add('active');
+                
+                // Reset to page 1 when modal opens
+                currentPageIndicator.textContent = '1';
+                currentPageIndicator2.textContent = '2';
+                
+                // Setup navigation buttons
+                modalNextBtn.addEventListener('click', goToAnalyticsPage);
+                modalNextBtn2.addEventListener('click', goToAnalyticsPage);
+                modalBackBtn.addEventListener('click', goToProductDetailsPage);
+                modalBackBtn2.addEventListener('click', goToProductDetailsPage);
+                
+                // Enable/disable buttons appropriately
+                modalBackBtn.disabled = true;
+                modalBackBtn2.disabled = false;
+                modalNextBtn.disabled = false;
+                modalNextBtn2.disabled = true;
+            } else {
+                // Desktop view - show both pages
+                analyticsPage.classList.add('active');
+                productDetailsPage.classList.add('active');
+            }
+        }
+        
+        function goToAnalyticsPage() {
+            if (!isMobileView) return;
+            
+            productDetailsPage.classList.remove('active');
+            analyticsPage.classList.add('active');
+            
+            currentPageIndicator.textContent = '2';
+            currentPageIndicator2.textContent = '2';
+            
+            modalBackBtn.disabled = false;
+            modalBackBtn2.disabled = false;
+            modalNextBtn.disabled = true;
+            modalNextBtn2.disabled = true;
+        }
+        
+        function goToProductDetailsPage() {
+            if (!isMobileView) return;
+            
+            analyticsPage.classList.remove('active');
+            productDetailsPage.classList.add('active');
+            
+            currentPageIndicator.textContent = '1';
+            currentPageIndicator2.textContent = '1';
+            
+            modalBackBtn.disabled = true;
+            modalBackBtn2.disabled = true;
+            modalNextBtn.disabled = false;
+            modalNextBtn2.disabled = false;
+        }
+
         // ========== CART FUNCTIONS ========== //
-        function addToCart(product, quantity = 1) {
-            const existingItem = cart.find(item => item.id === product.id);
+        function addToCart(product, quantity = 1, unitPrice = null) {
+            const priceToUse = unitPrice !== null ? unitPrice : product.price;
+            const existingItem = cart.find(item => item.id === product.id && item.unitPrice === priceToUse);
             
             if (existingItem) {
                 existingItem.quantity += quantity;
@@ -3833,9 +3332,10 @@
                 cart.push({
                     id: product.id,
                     name: product.name,
-                    price: product.price,
+                    price: priceToUse, // Use the custom unit price if provided
                     image: product.image,
-                    quantity: quantity
+                    quantity: quantity,
+                    unitPrice: priceToUse // Store the actual unit price used
                 });
             }
             
@@ -4028,8 +3528,9 @@
                 return;
             }
             
-            addToCart(currentProduct, 1);
-            showToast(`${currentProduct.name} added to cart!`, 'success');
+            // Use the selected quantity from the bulk selector
+            addToCart(currentProduct, currentSelectedQuantity, currentSelectedUnitPrice);
+            showToast(`${currentProduct.name} (${currentSelectedQuantity} units) added to cart!`, 'success');
         });
 
         // ========== TOAST MESSAGES ========== //
@@ -4227,6 +3728,94 @@
             
             whatsappCheckout.href = `https://wa.me/2348139583320?text=${message}`;
         });
+
+        // ========== ANALYTICS FUNCTIONS (Placeholders) ========== //
+        function generateAnalyticsSlides(product) {
+            // Simplified analytics slides generation
+            statsSlides.innerHTML = '';
+            slidePagination.innerHTML = '';
+            
+            const slideTemplates = [
+                {
+                    title: "📈 Purchase Frequency",
+                    chart: "line",
+                    description: "Monthly sales trend showing peak purchasing periods"
+                },
+                {
+                    title: "📊 Business KPIs",
+                    chart: "kpi",
+                    description: "Key performance indicators for this product"
+                },
+                {
+                    title: "🌍 Country Sales",
+                    chart: "countryBar",
+                    description: "Sales volume by country"
+                },
+                {
+                    title: "🔄 Inventory Turnover",
+                    chart: "doughnut",
+                    description: "Ratio of good vs stuck inventory stock"
+                },
+                {
+                    title: "💰 Revenue Sources",
+                    chart: "pie",
+                    description: "Revenue distribution across sales channels"
+                },
+                {
+                    title: "🏆 Performance Summary",
+                    chart: "composite",
+                    description: "Overall performance metrics and trust score"
+                }
+            ];
+            
+            slideTemplates.forEach((slide, index) => {
+                const slideEl = document.createElement('div');
+                slideEl.className = 'stats-slide';
+                slideEl.dataset.index = index;
+                
+                slideEl.innerHTML = `
+                    <div class="slide-title">
+                        <i class="${slide.chart === 'line' ? 'fas fa-chart-line' : 
+                                  slide.chart === 'kpi' ? 'fas fa-tachometer-alt' : 
+                                  slide.chart === 'countryBar' ? 'fas fa-globe-africa' : 
+                                  slide.chart === 'doughnut' ? 'fas fa-chart-pie' : 
+                                  slide.chart === 'pie' ? 'fas fa-chart-pie' : 
+                                  'fas fa-star'}"></i>
+                        ${slide.title}
+                    </div>
+                    <div class="chart-container" id="chart-${index}">
+                        <canvas></canvas>
+                    </div>
+                    <div class="insight-text" id="insight-${index}">
+                        Detailed analytics for ${product.name} show strong market performance with consistent growth and high customer satisfaction.
+                    </div>
+                `;
+                statsSlides.appendChild(slideEl);
+                
+                // Create pagination dot
+                const dot = document.createElement('div');
+                dot.className = 'slide-dot';
+                dot.dataset.index = index;
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    scrollToSlide(index);
+                });
+                slidePagination.appendChild(dot);
+            });
+            
+            // Initialize first slide
+            currentSlideIndex = 0;
+        }
+        
+        function scrollToSlide(index) {
+            const slide = statsSlides.querySelector(`.stats-slide[data-index="${index}"]`);
+            if (slide) {
+                statsSlides.scrollTo({
+                    left: slide.offsetLeft,
+                    behavior: 'smooth'
+                });
+            }
+        }
     </script>
 </body>
 </html>
