@@ -993,8 +993,8 @@
 
         .modal {
             background: var(--white);
-            width: 90%;
-            max-width: 900px;
+            width: 95%;
+            max-width: 1200px;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
@@ -1002,6 +1002,8 @@
             opacity: 0;
             transition: all 0.5s ease;
             border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 0;
         }
 
         .modal-overlay.active .modal {
@@ -1036,15 +1038,28 @@
         .modal-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            gap: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        .modal-image-section {
             padding: 40px;
+            background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
         }
 
         .modal-image {
-            height: 450px;
+            width: 100%;
+            height: 400px;
             overflow: hidden;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .modal-image img {
@@ -1058,13 +1073,29 @@
             transform: scale(1.05);
         }
 
+        .modal-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, var(--crimson), var(--brown));
+            color: var(--white);
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 2;
+            box-shadow: var(--shadow);
+            border-radius: 20px;
+        }
+
         .modal-details {
+            padding: 40px;
             display: flex;
             flex-direction: column;
+            background: var(--white);
         }
 
         .modal-title {
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin-bottom: 15px;
             color: var(--crimson-dark);
         }
@@ -1115,13 +1146,53 @@
             box-shadow: var(--glow);
         }
 
+        .quantity-selector {
+            margin-bottom: 25px;
+        }
+
+        .quantity-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--crimson-dark);
+        }
+
+        .quantity-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quantity-option {
+            padding: 10px 15px;
+            border: 1px solid var(--gray-light);
+            cursor: none;
+            transition: var(--transition);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .quantity-option:hover, .quantity-option.selected {
+            background: var(--crimson);
+            color: var(--white);
+            border-color: var(--crimson);
+        }
+
         .bulk-pricing {
             margin-bottom: 25px;
+        }
+
+        .bulk-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--crimson-dark);
         }
 
         .bulk-table {
             width: 100%;
             border-collapse: collapse;
+            background: rgba(165, 42, 42, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .bulk-table th, .bulk-table td {
@@ -1132,7 +1203,7 @@
 
         .bulk-table th {
             font-weight: 600;
-            background: rgba(165, 42, 42, 0.05);
+            background: rgba(165, 42, 42, 0.1);
             color: var(--crimson-dark);
         }
 
@@ -1154,17 +1225,84 @@
         .modal-actions {
             display: flex;
             gap: 15px;
-            margin-top: auto;
+            margin-top: 20px;
         }
 
-        /* Glassmorphism effect - increased opacity */
-        .modal-glass {
-            background: rgba(165, 42, 42, 0.25); /* Increased opacity */
-            backdrop-filter: blur(10px);
+        .btn-add-cart-modal, .btn-wishlist-modal {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: none;
             border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
+            font-size: 1rem;
+        }
+
+        .btn-add-cart-modal {
+            background: var(--crimson);
+            color: var(--white);
+        }
+
+        .btn-wishlist-modal {
+            background: var(--white);
             color: var(--crimson-dark);
+            border: 1px solid var(--crimson);
+        }
+
+        .btn-add-cart-modal:hover, .btn-wishlist-modal:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+
+        .btn-add-cart-modal:hover {
+            background: var(--accent);
+        }
+
+        .btn-wishlist-modal:hover {
+            background: var(--crimson);
+            color: var(--white);
+        }
+
+        .btn-wishlist-modal.active {
+            background: #ff4757;
+            color: var(--white);
+            border-color: #ff4757;
+        }
+
+        .product-specs {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(165, 42, 42, 0.1);
+        }
+
+        .specs-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--crimson-dark);
+        }
+
+        .specs-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(165, 42, 42, 0.05);
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: var(--crimson-dark);
+        }
+
+        .spec-value {
+            color: var(--gray);
         }
 
         .reviews-section {
@@ -2225,8 +2363,6 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
         // ========== INITIALIZATION ========== //
         // Initialize AOS
         AOS.init({
@@ -2864,9 +3000,15 @@
                 reviews.push(fakeReviews[Math.floor(Math.random() * fakeReviews.length)]);
             }
             
+            // Generate bulk pricing table
+            const bulkPricing = generateBulkPricing(product);
+            
             modalContent.innerHTML = `
-                <div class="modal-image">
-                    <img src="assets/images/${product.image}" alt="${product.name}">
+                <div class="modal-image-section">
+                    <div class="modal-image">
+                        <div class="modal-badge">-${product.displayDiscount}%</div>
+                        <img src="assets/images/${product.image}" alt="${product.name}">
+                    </div>
                 </div>
                 <div class="modal-details">
                     <h3 class="modal-title">${product.name}</h3>
@@ -2890,18 +3032,39 @@
                         </div>
                     </div>
                     
-                    <!-- Quantity selector in modal -->
                     <div class="quantity-selector">
-                        <button class="toggle-bulk-options">
-                            Bulk Options <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="quantity-options" style="display: none;">
+                        <div class="quantity-title">Select Quantity:</div>
+                        <div class="quantity-options">
                             <div class="quantity-option selected" data-qty="1">1 Unit</div>
                             <div class="quantity-option" data-qty="10">10 Units</div>
                             <div class="quantity-option" data-qty="25">25 Units</div>
                             <div class="quantity-option" data-qty="50">50 Units</div>
                             <div class="quantity-option" data-qty="100">100 Units</div>
                         </div>
+                    </div>
+                    
+                    <div class="bulk-pricing">
+                        <div class="bulk-title">Bulk Pricing</div>
+                        <table class="bulk-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Price per Unit</th>
+                                    <th>Total Price</th>
+                                    <th>Savings</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${bulkPricing.map(item => `
+                                    <tr>
+                                        <td>${item.quantity}</td>
+                                        <td>₦${item.pricePerUnit.toLocaleString()}</td>
+                                        <td>₦${item.totalPrice.toLocaleString()}</td>
+                                        <td>${item.savings > 0 ? '₦' + item.savings.toLocaleString() : '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>
                     
                     <div class="modal-actions">
@@ -2913,19 +3076,56 @@
                         </button>
                     </div>
                     
-                    <div class="product-reviews">
-                        <h4>Customer Reviews</h4>
+                    <div class="product-specs">
+                        <div class="specs-title">Product Specifications</div>
+                        <div class="specs-list">
+                            <div class="spec-item">
+                                <span class="spec-label">Material:</span>
+                                <span class="spec-value">Premium Leather</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Sole:</span>
+                                <span class="spec-value">Rubber</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Closure:</span>
+                                <span class="spec-value">Lace-up/Zipper</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Heel Height:</span>
+                                <span class="spec-value">2-4 inches</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Color:</span>
+                                <span class="spec-value">As shown</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Care:</span>
+                                <span class="spec-value">Wipe clean with damp cloth</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="reviews-section">
+                        <div class="reviews-title">Customer Reviews</div>
                         ${reviews.map(review => `
                             <div class="review">
                                 <div class="review-header">
-                                    <span class="reviewer">${review.user}</span>
-                                    <div class="stars">
+                                    <span class="review-user">${review.user}</span>
+                                    <div class="review-stars">
                                         ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
                                     </div>
                                 </div>
                                 <p class="review-text">${review.text}</p>
                             </div>
                         `).join('')}
+                        <div class="show-more-reviews">
+                            <a href="#">Show More Reviews</a>
+                        </div>
+                    </div>
+                    
+                    <div class="urgency-note">
+                        <i class="fas fa-exclamation-circle"></i> Limited stock available. Order now to avoid disappointment!
                     </div>
                 </div>
             `;
@@ -2940,11 +3140,33 @@
             }, 10);
         }
 
+        function generateBulkPricing(product) {
+            const bulkPricing = [
+                { quantity: 1, pricePerUnit: product.price, totalPrice: product.price, savings: 0 },
+                { quantity: 10, pricePerUnit: Math.round(product.price * 0.95), totalPrice: Math.round(product.price * 0.95) * 10, savings: Math.round(product.price * 0.05 * 10) },
+                { quantity: 25, pricePerUnit: Math.round(product.price * 0.90), totalPrice: Math.round(product.price * 0.90) * 25, savings: Math.round(product.price * 0.10 * 25) },
+                { quantity: 50, pricePerUnit: Math.round(product.price * 0.85), totalPrice: Math.round(product.price * 0.85) * 50, savings: Math.round(product.price * 0.15 * 50) },
+                { quantity: 100, pricePerUnit: Math.round(product.price * 0.80), totalPrice: Math.round(product.price * 0.80) * 100, savings: Math.round(product.price * 0.20 * 100) }
+            ];
+            
+            return bulkPricing;
+        }
+
         function setupModalInteractions() {
             // Size selection
             document.querySelectorAll('.size-option').forEach(option => {
                 option.addEventListener('click', function() {
                     document.querySelectorAll('.size-option').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Quantity selection
+            document.querySelectorAll('.quantity-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.quantity-option').forEach(el => {
                         el.classList.remove('selected');
                     });
                     this.classList.add('selected');
@@ -2991,25 +3213,6 @@
                     }
                 });
             }
-            
-            // Quantity options in modal
-            document.querySelectorAll('.quantity-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options
-                    this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
-                        el.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                });
-            });
-            
-            // Toggle bulk options in modal
-            document.querySelector('.toggle-bulk-options').addEventListener('click', function() {
-                const options = this.nextElementSibling;
-                options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
-            });
         }
 
         function closeModal() {
