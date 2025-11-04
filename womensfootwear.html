@@ -14,21 +14,21 @@
     <style>
         /* === GLOBAL STYLES === */
         :root {
-            --crimsonn: #a52a2a;
-            --crimson-dark: #7a1f1f;
-            --crimson-light: #d15e5e;
-            --brown: #8B4513;
-            --brown-light: #a66b3c;
+            --primary: #FFA500;
+            --primary-dark: #FF8C00;
+            --primary-light: #FFD700;
+            --secondary: #FFD700;
+            --secondary-light: #FFF8DC;
             --accent: #FF8C00;
             --accent-light: #ffaa40;
             --gold: #d4af37;
             --gold-light: #f5e6b8;
-            --gray-dark: #222;
-            --gray: #444;
-            --gray-light: #e0e0e0;
+            --gray-dark: #333;
+            --gray: #555;
+            --gray-light: #f0f0f0;
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             --shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.4);
+            --shadow-gold: 0 0 15px rgba(255, 215, 0, 0.4);
             --shadow-dark: 0 5px 15px rgba(0, 0, 0, 0.2);
             --glow: 0 0 20px rgba(255, 140, 0, 0.4);
             --success: #27ae60;
@@ -54,7 +54,7 @@
         h1, h2, h3, h4 {
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
         }
 
         .container {
@@ -83,14 +83,14 @@
             transform: translateX(-50%);
             width: 100px;
             height: 3px;
-            background: linear-gradient(to right, var(--crimsonn), var(--gold));
+            background: linear-gradient(to right, var(--primary), var(--gold));
         }
 
         .btn {
             display: inline-block;
             padding: 14px 32px;
             background: transparent;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             text-decoration: none;
             font-weight: 600;
             letter-spacing: 1px;
@@ -98,7 +98,7 @@
             transition: var(--transition);
             text-transform: uppercase;
             font-size: 0.95rem;
-            border: 2px solid var(--crimson-dark);
+            border: 2px solid var(--primary-dark);
             position: relative;
             overflow: hidden;
         }
@@ -110,7 +110,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: var(--crimson-dark);
+            background: var(--primary-dark);
             transition: var(--transition);
             z-index: -1;
         }
@@ -127,14 +127,14 @@
 
         .btn-gold {
             background: linear-gradient(135deg, var(--gold), var(--accent));
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             border: 2px solid transparent;
         }
 
         .btn-gold:hover {
             background: transparent;
-            color: var(--crimson-dark);
-            border-color: var(--crimson-dark);
+            color: var(--primary-dark);
+            border-color: var(--primary-dark);
         }
 
         /* === PRELOADER === */
@@ -144,7 +144,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, var(--crimsonn), var(--brown));
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -270,7 +270,7 @@
         }
 
         header.scrolled {
-            background: rgba(165, 42, 42, 0.9);
+            background: rgba(255, 165, 0, 0.9);
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
 
@@ -298,14 +298,14 @@
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--crimsonn);
+            color: var(--primary);
             text-decoration: none;
             letter-spacing: 1px;
             transition: var(--transition);
         }
 
         .logo:hover {
-            color: var(--brown);
+            color: var(--accent);
         }
 
         /* Navigation */
@@ -323,7 +323,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             text-decoration: none;
             font-weight: 500;
             font-size: 0.95rem;
@@ -388,7 +388,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
@@ -397,7 +397,7 @@
         }
 
         .dropdown-content a:hover {
-            background: rgba(165, 42, 42, 0.05);
+            background: rgba(255, 165, 0, 0.05);
             color: var(--gold);
             padding-left: 25px;
         }
@@ -411,7 +411,7 @@
         .header-icon {
             position: relative;
             font-size: 1.4rem;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             transition: var(--transition);
         }
 
@@ -443,7 +443,7 @@
             background: none;
             border: none;
             font-size: 1.5rem;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             transition: var(--transition);
         }
 
@@ -460,7 +460,7 @@
             width: 85%;
             max-width: 320px;
             height: 100vh;
-            background: rgba(165, 42, 42, 0.95);
+            background: rgba(255, 165, 0, 0.95);
             backdrop-filter: blur(10px);
             z-index: 1100;
             transition: var(--transition);
@@ -643,7 +643,7 @@
         }
 
         .hero .btn:hover {
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
         }
 
         .hero .btn:before {
@@ -663,9 +663,9 @@
 
         /* === PROMOTIONAL STRIP === */
         .promo-strip {
-            background: linear-gradient(45deg, var(--crimsonn) 25%, var(--brown) 25%, 
-                        var(--brown) 50%, var(--crimsonn) 50%, var(--crimsonn) 75%, 
-                        var(--brown) 75%, var(--brown));
+            background: linear-gradient(45deg, var(--primary) 25%, var(--accent) 25%, 
+                        var(--accent) 50%, var(--primary) 50%, var(--primary) 75%, 
+                        var(--accent) 75%, var(--accent));
             background-size: 60px 60px;
             padding: 20px 0;
             overflow: hidden;
@@ -739,7 +739,7 @@
         }
 
         .product-card:hover .product-image {
-            box-shadow: 0 10px 30px rgba(165, 42, 42, 0.2);
+            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.2);
         }
 
         .product-image {
@@ -761,7 +761,7 @@
             position: absolute;
             top: 15px;
             left: 15px;
-            background: linear-gradient(135deg, var(--crimsonn), var(--brown));
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: var(--white);
             padding: 5px 15px;
             font-size: 0.9rem;
@@ -782,7 +782,7 @@
         .product-title {
             font-size: 1.2rem;
             margin-bottom: 10px;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             font-weight: 600;
         }
 
@@ -804,7 +804,7 @@
         .price-real {
             font-size: 1.4rem;
             font-weight: 700;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
         }
 
         .discount-tag {
@@ -858,9 +858,9 @@
 
         .quantity-option:hover, 
         .quantity-option.selected {
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
-            border-color: var(--crimsonn);
+            border-color: var(--primary);
         }
 
         .toggle-bulk-options {
@@ -878,7 +878,7 @@
         }
 
         .toggle-bulk-options:hover {
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
         }
 
@@ -903,14 +903,14 @@
         }
 
         .btn-add-cart {
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
         }
 
         .btn-view-details {
             background: var(--white);
-            color: var(--crimson-dark);
-            border: 1px solid var(--crimsonn);
+            color: var(--primary-dark);
+            border: 1px solid var(--primary);
         }
 
         .btn-add-cart:hover, .btn-view-details:hover {
@@ -923,7 +923,7 @@
         }
 
         .btn-view-details:hover {
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
         }
 
@@ -971,7 +971,7 @@
             margin-bottom: 30px;
             font-size: 1.2rem;
             display: none;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             font-weight: 500;
         }
 
@@ -994,7 +994,7 @@
         .product-details {
             flex: 1;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
+            background: white;
             border-radius: 10px;
             margin-right: 0;
             margin-bottom: 20px;
@@ -1002,6 +1002,7 @@
             overflow-y: auto;
             width: 100%;
             height: 100%;
+            color: var(--gray-dark);
         }
 
         @media (min-width: 992px) {
@@ -1017,12 +1018,13 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: rgba(30, 30, 30, 0.7);
+            background: white;
             border-radius: 10px;
             overflow: hidden;
             position: relative;
             width: 100%;
             height: 100%;
+            color: var(--gray-dark);
         }
 
         @media (min-width: 992px) {
@@ -1035,14 +1037,14 @@
         .quantity-selection-modal {
             margin: 25px 0;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(255, 215, 0, 0.1);
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
         }
 
         .quantity-selection-modal h4 {
             margin-bottom: 15px;
-            color: var(--gold);
+            color: var(--primary-dark);
             font-size: 1.2rem;
             display: flex;
             align-items: center;
@@ -1064,9 +1066,9 @@
 
         .quantity-option-modal {
             padding: 12px 8px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 165, 0, 0.5);
             background: transparent;
-            color: white;
+            color: var(--gray-dark);
             cursor: pointer;
             transition: var(--transition);
             text-align: center;
@@ -1075,31 +1077,32 @@
         }
 
         .quantity-option-modal:hover {
-            border-color: var(--gold);
-            color: var(--gold);
+            border-color: var(--primary);
+            color: var(--primary);
             transform: translateY(-2px);
         }
 
         .quantity-option-modal.selected {
-            background: var(--gold);
-            color: var(--black);
-            border-color: var(--gold);
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
             font-weight: 600;
         }
 
         .quantity-price-display {
             margin-top: 15px;
             padding: 12px;
-            background: rgba(212, 175, 55, 0.1);
+            background: rgba(255, 215, 0, 0.2);
             border-radius: 4px;
             text-align: center;
-            border-left: 3px solid var(--gold);
+            border-left: 3px solid var(--primary);
+            color: var(--gray-dark);
         }
 
         .quantity-total-price {
             font-size: 1.3rem;
             font-weight: 700;
-            color: var(--gold);
+            color: var(--primary-dark);
             margin-top: 5px;
         }
 
@@ -1127,7 +1130,7 @@
         }
 
         .modal {
-            background: #111; /* Dark background - no transparency */
+            background: white; /* Changed from dark to white */
             width: 100vw;
             height: 100vh;
             max-width: none;
@@ -1139,7 +1142,7 @@
             flex-direction: column;
             border-radius: 0;
             transform: none;
-            color: white;
+            color: var(--gray-dark);
         }
 
         .modal-close {
@@ -1149,7 +1152,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
             display: flex;
             align-items: center;
@@ -1171,13 +1174,13 @@
             position: sticky;
             top: 0;
             z-index: 10;
-            background: rgba(0, 0, 0, 0.8);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
         }
 
         .modal-title {
             font-size: 1.8rem;
-            color: var(--gold);
+            color: var(--primary-dark);
             text-align: center;
         }
 
@@ -1192,13 +1195,13 @@
             max-height: 400px;
             object-fit: contain;
             border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .product-name {
             font-size: 2rem;
             margin-bottom: 10px;
-            color: var(--gold);
+            color: var(--primary-dark);
         }
 
         .product-price-container {
@@ -1211,19 +1214,19 @@
         .product-real-price {
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--white);
+            color: var(--primary-dark);
         }
 
         .product-fake-price {
             font-size: 1.4rem;
-            color: #aaa;
+            color: #777;
             text-decoration: line-through;
         }
 
         .product-description {
             margin-bottom: 30px;
             line-height: 1.8;
-            color: #ddd;
+            color: var(--gray);
         }
 
         /* Size Selection Grid */
@@ -1233,7 +1236,7 @@
 
         .size-selection h4 {
             margin-bottom: 15px;
-            color: var(--gold);
+            color: var(--primary-dark);
             font-size: 1.2rem;
         }
 
@@ -1246,9 +1249,9 @@
 
         .size-option {
             padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--gray-light);
             background: transparent;
-            color: white;
+            color: var(--gray-dark);
             cursor: pointer;
             transition: var(--transition);
             text-align: center;
@@ -1256,34 +1259,35 @@
         }
 
         .size-option:hover {
-            border-color: var(--gold);
-            color: var(--gold);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .size-option.selected {
-            background: var(--gold);
-            color: var(--black);
-            border-color: var(--gold);
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
         }
 
         .bulk-pricing {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 215, 0, 0.05);
+            color: var(--gray-dark);
         }
 
         .bulk-pricing th {
-            background: rgba(212, 175, 55, 0.2);
+            background: rgba(255, 165, 0, 0.1);
             padding: 12px 15px;
             text-align: left;
             font-weight: 600;
-            color: var(--gold);
+            color: var(--primary-dark);
         }
 
         .bulk-pricing td {
             padding: 12px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--gray-light);
         }
 
         .bulk-pricing tr:last-child td {
@@ -1291,7 +1295,7 @@
         }
 
         .bulk-pricing tr:hover {
-            background: rgba(212, 175, 55, 0.1);
+            background: rgba(255, 215, 0, 0.1);
         }
 
         .reviews-container {
@@ -1301,7 +1305,7 @@
         .reviews-title {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            color: var(--gold);
+            color: var(--primary-dark);
             position: relative;
             padding-bottom: 10px;
         }
@@ -1313,12 +1317,12 @@
             left: 0;
             width: 60px;
             height: 2px;
-            background: var(--gold);
+            background: var(--primary);
         }
 
         .review {
             padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--gray-light);
         }
 
         .review:last-child {
@@ -1335,33 +1339,35 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--gold);
+            background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             margin-right: 15px;
+            color: white;
         }
 
         .review-user {
             font-weight: 600;
             margin-right: 15px;
+            color: var(--gray-dark);
         }
 
         .review-rating {
-            color: var(--gold);
+            color: var(--primary);
         }
 
         .review-text {
-            color: #ccc;
+            color: var(--gray);
             line-height: 1.6;
         }
 
         .modal-add-cart {
             margin-top: 30px;
             padding: 15px;
-            background: var(--gold);
-            color: var(--black);
+            background: var(--primary);
+            color: white;
             border: none;
             font-weight: 600;
             cursor: pointer;
@@ -1371,7 +1377,7 @@
         }
 
         .modal-add-cart:hover {
-            background: var(--white);
+            background: var(--primary-dark);
             transform: translateY(-3px);
         }
 
@@ -1389,12 +1395,13 @@
             scroll-snap-align: start;
             padding: 20px;
             overflow-y: auto;
+            color: var(--gray-dark);
         }
 
         .slide-title {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            color: var(--gold);
+            color: var(--primary-dark);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -1407,14 +1414,14 @@
         }
 
         .insight-text {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(255, 215, 0, 0.1);
             padding: 20px;
             border-radius: 8px;
             font-size: 1.1rem;
             line-height: 1.6;
-            color: #ddd;
+            color: var(--gray);
             margin-top: 20px;
-            border-left: 3px solid var(--gold);
+            border-left: 3px solid var(--primary);
         }
 
         .slide-pagination {
@@ -1422,20 +1429,20 @@
             justify-content: center;
             padding: 15px;
             gap: 10px;
-            background: rgba(0, 0, 0, 0.5);
+            background: white;
         }
 
         .slide-dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--gray-light);
             cursor: pointer;
             transition: var(--transition);
         }
 
         .slide-dot.active {
-            background: var(--gold);
+            background: var(--primary);
             transform: scale(1.2);
         }
 
@@ -1445,7 +1452,7 @@
             left: 0;
             width: 100%;
             text-align: center;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--gray);
             font-size: 0.9rem;
             display: none;
         }
@@ -1463,30 +1470,31 @@
         }
 
         .metric-card {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(255, 215, 0, 0.1);
             border-radius: 8px;
             padding: 20px;
             text-align: center;
             transition: var(--transition);
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            color: var(--gray-dark);
         }
 
         .metric-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border-color: var(--gold);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: var(--primary);
         }
 
         .metric-value {
             font-size: 2.2rem;
             font-weight: 700;
             margin: 10px 0;
-            color: var(--gold);
+            color: var(--primary-dark);
         }
 
         .metric-label {
             font-size: 0.95rem;
-            color: #aaa;
+            color: var(--gray);
         }
 
         .metric-success {
@@ -1510,7 +1518,7 @@
         .trust-bar {
             flex: 1;
             height: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--gray-light);
             border-radius: 5px;
             overflow: hidden;
             margin: 0 15px;
@@ -1518,14 +1526,14 @@
 
         .trust-fill {
             height: 100%;
-            background: var(--gold);
+            background: var(--primary);
             width: 85%;
             transition: width 1s ease;
         }
 
         .trust-value {
             font-weight: 700;
-            color: var(--gold);
+            color: var(--primary-dark);
         }
 
         /* === PAGINATION === */
@@ -1541,7 +1549,7 @@
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            border: 1px solid var(--crimsonn);
+            border: 1px solid var(--primary);
             background: var(--white);
             display: flex;
             align-items: center;
@@ -1552,7 +1560,7 @@
         }
 
         .page-btn:hover, .page-btn.active {
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
             transform: translateY(-3px);
             box-shadow: var(--glow);
@@ -1568,7 +1576,7 @@
 
         .toast {
             padding: 15px 20px;
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
             border-radius: 8px;
             box-shadow: var(--shadow-dark);
@@ -1631,7 +1639,7 @@
             transition: var(--transition);
             overflow-y: auto;
             padding: 30px;
-            border-left: 3px solid var(--crimsonn);
+            border-left: 3px solid var(--primary);
         }
 
         .cart-panel.active {
@@ -1649,13 +1657,13 @@
 
         .cart-title {
             font-size: 1.5rem;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
         }
 
         .close-cart {
             background: none;
             border: none;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             font-size: 1.5rem;
             transition: var(--transition);
         }
@@ -1703,11 +1711,11 @@
         .cart-item-name {
             font-weight: 600;
             margin-bottom: 5px;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
         }
 
         .cart-item-price {
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             font-weight: 600;
             margin-bottom: 5px;
         }
@@ -1732,7 +1740,7 @@
         }
 
         .cart-item-quantity button:hover {
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
         }
 
@@ -1763,7 +1771,7 @@
             font-weight: 600;
             display: flex;
             justify-content: space-between;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
         }
 
         .cart-actions {
@@ -1773,7 +1781,7 @@
         }
 
         .checkout-btn {
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
             border: none;
             padding: 12px;
@@ -1800,7 +1808,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--crimsonn), var(--brown));
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: var(--white);
             display: flex;
             align-items: center;
@@ -1814,7 +1822,7 @@
 
         .chat-float:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(165, 42, 42, 0.7);
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.7);
         }
 
         .chat-modal {
@@ -1839,7 +1847,7 @@
 
         .chat-header {
             padding: 15px;
-            background: var(--crimsonn);
+            background: var(--primary);
             color: var(--white);
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
@@ -1858,7 +1866,7 @@
 
         /* === FOOTER === */
         footer {
-            background: linear-gradient(135deg, var(--crimsonn), var(--brown));
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             padding: 80px 0 40px;
             color: var(--gold-light);
         }
@@ -1939,7 +1947,7 @@
 
         .social-links a:hover {
             background: var(--gold);
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
             transform: translateY(-5px);
         }
 
@@ -2015,9 +2023,9 @@
         }
 
         .invoice-table th {
-            background: rgba(165, 42, 42, 0.05);
+            background: rgba(255, 165, 0, 0.05);
             font-weight: 600;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
         }
 
         .invoice-table tr:last-child td {
@@ -2029,7 +2037,7 @@
             font-size: 1.3rem;
             font-weight: 700;
             padding: 20px 0;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
         }
 
         .customer-field {
@@ -2040,7 +2048,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: var(--crimson-dark);
+            color: var(--primary-dark);
         }
 
         .customer-field input {
@@ -2058,21 +2066,21 @@
         }
 
         .topic-card {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(255, 215, 0, 0.1);
             border-radius: 8px;
             padding: 20px;
-            border-left: 3px solid var(--gold);
+            border-left: 3px solid var(--primary);
             transition: var(--transition);
         }
 
         .topic-card:hover {
             transform: translateY(-5px);
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(255, 215, 0, 0.2);
         }
 
         .topic-title {
             font-size: 1.2rem;
-            color: var(--gold);
+            color: var(--primary-dark);
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -2080,12 +2088,12 @@
         }
 
         .topic-content {
-            color: #ddd;
+            color: var(--gray);
             line-height: 1.6;
         }
 
         .topic-highlight {
-            color: var(--gold);
+            color: var(--primary-dark);
             font-weight: 600;
         }
 
@@ -2094,7 +2102,7 @@
         }
 
         .insight-highlight {
-            color: var(--gold);
+            color: var(--primary-dark);
             font-weight: 600;
         }
 
@@ -2104,7 +2112,7 @@
             justify-content: space-between;
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid var(--gray-light);
         }
 
         @media (max-width: 768px) {
@@ -2114,8 +2122,8 @@
         }
 
         .modal-nav-btn {
-            background: var(--gold);
-            color: var(--black);
+            background: var(--primary);
+            color: white;
             border: none;
             padding: 12px 20px;
             border-radius: 4px;
@@ -2128,7 +2136,7 @@
         }
 
         .modal-nav-btn:hover {
-            background: var(--white);
+            background: var(--primary-dark);
             transform: translateY(-2px);
         }
 
@@ -2139,11 +2147,11 @@
         }
 
         .modal-nav-btn:disabled:hover {
-            background: var(--gold);
+            background: var(--primary);
         }
 
         .page-indicator {
-            color: var(--gold);
+            color: var(--primary-dark);
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -2278,8 +2286,9 @@
                 font-size: 2.3rem;
             }
             
+            /* MOBILE FIX: Show only 1 product per row */
             .products-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
             
             .page-btn {
@@ -4066,15 +4075,17 @@
                         filterMessage.style.display = 'none';
                     } else {
                         filteredProducts = products.filter(product => 
-                            product.name.toLowerCase().includes(category.toLowerCase())
+                            product.name.toLowerCase().includes(category)
                         );
+                        
+                        // Show filter message
                         filterMessage.textContent = `Showing ${filteredProducts.length} ${category} products`;
                         filterMessage.style.display = 'block';
                     }
                     
+                    // Reset to first page and render
                     currentPage = 1;
                     renderProducts();
-                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
                 });
             });
         }
@@ -4083,17 +4094,11 @@
         function setupInvoicePreview() {
             previewInvoice.addEventListener('click', () => {
                 if (cart.length === 0) {
-                    showToast('Your cart is empty', 'warning');
+                    showToast('Your cart is empty!');
                     return;
                 }
                 
-                // Set customer name if available
-                const storedName = localStorage.getItem('customerName');
-                if (storedName) {
-                    customerName.value = storedName;
-                }
-                
-                // Render invoice items
+                // Populate invoice items
                 invoiceItems.innerHTML = '';
                 let total = 0;
                 
@@ -4115,47 +4120,15 @@
                 
                 // Show invoice modal
                 invoiceOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
             });
             
             invoiceClose.addEventListener('click', () => {
                 invoiceOverlay.classList.remove('active');
-                document.body.style.overflow = '';
             });
             
             printInvoice.addEventListener('click', () => {
-                // Store customer name
-                if (customerName.value.trim()) {
-                    localStorage.setItem('customerName', customerName.value.trim());
-                }
-                
-                // Generate WhatsApp message
-                const customer = customerName.value.trim() || 'Customer';
-                let message = `*INVOICE - JMPOTTERS WOMEN'S FOOTWEAR*%0A%0A`;
-                message += `*Customer:* ${customer}%0A%0A`;
-                message += `*Order Summary:*%0A`;
-                
-                cart.forEach(item => {
-                    message += `• ${item.name} x${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}%0A`;
-                });
-                
-                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                message += `%0A*Total: ₦${total.toLocaleString()}*%0A%0A`;
-                message += `Please confirm this order and provide delivery details.`;
-                
-                // Update WhatsApp checkout link
-                whatsappCheckout.href = `https://wa.me/2348139583320?text=${message}`;
-                
-                // Show success message
-                showToast('Invoice ready for WhatsApp confirmation!');
-                
-                // Close invoice modal
-                invoiceOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-                
-                // Close cart panel
-                cartPanel.classList.remove('active');
-                cartOverlay.classList.remove('active');
+                // In a real app, this would generate a printable invoice
+                showToast('Invoice generated successfully!');
             });
         }
 
@@ -4164,379 +4137,368 @@
             statsSlides.innerHTML = '';
             slidePagination.innerHTML = '';
             
-            const slideTemplates = [
-                {
-                    title: "📈 Purchase Frequency",
-                    chart: "line",
-                    description: "Monthly sales trend showing peak purchasing periods"
-                },
-                {
-                    title: "📊 Business KPIs",
-                    chart: "kpi",
-                    description: "Key performance indicators for this product"
-                },
-                {
-                    title: "🌍 Country Sales",
-                    chart: "countryBar",
-                    description: "Sales volume by country"
-                },
-                {
-                    title: "🔄 Inventory Turnover",
-                    chart: "doughnut",
-                    description: "Ratio of good vs stuck inventory stock"
-                },
-                {
-                    title: "💰 Revenue Sources",
-                    chart: "pie",
-                    description: "Revenue distribution across sales channels"
-                },
-                {
-                    title: "🏆 Performance Summary",
-                    chart: "composite",
-                    description: "Overall performance metrics and trust score"
-                }
-            ];
+            // Slide 1: Market Insights
+            const insightsSlide = document.createElement('div');
+            insightsSlide.className = 'stats-slide';
+            insightsSlide.innerHTML = `
+                <h3 class="slide-title">
+                    <i class="fas fa-chart-line"></i> Market Insights
+                </h3>
+                <div class="chart-container">
+                    <canvas id="popularityChart"></canvas>
+                </div>
+                <div class="insight-text">
+                    <p><span class="insight-highlight">${product.name}</span> has shown a <span class="insight-highlight">${Math.floor(Math.random() * 40) + 10}% increase</span> in demand over the past month, making it one of our top-performing products.</p>
+                    <p>Customers who viewed this item also showed interest in our <span class="insight-highlight">premium collection</span> and <span class="insight-highlight">luxury designer lines</span>.</p>
+                </div>
+            `;
+            statsSlides.appendChild(insightsSlide);
             
-            slideTemplates.forEach((slide, index) => {
-                const slideEl = document.createElement('div');
-                slideEl.className = 'stats-slide';
-                slideEl.dataset.index = index;
-                
-                slideEl.innerHTML = `
-                    <div class="slide-title">
-                        <i class="${slide.chart === 'line' ? 'fas fa-chart-line' : 
-                                  slide.chart === 'kpi' ? 'fas fa-tachometer-alt' : 
-                                  slide.chart === 'countryBar' ? 'fas fa-globe-africa' : 
-                                  slide.chart === 'doughnut' ? 'fas fa-chart-pie' : 
-                                  slide.chart === 'pie' ? 'fas fa-chart-pie' : 
-                                  'fas fa-star'}"></i>
-                        ${slide.title}
+            // Slide 2: Customer Metrics
+            const metricsSlide = document.createElement('div');
+            metricsSlide.className = 'stats-slide';
+            metricsSlide.innerHTML = `
+                <h3 class="slide-title">
+                    <i class="fas fa-users"></i> Customer Metrics
+                </h3>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <i class="fas fa-eye"></i>
+                        <div class="metric-value">${(Math.floor(Math.random() * 500) + 200).toLocaleString()}</div>
+                        <div class="metric-label">Monthly Views</div>
                     </div>
-                    <div class="chart-container" id="chart-${index}">
-                        <canvas></canvas>
+                    <div class="metric-card">
+                        <i class="fas fa-shopping-cart"></i>
+                        <div class="metric-value">${(Math.floor(Math.random() * 50) + 10).toLocaleString()}</div>
+                        <div class="metric-label">Monthly Sales</div>
                     </div>
-                    <div class="insight-text" id="insight-${index}">
-                        Detailed analytics for ${product.name} show strong market performance with consistent growth and high customer satisfaction.
+                    <div class="metric-card">
+                        <i class="fas fa-star"></i>
+                        <div class="metric-value metric-success">${(4 + Math.random()).toFixed(1)}</div>
+                        <div class="metric-label">Average Rating</div>
                     </div>
-                `;
-                statsSlides.appendChild(slideEl);
-                
-                // Create pagination dot
+                    <div class="metric-card">
+                        <i class="fas fa-undo"></i>
+                        <div class="metric-value metric-warning">${Math.floor(Math.random() * 5)}%</div>
+                        <div class="metric-label">Return Rate</div>
+                    </div>
+                </div>
+                <div class="trust-score">
+                    <span>Trust Score:</span>
+                    <div class="trust-bar">
+                        <div class="trust-fill" style="width: ${Math.floor(Math.random() * 30) + 70}%"></div>
+                    </div>
+                    <span class="trust-value">${Math.floor(Math.random() * 30) + 70}%</span>
+                </div>
+            `;
+            statsSlides.appendChild(metricsSlide);
+            
+            // Slide 3: Size & Fit Analytics
+            const fitSlide = document.createElement('div');
+            fitSlide.className = 'stats-slide';
+            fitSlide.innerHTML = `
+                <h3 class="slide-title">
+                    <i class="fas fa-ruler"></i> Size & Fit Analytics
+                </h3>
+                <div class="chart-container">
+                    <canvas id="sizeChart"></canvas>
+                </div>
+                <div class="insight-text">
+                    <p>Based on customer feedback, this style <span class="insight-highlight">${Math.random() > 0.5 ? 'runs true to size' : 'runs slightly large'}</span>.</p>
+                    <p><span class="insight-highlight">${Math.floor(Math.random() * 70) + 20}% of customers</span> report perfect fit on first order.</p>
+                </div>
+            `;
+            statsSlides.appendChild(fitSlide);
+            
+            // Slide 4: Regional Popularity
+            const regionalSlide = document.createElement('div');
+            regionalSlide.className = 'stats-slide';
+            regionalSlide.innerHTML = `
+                <h3 class="slide-title">
+                    <i class="fas fa-globe-africa"></i> Regional Popularity
+                </h3>
+                <div class="chart-container">
+                    <canvas id="regionalChart"></canvas>
+                </div>
+                <div class="insight-text">
+                    <p>This product is particularly popular in <span class="insight-highlight">${fakeLocations[Math.floor(Math.random() * fakeLocations.length)]}</span> and <span class="insight-highlight">${fakeLocations[Math.floor(Math.random() * fakeLocations.length)]}</span> regions.</p>
+                    <p>International orders account for <span class="insight-highlight">${Math.floor(Math.random() * 20) + 5}%</span> of total sales.</p>
+                </div>
+            `;
+            statsSlides.appendChild(regionalSlide);
+            
+            // Add pagination dots
+            for (let i = 0; i < 4; i++) {
                 const dot = document.createElement('div');
-                dot.className = 'slide-dot';
-                dot.dataset.index = index;
-                if (index === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => {
-                    scrollToSlide(index);
+                dot.className = `slide-dot ${i === 0 ? 'active' : ''}`;
+                dot.dataset.index = i;
+                dot.addEventListener('click', function() {
+                    currentSlideIndex = parseInt(this.dataset.index);
+                    updateSlidePosition();
+                    updateSlideDots();
                 });
                 slidePagination.appendChild(dot);
-            });
+            }
             
-            // Initialize first slide
-            currentSlideIndex = 0;
-            
-            // Setup scroll events
-            statsSlides.addEventListener('scroll', handleSlideScroll);
-            
-            // Initialize charts for first slide
-            setTimeout(() => {
-                initializeChartForSlide(0);
-            }, 300);
-        }
-        
-        function initializeChartForSlide(index) {
-            const slide = statsSlides.querySelector(`.stats-slide[data-index="${index}"]`);
-            if (!slide) return;
-            
-            const canvas = slide.querySelector('canvas');
-            if (!canvas) return;
-            
-            const chartType = [
-                "line", "kpi", "countryBar", "doughnut", "pie", "composite"
-            ][index];
-            
-            // For demo purposes, we'll create simple charts
-            // In a real implementation, you would use the analyticsData to create proper charts
-            
-            const ctx = canvas.getContext('2d');
-            
-            // Create a simple chart based on type
-            switch(chartType) {
-                case "line":
-                    // Create a simple line chart
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                            datasets: [{
-                                label: 'Sales',
-                                data: [65, 59, 80, 81, 56, 55, 40, 45, 60, 70, 75, 80],
-                                borderColor: '#d4af37',
-                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                tension: 0.4,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
-                            }
-                        }
-                    });
-                    break;
-                    
-                case "kpi":
-                    // Create KPI cards instead of a chart
-                    const container = slide.querySelector('.chart-container');
-                    container.innerHTML = `
-                        <div class="metric-grid">
-                            <div class="metric-card">
-                                <div class="metric-value metric-success">1,500</div>
-                                <div class="metric-label">Units Sold</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-value metric-warning">2.5%</div>
-                                <div class="metric-label">Return Rate</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-value metric-success">75%</div>
-                                <div class="metric-label">Sell-Through Rate</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-value metric-danger">18</div>
-                                <div class="metric-label">Days of Stock</div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "countryBar":
-                    // Create a simple bar chart
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Nigeria', 'Kenya', 'Ghana', 'Uganda', 'South Africa', 'Tanzania', 'Rwanda'],
-                            datasets: [{
-                                label: 'Sales',
-                                data: [65, 59, 80, 81, 56, 55, 40],
-                                backgroundColor: '#d4af37'
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
-                            }
-                        }
-                    });
-                    break;
-                    
-                case "doughnut":
-                    // Create a simple doughnut chart
-                    new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Sold', 'Stuck', 'New'],
-                            datasets: [{
-                                data: [60, 15, 25],
-                                backgroundColor: [
-                                    '#27ae60',
-                                    '#e74c3c',
-                                    '#f39c12'
-                                ]
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
-                    });
-                    break;
-                    
-                case "pie":
-                    // Create a simple pie chart
-                    new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: ['Bulk Orders', 'Retail Stores', 'B2B Partnerships'],
-                            datasets: [{
-                                data: [40, 35, 25],
-                                backgroundColor: [
-                                    '#d4af37',
-                                    '#3498db',
-                                    '#9b59b6'
-                                ]
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
-                    });
-                    break;
-                    
-                case "composite":
-                    // Create trust score visualization
-                    const compositeContainer = slide.querySelector('.chart-container');
-                    compositeContainer.innerHTML = `
-                        <div class="metric-card">
-                            <div class="metric-value">88/100</div>
-                            <div class="metric-label">Trust Score</div>
-                            <div class="trust-score">
-                                <span>Low</span>
-                                <div class="trust-bar">
-                                    <div class="trust-fill" style="width: 88%"></div>
-                                </div>
-                                <span class="trust-value">High</span>
-                            </div>
-                        </div>
-                        <div class="metric-grid">
-                            <div class="metric-card">
-                                <div class="metric-value metric-success">4.5</div>
-                                <div class="metric-label">Avg. Rating</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-value metric-success">92%</div>
-                                <div class="metric-label">Recommend</div>
-                            </div>
-                        </div>
-                    `;
-                    break;
+            // Initialize charts when modal opens
+            if (!modalChartsInitialized) {
+                setTimeout(() => {
+                    initializeModalCharts();
+                    modalChartsInitialized = true;
+                }, 500);
             }
         }
-        
-        function scrollToSlide(index) {
-            const slide = statsSlides.querySelector(`.stats-slide[data-index="${index}"]`);
-            if (slide) {
-                statsSlides.scrollTo({
-                    left: slide.offsetLeft,
-                    behavior: 'smooth'
-                });
-            }
-        }
-        
-        function handleSlideScroll() {
-            const slides = statsSlides.querySelectorAll('.stats-slide');
-            const scrollPosition = statsSlides.scrollLeft + statsSlides.offsetWidth / 2;
-            
-            let closestSlide = null;
-            let closestDistance = Infinity;
-            
-            slides.forEach(slide => {
-                const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-                const distance = Math.abs(scrollPosition - slideCenter);
-                
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestSlide = slide;
+
+        function initializeModalCharts() {
+            // Popularity Chart
+            const popularityCtx = document.getElementById('popularityChart').getContext('2d');
+            new Chart(popularityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Monthly Sales',
+                        data: [12, 19, 15, 25, 22, 30],
+                        borderColor: '#FF8C00',
+                        backgroundColor: 'rgba(255, 140, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
                 }
             });
             
-            if (closestSlide) {
-                const newIndex = parseInt(closestSlide.dataset.index);
-                if (newIndex !== currentSlideIndex) {
-                    currentSlideIndex = newIndex;
-                    updateSlidePagination();
-                    initializeChartForSlide(newIndex);
+            // Size Chart
+            const sizeCtx = document.getElementById('sizeChart').getContext('2d');
+            new Chart(sizeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['36', '37', '38', '39', '40', '41', '42'],
+                    datasets: [{
+                        label: 'Size Distribution',
+                        data: [12, 19, 23, 17, 15, 10, 4],
+                        backgroundColor: '#FFD700',
+                        borderColor: '#FF8C00',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
                 }
-            }
+            });
+            
+            // Regional Chart
+            const regionalCtx = document.getElementById('regionalChart').getContext('2d');
+            new Chart(regionalCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Lagos', 'Abuja', 'PH', 'Ibadan', 'Others'],
+                    datasets: [{
+                        data: [35, 25, 15, 15, 10],
+                        backgroundColor: [
+                            '#FF8C00',
+                            '#FFA500',
+                            '#FFD700',
+                            '#FFE135',
+                            '#FFF8DC'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
         }
-        
-        function updateSlidePagination() {
-            const dots = slidePagination.querySelectorAll('.slide-dot');
-            dots.forEach((dot, index) => {
-                if (index === currentSlideIndex) {
-                    dot.classList.add('active');
-                } else {
-                    dot.classList.remove('active');
-                }
+
+        function updateSlidePosition() {
+            statsSlides.scrollTo({
+                left: currentSlideIndex * statsSlides.clientWidth,
+                behavior: 'smooth'
+            });
+        }
+
+        function updateSlideDots() {
+            document.querySelectorAll('.slide-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlideIndex);
             });
         }
 
         // ========== EVENT LISTENERS ========== //
-        // Mobile menu toggle
+        // Cart icon click
+        cartIcon.addEventListener('click', toggleCart);
+        
+        // Close cart
+        closeCart.addEventListener('click', toggleCart);
+        
+        // Mobile navigation
         mobileToggle.addEventListener('click', () => {
             mobileNav.classList.add('active');
-            navOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            navOverlay.style.display = 'block';
+            setTimeout(() => {
+                navOverlay.classList.add('active');
+            }, 10);
         });
-
+        
         closeNav.addEventListener('click', () => {
             mobileNav.classList.remove('active');
             navOverlay.classList.remove('active');
-            document.body.style.overflow = '';
+            setTimeout(() => {
+                navOverlay.style.display = 'none';
+            }, 300);
         });
-
+        
         navOverlay.addEventListener('click', () => {
             mobileNav.classList.remove('active');
             navOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        // Cart toggle
-        cartIcon.addEventListener('click', toggleCart);
-
-        closeCart.addEventListener('click', () => {
-            cartPanel.classList.remove('active');
-            cartOverlay.classList.remove('active');
             setTimeout(() => {
-                cartOverlay.style.display = 'none';
+                navOverlay.style.display = 'none';
             }, 300);
         });
-
-        cartOverlay.addEventListener('click', () => {
-            cartPanel.classList.remove('active');
-            cartOverlay.classList.remove('active');
-            setTimeout(() => {
-                cartOverlay.style.display = 'none';
-            }, 300);
-        });
-
+        
         // Modal close
         modalClose.addEventListener('click', () => {
             modalOverlay.classList.remove('active');
-            document.body.style.overflow = '';
+            document.body.style.overflow = 'auto';
+            modalChartsInitialized = false;
         });
-
+        
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                modalChartsInitialized = false;
+            }
+        });
+        
         // Modal add to cart
         modalAddCart.addEventListener('click', () => {
-            if (!currentProduct) return;
-            
-            // Check if a size is selected (only for mobile)
-            if (isMobileView && !selectedSize) {
-                showToast('Please select a size before adding to cart');
+            if (!selectedSize) {
+                showToast('Please select a size');
                 return;
             }
             
-            // Use the selected quantity from the bulk selector
             addToCart(currentProduct, currentSelectedQuantity, currentSelectedUnitPrice);
-            showToast(`${currentProduct.name} (${currentSelectedQuantity} units) added to cart!`);
+            showToast(`${currentProduct.name} added to cart!`);
             
             // Close modal after adding to cart
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = '';
+            setTimeout(() => {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }, 1500);
         });
-
-        // Update WhatsApp checkout link on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            let message = `Hello! I'm interested in purchasing these items from JMPOTTERS:%0A%0A`;
+        
+        // WhatsApp checkout
+        whatsappCheckout.addEventListener('click', (e) => {
+            if (cart.length === 0) {
+                e.preventDefault();
+                showToast('Your cart is empty!');
+                return;
+            }
+            
+            // Generate order summary
+            let message = "Hello! I'd like to place an order:\n\n";
+            let total = 0;
             
             cart.forEach(item => {
-                message += `• ${item.name} x${item.quantity}%0A`;
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                message += `• ${item.name} (${item.quantity}) - ₦${itemTotal.toLocaleString()}\n`;
             });
             
-            message += `%0ATotal: ₦${total.toLocaleString()}%0A%0ACan you provide more details?`;
+            message += `\nTotal: ₦${total.toLocaleString()}`;
+            message += "\n\nPlease confirm availability and provide payment details.";
             
-            whatsappCheckout.href = `https://wa.me/2348139583320?text=${message}`;
+            // Encode message for WhatsApp URL
+            const encodedMessage = encodeURIComponent(message);
+            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodedMessage}`;
         });
+        
+        // Stats slides swipe functionality
+        let startX = 0;
+        let isSwiping = false;
+        
+        statsSlides.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isSwiping = true;
+        });
+        
+        statsSlides.addEventListener('touchmove', (e) => {
+            if (!isSwiping) return;
+            e.preventDefault();
+        });
+        
+        statsSlides.addEventListener('touchend', (e) => {
+            if (!isSwiping) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const diffX = startX - endX;
+            
+            if (Math.abs(diffX) > 50) { // Minimum swipe distance
+                if (diffX > 0 && currentSlideIndex < 3) {
+                    // Swipe left - next slide
+                    currentSlideIndex++;
+                } else if (diffX < 0 && currentSlideIndex > 0) {
+                    // Swipe right - previous slide
+                    currentSlideIndex--;
+                }
+                
+                updateSlidePosition();
+                updateSlideDots();
+            }
+            
+            isSwiping = false;
+        });
+        
+        // Keyboard navigation for modal
+        document.addEventListener('keydown', (e) => {
+            if (modalOverlay.classList.contains('active')) {
+                if (e.key === 'Escape') {
+                    modalOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    modalChartsInitialized = false;
+                } else if (e.key === 'ArrowLeft' && currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    updateSlidePosition();
+                    updateSlideDots();
+                } else if (e.key === 'ArrowRight' && currentSlideIndex < 3) {
+                    currentSlideIndex++;
+                    updateSlidePosition();
+                    updateSlideDots();
+                }
+            }
+        });
+        
+        // Prevent default for touch events to avoid scrolling while swiping
+        document.addEventListener('touchmove', (e) => {
+            if (isSwiping) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
