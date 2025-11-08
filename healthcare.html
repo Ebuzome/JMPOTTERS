@@ -214,30 +214,54 @@
             color: var(--light-color);
         }
 
-        /* ===== HERO ===== */
-        .hero {
+        /* ===== HERO CAROUSEL ===== */
+        .hero-carousel {
+            position: relative;
             height: 70vh;
+            overflow: hidden;
+            margin-top: 50px;
+        }
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease;
+            background-size: cover;
+            background-position: center;
             display: flex;
             align-items: center;
-            position: relative;
-            background: linear-gradient(rgba(46, 125, 50, 0.7), rgba(46, 125, 50, 0.7)),
-                        url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
-            color: var(--light-color);
+            justify-content: center;
             text-align: center;
-            margin-top: 50px;            /* Adjusted for shorter header */
+            color: var(--light-color);
         }
-        .hero-content {
+        .carousel-slide.active {
+            opacity: 1;
+        }
+        .carousel-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .carousel-content {
+            position: relative;
+            z-index: 2;
             max-width: 800px;
-            margin: 0 auto;
+            padding: 0 20px;
         }
-        .hero h1 {
+        .carousel-content h1 {
             font-size: 3rem;
             margin-bottom: 15px;
             animation: fadeInUp 1s ease-out;
         }
-        .hero p {
+        .carousel-content p {
             font-size: 1.1rem;
-            max-width: 600px;
             margin: 0 auto 30px;
             animation: fadeInUp 1s ease-out .3s forwards;
             opacity: 0;
@@ -246,196 +270,218 @@
             from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
-        /* ===== SERVICES ===== */
-        .services {
-            background-color: var(--light-green);
+        .carousel-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 3;
         }
-        .services-grid {
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .carousel-dot.active {
+            background: var(--light-color);
+        }
+
+        /* ===== PRODUCT SECTIONS ===== */
+        .product-section {
+            margin-bottom: 60px;
+        }
+        .product-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .product-header h2 {
+            font-size: 2.2rem;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+        .product-header p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ANSA Product Display */
+        .ansa-product {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+        .ansa-images {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+            height: 400px;
+        }
+        .ansa-carousel {
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        .ansa-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #f9f9f9;
+        }
+        .ansa-slide.active {
+            opacity: 1;
+        }
+        .ansa-details {
+            flex: 1;
+            min-width: 300px;
+        }
+        .ansa-details h3 {
+            font-size: 1.8rem;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+        }
+        .ansa-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .quantity-selector {
+            margin-bottom: 20px;
+        }
+        .quantity-selector label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .quantity-selector select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 200px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        /* Honey Products */
+        .honey-products {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
         }
-        .service-card {
+        .honey-product {
             background: var(--light-color);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 12px var(--shadow-color);
             transition: var(--transition);
             text-align: center;
-            padding: 30px 20px;
         }
-        .service-card:hover {
+        .honey-product:hover {
             transform: translateY(-8px);
             box-shadow: 0 12px 25px rgba(76, 175, 80, 0.25);
         }
-        .service-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 1.8rem;
+        .honey-image {
+            height: 250px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #f9f9f9;
         }
-        .service-card h3 {
-            margin-bottom: 15px;
+        .honey-info {
+            padding: 20px;
+        }
+        .honey-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
             color: var(--dark-color);
         }
-        .service-card p {
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        /* ===== PRODUCTS ===== */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 30px;
-        }
-        .product-card {
-            background: var(--light-color);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-        }
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 25px rgba(76, 175, 80, 0.25);
-        }
-        .product-image {
-            height: 220px;
-            overflow: hidden;
-        }
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-        .product-card:hover .product-image img { transform: scale(1.05); }
-        .product-info {
-            padding: 18px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .product-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        .product-price {
-            margin-top: auto;
-            font-size: 1.1rem;
+        .honey-price {
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--primary-color);
-        }
-
-        .product-toggle, .cart-btn, .wishlist-btn {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 8px;
-        }
-        .product-toggle {
-            background: var(--light-color);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-        .product-toggle:hover { background: var(--primary-color); color: var(--light-color); }
-        .cart-btn {
-            background: var(--primary-color);
-            color: var(--light-color);
-        }
-        .cart-btn:hover { background: var(--accent-color); }
-        .wishlist-btn {
-            background: transparent;
-            border: 1px solid #ccc;
-            color: var(--dark-color);
-        }
-        .wishlist-btn.active, .wishlist-btn:hover {
-            background: var(--accent-color);
-            color: var(--light-color);
-            border-color: var(--accent-color);
-        }
-        .whatsapp-btn {
-            background: #25d366;
-            color: var(--light-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 8px;
-        }
-        .whatsapp-btn:hover { background: #128c7e; }
-
-        .product-details {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height .5s ease;
-            padding: 0 18px;
-            background: #fafafa;
-        }
-        .product-details.active {
-            max-height: 400px;
-            padding: 18px;
-        }
-
-        /* ===== TESTIMONIALS ===== */
-        .testimonials {
-            background-color: var(--light-green);
-        }
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        .testimonial-card {
-            background: var(--light-color);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 12px var(--shadow-color);
-        }
-        .testimonial-text {
-            font-style: italic;
             margin-bottom: 15px;
-            color: #555;
         }
-        .testimonial-author {
+
+        /* ===== HEALTH BENEFITS ===== */
+        .health-benefits {
+            background-color: var(--light-green);
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+        .benefits-title {
+            font-size: 1.8rem;
+            color: var(--dark-color);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .benefit-item {
+            background: var(--light-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .benefit-item h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
+            gap: 10px;
         }
-        .author-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-right: 15px;
+        .benefit-item h4 i {
+            font-size: 1.2rem;
         }
-        .author-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+
+        /* ===== BULK INFO ===== */
+        .bulk-info {
+            background: var(--dark-color);
+            color: var(--light-color);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 60px;
         }
-        .author-info h4 {
-            margin-bottom: 5px;
-            color: var(--dark-color);
+        .bulk-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
         }
-        .author-info p {
-            color: #777;
-            font-size: 0.9rem;
+        .bulk-info p {
+            max-width: 700px;
+            margin: 0 auto 20px;
         }
 
         /* ===== PANELS ===== */
@@ -545,12 +591,21 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.3rem; }
+            .carousel-content h1 { font-size: 2.3rem; }
             .section-title { font-size: 1.8rem; }
-            .services-grid, .products-grid, .testimonials-grid { 
+            .ansa-product {
+                flex-direction: column;
+            }
+            .ansa-images, .ansa-details {
+                width: 100%;
+            }
+            .honey-products {
                 grid-template-columns: 1fr;
             }
-            .hero {
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-carousel {
                 margin-top: 48px; /* Adjusted for shorter header on mobile */
             }
         }
@@ -601,109 +656,215 @@
         </ul>
     </div>
 
-    <!-- ========= HERO ========= -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Healthcare & Wellbeing</h1>
-                <p>Discover premium health products and wellness solutions for a healthier lifestyle. From medical equipment to personal care, we've got you covered.</p>
+    <!-- ========= HERO CAROUSEL ========= -->
+    <div class="hero-carousel">
+        <div class="carousel-slide active" style="background-image: url('assets/images/healthcare-1.png');">
+            <div class="carousel-content">
+                <h1>Premium Healthcare Products</h1>
+                <p>Discover natural wellness solutions for a healthier lifestyle</p>
                 <a href="#products" class="btn">Explore Products</a>
             </div>
         </div>
-    </section>
-
-    <!-- ========= SERVICES ========= -->
-    <section class="services">
-        <div class="container">
-            <h2 class="section-title">Our Healthcare Services</h2>
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-stethoscope"></i>
-                    </div>
-                    <h3>Medical Equipment</h3>
-                    <p>High-quality medical devices and equipment for professional and home use.</p>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-pills"></i>
-                    </div>
-                    <h3>Pharmaceuticals</h3>
-                    <p>Trusted medications and supplements for various health conditions.</p>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
-                    <h3>Wellness Products</h3>
-                    <p>Products to support your overall health, fitness, and wellbeing.</p>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <h3>Professional Consultation</h3>
-                    <p>Connect with healthcare professionals for expert advice and guidance.</p>
-                </div>
+        <div class="carousel-slide" style="background-image: url('assets/images/healthcare-2.png');">
+            <div class="carousel-content">
+                <h1>ANSA Soursop Tea</h1>
+                <p>100% natural herbal tea for optimal health and wellness</p>
+                <a href="#ansa-tea" class="btn">Learn More</a>
             </div>
         </div>
-    </section>
+        <div class="carousel-slide" style="background-image: url('assets/images/healthcare-3.png');">
+            <div class="carousel-content">
+                <h1>JMPOTTERS Pure Honey</h1>
+                <p>Natural, unprocessed honey with numerous health benefits</p>
+                <a href="#honey" class="btn">Shop Now</a>
+            </div>
+        </div>
+        <div class="carousel-slide" style="background-image: url('assets/images/healthcare-4.png');">
+            <div class="carousel-content">
+                <h1>Bulk Orders Available</h1>
+                <p>Special discounts for retailers and wholesalers</p>
+                <a href="#bulk" class="btn">Contact Us</a>
+            </div>
+        </div>
+        <div class="carousel-dots">
+            <div class="carousel-dot active" data-index="0"></div>
+            <div class="carousel-dot" data-index="1"></div>
+            <div class="carousel-dot" data-index="2"></div>
+            <div class="carousel-dot" data-index="3"></div>
+        </div>
+    </div>
 
     <!-- ========= PRODUCTS ========= -->
-    <section id="products" class="product-gallery">
+    <section id="products">
         <div class="container">
-            <h2 class="section-title">Featured Healthcare Products</h2>
-            <div class="products-grid" id="productsGrid"></div>
-        </div>
-    </section>
-
-    <!-- ========= TESTIMONIALS ========= -->
-    <section class="testimonials">
-        <div class="container">
-            <h2 class="section-title">What Our Customers Say</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-text">
-                        "The blood pressure monitor I purchased is incredibly accurate and easy to use. It gives me peace of mind monitoring my health at home."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Sarah Johnson">
+            <!-- ANSA Soursop Tea Section -->
+            <div class="product-section" id="ansa-tea">
+                <div class="product-header">
+                    <h2>ANSA Soursop Tea</h2>
+                    <p>An accredited affiliate and marketer of ANSA Soursop Tea - 100% natural herbal tea for optimal health</p>
+                </div>
+                
+                <div class="ansa-product">
+                    <div class="ansa-images">
+                        <div class="ansa-carousel">
+                            <div class="ansa-slide active" style="background-image: url('assets/images/ansa-1.png');"></div>
+                            <div class="ansa-slide" style="background-image: url('assets/images/ansa-2.png');"></div>
+                            <div class="ansa-slide" style="background-image: url('assets/images/ansa-3.png');"></div>
                         </div>
-                        <div class="author-info">
-                            <h4>Sarah Johnson</h4>
-                            <p>Regular Customer</p>
+                    </div>
+                    <div class="ansa-details">
+                        <h3>ANSA Soursop Tea - 25 Tea Bags</h3>
+                        <div class="ansa-price">₦25,000</div>
+                        <p>Each packet contains 25 premium tea bags of 100% natural soursop leaves, spiced with ginger for enhanced flavor and health benefits.</p>
+                        
+                        <div class="quantity-selector">
+                            <label for="ansa-quantity">Select Quantity (Packs):</label>
+                            <select id="ansa-quantity">
+                                <option value="1">1 Pack</option>
+                                <option value="2">2 Packs</option>
+                                <option value="3">3 Packs</option>
+                                <option value="4">4 Packs</option>
+                                <option value="5">5 Packs</option>
+                                <option value="10">10 Packs (5% off)</option>
+                                <option value="20">20 Packs (10% off)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn" id="addAnsaToCart">Add to Cart</button>
+                            <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20ANSA%20Soursop%20Tea" class="btn whatsapp-btn" target="_blank">
+                                <i class="fab fa-whatsapp"></i> Order via WhatsApp
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-text">
-                        "As a healthcare professional, I appreciate the quality of medical supplies available here. The delivery is always prompt and reliable."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Dr. Michael Chen">
+                
+                <!-- ANSA Health Benefits -->
+                <div class="health-benefits">
+                    <h3 class="benefits-title">Health Benefits of ANSA Soursop Tea</h3>
+                    <div class="benefits-grid">
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-heart"></i> Heart Health</h4>
+                            <p>Reduces blood pressure and supports cardiovascular function</p>
                         </div>
-                        <div class="author-info">
-                            <h4>Dr. Michael Chen</h4>
-                            <p>Medical Practitioner</p>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-shield-alt"></i> Immune Boost</h4>
+                            <p>Strengthens the immune system with rich antioxidants</p>
+                        </div>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-bacteria"></i> Anti-inflammatory</h4>
+                            <p>Reduces inflammation throughout the body</p>
+                        </div>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-dna"></i> Cancer Prevention</h4>
+                            <p>Contains compounds that may help prevent cancer growth</p>
+                        </div>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-tint"></i> Blood Sugar Control</h4>
+                            <p>Helps regulate blood sugar levels naturally</p>
+                        </div>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-male"></i> Prostate Health</h4>
+                            <p>Inhibits prostate enlargement and improves urine flow</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4>Product Details:</h4>
+                        <p><strong>Description:</strong> Each tea bag contains high-grade 100% natural soursop leaves, spiced with ginger, and blended to help you lead a healthy, happier life.</p>
+                        <p><strong>Key Features:</strong> Dark green powdery granules, readily soluble in water</p>
+                        <p><strong>Usage:</strong> Place one tea bag in a teacup and add freshly boiled water. Wait for 5–15 minutes, then take your natural drink for everyday usage.</p>
+                        <p><strong>Packaging:</strong> Each packet of 0.05 kg contains 25 teabags.</p>
+                        <p><strong>Storage:</strong> Store in a cool, dry place away from direct sunlight.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Honey Products Section -->
+            <div class="product-section" id="honey">
+                <div class="product-header">
+                    <h2>JMPOTTERS Pure Honey</h2>
+                    <p>Natural, unprocessed honey with exceptional flavor and health benefits</p>
+                </div>
+                
+                <div class="honey-products">
+                    <div class="honey-product">
+                        <div class="honey-image" style="background-image: url('assets/images/honey-1-litre-1500.png');"></div>
+                        <div class="honey-info">
+                            <h3>Pure Honey - 1 Litre</h3>
+                            <div class="honey-price">₦15,000</div>
+                            <p>Premium quality, unprocessed honey in a 1-litre bottle</p>
+                            <div class="action-buttons" style="margin-top: 15px;">
+                                <button class="btn add-to-cart" data-product="Honey 1 Litre" data-price="15000">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="honey-product">
+                        <div class="honey-image" style="background-image: url('assets/images/honey-750cl-8000.png');"></div>
+                        <div class="honey-info">
+                            <h3>Pure Honey - 750cl</h3>
+                            <div class="honey-price">₦8,000</div>
+                            <p>Natural honey in a convenient 750cl size</p>
+                            <div class="action-buttons" style="margin-top: 15px;">
+                                <button class="btn add-to-cart" data-product="Honey 750cl" data-price="8000">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="honey-product">
+                        <div class="honey-image" style="background-image: url('assets/images/honey-combo-20000.png');"></div>
+                        <div class="honey-info">
+                            <h3>Honey Combo Pack</h3>
+                            <div class="honey-price">₦20,000</div>
+                            <p>Special combo including 1 litre and 750cl bottles</p>
+                            <div class="action-buttons" style="margin-top: 15px;">
+                                <button class="btn add-to-cart" data-product="Honey Combo" data-price="20000">Add to Cart</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-text">
-                        "The wellness supplements have made a noticeable difference in my energy levels. I'm impressed with the quality and effectiveness."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Emily Rodriguez">
+                
+                <!-- Honey Health Benefits -->
+                <div class="health-benefits">
+                    <h3 class="benefits-title">Health Benefits of Pure Honey</h3>
+                    <div class="benefits-grid">
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-bacteria"></i> Natural Antibacterial</h4>
+                            <p>Contains hydrogen peroxide and has low pH, inhibiting bacterial growth</p>
                         </div>
-                        <div class="author-info">
-                            <h4>Emily Rodriguez</h4>
-                            <p>Fitness Enthusiast</p>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-lungs"></i> Soothes Coughs</h4>
+                            <p>Effective at reducing cough frequency and severity</p>
+                        </div>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-heart"></i> Heart Health</h4>
+                            <p>May help lower blood pressure and improve cholesterol levels</p>
+                        </div>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-brain"></i> Brain Function</h4>
+                            <p>Contains antioxidants that may support brain health and memory</p>
+                        </div>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-allergies"></i> Allergy Relief</h4>
+                            <p>Local honey may help build immunity to pollen allergies</p>
+                        </div>
+                        <div class="benefit-item">
+                            <h4><i class="fas fa-burn"></i> Energy Boost</h4>
+                            <p>Natural source of carbohydrates for quick energy</p>
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <!-- Bulk Order Information -->
+            <div class="bulk-info" id="bulk">
+                <h3>Bulk Orders & Wholesale</h3>
+                <p>We distribute both ANSA Soursop Tea and JMPOTTERS Honey products in large quantities at discounted prices to retailers and wholesalers looking to buy in bulk and resell.</p>
+                <p>Contact us for special pricing on large orders!</p>
+                <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20bulk%20purchase%20of%20your%20healthcare%20products" class="btn" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Inquire About Bulk Orders
+                </a>
             </div>
         </div>
     </section>
@@ -748,12 +909,11 @@
                     <p>Your trusted partner for health and wellbeing products. Quality healthcare solutions for everyone.</p>
                 </div>
                 <div class="footer-column">
-                    <h3>Healthcare Categories</h3>
+                    <h3>Our Products</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Medical Equipment</a></li>
-                        <li><a href="#">Pharmaceuticals</a></li>
-                        <li><a href="#">Wellness Products</a></li>
-                        <li><a href="#">Personal Care</a></li>
+                        <li><a href="#ansa-tea">ANSA Soursop Tea</a></li>
+                        <li><a href="#honey">JMPOTTERS Honey</a></li>
+                        <li><a href="#bulk">Bulk Orders</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -777,24 +937,41 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- ========= PRODUCT ARRAY & SCRIPT ========= -->
+    <!-- ========= SCRIPT ========= -->
     <script>
-        const products = [
-          { id: 1, name: "Digital Blood Pressure Monitor", price: 8500, image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
-          { id: 2, name: "Digital Thermometer", price: 3200, image: "https://images.unsplash.com/photo-1584302179602-e4819bb92daa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
-          { id: 3, name: "First Aid Kit", price: 6500, image: "https://images.unsplash.com/photo-1582719471384-894fbb16e074?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
-          { id: 4, name: "Pulse Oximeter", price: 5500, image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
-          { id: 5, name: "Digital Weighing Scale", price: 4200, image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
-          { id: 6, name: "Nebulizer Machine", price: 12500, image: "https://images.unsplash.com/photo-1585435557343-3b092031d5ad?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
-          { id: 7, name: "Vitamin C Supplements", price: 2800, image: "https://images.unsplash.com/photo-1593081891733-f3f1583ea48c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
-          { id: 8, name: "Medical Gloves (Box of 100)", price: 3500, image: "https://images.unsplash.com/photo-1584634731339-252c581abfc5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }
-        ];
+        // Products data
+        const products = {
+            ansa: {
+                name: "ANSA Soursop Tea - 25 Tea Bags",
+                price: 25000,
+                images: [
+                    'assets/images/ansa-1.png',
+                    'assets/images/ansa-2.png',
+                    'assets/images/ansa-3.png'
+                ]
+            },
+            honey1L: {
+                name: "Pure Honey - 1 Litre",
+                price: 15000,
+                image: 'assets/images/honey-1-litre-1500.png'
+            },
+            honey750cl: {
+                name: "Pure Honey - 750cl",
+                price: 8000,
+                image: 'assets/images/honey-750cl-8000.png'
+            },
+            honeyCombo: {
+                name: "Honey Combo Pack",
+                price: 20000,
+                image: 'assets/images/honey-combo-20000.png'
+            }
+        };
 
-        /* ===== JAVASCRIPT ===== */
+        // Cart and wishlist
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
 
-        const productsGrid = document.getElementById('productsGrid');
+        // DOM elements
         const wishlistIcon = document.getElementById('wishlistIcon');
         const wishlistPanel = document.getElementById('wishlistPanel');
         const wishlistOverlay = document.getElementById('wishlistOverlay');
@@ -813,112 +990,136 @@
         const navOverlay = document.getElementById('navOverlay');
         const closeNav = document.querySelector('.close-nav');
         const whatsappCheckout = document.getElementById('whatsappCheckout');
+        const addAnsaToCart = document.getElementById('addAnsaToCart');
+        const ansaQuantity = document.getElementById('ansa-quantity');
 
+        // Initialize the page
         document.addEventListener('DOMContentLoaded', () => {
-            renderProducts();
             updateWishlistCount();
             updateCartCount();
             updateCartTotal();
+            initCarousels();
         });
 
-        function renderProducts() {
-            productsGrid.innerHTML = '';
-            products.forEach(product => {
-                const isInWishlist = wishlist.some(item => item.id === product.id);
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <div class="product-image">
-                        <img src="${product.image}" alt="${product.name}" loading="lazy">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">${product.name}</h3>
-                        <div class="product-price">₦${product.price.toLocaleString()}</div>
-                        <button class="product-toggle">View Details</button>
-                    </div>
-                    <div class="product-details">
-                        <p class="product-description">Premium healthcare product designed to support your wellbeing.</p>
-                        <div class="availability"><i class="fas fa-check-circle"></i> In Stock</div>
-                        <div class="action-buttons">
-                            <button class="cart-btn" data-id="${product.id}"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-                            <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}">
-                                <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Wishlist'}
-                            </button>
-                            <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20${encodeURIComponent(product.name)}" class="whatsapp-btn" target="_blank">
-                                <i class="fab fa-whatsapp"></i> WhatsApp Order
-                            </a>
-                        </div>
-                    </div>
-                `;
-                productsGrid.appendChild(card);
+        // Initialize carousels
+        function initCarousels() {
+            // Hero carousel
+            const heroSlides = document.querySelectorAll('.hero-carousel .carousel-slide');
+            const heroDots = document.querySelectorAll('.hero-carousel .carousel-dot');
+            let heroCurrent = 0;
+            
+            function showHeroSlide(index) {
+                heroSlides.forEach(slide => slide.classList.remove('active'));
+                heroDots.forEach(dot => dot.classList.remove('active'));
+                
+                heroSlides[index].classList.add('active');
+                heroDots[index].classList.add('active');
+                heroCurrent = index;
+            }
+            
+            // Auto advance hero carousel
+            setInterval(() => {
+                let next = (heroCurrent + 1) % heroSlides.length;
+                showHeroSlide(next);
+            }, 5000);
+            
+            // Dot click events
+            heroDots.forEach((dot, index) => {
+                dot.addEventListener('click', () => showHeroSlide(index));
             });
-            setupProductInteractions();
+            
+            // ANSA product carousel
+            const ansaSlides = document.querySelectorAll('.ansa-carousel .ansa-slide');
+            let ansaCurrent = 0;
+            
+            function showAnsaSlide(index) {
+                ansaSlides.forEach(slide => slide.classList.remove('active'));
+                ansaSlides[index].classList.add('active');
+                ansaCurrent = index;
+            }
+            
+            // Auto advance ANSA carousel
+            setInterval(() => {
+                let next = (ansaCurrent + 1) % ansaSlides.length;
+                showAnsaSlide(next);
+            }, 4000);
         }
 
-        function setupProductInteractions() {
-            document.querySelectorAll('.product-toggle').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const details = this.parentElement.nextElementSibling;
-                    details.classList.toggle('active');
-                    this.textContent = details.classList.contains('active') ? 'Hide Details' : 'View Details';
-                });
-            });
+        // Add ANSA tea to cart
+        addAnsaToCart.addEventListener('click', () => {
+            const quantity = parseInt(ansaQuantity.value);
+            let price = products.ansa.price * quantity;
+            
+            // Apply bulk discounts
+            if (quantity >= 10 && quantity < 20) {
+                price *= 0.95; // 5% off
+            } else if (quantity >= 20) {
+                price *= 0.90; // 10% off
+            }
+            
+            const product = {
+                id: 'ansa-tea',
+                name: products.ansa.name,
+                price: Math.round(price / quantity), // Price per unit
+                quantity: quantity,
+                total: Math.round(price)
+            };
+            
+            addToCart(product);
+        });
 
-            document.querySelectorAll('.cart-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const id = parseInt(this.dataset.id);
-                    const product = products.find(p => p.id === id);
-                    addToCart(product);
-                });
+        // Add honey products to cart
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productName = this.dataset.product;
+                const price = parseInt(this.dataset.price);
+                
+                let product;
+                
+                if (productName === "Honey 1 Litre") {
+                    product = {
+                        id: 'honey-1L',
+                        name: products.honey1L.name,
+                        price: price,
+                        quantity: 1,
+                        total: price
+                    };
+                } else if (productName === "Honey 750cl") {
+                    product = {
+                        id: 'honey-750cl',
+                        name: products.honey750cl.name,
+                        price: price,
+                        quantity: 1,
+                        total: price
+                    };
+                } else if (productName === "Honey Combo") {
+                    product = {
+                        id: 'honey-combo',
+                        name: products.honeyCombo.name,
+                        price: price,
+                        quantity: 1,
+                        total: price
+                    };
+                }
+                
+                addToCart(product);
             });
+        });
 
-            document.querySelectorAll('.wishlist-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const id = parseInt(this.dataset.id);
-                    const product = products.find(p => p.id === id);
-                    if (this.classList.contains('active')) {
-                        removeFromWishlist(id);
-                        this.classList.remove('active');
-                        this.innerHTML = '<i class="fas fa-heart"></i> Wishlist';
-                    } else {
-                        addToWishlist(product);
-                        this.classList.add('active');
-                        this.innerHTML = '<i class="fas fa-heart"></i> In Wishlist';
-                    }
-                });
-            });
-        }
-
-        /* ===== CART / WISHLIST ===== */
+        /* ===== CART / WISHLIST FUNCTIONS ===== */
         function addToCart(product) {
             const existing = cart.find(item => item.id === product.id);
             if (existing) {
-                existing.quantity += 1;
+                existing.quantity += product.quantity;
+                existing.total = existing.price * existing.quantity;
             } else {
-                cart.push({ ...product, quantity: 1 });
+                cart.push(product);
             }
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
             updateCartTotal();
             renderCartItems();
-            showNotification(`${product.name} added to cart!`);
-        }
-
-        function addToWishlist(product) {
-            if (!wishlist.find(item => item.id === product.id)) {
-                wishlist.push(product);
-                localStorage.setItem('wishlist', JSON.stringify(wishlist));
-                updateWishlistCount();
-                renderWishlistItems();
-                showNotification(`${product.name} added to wishlist!`);
-            }
-        }
-
-        function removeFromWishlist(id) {
-            wishlist = wishlist.filter(item => item.id !== id);
-            localStorage.setItem('wishlist', JSON.stringify(wishlist));
-            updateWishlistCount();
-            renderWishlistItems();
+            showNotification(`${product.quantity} ${product.name} added to cart!`);
         }
 
         function updateCartCount() {
@@ -930,7 +1131,7 @@
         }
 
         function updateCartTotal() {
-            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const total = cart.reduce((sum, item) => sum + item.total, 0);
             cartTotal.textContent = `₦${Math.round(total).toLocaleString()}`;
             updateWhatsAppCheckoutLink();
         }
@@ -945,7 +1146,6 @@
                 const div = document.createElement('div');
                 div.className = 'cart-item';
                 div.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" style="width:60px;height:60px;border-radius:6px;">
                     <div style="flex:1;margin-left:10px;">
                         <div style="font-weight:600">${item.name}</div>
                         <div style="color:var(--primary-color)">₦${Math.round(item.price).toLocaleString()} × ${item.quantity}</div>
@@ -956,7 +1156,7 @@
             });
             document.querySelectorAll('.cart-item-remove').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    cart = cart.filter(item => item.id !== parseInt(btn.dataset.id));
+                    cart = cart.filter(item => item.id !== btn.dataset.id);
                     localStorage.setItem('cart', JSON.stringify(cart));
                     updateCartCount();
                     updateCartTotal();
@@ -972,9 +1172,9 @@
             }
             let text = "I would like to purchase:\n";
             cart.forEach(item => {
-                text += `- ${item.name} (${item.quantity} × ₦${Math.round(item.price).toLocaleString()}) = ₦${Math.round(item.price * item.quantity).toLocaleString()}\n`;
+                text += `- ${item.name} (${item.quantity} × ₦${Math.round(item.price).toLocaleString()}) = ₦${Math.round(item.total).toLocaleString()}\n`;
             });
-            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const total = cart.reduce((sum, item) => sum + item.total, 0);
             text += `\n*Total: ₦${Math.round(total).toLocaleString()}*\n\nPlease confirm order & shipping details.`;
             whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
         }
@@ -992,7 +1192,6 @@
             wishlistPanel.classList.add('active');
             wishlistOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            renderWishlistItems();
         });
         cartIcon.addEventListener('click', () => {
             cartPanel.classList.add('active');
