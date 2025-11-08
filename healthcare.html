@@ -310,61 +310,58 @@
             margin: 0 auto;
         }
 
-        /* ANSA Product Display - FIXED CAROUSEL */
+        /* ANSA Product Display - GRID LAYOUT */
+        .ansa-products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
         .ansa-product {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 40px;
-            align-items: center;
-            margin-bottom: 60px;
-        }
-        .ansa-images {
-            flex: 1;
-            min-width: 300px;
-            position: relative;
-            height: 400px;
-        }
-        .ansa-carousel {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+            background: var(--light-color);
             border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: var(--transition);
+            text-align: center;
         }
-        .ansa-slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.8s ease;
+        .ansa-product:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(76, 175, 80, 0.25);
+        }
+        .ansa-image {
+            height: 250px;
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
             background-color: #f9f9f9;
         }
-        .ansa-slide.active {
-            opacity: 1;
+        .ansa-info {
+            padding: 20px;
         }
-        .ansa-details {
-            flex: 1;
-            min-width: 300px;
-        }
-        .ansa-details h3 {
-            font-size: 1.8rem;
+        .ansa-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
             color: var(--dark-color);
-            margin-bottom: 15px;
+        }
+        
+        .ansa-details {
+            margin-top: 30px;
+            background: var(--light-color);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px var(--shadow-color);
         }
         .ansa-price {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--primary-color);
             margin-bottom: 20px;
+            text-align: center;
         }
         .quantity-selector {
             margin-bottom: 20px;
+            text-align: center;
         }
         .quantity-selector label {
             display: block;
@@ -384,6 +381,7 @@
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
+            justify-content: center;
         }
         .action-buttons .btn {
             flex: 1;
@@ -594,17 +592,7 @@
         @media (max-width: 768px) {
             .carousel-content h1 { font-size: 2.3rem; }
             .section-title { font-size: 1.8rem; }
-            .ansa-product {
-                flex-direction: column;
-            }
-            .ansa-images, .ansa-details {
-                width: 100%;
-            }
-            /* FIXED: ANSA carousel height for mobile */
-            .ansa-images {
-                height: 300px; /* Reduced height for mobile */
-            }
-            .honey-products {
+            .ansa-products, .honey-products {
                 grid-template-columns: 1fr;
             }
             .benefits-grid {
@@ -618,12 +606,6 @@
             }
             .bulk-info {
                 padding: 25px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .ansa-images {
-                height: 250px; /* Even smaller for very small screens */
             }
             .action-buttons {
                 flex-direction: column;
@@ -727,38 +709,56 @@
                     <p>An accredited affiliate and marketer of ANSA Soursop Tea - 100% natural herbal tea for optimal health</p>
                 </div>
                 
-                <div class="ansa-product">
-                    <div class="ansa-images">
-                        <div class="ansa-carousel">
-                            <div class="ansa-slide active" style="background-image: url('assets/images/ansa-1.png');"></div>
-                            <div class="ansa-slide" style="background-image: url('assets/images/ansa-2.png');"></div>
-                            <div class="ansa-slide" style="background-image: url('assets/images/ansa-3.png');"></div>
+                <!-- ANSA Product Images in Grid -->
+                <div class="ansa-products">
+                    <div class="ansa-product">
+                        <div class="ansa-image" style="background-image: url('assets/images/ansa-1.png');"></div>
+                        <div class="ansa-info">
+                            <h3>ANSA Soursop Tea</h3>
+                            <p>Front view of packaging</p>
                         </div>
                     </div>
-                    <div class="ansa-details">
-                        <h3>ANSA Soursop Tea - 25 Tea Bags</h3>
-                        <div class="ansa-price">₦25,000</div>
-                        <p>Each packet contains 25 premium tea bags of 100% natural soursop leaves, spiced with ginger for enhanced flavor and health benefits.</p>
-                        
-                        <div class="quantity-selector">
-                            <label for="ansa-quantity">Select Quantity (Packs):</label>
-                            <select id="ansa-quantity">
-                                <option value="1">1 Pack</option>
-                                <option value="2">2 Packs</option>
-                                <option value="3">3 Packs</option>
-                                <option value="4">4 Packs</option>
-                                <option value="5">5 Packs</option>
-                                <option value="10">10 Packs (5% off)</option>
-                                <option value="20">20 Packs (10% off)</option>
-                            </select>
+                    
+                    <div class="ansa-product">
+                        <div class="ansa-image" style="background-image: url('assets/images/ansa-2.png');"></div>
+                        <div class="ansa-info">
+                            <h3>ANSA Soursop Tea</h3>
+                            <p>Side view of packaging</p>
                         </div>
-                        
-                        <div class="action-buttons">
-                            <button class="btn" id="addAnsaToCart">Add to Cart</button>
-                            <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20ANSA%20Soursop%20Tea" class="btn whatsapp-btn" target="_blank">
-                                <i class="fab fa-whatsapp"></i> Order via WhatsApp
-                            </a>
+                    </div>
+                    
+                    <div class="ansa-product">
+                        <div class="ansa-image" style="background-image: url('assets/images/ansa-3.png');"></div>
+                        <div class="ansa-info">
+                            <h3>ANSA Soursop Tea</h3>
+                            <p>Tea bags inside</p>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- ANSA Product Details -->
+                <div class="ansa-details">
+                    <div class="ansa-price">₦25,000 per pack</div>
+                    <p>Each packet contains 25 premium tea bags of 100% natural soursop leaves, spiced with ginger for enhanced flavor and health benefits.</p>
+                    
+                    <div class="quantity-selector">
+                        <label for="ansa-quantity">Select Quantity (Packs):</label>
+                        <select id="ansa-quantity">
+                            <option value="1">1 Pack</option>
+                            <option value="2">2 Packs</option>
+                            <option value="3">3 Packs</option>
+                            <option value="4">4 Packs</option>
+                            <option value="5">5 Packs</option>
+                            <option value="10">10 Packs (5% off)</option>
+                            <option value="20">20 Packs (10% off)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn" id="addAnsaToCart">Add to Cart</button>
+                        <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20ANSA%20Soursop%20Tea" class="btn whatsapp-btn" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Order via WhatsApp
+                        </a>
                     </div>
                 </div>
                 
@@ -1050,22 +1050,6 @@
             heroDots.forEach((dot, index) => {
                 dot.addEventListener('click', () => showHeroSlide(index));
             });
-            
-            // ANSA product carousel
-            const ansaSlides = document.querySelectorAll('.ansa-carousel .ansa-slide');
-            let ansaCurrent = 0;
-            
-            function showAnsaSlide(index) {
-                ansaSlides.forEach(slide => slide.classList.remove('active'));
-                ansaSlides[index].classList.add('active');
-                ansaCurrent = index;
-            }
-            
-            // Auto advance ANSA carousel
-            setInterval(() => {
-                let next = (ansaCurrent + 1) % ansaSlides.length;
-                showAnsaSlide(next);
-            }, 4000);
         }
 
         // Add ANSA tea to cart
