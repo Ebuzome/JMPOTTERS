@@ -1,209 +1,1579 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jmpotters - Curated for Your Lifestyle</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Custom Tailwind Config & Styles -->
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'brand-orange': '#f97316',
-              'brand-red': '#dc2626',
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-            },
-          },
-        },
-      }
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JM POTTERS | Luxury Lifestyle & Homeware</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Importing a nice font from Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        /* ===== UPDATED VARIABLES & RESET ===== */
+        :root {
+            --cream-light: #fefaf0;
+            --cream-medium: #fffaf3;
+            --cream-dark: #f7f0e1;
+            --gold-primary: #d4af37;
+            --gold-secondary: #e8c170;
+            --gold-light: #f5e6b8;
+            --gold-dark: #b8860b;
+            --charcoal: #333333;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--charcoal);
+            background-color: var(--cream-light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: var(--gold-dark);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.2rem;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--gold-primary);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: var(--gold-primary);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            letter-spacing: 1px;
+            border-radius: 0;
+            transition: var(--transition);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: transparent;
+            border-color: var(--gold-primary);
+            color: var(--gold-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .explore-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--gold-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+
+        .explore-link:hover {
+            color: var(--gold-dark);
+            gap: 8px;
+        }
+
+        .explore-link i {
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .explore-link:hover i {
+            transform: translateX(5px);
+        }
+
+        /* ===== HEADER - SLIMMER ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 15px 0;
+            background: rgba(254, 250, 240, 0.98);
+            transition: var(--transition);
+            border-bottom: 1px solid transparent;
+            backdrop-filter: blur(10px);
+        }
+
+        header.scrolled {
+            padding: 10px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid var(--gold-light);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--gold-dark);
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--gold-primary);
+        }
+
+        /* Navigation */
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 12px;
+            position: relative;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--charcoal);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            transition: var(--transition);
+            padding: 6px 12px;
+            border-radius: 30px;
+        }
+
+        .nav-links a i {
+            color: var(--gold-primary);
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-dark);
+        }
+
+        .nav-links a:hover i {
+            transform: translateY(-3px);
+            color: var(--gold-dark);
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--gold-primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        /* Dropdown styles */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 200px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            border-radius: 5px;
+            overflow: hidden;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--transition);
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-content a {
+            padding: 10px 16px;
+            border-radius: 0;
+            display: block;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content a:hover {
+            background: rgba(212, 175, 55, 0.1);
+            padding-left: 20px;
+        }
+
+        .dropdown-content a i {
+            width: 18px;
+        }
+
+        /* Header Icons */
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            position: relative;
+            color: var(--charcoal);
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .header-icon:hover {
+            color: var(--gold-primary);
+        }
+
+        .icon-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--gold-primary);
+            color: white;
+            font-size: 0.65rem;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--charcoal);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mobile-toggle:hover {
+            color: var(--gold-primary);
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 85%;
+            max-width: 300px;
+            height: 100vh;
+            background: rgba(254, 250, 240, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1100;
+            transition: var(--transition);
+            overflow-y: auto;
+            padding: 25px;
+            border-left: 2px solid var(--gold-primary);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-nav.active {
+            right: 0;
+        }
+
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--gold-light);
+        }
+
+        .close-nav {
+            background: none;
+            border: none;
+            color: var(--charcoal);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-nav:hover {
+            color: var(--gold-primary);
+            transform: rotate(90deg);
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .mobile-nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--charcoal);
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 10px 12px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-links a i {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            width: 25px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-links a:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-dark);
+            padding-left: 15px;
+        }
+
+        .mobile-nav-links a:hover i {
+            transform: scale(1.1);
+            color: var(--gold-dark);
+        }
+
+        /* Mobile dropdown styles */
+        .mobile-dropdown-content {
+            display: none;
+            padding-left: 15px;
+            margin-top: 5px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 5px;
+            transition: var(--transition);
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .mobile-dropdown.active .mobile-dropdown-content {
+            display: block;
+            max-height: 300px;
+        }
+
+        .mobile-dropdown-content a {
+            font-size: 0.95rem;
+            padding: 8px 12px;
+        }
+
+        .mobile-dropdown > a .fa-chevron-down {
+            transition: var(--transition);
+        }
+
+        .mobile-dropdown.active > a .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* ===== VALUE PROPOSITIONS ===== */
+        .values {
+            background: white;
+            padding: 50px 0;
+        }
+
+        .values-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .value-card {
+            text-align: center;
+            padding: 25px 20px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .value-card i {
+            font-size: 2.2rem;
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+        }
+
+        .value-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--charcoal);
+        }
+
+        .value-card p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            height: 90vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+                        url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            animation: zoomIn 20s ease-in-out forwards;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(1.1); }
+            to { transform: scale(1); }
+        }
+
+        .hero-content {
+            max-width: 700px;
+            color: white;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            line-height: 1.1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            color: var(--gold-light);
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        /* ===== CATEGORIES SECTION ===== */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .category-card {
+            position: relative;
+            height: 280px;
+            overflow: hidden;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition);
+        }
+
+        .category-card.appear {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .category-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: white;
+            transition: var(--transition);
+        }
+
+        .category-overlay h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: var(--gold-light);
+        }
+
+        .category-overlay p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* ===== TOP PRODUCTS SECTION ===== */
+        .top-products {
+            background-color: var(--cream-medium);
+        }
+
+        .products-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+
+        @media (max-width: 992px) {
+            .products-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .products-container {
+                display: flex;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                grid-template-columns: unset;
+            }
+            .product-card {
+                scroll-snap-align: start;
+                flex: 0 0 auto;
+                width: 280px;
+            }
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card.appear {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-img {
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-img img {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--charcoal);
+        }
+
+        .product-info p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            min-height: 40px;
+        }
+
+        /* Quick Add Button */
+        .quick-add-btn {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background: var(--gold-primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 10;
+            white-space: nowrap;
+            box-shadow: var(--shadow);
+        }
+
+        .product-card:hover .quick-add-btn {
+            bottom: 15px;
+        }
+
+        .quick-add-btn:hover {
+            background: var(--gold-dark);
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        /* ===== LIMITED OFFERS SECTION ===== */
+        .limited-offers {
+            background-color: var(--cream-dark);
+            padding: 60px 0;
+        }
+
+        .offer-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--gold-light);
+        }
+
+        .offer-icon {
+            font-size: 1.8rem;
+            color: var(--gold-primary);
+            margin-right: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .offer-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .offer-text span {
+            color: var(--gold-primary);
+            font-weight: 600;
+        }
+
+        /* ===== AS FEATURED IN SECTION ===== */
+        .press {
+            padding: 60px 0;
+            background: white;
+        }
+
+        .press-title {
+            text-align: center;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .press-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            opacity: 0.6;
+            transition: var(--transition);
+        }
+
+        .press-logo {
+            height: 30px;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .press-logo:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        /* ===== STYLE MOMENTS SECTION ===== */
+        .moments-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .moment-card {
+            position: relative;
+            height: 350px;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition);
+        }
+
+        .moment-card.appear {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .moment-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .moment-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: white;
+            text-align: center;
+        }
+
+        .moment-overlay p {
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--gold-light);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--cream-dark);
+            color: var(--charcoal);
+            padding: 60px 0 20px;
+            border-top: 1px solid var(--gold-light);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .footer-logo img {
+            height: 70px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 35px;
+            height: 2px;
+            background: var(--gold-primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #555;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold-primary);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-primary);
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .social-links a:hover {
+            background: var(--gold-primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .newsletter-form input {
+            padding: 10px 12px;
+            border: 1px solid var(--gold-light);
+            background: white;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .newsletter-form .btn {
+            padding: 10px;
+            font-size: 0.8rem;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        /* ===== WHATSAPP FLOATING BUTTON ===== */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #25D366;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            animation: float 3s ease-in-out infinite;
+            transition: var(--transition);
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1) translateY(-5px);
+            animation: none;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* ===== PLACEHOLDER STYLES ===== */
+        .skeleton-loader {
+            background-color: var(--cream-medium);
+            background-image: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.6),
+                transparent
+            );
+            background-size: 200% 100%;
+            background-repeat: no-repeat;
+            border-radius: 4px;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        .skeleton-pattern-stripe {
+            background: linear-gradient(
+                45deg,
+                var(--cream-medium) 25%,
+                var(--gold-light) 25%,
+                var(--gold-light) 50%,
+                var(--cream-medium) 50%,
+                var(--cream-medium) 75%,
+                var(--gold-light) 75%,
+                var(--gold-light)
+            );
+            background-size: 20px 20px;
+            animation: skeleton-moving-stripe 1.5s linear infinite;
+        }
+
+        .skeleton-shimmer {
+            background: linear-gradient(
+                90deg,
+                var(--cream-medium) 0%,
+                var(--gold-light) 40%,
+                var(--gold-light) 60%,
+                var(--cream-medium) 100%
+            );
+            background-size: 200% 100%;
+            animation: skeleton-shine 1.5s infinite;
+        }
+
+        @keyframes skeleton-shine {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+        
+        @keyframes skeleton-moving-stripe {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .values-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .moments-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            section {
+                padding: 60px 0;
+            }
+            
+            .hero {
+                height: 80vh;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+                margin-bottom: 40px;
+            }
+            
+            .categories-grid, .moments-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .category-card, .moment-card {
+                height: 250px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .press-logos {
+                gap: 25px;
+            }
+            
+            .press-logo {
+                height: 25px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                height: 70vh;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .offer-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .offer-icon {
+                margin-right: 0;
+            }
+        }
     </style>
 </head>
-<body class="bg-white text-gray-900 font-sans antialiased">
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">JMPOTTERS</a>
+            
+            <!-- Desktop Navigation -->
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+           
+                <!-- Footwear dropdown -->
+                <li class="dropdown">
+                    <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-content">
+                        <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
+                        <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
+                    </div>
+                </li>
+                
+                <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
+                <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
+                <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
+                <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
+                <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
+                <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
+                <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
+            </ul>
+            
+            <div class="header-icons">
+                <div class="header-icon" id="wishlistIcon">
+                    <i class="fas fa-heart"></i>
+                    <span class="icon-badge" id="wishlistCount">0</span>
+                </div>
+                <div class="header-icon" id="cartIcon">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="icon-badge" id="cartCount">0</span>
+                </div>
+            </div>
+            
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
 
-    <!-- This is where our React App will be rendered -->
-    <div id="root"></div>
+    <!-- Mobile Navigation -->
+    <div class="overlay" id="navOverlay"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <a href="index.html" class="logo">JMPOTTERS</a>
+            <button class="close-nav">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
 
-    <!-- React, ReactDOM, and Babel (for JSX transformation) -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Framer Motion for Animations -->
-    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.min.js"></script>
+            <!-- Mobile Footwear dropdown -->
+            <li class="mobile-dropdown" id="mobileFootwearDropdown">
+                <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
+                <div class="mobile-dropdown-content">
+                    <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
+                    <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
+                </div>
+            </li>
+            
+            <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
+            <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
+            <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
+            <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
+            <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
+            <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
+            <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
+        </ul>
+    </div>
 
-    <!-- The Main React Application -->
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { motion } = Motion;
+    <!-- Value Propositions -->
+    <section class="values">
+        <div class="container">
+            <div class="values-container">
+                <div class="value-card">
+                    <i class="fas fa-truck"></i>
+                    <h4>Free Shipping</h4>
+                    <p>On all orders over ₦50,000</p>
+                </div>
+                <div class="value-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>Secure Payment</h4>
+                    <p>100% secure payment gateway</p>
+                </div>
+                <div class="value-card">
+                    <i class="fas fa-undo"></i>
+                    <h4>Easy Returns</h4>
+                    <p>30-day money-back guarantee</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // --- ASSETS & DATA ---
-        const logoUrl = "https://z-cdn-media.chatglm.cn/files/8abd1e94-e6ed-4f84-a6a1-efbe90ae5b5d.jpg?auth_key=1865160369-b0c435845f054c90a11fe05be480737c-0-7b0e0046923aa96d5bfc8322aacb749b";
-        const categories = [
-            { name: 'Shoes', image: 'jmpotters-shoes-category' },
-            { name: 'Clothing', image: 'jmpotters-clothing-category' },
-            { name: 'Bags', image: 'jmpotters-bags-category' },
-            { name: 'Home', image: 'jmpotters-home-category' },
-        ];
-        const products = [
-            { id: 1, name: 'The Urban Backpack', price: '$89', image: 'jmpotters-backpack' },
-            { id: 2, name: 'Minimalist Sneakers', price: '$120', image: 'jmpotters-sneakers' },
-            { id: 3, name: 'Linen Summer Shirt', price: '$65', image: 'jmpotters-shirt' },
-            { id: 4, name: 'Ceramic Vase Set', price: '$45', image: 'jmpotters-vase' },
-        ];
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Where Style Meets Simplicity</h1>
+                <p>Explore fashion-forward collections for every space and season</p>
+                <a href="#products" class="btn">Browse Collection</a>
+            </div>
+        </div>
+    </section>
 
-        // --- COMPONENTS ---
+    <!-- Featured Categories -->
+    <section class="categories">
+        <div class="container">
+            <h2 class="section-title">Shop by Category</h2>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Footwear">
+                    <div class="category-overlay">
+                        <h3>Footwear</h3>
+                        <p>Step into elegance</p>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Fashion">
+                    <div class="category-overlay">
+                        <h3>Fashion</h3>
+                        <p>Timeless pieces for every occasion</p>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Home Essentials">
+                    <div class="category-overlay">
+                        <h3>Home Essentials</h3>
+                        <p>Elevate your living space</p>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Accessories">
+                    <div class="category-overlay">
+                        <h3>Accessories</h3>
+                        <p>Finishing touches to perfection</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        const Reveal = ({ children }) => {
-            return (
-                <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.2 }}
-                    transition={{ duration: 0.6, ease: 'easeOut' }}
-                >
-                    {children}
-                </motion.div>
-            );
+    <!-- Top Products -->
+    <section class="top-products" id="products">
+        <div class="container">
+            <h2 class="section-title">Top Picks</h2>
+            <div class="products-container">
+                <!-- Product 1 -->
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
+                    </div>
+                    <button class="quick-add-btn">Quick Add +</button>
+                    <div class="product-info">
+                        <h3>Minimalist Leather Sandals</h3>
+                        <p>Handcrafted premium leather with gold accents</p>
+                        <a href="womensfootwear.html" class="explore-link">Explore Collection <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Product 2 -->
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
+                    </div>
+                    <button class="quick-add-btn">Quick Add +</button>
+                    <div class="product-info">
+                        <h3>Cashmere Blend Sweater</h3>
+                        <p>Luxurious softness for everyday elegance</p>
+                        <a href="womensfootwear.html" class="explore-link">Explore Collection <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Product 3 -->
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
+                    </div>
+                    <button class="quick-add-btn">Quick Add +</button>
+                    <div class="product-info">
+                        <h3>Ceramic Tableware Set</h3>
+                        <p>Minimalist design for modern dining</p>
+                        <a href="household.html" class="explore-link">Explore Collection <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Product 4 -->
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product">
+                    </div>
+                    <button class="quick-add-btn">Quick Add +</button>
+                    <div class="product-info">
+                        <h3>Gold Accent Watch</h3>
+                        <p>Elegant timepiece for the modern woman</p>
+                        <a href="accessories.html" class="explore-link">Explore Collection <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Limited Offers -->
+    <section class="limited-offers">
+        <div class="container">
+            <div class="offer-banner">
+                <div class="offer-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="offer-text">
+                    <strong>Limited Stock:</strong> <span>Exclusive Dish Rack</span>, <span>Granite Pot Set</span>, 
+                    <span>Chafing Dish</span>, and <span>Ladders</span>.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- As Featured In -->
+    <section class="press">
+        <div class="container">
+            <h4 class="press-title">As Featured In</h4>
+            <div class="press-logos">
+                <!-- These would be replaced with actual logo images -->
+                <div class="skeleton-loader skeleton-pattern-stripe" style="width: 120px; height: 30px; border-radius: 2px;"></div>
+                <div class="skeleton-loader skeleton-pattern-stripe" style="width: 100px; height: 30px; border-radius: 2px;"></div>
+                <div class="skeleton-loader skeleton-pattern-stripe" style="width: 110px; height: 30px; border-radius: 2px;"></div>
+                <div class="skeleton-loader skeleton-pattern-stripe" style="width: 90px; height: 30px; border-radius: 2px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Style Moments -->
+    <section class="style-moments">
+        <div class="container">
+            <h2 class="section-title">Style Moments</h2>
+            <div class="moments-grid">
+                <div class="moment-card">
+                    <img src="https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Style Moment">
+                    <div class="moment-overlay">
+                        <p>Loved by 100+ happy customers</p>
+                    </div>
+                </div>
+                <div class="moment-card">
+                    <img src="https://images.unsplash.com/photo-1505842381624-c6b0579625a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Style Moment">
+                    <div class="moment-overlay">
+                        <p>Styled to fit your space</p>
+                    </div>
+                </div>
+                <div class="moment-card">
+                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Style Moment">
+                    <div class="moment-overlay">
+                        <p>Featured in top lifestyle magazines</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-logo">
+                <a href="index.html" class="logo">JMPOTTERS</a>
+            </div>
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>JMPOTTERS</h3>
+                    <p>Where Style Meets Simplicity. We curate elegant, minimalist pieces for the modern lifestyle.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Shop</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">New Arrivals</a></li>
+                        <li><a href="#">Best Sellers</a></li>
+                        <li><a href="#">Sale</a></li>
+                        <li><a href="footwear.html">Footwear</a></li>
+                        <li><a href="household.html">Home Essentials</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Information</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Returns & Exchanges</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to receive updates, access to exclusive deals, and more.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email address" required>
+                        <button type="submit" class="btn">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 JMPOTTERS. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile navigation toggle
+        const mobileToggle = document.getElementById('mobileToggle');
+        const mobileNav = document.getElementById('mobileNav');
+        const navOverlay = document.getElementById('navOverlay');
+        const closeNav = document.querySelector('.close-nav');
+        
+        mobileToggle.addEventListener('click', function() {
+            mobileNav.classList.add('active');
+            navOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeNav.addEventListener('click', function() {
+            mobileNav.classList.remove('active');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        navOverlay.addEventListener('click', function() {
+            mobileNav.classList.remove('active');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        // Scroll animations for sections
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
         };
 
-        const Navbar = () => {
-            const [isScrolled, setIsScrolled] = useState(false);
-            useEffect(() => {
-                const handleScroll = () => setIsScrolled(window.scrollY > 20);
-                window.addEventListener('scroll', handleScroll);
-                return () => window.removeEventListener('scroll', handleScroll);
-            }, []);
-            return (
-                <motion.nav initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 0.6, ease: 'easeOut' }} className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-md' : 'bg-transparent'}`}>
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between items-center h-16">
-                            <div className="flex-shrink-0"><img className="h-12 w-12 rounded-full object-cover" src={logoUrl} alt="Jmpotters Logo" /></div>
-                            <div className="hidden md:block"><div className="ml-10 flex items-baseline space-x-8">{['New Arrivals', 'Clothing', 'Shoes', 'Bags', 'Home'].map((item) => (<a key={item} href="#" className="text-gray-700 hover:text-brand-orange px-3 py-2 text-sm font-medium transition-colors">{item}</a>))}</div></div>
-                            <div className="flex items-center space-x-4">
-                                <svg className="w-6 h-6 text-gray-700 hover:text-brand-orange cursor-pointer transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                                <svg className="w-6 h-6 text-gray-700 hover:text-brand-orange cursor-pointer transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                            </div>
-                        </div>
-                    </div>
-                </motion.nav>
-            );
-        };
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('appear');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
 
-        const Hero = () => (
-            <section className="relative h-screen flex items-center justify-center overflow-hidden">
-                <img className="absolute inset-0 w-full h-full object-cover" src="https://picsum.photos/seed/jmpotters-hero-lifestyle/1920/1080.jpg" alt="Lifestyle background" />
-                <div className="absolute inset-0 bg-black/30"></div>
-                <div className="relative z-10 text-center text-white px-4">
-                    <Reveal><h1 className="text-5xl md:text-7xl font-light tracking-wide mb-4">Curated for Your <span className="font-bold">Lifestyle</span></h1></Reveal>
-                    <Reveal><p className="text-lg md:text-xl max-w-2xl mx-auto mb-8 font-light">Discover unique pieces for your wardrobe, home, and every moment in between. Welcome to Jmpotters.</p></Reveal>
-                    <Reveal><motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-brand-orange hover:bg-brand-red text-white font-bold py-3 px-8 rounded-full transition-colors duration-300">Shop The Collection</motion.button></Reveal>
-                </div>
-            </section>
-        );
-        
-        const FeaturedCategories = () => (
-            <section className="py-16 px-4">
-                <div className="max-w-7xl mx-auto">
-                    <Reveal><h2 className="text-3xl font-bold text-center mb-12">Shop by Category</h2></Reveal>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {categories.map((cat) => (
-                            <Reveal key={cat.name}>
-                                <div className="relative group overflow-hidden rounded-lg cursor-pointer">
-                                    <img src={`https://picsum.photos/seed/${cat.image}/600/600.jpg`} alt={cat.name} className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110" />
-                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center"><p className="text-white text-2xl font-semibold tracking-wider">{cat.name}</p></div>
-                                </div>
-                            </Reveal>
-                        ))}
-                    </div>
-                </div>
-            </section>
-        );
+        // Observe all elements with the class
+        document.querySelectorAll('.category-card, .product-card, .moment-card').forEach(card => {
+            observer.observe(card);
+        });
 
-        const FeaturedProducts = () => (
-            <section className="py-16 px-4 bg-gray-50">
-                <div className="max-w-7xl mx-auto">
-                    <Reveal><h2 className="text-3xl font-bold text-center mb-12">Featured Products</h2></Reveal>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {products.map((product) => (
-                            <Reveal key={product.id}>
-                                <div className="group cursor-pointer">
-                                    <div className="overflow-hidden rounded-lg bg-white mb-4"><img src={`https://picsum.photos/seed/${product.image}/500/600.jpg`} alt={product.name} className="w-full h-80 object-cover transition-transform duration-500 group-hover:scale-105" /></div>
-                                    <h3 className="text-lg font-medium">{product.name}</h3>
-                                    <p className="text-gray-600">{product.price}</p>
-                                </div>
-                            </Reveal>
-                        ))}
-                    </div>
-                </div>
-            </section>
-        );
+        // Add scroll padding to first section
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.getElementById('header');
+            const firstSection = document.querySelector('.hero');
+            if (header && firstSection) {
+                firstSection.style.paddingTop = header.offsetHeight + 'px';
+            }
+        });
 
-        const BrandStory = () => (
-            <section className="py-16 px-4">
-                <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
-                    <Reveal><div className="md:w-1/2"><img src="https://picsum.photos/seed/jmpotters-brand-story/600/400.jpg" alt="Brand story" className="rounded-lg shadow-xl" /></div></Reveal>
-                    <Reveal><div className="md:w-1/2"><h2 className="text-3xl font-bold mb-4">Our Story, Your Style</h2><p className="text-gray-600 mb-4">At Jmpotters, we believe that the items you choose should be more than just objects—they should be an extension of your personality and a reflection of your values.</p><p className="text-gray-600">We travel the world to find unique, high-quality pieces, from handcrafted accessories to timeless apparel, bringing them together in one curated collection designed to inspire and delight.</p></div></Reveal>
-                </div>
-            </section>
-        );
-        
-        const Newsletter = () => (
-            <section className="py-16 px-4 bg-brand-orange text-white">
-                <div className="max-w-2xl mx-auto text-center">
-                    <Reveal><h2 className="text-3xl font-bold mb-4">Stay in the Loop</h2><p className="text-lg mb-8">Get the latest on new arrivals, exclusive offers, and style tips.</p></Reveal>
-                    <Reveal><form className="flex flex-col sm:flex-row gap-4 justify-center"><input type="email" placeholder="Enter your email" className="w-full sm:w-96 px-4 py-3 rounded-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-white" /><button type="submit" className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300">Subscribe</button></form></Reveal>
-                </div>
-            </section>
-        );
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
 
-        const Footer = () => (
-            <footer className="bg-gray-900 text-white py-12 px-4">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div><img className="h-10 w-10 rounded-full object-cover mb-4" src={logoUrl} alt="Jmpotters Logo" /><p className="text-gray-400 text-sm">Curating style for every facet of your life.</p></div>
-                    <div><h4 className="font-semibold mb-4">Shop</h4><ul className="space-y-2 text-gray-400 text-sm"><li><a href="#" className="hover:text-white transition-colors">New Arrivals</a></li><li><a href="#" className="hover:text-white transition-colors">Best Sellers</a></li><li><a href="#" className="hover:text-white transition-colors">Sale</a></li></ul></div>
-                    <div><h4 className="font-semibold mb-4">Customer Care</h4><ul className="space-y-2 text-gray-400 text-sm"><li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li><li><a href="#" className="hover:text-white transition-colors">Shipping Info</a></li><li><a href="#" className="hover:text-white transition-colors">Returns</a></li></ul></div>
-                    <div><h4 className="font-semibold mb-4">Follow Us</h4><div className="flex space-x-4">{['facebook', 'twitter', 'instagram'].map((social) => (<motion.a key={social} href="#" whileHover={{ scale: 1.2 }} className="text-gray-400 hover:text-white transition-colors"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></motion.a>))}</div></div>
-                </div>
-                <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-gray-800 text-center text-gray-400 text-sm"><p>&copy; {new Date().getFullYear()} Jmpotters. All Rights Reserved.</p></div>
-            </footer>
-        );
+        // Quick add button functionality
+        document.querySelectorAll('.quick-add-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Update cart count
+                const cartCount = document.getElementById('cartCount');
+                let count = parseInt(cartCount.textContent);
+                cartCount.textContent = count + 1;
+                
+                // Visual feedback
+                this.textContent = 'Added!';
+                this.style.background = 'green';
+                
+                setTimeout(() => {
+                    this.textContent = 'Quick Add +';
+                    this.style.background = '';
+                }, 1500);
+            });
+        });
 
-        // --- MAIN APP COMPONENT ---
-        const App = () => (
-            <>
-                <Navbar />
-                <main>
-                    <Hero />
-                    <FeaturedCategories />
-                    <FeaturedProducts />
-                    <BrandStory />
-                    <Newsletter />
-                </main>
-                <Footer />
-            </>
-        );
+        // Mobile dropdown toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile dropdowns
+            const mobileDropdowns = document.querySelectorAll('.mobile-dropdown');
+            mobileDropdowns.forEach(dropdown => {
+                const link = dropdown.querySelector('a');
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('active');
+                });
+            });
+        });
 
-        // --- RENDER THE APP ---
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-
+        // Simulate loading with skeleton placeholders (for demo purposes)
+        document.addEventListener('DOMContentLoaded', function() {
+            // This would be replaced with actual image loading logic
+            setTimeout(() => {
+                const placeholders = document.querySelectorAll('.skeleton-loader');
+                placeholders.forEach(placeholder => {
+                    placeholder.style.display = 'none';
+                });
+            }, 2000);
+        });
     </script>
 </body>
 </html>
