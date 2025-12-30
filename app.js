@@ -59,14 +59,20 @@ async function loadProducts() {
 function getCurrentCategory() {
     const page = window.location.pathname.split('/').pop();
     
-    if (page.includes('mensfootwear') || page.includes('womensfootwear')) return 'footwear';
-    if (page.includes('bags')) return 'bags';
-    if (page.includes('accessories')) return 'accessories';
-    if (page.includes('household')) return 'household';
-    if (page.includes('kids')) return 'kids';
-    if (page.includes('healthcare')) return 'healthcare';
+    // Map pages to category names (must match database exactly)
+    const categoryMap = {
+        'mensfootwear.html': 'mensfootwear',
+        'womensfootwear.html': 'womensfootwear', 
+        'bags.html': 'bags',
+        'accessories.html': 'accessories',
+        'household.html': 'household',
+        'kids.html': 'kids',
+        'healthcare.html': 'healthcare',
+        'index.html': 'home',
+        '': 'home'
+    };
     
-    return 'home'; // Homepage
+    return categoryMap[page] || 'home';
 }
 
 function displayProducts(products) {
