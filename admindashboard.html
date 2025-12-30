@@ -1,1 +1,48 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - JMPOTTERS</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .admin-btn { padding: 10px 20px; margin: 10px; background: #000; color: #fff; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    
+    <button class="admin-btn" onclick="uploadProducts()">📤 Upload Products</button>
+    <button class="admin-btn" onclick="viewProducts()">👁️ View All Products</button>
+    <button class="admin-btn" onclick="clearCart()">🗑️ Clear Cart</button>
+    
+    <div id="adminResults"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+    
+    <script>
+    async function uploadProducts() {
+        // Your product upload logic
+        alert('Upload feature coming soon!');
+    }
+    
+    async function viewProducts() {
+        const { data: products } = await window.supabaseClient
+            .from('products')
+            .select('*');
+        
+        const results = document.getElementById('adminResults');
+        results.innerHTML = `<h3>Total Products: ${products.length}</h3>`;
+        
+        products.forEach(p => {
+            results.innerHTML += `<p>${p.name} - ₦${p.price} (${p.category})</p>`;
+        });
+    }
+    
+    function clearCart() {
+        localStorage.removeItem('jmpotters_cart');
+        localStorage.removeItem('jmpotters_wishlist');
+        alert('Cart and wishlist cleared!');
+    }
+    </script>
+</body>
+</html>
