@@ -1746,10 +1746,6 @@
     </style>
 </head>
 <body>
-    </script>
-    <!-- Add these right before the closing </body> tag -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
     <!-- Preloader -->
     <div class="preloader" id="preloader">
         <div class="preloader-text">
@@ -1868,7 +1864,7 @@
         <div class="container">
             <h2 class="section-title">Bags Collection</h2>
             <div class="masonry-grid" id="productsGrid">
-                <!-- Products will be loaded here dynamically -->
+                <!-- Products will be loaded here dynamically from Supabase -->
             </div>
         </div>
     </section>
@@ -1899,7 +1895,7 @@
             </div>
             <div class="swiper arrivals-swiper">
                 <div class="swiper-wrapper" id="arrivalsGrid">
-                    <!-- New arrivals will be loaded here dynamically -->
+                    <!-- New arrivals will be loaded here dynamically from Supabase -->
                 </div>
             </div>
         </div>
@@ -2096,869 +2092,89 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
+    <!-- Critical: Supabase must load FIRST -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Then other dependencies -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <!-- Finally our app.js -->
+    <script src="app.js"></script>
+    
+    <!-- Simplified Bags Page Script -->
     <script>
-        // ========== INITIALIZATION ========== //
         // Initialize AOS
         AOS.init({
             duration: 800,
             once: true
         });
 
-        // Product data for bags
-        const bagFilenames = [
-            "Chanel-Patterned-Bag-48000.jpg",
-            "Chanel-Patterned-Bag-AST-48000.jpg",
-            "Chanel-Patterned-Blue-48000.jpg",
-            "Chanel-Patterned-Purse-48000.jpg",
-            "Chanel-Patterned-Purse-Lotte-48000.jpg",
-            "Chicverse-8000.jpg",
-            "CMO-Bag-11500.jpg",
-            "D-Bag-8500.jpg",
-            "DG-Black-Glow-48000.jpg",
-            "Diamond-Clustered-Purse-28000.jpg",
-            "Eminence-BGT-12000.jpg",
-            "Esyllia-8000.jpg",
-            "Exotic-Gold-43000.jpg",
-            "Fashion-Bags-10000.jpg",
-            "Gilded-Grace-8000.jpg",
-            "Juli-8000.jpg",
-            "Luxe-Bella-8000.jpg",
-            "mim-min-13000.jpg",
-            "Min-Min-Bag-8000.jpg",
-            "Mirror-Purse-8000.jpg",
-            "Opulence-8000.jpg",
-            "Premim-Fashion-AAE-7000.jpg",
-            "Prestige-Handbag-7000.jpg",
-            "Tot-XSA-14000.jpg",
-            "Velvet-Noir-8000.jpg",
-            "Velvet-Noir-WGR-8500.jpg",
-            "Versace-Deluxe-38000.jpg",
-            "Viens-avec-8000.jpg"
-        ];
-
-        // Generate products array from filenames
-        const products = bagFilenames.map((filename, index) => {
-            // Remove extension
-            const nameWithPrice = filename.split('.')[0];
-            // Split into parts
-            const parts = nameWithPrice.split('-');
-            // Last part is price
-            const price = parseInt(parts.pop());
-            // Join remaining parts for name
-            const name = parts.join(' ');
+        // Hero carousel
+        document.addEventListener('DOMContentLoaded', function() {
+            const heroSlides = document.querySelectorAll('.hero-slide');
+            let currentSlide = 0;
             
-            return {
-                id: index + 1,
-                name,
-                price,
-                image: filename,
-                inWishlist: false
-            };
-        });
-
-        // Initialize variables
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-        let currentProduct = null;
-        let currentSlide = 0;
-        let heroSlides = [];
-
-        // Update wishlist status
-        products.forEach(product => {
-            product.inWishlist = wishlist.some(item => item.id === product.id);
-        });
-
-        // DOM Elements
-        const preloader = document.getElementById('preloader');
-        const productsGrid = document.getElementById('productsGrid');
-        const wishlistIcon = document.getElementById('wishlistIcon');
-        const wishlistCount = document.getElementById('wishlistCount');
-        const cartIcon = document.getElementById('cartIcon');
-        const cartCount = document.getElementById('cartCount');
-        const mobileToggle = document.getElementById('mobileToggle');
-        const mobileNav = document.getElementById('mobileNav');
-        const navOverlay = document.getElementById('navOverlay');
-        const closeNav = document.querySelector('.close-nav');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalClose = document.getElementById('modalClose');
-        const modalImage = document.getElementById('modalImage');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalPrice = document.getElementById('modalPrice');
-        const modalAddCart = document.getElementById('modalAddCart');
-        const modalWishlist = document.getElementById('modalWishlist');
-        const header = document.getElementById('header');
-        const arrivalsGrid = document.getElementById('arrivalsGrid');
-        const arrivalsPrev = document.getElementById('arrivalsPrev');
-        const arrivalsNext = document.getElementById('arrivalsNext');
-        const mobileFootwearDropdown = document.getElementById('mobileFootwearDropdown');
-        const statsGrid = document.getElementById('statsGrid');
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
-        const heroCarousel = document.getElementById('heroCarousel');
-        const cartPanel = document.getElementById('cartPanel');
-        const cartOverlay = document.getElementById('cartOverlay');
-        const closeCart = document.getElementById('closeCart');
-        const cartItems = document.getElementById('cartItems');
-        const cartTotal = document.getElementById('cartTotal');
-        const wishlistPanel = document.getElementById('wishlistPanel');
-        const wishlistOverlay = document.getElementById('wishlistOverlay');
-        const closeWishlist = document.getElementById('closeWishlist');
-        const wishlistItems = document.getElementById('wishlistItems');
-        const whatsappCheckout = document.getElementById('whatsappCheckout');
-
-        // Initialize Swiper carousels
-        let arrivalsSwiper = null;
-
-        // ========== INITIALIZE PAGE ========== //
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize preloader
-            initializePreloader();
-            
-            // Initialize header scroll effect
-            initializeHeader();
-            
-            // Render products
-            renderProducts();
-            renderArrivals();
-            
-            // Initialize cart and wishlist counts
-            updateWishlistCount();
-            updateCartCount();
-            
-            // Setup Swiper carousels
-            setupSwipers();
-            
-            // Setup custom hero carousel
-            setupHeroCarousel();
-            
-            // Mobile dropdown toggle
-            mobileFootwearDropdown.addEventListener('click', function(e) {
-                if (!e.target.closest('a')) {
-                    this.classList.toggle('active');
-                }
-            });
-            
-            // Cart and wishlist panel toggles
-            cartIcon.addEventListener('click', toggleCartPanel);
-            wishlistIcon.addEventListener('click', toggleWishlistPanel);
-            closeCart.addEventListener('click', closeCartPanel);
-            closeWishlist.addEventListener('click', closeWishlistPanel);
-            cartOverlay.addEventListener('click', closeCartPanel);
-            wishlistOverlay.addEventListener('click', closeWishlistPanel);
-        });
-
-        // ========== PRELOADER FUNCTIONS ========== //
-        function initializePreloader() {
-            const letters = document.querySelectorAll('.preloader-text span');
-            letters.forEach((letter, index) => {
-                setTimeout(() => {
-                    letter.style.transform = 'translateY(0)';
-                    letter.style.opacity = '1';
-                }, index * 150);
-            });
+            if (heroSlides.length > 0) {
+                setInterval(() => {
+                    heroSlides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % heroSlides.length;
+                    heroSlides[currentSlide].classList.add('active');
+                }, 5000);
+            }
             
             // Hide preloader after 3 seconds
             setTimeout(() => {
-                preloader.style.opacity = '0';
-                preloader.style.visibility = 'hidden';
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    preloader.style.visibility = 'hidden';
+                }
             }, 3000);
-        }
-
-        // ========== HEADER FUNCTIONS ========== //
-        function initializeHeader() {
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
-                }
-            });
-        }
-
-        // ========== CUSTOM HERO CAROUSEL (Task 4) ========== //
-        function setupHeroCarousel() {
-            heroSlides = document.querySelectorAll('.hero-slide');
             
-            // Start the carousel
-            if (heroSlides.length > 0) {
-                setInterval(rotateHeroSlides, 5000);
+            // Setup mobile navigation
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const navOverlay = document.getElementById('navOverlay');
+            const closeNav = document.querySelector('.close-nav');
+            
+            if (mobileToggle && mobileNav) {
+                mobileToggle.addEventListener('click', () => {
+                    mobileNav.classList.add('active');
+                    navOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+                
+                closeNav.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+                
+                navOverlay.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
             }
-        }
-
-        function rotateHeroSlides() {
-            // Hide current slide
-            heroSlides[currentSlide].classList.remove('active');
             
-            // Move to next slide
-            currentSlide = (currentSlide + 1) % heroSlides.length;
-            
-            // Show next slide
-            heroSlides[currentSlide].classList.add('active');
-        }
-
-        // ========== SWIPER FUNCTIONS ========== //
-        function setupSwipers() {
-            // New arrivals carousel
-            arrivalsSwiper = new Swiper('.arrivals-swiper', {
-                slidesPerView: 1,
-                spaceBetween: 20,
-                loop: true,
-                navigation: {
-                    nextEl: '#arrivalsNext',
-                    prevEl: '#arrivalsPrev',
-                },
-                breakpoints: {
-                    576: {
-                        slidesPerView: 2,
+            // Initialize Swiper for arrivals
+            if (document.querySelector('.arrivals-swiper')) {
+                const arrivalsSwiper = new Swiper('.arrivals-swiper', {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    loop: true,
+                    navigation: {
+                        nextEl: '#arrivalsNext',
+                        prevEl: '#arrivalsPrev',
                     },
-                    768: {
-                        slidesPerView: 3,
-                    },
-                    992: {
-                        slidesPerView: 4,
-                    }
-                }
-            });
-        }
-
-        // ========== CART & WISHLIST PANELS (Tasks 1-3) ========== //
-        function toggleCartPanel() {
-            cartPanel.classList.toggle('active');
-            cartOverlay.classList.toggle('active');
-            document.body.style.overflow = cartPanel.classList.contains('active') ? 'hidden' : '';
-            renderCartItems();
-        }
-
-        function closeCartPanel() {
-            cartPanel.classList.remove('active');
-            cartOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        function toggleWishlistPanel() {
-            wishlistPanel.classList.toggle('active');
-            wishlistOverlay.classList.toggle('active');
-            document.body.style.overflow = wishlistPanel.classList.contains('active') ? 'hidden' : '';
-            renderWishlistItems();
-        }
-
-        function closeWishlistPanel() {
-            wishlistPanel.classList.remove('active');
-            wishlistOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        function renderCartItems() {
-            cartItems.innerHTML = '';
-            
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<div class="panel-empty">Your cart is empty</div>';
-                cartTotal.textContent = '₦0.00';
-                return;
-            }
-            
-            let total = 0;
-            
-            cart.forEach((item, index) => {
-                total += item.price * item.quantity;
-                
-                const cartItem = document.createElement('div');
-                cartItem.className = 'panel-item';
-                cartItem.innerHTML = `
-                    <div class="panel-item-image">
-                        <img src="assets/images/${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="panel-item-details">
-                        <h4 class="panel-item-name">${item.name}</h4>
-                        <div class="panel-item-price">₦${item.price.toLocaleString()}</div>
-                        <div class="panel-item-quantity">
-                            <button class="quantity-btn decrease-quantity" data-index="${index}">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="quantity-btn increase-quantity" data-index="${index}">+</button>
-                        </div>
-                    </div>
-                    <button class="remove-item" data-index="${index}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-                cartItems.appendChild(cartItem);
-            });
-            
-            // Format total with 2 decimal places
-            cartTotal.textContent = `₦${total.toLocaleString()}`;
-            
-            // Setup event listeners for quantity buttons
-            document.querySelectorAll('.decrease-quantity').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    if (cart[index].quantity > 1) {
-                        cart[index].quantity--;
-                        localStorage.setItem('cart', JSON.stringify(cart));
-                        renderCartItems();
-                        updateCartCount();
+                    breakpoints: {
+                        576: { slidesPerView: 2 },
+                        768: { slidesPerView: 3 },
+                        992: { slidesPerView: 4 }
                     }
                 });
-            });
-            
-            document.querySelectorAll('.increase-quantity').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    cart[index].quantity++;
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    renderCartItems();
-                    updateCartCount();
-                });
-            });
-            
-            // Setup event listeners for remove buttons
-            document.querySelectorAll('.remove-item').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    cart.splice(index, 1);
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    renderCartItems();
-                    updateCartCount();
-                    showNotification('Item removed from cart');
-                });
-            });
-            
-            // Update WhatsApp checkout link with cart items
-            let whatsappMessage = "Hello! I'd like to purchase the following items:\n\n";
-            cart.forEach(item => {
-                whatsappMessage += `${item.name} - ₦${item.price.toLocaleString()} x ${item.quantity}\n`;
-            });
-            whatsappMessage += `\nTotal: ₦${total.toLocaleString()}\n\nPlease confirm availability and provide payment details.`;
-            
-            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(whatsappMessage)}`;
-        }
-
-        function renderWishlistItems() {
-            wishlistItems.innerHTML = '';
-            
-            if (wishlist.length === 0) {
-                wishlistItems.innerHTML = '<div class="panel-empty">Your wishlist is empty</div>';
-                return;
             }
-            
-            wishlist.forEach((item, index) => {
-                const wishlistItem = document.createElement('div');
-                wishlistItem.className = 'panel-item';
-                wishlistItem.innerHTML = `
-                    <div class="panel-item-image">
-                        <img src="assets/images/${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="panel-item-details">
-                        <h4 class="panel-item-name">${item.name}</h4>
-                        <div class="panel-item-price">₦${item.price.toLocaleString()}</div>
-                        <button class="btn-add-cart" data-id="${item.id}" style="margin-top: 10px;">
-                            <i class="fas fa-shopping-bag"></i> Add to Cart
-                        </button>
-                    </div>
-                    <button class="remove-item" data-id="${item.id}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-                wishlistItems.appendChild(wishlistItem);
-            });
-            
-            // Setup event listeners for add to cart buttons
-            document.querySelectorAll('.wishlist-panel .btn-add-cart').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    addToCart(product);
-                    showNotification(`${product.name} added to cart!`);
-                });
-            });
-            
-            // Setup event listeners for remove buttons
-            document.querySelectorAll('.wishlist-panel .remove-item').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    removeFromWishlist(productId);
-                    renderWishlistItems();
-                    updateWishlistCount();
-                    showNotification('Item removed from wishlist');
-                    
-                    // Update wishlist button in products grid
-                    const wishlistBtn = document.querySelector(`.wishlist-btn[data-id="${productId}"]`);
-                    if (wishlistBtn) {
-                        wishlistBtn.classList.remove('active');
-                    }
-                });
-            });
-        }
-
-        // ========== PRODUCT FUNCTIONS ========== //
-        function renderProducts() {
-            // Clear the grid
-            productsGrid.innerHTML = '';
-            
-            // Add products to the grid
-            products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'masonry-item';
-                productCard.setAttribute('data-aos', 'fade-up');
-                productCard.innerHTML = `
-                    <button class="wishlist-btn ${product.inWishlist ? 'active' : ''}" data-id="${product.id}">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                    <img src="assets/images/${product.image}" alt="${product.name}" class="masonry-image">
-                    <div class="masonry-overlay">
-                        <h3 class="masonry-title">${product.name}</h3>
-                        <div class="masonry-price">₦${product.price.toLocaleString()}</div>
-                        <p class="masonry-desc">Premium handcrafted bag with elegant design and durable materials.</p>
-                        
-                        <!-- Quantity selector -->
-                        <div class="quantity-selector">
-                            <button class="toggle-bulk-options">
-                                Bulk Options <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="quantity-options">
-                                <div class="quantity-option selected" data-qty="1">1 Unit</div>
-                                <div class="quantity-option" data-qty="10">10 Units</div>
-                                <div class="quantity-option" data-qty="25">25 Units</div>
-                                <div class="quantity-option" data-qty="50">50 Units</div>
-                                <div class="quantity-option" data-qty="100">100 Units</div>
-                            </div>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button class="btn-add-cart" data-id="${product.id}">
-                                <i class="fas fa-shopping-bag"></i> Add to Cart
-                            </button>
-                            <button class="btn-view-details" data-id="${product.id}">
-                                <i class="fas fa-eye"></i> View Details
-                            </button>
-                        </div>
-                    </div>
-                `;
-                productsGrid.appendChild(productCard);
-            });
-            
-            // Setup event listeners for the new products
-            setupProductInteractions();
-        }
-
-        function renderArrivals() {
-            // Clear the grid
-            arrivalsGrid.innerHTML = '';
-            
-            // Get 8 random products for arrivals
-            const arrivals = [...products].sort(() => 0.5 - Math.random()).slice(0, 8);
-            
-            // Add products to arrivals
-            arrivals.forEach(product => {
-                const arrivalCard = document.createElement('div');
-                arrivalCard.className = 'swiper-slide';
-                arrivalCard.innerHTML = `
-                    <div class="arrival-card">
-                        <button class="arrival-wishlist ${product.inWishlist ? 'active' : ''}" data-id="${product.id}">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                        <img src="assets/images/${product.image}" alt="${product.name}" class="arrival-image">
-                        <div class="arrival-details">
-                            <h3 class="arrival-title">${product.name}</h3>
-                            <div class="arrival-price">₦${product.price.toLocaleString()}</div>
-                            
-                            <!-- Quantity selector -->
-                            <div class="quantity-selector">
-                                <button class="toggle-bulk-options">
-                                    Bulk Options <i class="fas fa-chevron-down"></i>
-                                </button>
-                                <div class="quantity-options">
-                                    <div class="quantity-option selected" data-qty="1">1 Unit</div>
-                                    <div class="quantity-option" data-qty="10">10 Units</div>
-                                    <div class="quantity-option" data-qty="25">25 Units</div>
-                                    <div class="quantity-option" data-qty="50">50 Units</div>
-                                    <div class="quantity-option" data-qty="100">100 Units</div>
-                                </div>
-                            </div>
-                            
-                            <div class="arrival-actions">
-                                <button class="arrival-btn arrival-cart" data-id="${product.id}">
-                                    <i class="fas fa-shopping-bag"></i> Add to Cart
-                                </button>
-                                <button class="arrival-btn arrival-view" data-id="${product.id}">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                arrivalsGrid.appendChild(arrivalCard);
-            });
-            
-            // Setup event listeners for arrivals
-            setupArrivalsInteractions();
-            
-            // Update Swiper if it exists
-            if (arrivalsSwiper) {
-                arrivalsSwiper.update();
-            }
-        }
-
-        function setupProductInteractions() {
-            // Add to Cart buttons
-            document.querySelectorAll('.btn-add-cart').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    // Get selected quantity
-                    const card = this.closest('.masonry-item');
-                    const selectedQty = card.querySelector('.quantity-option.selected');
-                    const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
-                    
-                    addToCart(product, quantity);
-                });
-            });
-            
-            // View Details buttons
-            document.querySelectorAll('.btn-view-details').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    currentProduct = products.find(p => p.id === productId);
-                    openProductModal(currentProduct);
-                });
-            });
-            
-            // Wishlist buttons
-            document.querySelectorAll('.wishlist-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    if (this.classList.contains('active')) {
-                        removeFromWishlist(productId);
-                        this.classList.remove('active');
-                    } else {
-                        addToWishlist(product);
-                        this.classList.add('active');
-                        createHeartExplosion(this);
-                    }
-                });
-            });
-            
-            // Quantity option selection
-            document.querySelectorAll('.quantity-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options
-                    this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
-                        el.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                });
-            });
-            
-            // Toggle bulk options
-            document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const options = this.nextElementSibling;
-                    options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
-                });
-            });
-        }
-
-        function setupArrivalsInteractions() {
-            // Add to Cart buttons
-            document.querySelectorAll('.arrival-cart').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    // Get selected quantity
-                    const card = this.closest('.arrival-details');
-                    const selectedQty = card.querySelector('.quantity-option.selected');
-                    const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
-                    
-                    addToCart(product, quantity);
-                });
-            });
-            
-            // View Details buttons
-            document.querySelectorAll('.arrival-view').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    currentProduct = products.find(p => p.id === productId);
-                    openProductModal(currentProduct);
-                });
-            });
-            
-            // Wishlist buttons
-            document.querySelectorAll('.arrival-wishlist').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    if (this.classList.contains('active')) {
-                        removeFromWishlist(productId);
-                        this.classList.remove('active');
-                    } else {
-                        addToWishlist(product);
-                        this.classList.add('active');
-                        createHeartExplosion(this);
-                    }
-                });
-            });
-            
-            // Quantity option selection
-            document.querySelectorAll('.arrival-details .quantity-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options
-                    this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
-                        el.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                });
-            });
-            
-            // Toggle bulk options
-            document.querySelectorAll('.arrival-details .toggle-bulk-options').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const options = this.nextElementSibling;
-                    options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
-                });
-            });
-        }
-
-        function openProductModal(product) {
-            modalImage.src = `assets/images/${product.image}`;
-            modalTitle.textContent = product.name;
-            modalPrice.textContent = `₦${product.price.toLocaleString()}`;
-            
-            // Set data-id for buttons
-            modalAddCart.setAttribute('data-id', product.id);
-            modalWishlist.setAttribute('data-id', product.id);
-            
-            // Update wishlist button state
-            modalWishlist.classList.toggle('active', product.inWishlist);
-            modalWishlist.innerHTML = product.inWishlist 
-                ? '<i class="fas fa-check"></i> Added to Wishlist' 
-                : '<i class="fas fa-heart"></i> Add to Wishlist';
-            
-            // Generate random stats
-            generateRandomStats();
-            
-            // Show modal
-            modalOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function generateRandomStats() {
-            statsGrid.innerHTML = '';
-            
-            // Generate random stats for each product
-            const stats = [
-                { 
-                    label: "Customer Satisfaction", 
-                    value: `${Math.floor(Math.random() * 14) + 85}%` 
-                },
-                { 
-                    label: "Average Rating", 
-                    value: `${(Math.floor(Math.random() * 6) + 45) / 10}/5`
-                },
-                { 
-                    label: "Units Sold This Week", 
-                    value: Math.floor(Math.random() * 50) + 20
-                },
-                { 
-                    label: "Recommend to Friends", 
-                    value: `${Math.floor(Math.random() * 10) + 90}%` 
-                }
-            ];
-            
-            // Add stats to the grid
-            stats.forEach(stat => {
-                const statItem = document.createElement('div');
-                statItem.className = 'stat-item';
-                statItem.innerHTML = `
-                    <div class="stat-value">${stat.value}</div>
-                    <div class="stat-label">${stat.label}</div>
-                `;
-                statsGrid.appendChild(statItem);
-            });
-        }
-
-        // Close modal
-        modalClose.addEventListener('click', () => {
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-
-        // ========== CART FUNCTIONS ========== //
-        function addToCart(product, quantity = 1) {
-            const existingItem = cart.find(item => item.id === product.id);
-            
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    quantity: quantity,
-                    image: product.image
-                });
-            }
-            
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            
-            // Show notification
-            showNotification(`${quantity} ${product.name} added to cart!`);
-        }
-
-        function updateCartCount() {
-            const count = cart.reduce((total, item) => total + item.quantity, 0);
-            cartCount.textContent = count;
-        }
-
-        // ========== WISHLIST FUNCTIONS ========== //
-        function addToWishlist(product) {
-            if (!wishlist.some(item => item.id === product.id)) {
-                wishlist.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    image: product.image
-                });
-                
-                localStorage.setItem('wishlist', JSON.stringify(wishlist));
-                updateWishlistCount();
-                
-                // Update product status
-                product.inWishlist = true;
-                
-                // Show notification
-                showNotification(`${product.name} added to wishlist!`);
-            }
-        }
-
-        function removeFromWishlist(productId) {
-            wishlist = wishlist.filter(item => item.id !== productId);
-            localStorage.setItem('wishlist', JSON.stringify(wishlist));
-            updateWishlistCount();
-            
-            // Update product status
-            const product = products.find(p => p.id === productId);
-            if (product) product.inWishlist = false;
-        }
-
-        function updateWishlistCount() {
-            wishlistCount.textContent = wishlist.length;
-        }
-
-        // ========== HEART EXPLOSION EFFECT ========== //
-        function createHeartExplosion(button) {
-            for (let i = 0; i < 7; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'heart-particle';
-                heart.innerHTML = '❤️';
-                
-                // Position at button
-                const rect = button.getBoundingClientRect();
-                heart.style.left = (rect.left + rect.width / 2) + 'px';
-                heart.style.top = (rect.top + rect.height / 2) + 'px';
-                
-                document.body.appendChild(heart);
-                
-                // Random movement (float up and maybe left/right a bit)
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 50 + Math.random() * 100;
-                const tx = Math.cos(angle) * distance;
-                const ty = -Math.abs(Math.sin(angle) * distance * 2); // mostly upward
-                
-                // Animate
-                heart.animate([
-                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                    { transform: `translate(${tx}px, ${ty}px) scale(1.5)`, opacity: 0 }
-                ], {
-                    duration: 1500 + Math.random() * 1000,
-                    easing: 'ease-out',
-                    fill: 'forwards'
-                });
-                
-                // Remove after animation
-                setTimeout(() => {
-                    heart.remove();
-                }, 2500);
-            }
-        }
-
-        // ========== MODAL BUTTON HANDLERS ========== //
-        modalAddCart.addEventListener('click', function() {
-            const productId = parseInt(this.getAttribute('data-id'));
-            const product = products.find(p => p.id === productId);
-            
-            // Get selected quantity
-            const selectedQty = document.querySelector('.modal .quantity-option.selected');
-            const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
-            
-            addToCart(product, quantity);
-            
-            // Close modal
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        modalWishlist.addEventListener('click', function() {
-            const productId = parseInt(this.getAttribute('data-id'));
-            const product = products.find(p => p.id === productId);
-            
-            if (this.classList.contains('active')) {
-                removeFromWishlist(productId);
-                this.classList.remove('active');
-                this.innerHTML = '<i class="fas fa-heart"></i> Add to Wishlist';
-            } else {
-                addToWishlist(product);
-                this.classList.add('active');
-                this.innerHTML = '<i class="fas fa-check"></i> Added to Wishlist';
-                createHeartExplosion(this);
-            }
-        });
-
-        // ========== NOTIFICATION FUNCTION ========== //
-        function showNotification(message) {
-            notificationText.textContent = message;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // ========== PANEL TOGGLE FUNCTIONS ========== //
-        // Mobile navigation toggle
-        mobileToggle.addEventListener('click', function() {
-            mobileNav.classList.add('active');
-            navOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-        
-        closeNav.addEventListener('click', function() {
-            mobileNav.classList.remove('active');
-            navOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        
-        navOverlay.addEventListener('click', function() {
-            mobileNav.classList.remove('active');
-            navOverlay.classList.remove('active');
-            document.body.style.overflow = '';
         });
     </script>
 </body>
