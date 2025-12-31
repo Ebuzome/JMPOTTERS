@@ -455,7 +455,7 @@ function detectCurrentCategory() {
         'bags.html': 'bags',
         'household.html': 'household',
         'healthcare.html': 'healthcare',
-        'electronics.html': 'electronics'
+        'accessories.html': 'accessories'
     };
     
     return categoryMap[pageName] || 'mensfootwear'; // default
