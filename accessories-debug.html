@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessorize with Elegance | JMPOTTERS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* [KEEP ALL YOUR EXISTING CSS STYLES] */
+        :root {
+            --primary-color: #1abc9c;
+            --accent-color: #ff6f61;
+            --dark-color: #2c2c2c;
+            --light-color: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --transition: .35s cubic-bezier(.4, 0, .2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; color: var(--dark-color); background: var(--light-color); line-height: 1.6; }
+        
+        /* Debug panel */
+        #debugPanel {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 500px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 9999;
+            display: none;
+        }
+        #debugPanel.active { display: block; }
+        #toggleDebug {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: #000;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 10000;
+        }
+        
+        /* [REST OF YOUR CSS STYLES REMAIN THE SAME] */
+        /* ... copy all your existing CSS here ... */
+    </style>
+</head>
+<body>
+    <!-- Debug Panel -->
+    <div id="debugPanel"></div>
+    <button id="toggleDebug">Toggle Debug</button>
+
+    <!-- [KEEP ALL YOUR EXISTING HTML STRUCTURE] -->
+    <!-- Header, Hero, Filters, Product Grid, Footer -->
+    <!-- Copy all your HTML from the previous version -->
+
+    <!-- ========= SUPABASE & DEBUG SCRIPT ========= -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Debug logging function
+        function debugLog(message, type = 'info') {
+            const panel = document.getElementById('debugPanel');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6b6b' : type === 'success' ? '#1dd1a1' : '#54a0ff';
+            
+            if (panel) {
+                panel.innerHTML += `<div style="color:${color};margin-bottom:5px;">[${timestamp}] ${message}</div>`;
+                panel.scrollTop = panel.scrollHeight;
+            }
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Toggle debug panel
+        document.getElementById('toggleDebug').addEventListener('click', () => {
+            document.getElementById('debugPanel').classList.toggle('active');
+        });
+
+        // Configuration
+        window.SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+        window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUwMDE4ODUsImV4cCI6MjA1MDU3Nzg4NX0.9O44TzEV47M1qV0RlBfd7Tus0mpWxP35GR10l6MjwXo';
+        window.currentCategory = 'accessories';
+
+        // TEST 1: Check if Supabase loads
+        debugLog('Step 1: Loading Supabase...');
+        if (typeof supabase === 'undefined') {
+            debugLog('ERROR: Supabase library not loaded', 'error');
+        } else {
+            debugLog('✅ Supabase library loaded', 'success');
+        }
+
+        // Create Supabase client
+        const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        debugLog('Step 2: Supabase client created');
+
+        // TEST 2: Load products directly (bypass app.js for now)
+        async function loadProductsDirectly() {
+            debugLog('Step 3: Attempting to load products...');
+            
+            try {
+                // 1. Get accessories category
+                debugLog('→ Querying categories table...');
+                const { data: category, error: catError } = await supabaseClient
+                    .from('categories')
+                    .select('id, name, slug')
+                    .eq('slug', 'accessories')
+                    .single();
+                
+                if (catError) {
+                    debugLog(`❌ Category error: ${catError.message}`, 'error');
+                    return;
+                }
+                
+                if (!category) {
+                    debugLog('❌ Accessories category not found in database', 'error');
+                    return;
+                }
+                
+                debugLog(`✅ Category found: ${category.name} (ID: ${category.id})`, 'success');
+                
+                // 2. Get products for this category
+                debugLog('→ Querying products table...');
+                const { data: products, error: prodError } = await supabaseClient
+                    .from('products')
+                    .select('*')
+                    .eq('category_id', category.id)
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false });
+                
+                if (prodError) {
+                    debugLog(`❌ Products error: ${prodError.message}`, 'error');
+                    return;
+                }
+                
+                debugLog(`✅ Found ${products?.length || 0} products`, 'success');
+                
+                // 3. Render products
+                if (!products || products.length === 0) {
+                    debugLog('No products found for accessories', 'error');
+                    document.getElementById('productsGrid').innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                            <h3>No Accessories Found</h3>
+                            <p>The database is empty for this category.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                debugLog(`Rendering ${products.length} products...`);
+                renderProductsDirectly(products);
+                
+            } catch (error) {
+                debugLog(`❌ Fatal error: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            }
+        }
+
+        function renderProductsDirectly(products) {
+            const productsGrid = document.getElementById('productsGrid');
+            if (!productsGrid) {
+                debugLog('❌ productsGrid element not found', 'error');
+                return;
+            }
+            
+            productsGrid.innerHTML = '';
+            
+            // Image base URL
+            const IMAGE_BASE = 'https://ebuzome.github.io/JMPOTTERS/assets/images/accessories/';
+            
+            products.forEach(product => {
+                const imageUrl = IMAGE_BASE + product.image_url;
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.name}" 
+                             onerror="console.error('Image failed:', this.src)">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.name}</h3>
+                        <div class="product-price">₦${product.price.toLocaleString()}</div>
+                        <div class="product-stock">${product.stock} in stock</div>
+                        <button class="cart-btn" onclick="addToCartDirectly(${product.id})">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                `;
+                productsGrid.appendChild(productCard);
+                
+                // Log each product
+                debugLog(`📦 ${product.name} - ₦${product.price} - ${imageUrl}`);
+            });
+            
+            debugLog(`✅ Successfully rendered ${products.length} products`, 'success');
+        }
+
+        // Simple cart function for testing
+        function addToCartDirectly(productId) {
+            debugLog(`Adding product ${productId} to cart`);
+            alert(`Product ${productId} added to cart (test)`);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('DOM loaded, starting tests...');
+            
+            // Run mobile nav code
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const navOverlay = document.getElementById('navOverlay');
+            const closeNav = document.querySelector('.close-nav');
+            
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => {
+                    mobileNav.classList.add('active');
+                    navOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+            
+            if (closeNav) {
+                closeNav.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            if (navOverlay) {
+                navOverlay.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            // Load products directly (bypass app.js)
+            loadProductsDirectly();
+        });
+
+        // Also try to load app.js but handle errors
+        setTimeout(() => {
+            debugLog('Attempting to load app.js...');
+            const script = document.createElement('script');
+            script.src = 'app.js';
+            script.onload = () => debugLog('✅ app.js loaded successfully', 'success');
+            script.onerror = () => debugLog('❌ Failed to load app.js', 'error');
+            document.head.appendChild(script);
+        }, 1000);
+    </script>
+</body>
+</html>
