@@ -1,144 +1,30 @@
-// app.js - ENHANCED VERSION WITH CATEGORIES, CART & CHECKOUT
-console.log('🎯 Starting Supabase integration...');
+// ====================
+// CONFIGURATION
+// ====================
+const SUPABASE_URL = window.SUPABASE_URL || 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUwMDE4ODUsImV4cCI6MjA1MDU3Nzg4NX0.9O44TzEV47M1qV0RlBfd7Tus0mpWxP35GR10l6MjwXo';
 
-// Your credentials
-const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUwMDE4ODUsImV4cCI6MjA1MDU3Nzg4NX0.9O44TzEV47M1qV0RlBfd7Tus0mpWxP35GR10l6MjwXo';
-
-// Initialize
+// Initialize Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-window.supabaseClient = supabase;
 
-console.log('✅ Supabase ready');
+// ====================
+// IMAGE PATH CONFIGURATION
+// ====================
+const IMAGE_BASE_URL = 'https://ebuzome.io/JMPOTTERS/assets/images/';
 
-// ============================================
-// 1. PRODUCT FUNCTIONS - BY CATEGORY
-// ============================================
+// Image paths for each category
+const CATEGORY_IMAGE_PATHS = {
+    'mensfootwear': IMAGE_BASE_URL + 'mensfootwear/',
+    'womensfootwear': IMAGE_BASE_URL,  // Root images folder
+    'bags': IMAGE_BASE_URL,            // Same as womensfootwear
+    'household': IMAGE_BASE_URL + 'household2/',
+    'kids': IMAGE_BASE_URL + 'kids/',
+    'accessories': IMAGE_BASE_URL + 'accessories/'
+};
 
-async function loadProductsByCategory(categorySlug) {
-    console.log(`📦 Loading products for category: ${categorySlug}`);
-    
-    try {
-        // First, get the category ID from slug
-        const { data: category, error: catError } = await supabase
-            .from('categories')
-            .select('id, name')
-            .eq('slug', categorySlug)
-            .single();
-        
-        if (catError) {
-            console.error('❌ Category error:', catError);
-            showError(catError);
-            return;
-        }
-        
-        if (!category) {
-            console.error(`❌ Category "${categorySlug}" not found`);
-            showError(new Error(`Category not found: ${categorySlug}`));
-            return;
-        }
-        
-        // Update page title if needed
-        const pageTitle = document.getElementById('page-title');
-        if (pageTitle && category.name) {
-            pageTitle.textContent = category.name;
-        }
-        
-        // Get products for this category
-        const { data: products, error } = await supabase
-            .from('products')
-            .select('*')
-            .eq('category_id', category.id)
-            .eq('is_active', true)
-            .order('created_at', { ascending: false });
-        
-        if (error) {
-            console.error('❌ Products error:', error);
-            showError(error);
-            return;
-        }
-        
-        console.log(`✅ Found ${products?.length || 0} products for ${categorySlug}`);
-        
-        if (!products || products.length === 0) {
-            showNoProducts();
-            return;
-        }
-        
-        // Show products
-        showProducts(products, categorySlug);
-        
-    } catch (err) {
-        console.error('❌ Fatal error:', err);
-        showError(err);
-    }
-}
-
-// Show products in your grid
-function showProducts(products, categorySlug) {
-    const grid = document.getElementById('productsGrid');
-    if (!grid) {
-        console.error('❌ #productsGrid not found!');
-        return;
-    }
-    
-    // Clear
-    grid.innerHTML = '';
-    
-    // Add each product
-    products.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        
-        // Build image URL based on your structure
-        const imageUrl = product.image_url.startsWith('http') 
-            ? product.image_url 
-            : `https://ebuzome.github.io/JMPOTTERS/assets/images/${categorySlug}/${product.image_url}`;
-        
-        // Calculate discount (optional)
-        const fakePrice = Math.round(product.price * 1.3);
-        const discount = Math.floor((fakePrice - product.price) / fakePrice * 100);
-        
-        card.innerHTML = `
-            <div class="product-image">
-                <div class="product-badge">-${discount}%</div>
-                <img src="${imageUrl}" alt="${product.name}" loading="lazy"
-                     onerror="this.src='https://ebuzome.github.io/JMPOTTERS/assets/images/placeholder.jpg'">
-            </div>
-            <div class="product-info">
-                <h3 class="product-title">${product.name}</h3>
-                ${product.description ? `<p class="product-desc">${product.description}</p>` : ''}
-                <div class="product-price">
-                    <del class="price-fake">₦${fakePrice.toLocaleString()}</del>
-                    <span class="price-real">₦${product.price.toLocaleString()}</span>
-                </div>
-                <div class="availability ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}">
-                    <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i>
-                    ${product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock'}
-                </div>
-                <div class="action-buttons">
-                    <button class="btn-add-cart" onclick="addToCart(${product.id})" 
-                            ${product.stock === 0 ? 'disabled' : ''}>
-                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                    </button>
-                    <button class="btn-view-details" onclick="viewDetails(${product.id})">
-                        <i class="fas fa-eye"></i> Details
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        grid.appendChild(card);
-    });
-    
-    console.log('✅ Products displayed');
-}
-
-// ============================================
-// 2. CART FUNCTIONS - WITH SUPABASE BACKUP
-// ============================================
-
-// Generate session ID for guest
+// ====================
+// UTILITY FUNCTIONS
+// ====================
 function getSessionId() {
     let sessionId = localStorage.getItem('session_id');
     if (!sessionId) {
@@ -148,269 +34,9 @@ function getSessionId() {
     return sessionId;
 }
 
-// Add to cart (local + Supabase backup)
-window.addToCart = async function(productId) {
-    console.log(`Adding product ${productId} to cart`);
-    
-    try {
-        // Get product details
-        const { data: product, error } = await supabase
-            .from('products')
-            .select('*')
-            .eq('id', productId)
-            .single();
-        
-        if (error) throw error;
-        
-        if (product.stock < 1) {
-            alert('❌ Product out of stock!');
-            return;
-        }
-        
-        // 1. Add to localStorage (immediate)
-        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const existingItem = cart.find(item => item.product_id === productId);
-        
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            cart.push({
-                product_id: productId,
-                quantity: 1,
-                name: product.name,
-                price: product.price,
-                image_url: product.image_url,
-                added_at: new Date().toISOString()
-            });
-        }
-        
-        localStorage.setItem('cart', JSON.stringify(cart));
-        
-        // 2. Backup to Supabase (guest_carts table)
-        const sessionId = getSessionId();
-        const { error: supabaseError } = await supabase
-            .from('guest_carts')
-            .upsert({
-                session_id: sessionId,
-                product_id: productId,
-                quantity: existingItem ? existingItem.quantity + 1 : 1
-            }, {
-                onConflict: 'session_id,product_id'
-            });
-        
-        if (supabaseError) {
-            console.warn('Supabase cart backup failed:', supabaseError);
-        }
-        
-        // Update UI
-        updateCartUI();
-        
-        // Show success
-        showNotification('✅ Added to cart!', 'success');
-        
-    } catch (err) {
-        console.error('❌ Cart error:', err);
-        showNotification('Failed to add to cart', 'error');
-    }
-};
-
-// Update cart UI
-function updateCartUI() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    // Update cart count
-    document.querySelectorAll('.cart-count').forEach(el => {
-        el.textContent = totalItems;
-        el.style.display = totalItems > 0 ? 'inline-block' : 'none';
-    });
-    
-    // Update cart dropdown if exists
-    const cartDropdown = document.getElementById('cartDropdown');
-    if (cartDropdown) {
-        if (totalItems === 0) {
-            cartDropdown.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-        } else {
-            let cartHTML = `
-                <div class="cart-header">
-                    <h4>Your Cart (${totalItems} items)</h4>
-                    <small>₦${totalPrice.toLocaleString()}</small>
-                </div>
-                <div class="cart-items">
-            `;
-            
-            cart.forEach(item => {
-                cartHTML += `
-                    <div class="cart-item">
-                        <img src="https://ebuzome.github.io/JMPOTTERS/assets/images/mensfootwear/${item.image_url}" 
-                             alt="${item.name}" width="50">
-                        <div class="cart-item-info">
-                            <strong>${item.name}</strong>
-                            <div>₦${item.price.toLocaleString()} × ${item.quantity}</div>
-                        </div>
-                        <button onclick="removeFromCart(${item.product_id})" class="remove-item">×</button>
-                    </div>
-                `;
-            });
-            
-            cartHTML += `
-                </div>
-                <div class="cart-footer">
-                    <div class="cart-total">
-                        <strong>Total:</strong>
-                        <span>₦${totalPrice.toLocaleString()}</span>
-                    </div>
-                    <a href="checkout.html" class="checkout-btn">Proceed to Checkout</a>
-                </div>
-            `;
-            
-            cartDropdown.innerHTML = cartHTML;
-        }
-    }
-}
-
-// Remove from cart
-window.removeFromCart = async function(productId) {
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    cart = cart.filter(item => item.product_id !== productId);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    
-    // Remove from Supabase too
-    const sessionId = getSessionId();
-    await supabase
-        .from('guest_carts')
-        .delete()
-        .eq('session_id', sessionId)
-        .eq('product_id', productId);
-    
-    updateCartUI();
-    showNotification('Item removed from cart', 'info');
-};
-
-// View cart page
-window.viewCart = function() {
-    window.location.href = 'cart.html';
-};
-
-// ============================================
-// 3. CHECKOUT FUNCTIONS
-// ============================================
-
-window.processCheckout = async function(checkoutForm) {
-    event.preventDefault();
-    
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    if (cart.length === 0) {
-        alert('Your cart is empty!');
-        return;
-    }
-    
-    // Calculate total
-    const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    // Get form data
-    const formData = {
-        customer_name: document.getElementById('name').value,
-        customer_email: document.getElementById('email').value,
-        customer_phone: document.getElementById('phone').value,
-        shipping_address: document.getElementById('address').value,
-        notes: document.getElementById('notes').value,
-        total_amount: totalAmount
-    };
-    
-    console.log('Processing checkout:', formData);
-    
-    try {
-        // 1. Create order in Supabase
-        const { data: order, error: orderError } = await supabase
-            .from('orders')
-            .insert([formData])
-            .select()
-            .single();
-        
-        if (orderError) throw orderError;
-        
-        console.log('✅ Order created:', order);
-        
-        // 2. Add order items
-        const orderItems = cart.map(item => ({
-            order_id: order.id,
-            product_id: item.product_id,
-            quantity: item.quantity,
-            unit_price: item.price
-        }));
-        
-        const { error: itemsError } = await supabase
-            .from('order_items')
-            .insert(orderItems);
-        
-        if (itemsError) throw itemsError;
-        
-        // 3. Clear cart
-        localStorage.removeItem('cart');
-        
-        // 4. Clear Supabase guest cart
-        const sessionId = getSessionId();
-        await supabase
-            .from('guest_carts')
-            .delete()
-            .eq('session_id', sessionId);
-        
-        // 5. Show success
-        showCheckoutSuccess(order);
-        
-    } catch (err) {
-        console.error('❌ Checkout error:', err);
-        alert('Checkout failed: ' + err.message);
-    }
-};
-
-function showCheckoutSuccess(order) {
-    const checkoutForm = document.getElementById('checkoutForm');
-    if (!checkoutForm) return;
-    
-    checkoutForm.innerHTML = `
-        <div class="success-message">
-            <h2>🎉 Order Confirmed!</h2>
-            <p><strong>Order Number:</strong> ${order.order_number}</p>
-            <p><strong>Total:</strong> ₦${order.total_amount.toLocaleString()}</p>
-            <p>We've sent a confirmation email to ${order.customer_email}</p>
-            <p>Thank you for shopping with us!</p>
-            <a href="index.html" class="btn-continue">Continue Shopping</a>
-        </div>
-    `;
-}
-
-// ============================================
-// 4. UTILITY FUNCTIONS
-// ============================================
-
-function showError(error) {
-    const grid = document.getElementById('productsGrid');
-    if (!grid) return;
-    
-    grid.innerHTML = `
-        <div style="text-align: center; padding: 40px; grid-column: 1/-1;">
-            <h3 style="color: #e74c3c;">⚠️ Database Error</h3>
-            <p>${error.message || 'Cannot load products'}</p>
-            <button onclick="location.reload()" style="padding: 10px 20px; background: #000; color: #fff; border: none; margin-top: 20px;">
-                ↻ Retry
-            </button>
-        </div>
-    `;
-}
-
-function showNoProducts() {
-    const grid = document.getElementById('productsGrid');
-    if (!grid) return;
-    
-    grid.innerHTML = `
-        <div style="text-align: center; padding: 40px; grid-column: 1/-1;">
-            <h3>📭 No Products Found</h3>
-            <p>Add products in Supabase or run setup.</p>
-        </div>
-    `;
+function getImageUrl(categorySlug, imageFilename) {
+    const basePath = CATEGORY_IMAGE_PATHS[categorySlug] || IMAGE_BASE_URL;
+    return basePath + imageFilename;
 }
 
 function showNotification(message, type = 'success') {
@@ -443,81 +69,622 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// Detect current category from page
-function detectCurrentCategory() {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop();
+// ====================
+// PRODUCT FUNCTIONS
+// ====================
+async function loadProductsByCategory(categorySlug) {
+    console.log(`📦 Loading products for: ${categorySlug}`);
     
-    // Map page names to category slugs
-    const categoryMap = {
-        'mensfootwear.html': 'mensfootwear',
-        'womensfootwear.html': 'womensfootwear',
-        'bags.html': 'bags',
-        'household.html': 'household',
-        'healthcare.html': 'healthcare',
-        'accessories.html': 'accessories'
-    };
-    
-    return categoryMap[pageName] || 'mensfootwear'; // default
-}
-
-// ============================================
-// 5. INITIALIZATION
-// ============================================
-
-// Start when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🏠 Page loaded, initializing...');
-    
-    // Initialize cart UI
-    updateCartUI();
-    
-    // Load products for current category
-    const currentCategory = detectCurrentCategory();
-    console.log(`Detected category: ${currentCategory}`);
-    
-    if (document.getElementById('productsGrid')) {
-        loadProductsByCategory(currentCategory);
-    }
-    
-    // If on checkout page, load cart summary
-    if (window.location.pathname.includes('checkout.html')) {
-        loadCheckoutSummary();
-    }
-});
-
-// Load cart summary on checkout page
-async function loadCheckoutSummary() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const summaryEl = document.getElementById('cartSummary');
-    const totalEl = document.getElementById('checkoutTotal');
-    
-    if (!summaryEl || !totalEl) return;
-    
-    if (cart.length === 0) {
-        summaryEl.innerHTML = '<p>Your cart is empty</p>';
-        totalEl.textContent = '₦0';
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid) {
+        console.error('❌ Products grid not found');
         return;
     }
     
-    let summaryHTML = '';
-    let total = 0;
+    // Show loading
+    productsGrid.innerHTML = `
+        <div class="loading" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p>Loading products...</p>
+        </div>
+    `;
+    
+    try {
+        // Get category ID
+        const { data: category, error: catError } = await supabase
+            .from('categories')
+            .select('id, name, description')
+            .eq('slug', categorySlug)
+            .single();
+        
+        if (catError || !category) {
+            throw new Error(`Category "${categorySlug}" not found`);
+        }
+        
+        // Update page title if exists
+        const pageTitle = document.getElementById('page-title');
+        if (pageTitle) {
+            pageTitle.textContent = category.name;
+        }
+        
+        // Update page description if exists
+        const pageDesc = document.getElementById('page-description');
+        if (pageDesc && category.description) {
+            pageDesc.textContent = category.description;
+        }
+        
+        // Get products
+        const { data: products, error: prodError } = await supabase
+            .from('products')
+            .select('*')
+            .eq('category_id', category.id)
+            .eq('is_active', true)
+            .order('created_at', { ascending: false });
+        
+        if (prodError) throw prodError;
+        
+        if (!products || products.length === 0) {
+            showNoProducts(categorySlug);
+            return;
+        }
+        
+        console.log(`✅ Loaded ${products.length} products for ${categorySlug}`);
+        renderProducts(products, categorySlug);
+        
+    } catch (error) {
+        console.error('❌ Error loading products:', error);
+        productsGrid.innerHTML = `
+            <div class="error" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <h3>⚠️ Error Loading Products</h3>
+                <p>${error.message}</p>
+                <button onclick="location.reload()" class="retry-btn">Retry</button>
+            </div>
+        `;
+    }
+}
+
+function renderProducts(products, categorySlug) {
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid) return;
+    
+    // Clear grid
+    productsGrid.innerHTML = '';
+    
+    // Render each product
+    products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.dataset.id = product.id;
+        
+        // Build image URL using correct path
+        const imageUrl = getImageUrl(categorySlug, product.image_url);
+        const placeholderUrl = IMAGE_BASE_URL + 'placeholder.jpg';
+        
+        // Calculate discount for display (optional)
+        const fakePrice = Math.round(product.price * 1.3);
+        const discount = Math.floor((fakePrice - product.price) / fakePrice * 100);
+        
+        productCard.innerHTML = `
+            <div class="product-image">
+                ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
+                <img src="${imageUrl}" alt="${product.name}" 
+                     loading="lazy"
+                     onerror="this.onerror=null; this.src='${placeholderUrl}'">
+                <div class="quick-actions">
+                    <button class="quick-view" onclick="quickView(${product.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="product-info">
+                <h3 class="product-name">${product.name}</h3>
+                ${product.description ? `<p class="product-desc">${product.description}</p>` : ''}
+                <div class="product-price">
+                    ${discount > 0 ? `<span class="old-price">₦${fakePrice.toLocaleString()}</span>` : ''}
+                    <span class="current-price">₦${product.price.toLocaleString()}</span>
+                </div>
+                <div class="product-meta">
+                    <span class="product-stock ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}">
+                        <i class="fas ${product.stock > 0 ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                        ${product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                    </span>
+                </div>
+                <div class="product-actions">
+                    <button class="btn-add-cart" onclick="addToCart(${product.id})" 
+                            ${product.stock < 1 ? 'disabled' : ''}>
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        productsGrid.appendChild(productCard);
+    });
+    
+    // Update product count display
+    const productCount = document.getElementById('productCount');
+    if (productCount) {
+        productCount.textContent = `${products.length} products`;
+    }
+}
+
+function showNoProducts(categorySlug) {
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid) return;
+    
+    productsGrid.innerHTML = `
+        <div class="no-products" style="grid-column: 1/-1; text-align: center; padding: 60px;">
+            <i class="fas fa-box-open fa-3x" style="color: #ccc; margin-bottom: 20px;"></i>
+            <h3>No Products Found</h3>
+            <p>Check back later for new arrivals in ${categorySlug}!</p>
+            <a href="index.html" class="btn-shop-all">Browse All Categories</a>
+        </div>
+    `;
+}
+
+// ====================
+// CART FUNCTIONS
+// ====================
+async function addToCart(productId) {
+    try {
+        // Get product details
+        const { data: product, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', productId)
+            .single();
+        
+        if (error) throw error;
+        
+        if (product.stock < 1) {
+            showNotification('Product out of stock!', 'error');
+            return;
+        }
+        
+        // Get or create cart
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingItem = cart.find(item => item.product_id === productId);
+        
+        if (existingItem) {
+            if (existingItem.quantity >= product.stock) {
+                showNotification('Maximum stock reached!', 'error');
+                return;
+            }
+            existingItem.quantity += 1;
+        } else {
+            // Get category slug for image path
+            const { data: category } = await supabase
+                .from('categories')
+                .select('slug')
+                .eq('id', product.category_id)
+                .single();
+            
+            cart.push({
+                product_id: productId,
+                quantity: 1,
+                name: product.name,
+                price: product.price,
+                image_url: product.image_url,
+                category_slug: category?.slug || 'products',
+                added_at: new Date().toISOString()
+            });
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+        
+        // Update UI
+        updateCartUI();
+        showNotification('✅ Added to cart!', 'success');
+        
+        // Update cart count animation
+        animateCartIcon();
+        
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        showNotification('Failed to add to cart', 'error');
+    }
+}
+
+function updateCartUI() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Update cart count in navbar
+    document.querySelectorAll('.cart-count').forEach(el => {
+        el.textContent = totalItems;
+        el.style.display = totalItems > 0 ? 'inline-block' : 'none';
+    });
+    
+    // Update cart total if on cart page
+    if (window.location.pathname.includes('cart.html')) {
+        updateCartTotal();
+    }
+}
+
+function animateCartIcon() {
+    const cartIcons = document.querySelectorAll('.cart-count');
+    cartIcons.forEach(icon => {
+        icon.style.transform = 'scale(1.5)';
+        setTimeout(() => {
+            icon.style.transform = 'scale(1)';
+        }, 300);
+    });
+}
+
+function removeFromCart(productId) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart = cart.filter(item => item.product_id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    updateCartUI();
+    showNotification('Item removed from cart', 'info');
+    
+    // If on cart page, refresh display
+    if (window.location.pathname.includes('cart.html')) {
+        loadCartPage();
+    }
+}
+
+function updateQuantity(productId, newQuantity) {
+    if (newQuantity < 1) {
+        removeFromCart(productId);
+        return;
+    }
+    
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const item = cart.find(i => i.product_id === productId);
+    if (item) {
+        item.quantity = newQuantity;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartUI();
+        
+        // Reload cart page if on it
+        if (window.location.pathname.includes('cart.html')) {
+            loadCartPage();
+        }
+    }
+}
+
+// ====================
+// CART PAGE FUNCTIONS
+// ====================
+async function loadCartPage() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartContainer = document.getElementById('cartContainer');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartCount = document.getElementById('cartItemCount');
+    const emptyCart = document.getElementById('emptyCart');
+    const cartItems = document.getElementById('cartItems');
+    const cartSummary = document.getElementById('cartSummary');
+    
+    if (!cartContainer) return;
+    
+    if (cart.length === 0) {
+        if (emptyCart) emptyCart.style.display = 'block';
+        if (cartItems) cartItems.style.display = 'none';
+        if (cartSummary) cartSummary.style.display = 'none';
+        if (cartTotal) cartTotal.textContent = '₦0';
+        if (cartCount) cartCount.textContent = '0 items';
+        return;
+    }
+    
+    // Show cart items and summary
+    if (emptyCart) emptyCart.style.display = 'none';
+    if (cartItems) cartItems.style.display = 'block';
+    if (cartSummary) cartSummary.style.display = 'block';
+    
+    // Calculate totals
+    let subtotal = 0;
+    let html = '';
     
     for (const item of cart) {
-        total += item.price * item.quantity;
-        summaryHTML += `
-            <div class="checkout-item">
-                <span>${item.name} × ${item.quantity}</span>
-                <span>₦${(item.price * item.quantity).toLocaleString()}</span>
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        
+        // Get image URL
+        const imageUrl = getImageUrl(item.category_slug, item.image_url);
+        
+        html += `
+            <div class="cart-item" data-id="${item.product_id}">
+                <div class="cart-item-image">
+                    <img src="${imageUrl}" alt="${item.name}"
+                         onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'">
+                </div>
+                <div class="cart-item-details">
+                    <h4>${item.name}</h4>
+                    <p class="price">₦${item.price.toLocaleString()}</p>
+                    <div class="quantity-controls">
+                        <button onclick="updateQuantity(${item.product_id}, ${item.quantity - 1})">-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.product_id}, ${item.quantity + 1})">+</button>
+                    </div>
+                </div>
+                <div class="cart-item-total">
+                    <p class="item-total">₦${itemTotal.toLocaleString()}</p>
+                    <button onclick="removeFromCart(${item.product_id})" class="remove-btn">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
             </div>
         `;
     }
     
-    summaryEl.innerHTML = summaryHTML;
-    totalEl.textContent = `₦${total.toLocaleString()}`;
+    if (cartItems) cartItems.innerHTML = html;
+    
+    // Calculate shipping and total
+    const shipping = subtotal > 0 ? 1500 : 0; // Free shipping over certain amount?
+    const total = subtotal + shipping;
+    
+    // Update summary
+    if (cartSummary) {
+        const subtotalEl = document.getElementById('cartSubtotal');
+        const shippingEl = document.getElementById('cartShipping');
+        const totalEl = document.getElementById('cartTotal');
+        
+        if (subtotalEl) subtotalEl.textContent = `₦${subtotal.toLocaleString()}`;
+        if (shippingEl) shippingEl.textContent = `₦${shipping.toLocaleString()}`;
+        if (totalEl) totalEl.textContent = `₦${total.toLocaleString()}`;
+    }
+    
+    if (cartCount) cartCount.textContent = `${cart.reduce((sum, item) => sum + item.quantity, 0)} items`;
 }
 
-// Add CSS animations for notifications
+function updateCartTotal() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shipping = subtotal > 0 ? 1500 : 0;
+    const total = subtotal + shipping;
+    
+    const totalEl = document.getElementById('cartTotal');
+    if (totalEl) totalEl.textContent = `₦${total.toLocaleString()}`;
+}
+
+// ====================
+// PAGE INITIALIZATION
+// ====================
+function detectCurrentCategory() {
+    // Try window.currentCategory first (set in HTML)
+    if (window.currentCategory) return window.currentCategory;
+    
+    // Detect from URL pathname
+    const path = window.location.pathname;
+    const page = path.split('/').pop().replace('.html', '');
+    
+    const pageToCategory = {
+        'mensfootwear': 'mensfootwear',
+        'womensfootwear': 'womensfootwear',
+        'bags': 'bags',
+        'household': 'household',
+        'kids': 'kids',
+        'accessories': 'accessories',
+        'index': 'featured' // Special case for homepage
+    };
+    
+    return pageToCategory[page] || 'mensfootwear';
+}
+
+async function initializePage() {
+    console.log('🚀 Initializing page...');
+    
+    // Update cart UI
+    updateCartUI();
+    
+    // Load products if on category page
+    const currentCategory = detectCurrentCategory();
+    if (document.getElementById('productsGrid') && currentCategory !== 'featured') {
+        await loadProductsByCategory(currentCategory);
+    }
+    
+    // Load featured products for homepage
+    if (currentCategory === 'featured' && document.getElementById('featuredProducts')) {
+        await loadFeaturedProducts();
+    }
+    
+    // Initialize cart page if needed
+    if (window.location.pathname.includes('cart.html')) {
+        loadCartPage();
+    }
+    
+    // Initialize checkout page if needed
+    if (window.location.pathname.includes('checkout.html')) {
+        initializeCheckout();
+    }
+    
+    console.log('✅ Page initialized');
+}
+
+// ====================
+// HOMEPAGE FUNCTIONS
+// ====================
+async function loadFeaturedProducts() {
+    try {
+        // Get 6 random products from different categories
+        const { data: products, error } = await supabase
+            .from('products')
+            .select('*, categories(slug)')
+            .eq('is_active', true)
+            .order('created_at', { ascending: false })
+            .limit(12);
+        
+        if (error) throw error;
+        
+        if (!products || products.length === 0) return;
+        
+        renderFeaturedProducts(products);
+        
+    } catch (error) {
+        console.error('Error loading featured products:', error);
+    }
+}
+
+function renderFeaturedProducts(products) {
+    const container = document.getElementById('featuredProducts');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    products.forEach(product => {
+        const categorySlug = product.categories?.slug || 'products';
+        const imageUrl = getImageUrl(categorySlug, product.image_url);
+        
+        const productCard = `
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${product.name}">
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p class="price">₦${product.price.toLocaleString()}</p>
+                    <button onclick="addToCart(${product.id})" class="btn-add-cart">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', productCard);
+    });
+}
+
+// ====================
+// CHECKOUT FUNCTIONS
+// ====================
+function initializeCheckout() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const orderSummary = document.getElementById('orderSummary');
+    
+    if (!orderSummary || cart.length === 0) return;
+    
+    let subtotal = 0;
+    let html = '';
+    
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        
+        html += `
+            <div class="order-item">
+                <span>${item.name} × ${item.quantity}</span>
+                <span>₦${itemTotal.toLocaleString()}</span>
+            </div>
+        `;
+    });
+    
+    const shipping = 1500;
+    const total = subtotal + shipping;
+    
+    html += `
+        <div class="order-totals">
+            <div class="total-row">
+                <span>Subtotal</span>
+                <span>₦${subtotal.toLocaleString()}</span>
+            </div>
+            <div class="total-row">
+                <span>Shipping</span>
+                <span>₦${shipping.toLocaleString()}</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total</span>
+                <span>₦${total.toLocaleString()}</span>
+            </div>
+        </div>
+    `;
+    
+    orderSummary.innerHTML = html;
+    
+    // Update checkout form total
+    const totalInput = document.getElementById('checkoutTotal');
+    if (totalInput) {
+        totalInput.value = total;
+    }
+}
+
+// ====================
+// QUICK VIEW FUNCTION
+// ====================
+async function quickView(productId) {
+    try {
+        const { data: product, error } = await supabase
+            .from('products')
+            .select('*, categories(slug, name)')
+            .eq('id', productId)
+            .single();
+        
+        if (error) throw error;
+        
+        // Create modal
+        const modal = document.createElement('div');
+        modal.className = 'quick-view-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        `;
+        
+        const imageUrl = getImageUrl(product.categories.slug, product.image_url);
+        
+        modal.innerHTML = `
+            <div class="modal-content" style="
+                background: white;
+                max-width: 800px;
+                width: 100%;
+                border-radius: 10px;
+                padding: 30px;
+                position: relative;
+                max-height: 90vh;
+                overflow-y: auto;
+            ">
+                <button class="close-modal" onclick="this.parentElement.parentElement.remove()" 
+                        style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer;">
+                    ×
+                </button>
+                <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div class="modal-image">
+                        <img src="${imageUrl}" alt="${product.name}" 
+                             style="width: 100%; border-radius: 5px;">
+                    </div>
+                    <div class="modal-details">
+                        <h2 style="margin-top: 0;">${product.name}</h2>
+                        <p class="price" style="font-size: 24px; color: #d4af37; font-weight: bold;">
+                            ₦${product.price.toLocaleString()}
+                        </p>
+                        ${product.description ? `<p>${product.description}</p>` : ''}
+                        <p><strong>Category:</strong> ${product.categories.name}</p>
+                        <p><strong>Stock:</strong> ${product.stock} available</p>
+                        <div class="modal-actions" style="margin-top: 30px;">
+                            <button onclick="addToCart(${product.id})" 
+                                    style="padding: 12px 30px; background: #000; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+    } catch (error) {
+        console.error('Error in quick view:', error);
+        showNotification('Failed to load product details', 'error');
+    }
+}
+
+// ====================
+// START APPLICATION
+// ====================
+document.addEventListener('DOMContentLoaded', initializePage);
+
+// Add CSS for notifications and animations
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -528,7 +695,40 @@ style.textContent = `
         from { transform: translateX(0); opacity: 1; }
         to { transform: translateX(100%); opacity: 0; }
     }
+    
+    .cart-count {
+        transition: transform 0.3s ease;
+    }
+    
+    .loading {
+        color: #666;
+    }
+    
+    .loading .fa-spinner {
+        color: #d4af37;
+        margin-bottom: 10px;
+    }
+    
+    .retry-btn {
+        padding: 8px 20px;
+        background: #d4af37;
+        color: #000;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    
+    .btn-shop-all {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 25px;
+        background: #000;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
 `;
 document.head.appendChild(style);
 
-console.log('🎯 app.js loaded and ready!');
+console.log('✅ app.js loaded with correct image paths');
