@@ -220,7 +220,7 @@
             align-items: center;
             position: relative;
             background: linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)),
-                        url('https://ebuzome.io/JMPOTTERS/assets/images/accessories/banner-accessories.jpg') center/cover;
+                        url('https://ebuzome.github.io/JMPOTTERS/assets/images/accessories/banner-accessories.jpg') center/cover;
             color: var(--light-color);
             text-align: center;
             margin-top: 55px;
@@ -591,12 +591,12 @@
         </div>
         <ul class="mobile-nav-links">
             <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="mensfootwear.html"><i class="fas fa-shoe-prints"></i> Men's Footwear</a></li>
+            <li><a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a></li>
             <li><a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a></li>
             <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
             <li><a href="accessories.html"><i class="fas fa-gem"></i> Accessories</a></li>
             <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-            <li><a href="kids.html"><i class="fas fa-baby"></i> Kids</a></li>
+            <li><a href="kids.html"><i class="fas fa-child"></i> Kids</a></li>
         </ul>
     </div>
 
@@ -723,27 +723,182 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- ========= SUPABASE & APP.JS INTEGRATION ========= -->
-    <!-- Supabase Client -->
+    <!-- ========= SIMPLE SUPABASE LOADER ========= -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
-    <!-- Configuration -->
     <script>
-        // Set current category for app.js to detect
-        window.currentCategory = 'accessories';
+        // Configuration - YOU NEED TO UPDATE THESE!
+        const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+        // ⚠️ GET NEW KEY FROM SUPABASE DASHBOARD → Settings → API → anon public
+        const SUPABASE_KEY = 'YOUR_NEW_SUPABASE_ANON_KEY_HERE'; // REPLACE THIS!
         
-        // Set your Supabase credentials (make sure these are correct)
-        window.SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-        window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUwMDE4ODUsImV4cCI6MjA1MDU3Nzg4NX0.9O44TzEV47M1qV0RlBfd7Tus0mpWxP35GR10l6MjwXo';
-    </script>
-    
-    <!-- Main app.js -->
-    <script src="app.js"></script>
-    
-    <!-- Page-specific interactions (will be enhanced later) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mobile navigation
+        console.log('🔧 Initializing accessories page...');
+        console.log('Supabase URL:', SUPABASE_URL);
+        
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Test connection function
+        async function testConnection() {
+            console.log('🔍 Testing Supabase connection...');
+            try {
+                const { data, error } = await supabase
+                    .from('categories')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) {
+                    console.error('❌ Connection error:', error.message);
+                    showError(`Supabase Error: ${error.message}`);
+                    return false;
+                }
+                
+                console.log('✅ Connected to Supabase successfully');
+                return true;
+            } catch (err) {
+                console.error('❌ Fatal error:', err);
+                showError('Failed to connect to database');
+                return false;
+            }
+        }
+        
+        // Load products function
+        async function loadAccessoriesProducts() {
+            console.log('📦 Loading accessories products...');
+            
+            const productsGrid = document.getElementById('productsGrid');
+            if (!productsGrid) {
+                console.error('❌ Products grid not found');
+                return;
+            }
+            
+            try {
+                // 1. Get accessories category
+                const { data: category, error: catError } = await supabase
+                    .from('categories')
+                    .select('id, name')
+                    .eq('slug', 'accessories')
+                    .single();
+                
+                if (catError) throw catError;
+                if (!category) throw new Error('Accessories category not found');
+                
+                console.log(`✅ Found category: ${category.name} (ID: ${category.id})`);
+                
+                // 2. Get products
+                const { data: products, error: prodError } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('category_id', category.id)
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false });
+                
+                if (prodError) throw prodError;
+                
+                console.log(`✅ Found ${products?.length || 0} products`);
+                
+                // 3. Render products
+                renderProducts(products || []);
+                
+            } catch (error) {
+                console.error('❌ Error loading products:', error);
+                showError(`Failed to load products: ${error.message}`);
+            }
+        }
+        
+        function renderProducts(products) {
+            const productsGrid = document.getElementById('productsGrid');
+            if (!productsGrid) return;
+            
+            if (products.length === 0) {
+                productsGrid.innerHTML = `
+                    <div class="no-products">
+                        <i class="fas fa-box-open fa-3x"></i>
+                        <h3>No Accessories Found</h3>
+                        <p>Check back soon for new arrivals!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Clear loading spinner
+            productsGrid.innerHTML = '';
+            
+            // Image base URL
+            const IMAGE_BASE = 'https://ebuzome.github.io/JMPOTTERS/assets/images/accessories/';
+            
+            // Render each product
+            products.forEach(product => {
+                const imageUrl = IMAGE_BASE + product.image_url;
+                
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.name}" 
+                             loading="lazy"
+                             onerror="this.src='${IMAGE_BASE}placeholder.jpg'">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.name}</h3>
+                        ${product.description ? `<p class="product-desc">${product.description}</p>` : ''}
+                        <div class="product-price">₦${product.price.toLocaleString()}</div>
+                        <div class="product-stock ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}">
+                            ${product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                        </div>
+                        <button class="cart-btn" onclick="addToCart(${product.id})" 
+                                ${product.stock < 1 ? 'disabled' : ''}>
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                `;
+                
+                productsGrid.appendChild(productCard);
+            });
+            
+            console.log(`✅ Rendered ${products.length} products`);
+        }
+        
+        function showError(message) {
+            const productsGrid = document.getElementById('productsGrid');
+            if (productsGrid) {
+                productsGrid.innerHTML = `
+                    <div class="error-message" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <h3 style="color: #e74c3c;">⚠️ Error</h3>
+                        <p>${message}</p>
+                        <button onclick="location.reload()" 
+                                style="padding: 10px 20px; background: #000; color: white; border: none; margin-top: 15px;">
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Simple cart function
+        function addToCart(productId) {
+            console.log(`Adding product ${productId} to cart`);
+            alert(`Product ${productId} added to cart! (Cart functionality will be added in app.js)`);
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Page loaded, starting initialization...');
+            
+            // Test connection first
+            const isConnected = await testConnection();
+            
+            if (isConnected) {
+                // Load products
+                await loadAccessoriesProducts();
+            }
+            
+            // Setup mobile navigation
+            setupMobileNav();
+            console.log('✅ Accessories page initialized');
+        });
+        
+        function setupMobileNav() {
             const mobileToggle = document.getElementById('mobileToggle');
             const mobileNav = document.getElementById('mobileNav');
             const navOverlay = document.getElementById('navOverlay');
@@ -772,69 +927,7 @@
                     document.body.style.overflow = '';
                 });
             }
-            
-            // Cart panel (basic functionality for now)
-            const cartIcon = document.getElementById('cartIcon');
-            const cartPanel = document.getElementById('cartPanel');
-            const cartOverlay = document.getElementById('cartOverlay');
-            const closeCart = document.querySelector('.close-cart');
-            
-            if (cartIcon) {
-                cartIcon.addEventListener('click', () => {
-                    cartPanel.classList.add('active');
-                    cartOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-            
-            if (closeCart) {
-                closeCart.addEventListener('click', () => {
-                    cartPanel.classList.remove('active');
-                    cartOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
-            if (cartOverlay) {
-                cartOverlay.addEventListener('click', () => {
-                    cartPanel.classList.remove('active');
-                    cartOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
-            // Wishlist panel (basic functionality for now)
-            const wishlistIcon = document.getElementById('wishlistIcon');
-            const wishlistPanel = document.getElementById('wishlistPanel');
-            const wishlistOverlay = document.getElementById('wishlistOverlay');
-            const closeWishlist = document.querySelector('.close-wishlist');
-            
-            if (wishlistIcon) {
-                wishlistIcon.addEventListener('click', () => {
-                    wishlistPanel.classList.add('active');
-                    wishlistOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-            
-            if (closeWishlist) {
-                closeWishlist.addEventListener('click', () => {
-                    wishlistPanel.classList.remove('active');
-                    wishlistOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
-            if (wishlistOverlay) {
-                wishlistOverlay.addEventListener('click', () => {
-                    wishlistPanel.classList.remove('active');
-                    wishlistOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
-            console.log('Accessories page initialized - products will load from Supabase');
-        });
+        }
     </script>
 </body>
 </html>
