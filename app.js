@@ -1,12 +1,34 @@
 // ====================
 // CONFIGURATION
 // ====================
+// ====================
+// CONFIGURATION
+// ====================
 const SUPABASE_URL = window.SUPABASE_URL || 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUwMDE4ODUsImV4cCI6MjA1MDU3Nzg4NX0.9O44TzEV47M1qV0RlBfd7Tus0mpWxP35GR10l6MjwXo';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
 
-// Initialize Supabase
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialize Supabase - CHECK IF ALREADY EXISTS TO AVOID DUPLICATE
+let supabase;
+if (window.supabase && window.supabase.createClient) {
+    if (!window.globalSupabaseClient) {
+        window.globalSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+    supabase = window.globalSupabaseClient;
+} else {
+    console.error('Supabase library not loaded!');
+    // Create placeholder to prevent errors
+    supabase = { 
+        from: () => ({ 
+            select: () => ({ 
+                eq: () => ({ 
+                    single: async () => ({ data: null, error: { message: 'Supabase not loaded' } })
+                })
+            })
+        })
+    };
+}
 
+console.log('✅ Supabase initialized');
 // ====================
 // IMAGE PATH CONFIGURATION
 // ====================
