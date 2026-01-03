@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supabase Diagnostic Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border-left: 4px solid #ccc; }
+        .success { border-color: #4CAF50; background: #e8f5e9; }
+        .error { border-color: #f44336; background: #ffebee; }
+        .warning { border-color: #ff9800; background: #fff3e0; }
+        pre { background: #f5f5f5; padding: 10px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Supabase Diagnostic Test</h1>
+    <div id="results"></div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const results = document.getElementById('results');
+        
+        function addTestResult(title, message, type = 'info', data = null) {
+            const div = document.createElement('div');
+            div.className = `test ${type}`;
+            div.innerHTML = `<strong>${title}</strong><br>${message}`;
+            
+            if (data) {
+                const pre = document.createElement('pre');
+                pre.textContent = JSON.stringify(data, null, 2);
+                div.appendChild(pre);
+            }
+            
+            results.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
+        }
+        
+        async function runDiagnostics() {
+            addTestResult('Starting Diagnostic', 'Testing Supabase connection...', 'warning');
+            
+            // TEST 1: Basic Supabase connection
+            try {
+                addTestResult('Test 1', 'Checking if Supabase library loaded...', 'warning');
+                if (typeof supabase === 'undefined') {
+                    addTestResult('Test 1', 'FAILED: Supabase library not loaded', 'error');
+                    return;
+                }
+                addTestResult('Test 1', 'PASSED: Supabase library loaded', 'success');
+            } catch (e) {
+                addTestResult('Test 1', `FAILED: ${e.message}`, 'error');
+                return;
+            }
+            
+            // TEST 2: Simple query to check connection
+            try {
+                addTestResult('Test 2', 'Testing basic database connection...', 'warning');
+                const { data, error } = await supabase
+                    .from('categories')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) {
+                    addTestResult('Test 2', `FAILED: ${error.message}`, 'error', error);
+                    
+                    // Check if it's an RLS issue
+                    if (error.message.includes('policy') || error.message.includes('permission')) {
+                        addTestResult('RLS Issue', 'Row Level Security might be blocking access. Try disabling RLS temporarily in Supabase dashboard.', 'error');
+                    }
+                    return;
+                }
+                
+                addTestResult('Test 2', 'PASSED: Connected to database', 'success', data);
+            } catch (e) {
+                addTestResult('Test 2', `FAILED: ${e.message}`, 'error');
+                return;
+            }
+            
+            // TEST 3: Check if categories table exists and has data
+            try {
+                addTestResult('Test 3', 'Checking categories table...', 'warning');
+                const { data: categories, error } = await supabase
+                    .from('categories')
+                    .select('*')
+                    .order('id');
+                
+                if (error) {
+                    addTestResult('Test 3', `FAILED: ${error.message}`, 'error');
+                    return;
+                }
+                
+                if (!categories || categories.length === 0) {
+                    addTestResult('Test 3', 'FAILED: No categories found. Table might be empty.', 'error');
+                    return;
+                }
+                
+                addTestResult('Test 3', `PASSED: Found ${categories.length} categories`, 'success', categories);
+                
+                // Check if accessories category exists
+                const accessoriesCategory = categories.find(c => c.slug === 'accessories');
+                if (!accessoriesCategory) {
+                    addTestResult('Accessories Category', 'FAILED: No accessories category found. Available categories:', 'error', categories.map(c => c.slug));
+                    return;
+                }
+                
+                addTestResult('Accessories Category', `PASSED: Found accessories category (ID: ${accessoriesCategory.id})`, 'success');
+            } catch (e) {
+                addTestResult('Test 3', `FAILED: ${e.message}`, 'error');
+                return;
+            }
+            
+            // TEST 4: Check if products exist for accessories
+            try {
+                addTestResult('Test 4', 'Checking accessories products...', 'warning');
+                
+                // First get accessories category ID
+                const { data: category, error: catError } = await supabase
+                    .from('categories')
+                    .select('id')
+                    .eq('slug', 'accessories')
+                    .single();
+                
+                if (catError) {
+                    addTestResult('Test 4', `FAILED to get category: ${catError.message}`, 'error');
+                    return;
+                }
+                
+                // Get products
+                const { data: products, error: prodError } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('category_id', category.id)
+                    .limit(5);
+                
+                if (prodError) {
+                    addTestResult('Test 4', `FAILED: ${prodError.message}`, 'error');
+                    return;
+                }
+                
+                if (!products || products.length === 0) {
+                    addTestResult('Test 4', 'FAILED: No products found for accessories', 'error');
+                    return;
+                }
+                
+                addTestResult('Test 4', `PASSED: Found ${products.length} accessories products`, 'success', products);
+                
+                // TEST 5: Test image URLs
+                addTestResult('Test 5', 'Testing image URLs...', 'warning');
+                const sampleProduct = products[0];
+                const imageUrl = `https://ebuzome.github.io/JMPOTTERS/assets/images/accessories/${sampleProduct.image_url}`;
+                addTestResult('Test 5', `Sample image URL: ${imageUrl}`, 'success');
+                
+            } catch (e) {
+                addTestResult('Test 4', `FAILED: ${e.message}`, 'error');
+                return;
+            }
+            
+            // TEST 6: Check RLS policies
+            try {
+                addTestResult('Test 6', 'Checking RLS status...', 'warning');
+                
+                // Try to insert a test record (should fail due to RLS if enabled)
+                const { error: insertError } = await supabase
+                    .from('categories')
+                    .insert([{ 
+                        name: 'Test Category', 
+                        slug: 'test-category-' + Date.now(),
+                        is_active: true 
+                    }]);
+                
+                if (insertError && insertError.message.includes('new row violates row level security policy')) {
+                    addTestResult('Test 6', 'RLS is ENABLED and blocking inserts (this is normal for anonymous users)', 'warning');
+                } else if (insertError) {
+                    addTestResult('Test 6', `Insert test error: ${insertError.message}`, 'warning');
+                } else {
+                    addTestResult('Test 6', 'RLS might be DISABLED (insert succeeded)', 'warning');
+                }
+                
+            } catch (e) {
+                addTestResult('Test 6', `RLS check error: ${e.message}`, 'warning');
+            }
+            
+            addTestResult('Diagnostic Complete', 'All tests finished. Check results above.', 'success');
+        }
+        
+        // Run diagnostics when page loads
+        document.addEventListener('DOMContentLoaded', runDiagnostics);
+    </script>
+</body>
+</html>
