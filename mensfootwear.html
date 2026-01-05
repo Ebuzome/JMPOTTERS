@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Men's Footwear | JMPOTTERS</title>
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -11,6 +13,20 @@
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Configuration - ONLY SET CATEGORY HERE -->
+    <script>
+        (function() {
+            'use strict';
+            if (!window.JMPOTTERS_CONFIG) {
+                window.JMPOTTERS_CONFIG = {};
+            }
+            // ONLY SET CATEGORY - Supabase config will be set in app.js
+            window.JMPOTTERS_CONFIG.currentCategory = 'mensfootwear';
+            console.log('⚙️ Category set: mensfootwear');
+        })();
+    </script>
+    
     <style>
         /* === GLOBAL STYLES === */
         :root {
@@ -2190,6 +2206,51 @@
             display: flex;
             align-items: center;
         }
+
+        /* === LOADING STATES === */
+        .loading-spinner {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+        
+        .loading-spinner i {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .no-products {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px;
+        }
+        
+        .no-products i {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .error-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px;
+            background: #ffebee;
+            border-radius: 10px;
+        }
+        
+        .error-message h3 {
+            color: #d32f2f;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -2330,7 +2391,11 @@
             <div class="filter-message" id="filterMessage"></div>
             <h2 class="section-title" data-aos="fade-up">Premium Men's Footwear</h2>
             <div class="products-grid" id="productsGrid">
-                <!-- Products will be loaded here dynamically -->
+                <!-- Products will be loaded from Supabase -->
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading men's footwear from database...</p>
+                </div>
             </div>
             <div class="pagination" id="pagination">
                 <!-- Pagination will be added here dynamically -->
@@ -2594,1445 +2659,352 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     
+    <!-- ========= SUPABASE INTEGRATION ========= -->
+    <!-- Supabase Client Library -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- Main app.js (Supabase logic) -->
+    <script src="app.js"></script>
+    
+    <!-- Page-specific UI interactions ONLY -->
     <script>
-        // ========== INITIALIZATION ========== //
-        // Initialize AOS
-        AOS.init({
-            duration: 800,
-            once: true
-        });
-
-        // Product data
-        const products = [
-           
-          
-            { id: 81, name: "Vangelo GHY", price: 11000, image: "Vangelo-GHY-11000.jpg" },
-            { id: 82, name: "Vangelo NND", price: 18000, image: "Vangelo-NND-18000.jpg" }
-        ];
-
-        // Generate fake discounts for display
-        products.forEach(product => {
-            const discounts = [10, 20, 35];
-            product.displayDiscount = discounts[Math.floor(Math.random() * discounts.length)];
-        });
-
-        // Initialize variables
-        let currentPage = 1;
-        const itemsPerPage = 12;
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-        let filteredProducts = [...products];
-        let currentProduct = null;
-        let currentFilter = 'all';
-        let modalChartsInitialized = false;
-        let currentSlideIndex = 0;
-        let selectedSize = null;
-        let isMobileView = window.innerWidth <= 768;
-        let currentSelectedQuantity = 1;
-        let currentSelectedUnitPrice = 0;
-
-        // DOM Elements
-        const preloader = document.getElementById('preloader');
-        const productsGrid = document.getElementById('productsGrid');
-        const pagination = document.getElementById('pagination');
-        const wishlistIcon = document.getElementById('wishlistIcon');
-        const wishlistCount = document.getElementById('wishlistCount');
-        const cartIcon = document.getElementById('cartIcon');
-        const cartCount = document.getElementById('cartCount');
-        const cartPanel = document.getElementById('cartPanel');
-        const cartOverlay = document.getElementById('cartOverlay');
-        const closeCart = document.querySelector('.close-cart');
-        const cartItems = document.getElementById('cartItems');
-        const cartTotal = document.getElementById('cartTotal');
-        const mobileToggle = document.getElementById('mobileToggle');
-        const mobileNav = document.getElementById('mobileNav');
-        const navOverlay = document.getElementById('navOverlay');
-        const closeNav = document.querySelector('.close-nav');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalClose = document.getElementById('modalClose');
-        const modalImage = document.getElementById('modalImage');
-        const productName = document.getElementById('productName');
-        const productRealPrice = document.getElementById('productRealPrice');
-        const productFakePrice = document.getElementById('productFakePrice');
-        const productDescription = document.getElementById('productDescription');
-        const bulkPricingBody = document.getElementById('bulkPricingBody');
-        const reviewsList = document.getElementById('reviewsList');
-        const statsSlides = document.getElementById('statsSlides');
-        const slidePagination = document.getElementById('slidePagination');
-        const modalAddCart = document.getElementById('modalAddCart');
-        const toastContainer = document.getElementById('toastContainer');
-        const whatsappCheckout = document.getElementById('whatsappCheckout');
-        const header = document.getElementById('header');
-        const chatFloat = document.getElementById('chatFloat');
-        const chatModal = document.getElementById('chatModal');
-        const closeChat = document.getElementById('closeChat');
-        const categoryFilters = document.querySelectorAll('.category-filter');
-        const filterMessage = document.getElementById('filterMessage');
-        const previewInvoice = document.getElementById('previewInvoice');
-        const invoiceOverlay = document.getElementById('invoiceOverlay');
-        const invoiceClose = document.getElementById('invoiceClose');
-        const invoiceItems = document.getElementById('invoiceItems');
-        const invoiceTotal = document.getElementById('invoiceTotal');
-        const printInvoice = document.getElementById('printInvoice');
-        const customerName = document.getElementById('customerName');
-        
-        // New modal pagination elements
-        const productDetailsPage = document.getElementById('productDetailsPage');
-        const analyticsPage = document.getElementById('analyticsPage');
-        const modalBackBtn = document.getElementById('modalBackBtn');
-        const modalNextBtn = document.getElementById('modalNextBtn');
-        const modalBackBtn2 = document.getElementById('modalBackBtn2');
-        const modalNextBtn2 = document.getElementById('modalNextBtn2');
-        const currentPageIndicator = document.getElementById('currentPage');
-        const currentPageIndicator2 = document.getElementById('currentPage2');
-        const sizeGrid = document.getElementById('sizeGrid');
-        
-        // Bulk quantity selector elements
-        const quantityOptionsModal = document.getElementById('quantityOptionsModal');
-        const quantityTotalPrice = document.getElementById('quantityTotalPrice');
-
-        // Fake reviews data
-        const fakeReviews = [
-            { user: "ZeeKicks", rating: 5, text: "🔥🔥🔥 These boots sold out FAST. Great quality." },
-            { user: "ChiBoy44", rating: 4, text: "Sleek design, solid feel. Love it 💯" },
-            { user: "ShoeKing", rating: 5, text: "Best purchase this year! Comfortable and stylish." },
-            { user: "StyleGuru", rating: 4, text: "Perfect for both casual and formal occasions." },
-            { user: "FootwearFan", rating: 5, text: "Exceptional craftsmanship. Worth every penny!" },
-            { user: "UrbanGent", rating: 4, text: "Great fit and premium materials. Highly recommend." },
-            { user: "SneakerHead", rating: 5, text: "Attention to detail is impressive. Will buy again." },
-            { user: "FashionForward", rating: 4, text: "Elevates any outfit. Received many compliments." }
-        ];
-
-        // Fake toast messages
-        const toastMessages = [
-            "🛍️ {name} from {location} just bought {quantity} {product} – ₦{amount} 🤑",
-            "🔥 {name} from {location} ordered {quantity} {product} – ₦{amount} ({discount}% OFF)",
-            "🤯 {name} in {location} just added {quantity} {product} to cart 👟",
-            "💸 {name} from {location} purchased {quantity} {product} worth ₦{amount}",
-            "🚀 {name} in {location} just bought {quantity} {product} – great choice!",
-            "👑 {name} from {location} got {quantity} {product} – premium selection!",
-            "🌟 {name} in {location} ordered {quantity} {product} – luxury at its best!",
-            "💼 {name} from {location} purchased {quantity} {product} – business ready!",
-            "🎯 {name} in {location} bought {quantity} {product} – perfect fit!",
-            "✨ {name} from {location} just got {quantity} {product} – style upgrade!",
-            "🏆 {name} in {location} purchased {quantity} {product} – winning choice!"
-        ];
-
-        // Fake names and locations
-        const fakeNames = ["Chuka", "Mariam", "Jide", "Ade", "Bola", "Emeka", "Funke", "Tunde", "Ngozi", "Kunle"];
-        const fakeLocations = ["Lagos", "Abuja", "Ibadan", "Port Harcourt", "Kano", "Enugu", "Aba", "Owerri", "Benin", "Kaduna"];
-        const fakeProducts = ["Sneakers", "Loafers", "Boots", "Sandals", "Formal Shoes", "Designer Kicks", "Premium Footwear", "Luxury Shoes"];
-
-        // ========== BULK QUANTITY SELECTOR FUNCTIONS ========== //
-        function generateQuantityOptions(product) {
-            quantityOptionsModal.innerHTML = '';
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Men\'s Footwear page UI initialized');
             
-            const quantities = [
-                { value: 1, label: '1 Unit' },
-                { value: 5, label: '5 Units' },
-                { value: 10, label: '10 Units' },
-                { value: 25, label: '25 Units' },
-                { value: 50, label: '50 Units' },
-                { value: 100, label: '100 Units' }
-            ];
-            
-            quantities.forEach((qty, index) => {
-                const discount = qty.value === 1 ? 0 : Math.min(30, Math.floor(qty.value / 10) * 5);
-                const unitPrice = Math.round(product.price * (1 - discount / 100));
-                const totalPrice = unitPrice * qty.value;
-                
-                const option = document.createElement('button');
-                option.className = `quantity-option-modal ${index === 0 ? 'selected' : ''}`;
-                option.dataset.quantity = qty.value;
-                option.dataset.unitPrice = unitPrice;
-                option.dataset.totalPrice = totalPrice;
-                
-                option.innerHTML = `
-                    <div>${qty.label}</div>
-                    <div style="font-size: 0.8rem; opacity: 0.8;">₦${unitPrice.toLocaleString()}/unit</div>
-                `;
-                
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options
-                    quantityOptionsModal.querySelectorAll('.quantity-option-modal').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                    
-                    // Update total price display
-                    quantityTotalPrice.textContent = `₦${totalPrice.toLocaleString()}`;
-                    
-                    // Store selected quantity for add to cart
-                    currentSelectedQuantity = qty.value;
-                    currentSelectedUnitPrice = unitPrice;
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                once: true
+            });
+
+            // ========== INITIALIZE PRELOADER ========== //
+            function initializePreloader() {
+                const letters = document.querySelectorAll('.preloader-text span');
+                letters.forEach((letter, index) => {
+                    setTimeout(() => {
+                        letter.style.transform = 'translateY(0)';
+                        letter.style.opacity = '1';
+                    }, index * 150);
                 });
                 
-                quantityOptionsModal.appendChild(option);
-                
-                // Set initial selected quantity and price
-                if (index === 0) {
-                    quantityTotalPrice.textContent = `₦${totalPrice.toLocaleString()}`;
-                    currentSelectedQuantity = qty.value;
-                    currentSelectedUnitPrice = unitPrice;
-                }
-            });
-        }
+                // Hide preloader after 3 seconds
+                setTimeout(() => {
+                    const preloader = document.getElementById('preloader');
+                    preloader.style.opacity = '0';
+                    preloader.style.visibility = 'hidden';
+                }, 3000);
+            }
 
-        // ========== INITIALIZE PAGE ========== //
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize preloader
+            // ========== HEADER FUNCTIONS ========== //
+            function initializeHeader() {
+                const header = document.getElementById('header');
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 50) {
+                        header.classList.add('scrolled');
+                    } else {
+                        header.classList.remove('scrolled');
+                    }
+                });
+            }
+
+            // ========== HERO CAROUSEL FUNCTIONS ========== //
+            function initializeCarousel() {
+                const slides = document.querySelectorAll('.hero-slide');
+                let currentSlide = 0;
+                
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, 5000);
+            }
+
+            // ========== MODAL FUNCTIONS ========== //
+            function setupModalPagination() {
+                const productDetailsPage = document.getElementById('productDetailsPage');
+                const analyticsPage = document.getElementById('analyticsPage');
+                const modalBackBtn = document.getElementById('modalBackBtn');
+                const modalNextBtn = document.getElementById('modalNextBtn');
+                const modalBackBtn2 = document.getElementById('modalBackBtn2');
+                const modalNextBtn2 = document.getElementById('modalNextBtn2');
+                const currentPageIndicator = document.getElementById('currentPage');
+                const currentPageIndicator2 = document.getElementById('currentPage2');
+                
+                // Check if we're in mobile view
+                const isMobileView = window.innerWidth <= 768;
+                
+                if (isMobileView) {
+                    // Hide analytics page initially
+                    analyticsPage.classList.remove('active');
+                    productDetailsPage.classList.add('active');
+                    
+                    // Reset to page 1 when modal opens
+                    currentPageIndicator.textContent = '1';
+                    currentPageIndicator2.textContent = '2';
+                    
+                    // Setup navigation buttons
+                    modalNextBtn.addEventListener('click', goToAnalyticsPage);
+                    modalNextBtn2.addEventListener('click', goToAnalyticsPage);
+                    modalBackBtn.addEventListener('click', goToProductDetailsPage);
+                    modalBackBtn2.addEventListener('click', goToProductDetailsPage);
+                    
+                    // Enable/disable buttons appropriately
+                    modalBackBtn.disabled = true;
+                    modalBackBtn2.disabled = false;
+                    modalNextBtn.disabled = false;
+                    modalNextBtn2.disabled = true;
+                } else {
+                    // Desktop view - show both pages
+                    analyticsPage.classList.add('active');
+                    productDetailsPage.classList.add('active');
+                }
+                
+                function goToAnalyticsPage() {
+                    if (!isMobileView) return;
+                    
+                    productDetailsPage.classList.remove('active');
+                    analyticsPage.classList.add('active');
+                    
+                    currentPageIndicator.textContent = '2';
+                    currentPageIndicator2.textContent = '2';
+                    
+                    modalBackBtn.disabled = false;
+                    modalBackBtn2.disabled = false;
+                    modalNextBtn.disabled = true;
+                    modalNextBtn2.disabled = true;
+                }
+                
+                function goToProductDetailsPage() {
+                    if (!isMobileView) return;
+                    
+                    analyticsPage.classList.remove('active');
+                    productDetailsPage.classList.add('active');
+                    
+                    currentPageIndicator.textContent = '1';
+                    currentPageIndicator2.textContent = '1';
+                    
+                    modalBackBtn.disabled = true;
+                    modalBackBtn2.disabled = true;
+                    modalNextBtn.disabled = false;
+                    modalNextBtn2.disabled = false;
+                }
+            }
+
+            // ========== SIZE SELECTION FUNCTIONS ========== //
+            function generateSizeGrid() {
+                const sizeGrid = document.getElementById('sizeGrid');
+                if (!sizeGrid) return;
+                
+                sizeGrid.innerHTML = '';
+                const sizes = [38, 39, 40, 41, 42, 43, 44, 45, 46];
+                
+                sizes.forEach(size => {
+                    const sizeOption = document.createElement('button');
+                    sizeOption.className = 'size-option';
+                    sizeOption.textContent = size;
+                    sizeOption.dataset.size = size;
+                    
+                    sizeOption.addEventListener('click', function() {
+                        // Remove selected class from all size options
+                        sizeGrid.querySelectorAll('.size-option').forEach(option => {
+                            option.classList.remove('selected');
+                        });
+                        
+                        // Add selected class to clicked option
+                        this.classList.add('selected');
+                    });
+                    
+                    sizeGrid.appendChild(sizeOption);
+                });
+            }
+
+            // ========== TOAST MESSAGES ========== //
+            function showToast(message, type = 'info') {
+                const toastContainer = document.getElementById('toastContainer');
+                if (!toastContainer) return;
+                
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                const icons = {
+                    success: 'fas fa-check-circle',
+                    error: 'fas fa-exclamation-circle',
+                    warning: 'fas fa-exclamation-triangle',
+                    info: 'fas fa-info-circle'
+                };
+                
+                toast.innerHTML = `
+                    <i class="${icons[type] || icons.info} toast-icon"></i>
+                    <span>${message}</span>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // Show toast
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 100);
+                
+                // Hide and remove toast after 5 seconds
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 500);
+                }, 5000);
+            }
+
+            // ========== CHAT SUPPORT ========== //
+            function setupChatSupport() {
+                const chatFloat = document.getElementById('chatFloat');
+                const chatModal = document.getElementById('chatModal');
+                const closeChat = document.getElementById('closeChat');
+                
+                if (!chatFloat || !chatModal || !closeChat) return;
+                
+                chatFloat.addEventListener('click', () => {
+                    chatModal.classList.toggle('active');
+                });
+                
+                closeChat.addEventListener('click', () => {
+                    chatModal.classList.remove('active');
+                });
+                
+                // Close chat when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!chatFloat.contains(e.target) && !chatModal.contains(e.target)) {
+                        chatModal.classList.remove('active');
+                    }
+                });
+            }
+
+            // ========== DROPDOWN TOGGLE ========== //
+            function setupDropdownToggle() {
+                // Desktop dropdown toggle
+                const desktopDropdown = document.querySelector('.nav-links .dropdown');
+                if (desktopDropdown) {
+                    const dropdownLink = desktopDropdown.querySelector('a');
+                    dropdownLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        desktopDropdown.classList.toggle('active');
+                    });
+                }
+                
+                // Mobile dropdown toggle
+                const mobileDropdown = document.querySelector('.mobile-nav .mobile-dropdown');
+                if (mobileDropdown) {
+                    const mobileDropdownLink = mobileDropdown.querySelector('a');
+                    mobileDropdownLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        mobileDropdown.classList.toggle('active');
+                    });
+                }
+            }
+
+            // ========== CATEGORY FILTERS ========== //
+            function setupCategoryFilters() {
+                const categoryFilters = document.querySelectorAll('.category-filter');
+                const filterMessage = document.getElementById('filterMessage');
+                
+                categoryFilters.forEach(filter => {
+                    filter.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        const category = this.getAttribute('data-category');
+                        if (filterMessage) {
+                            filterMessage.textContent = `Filtering by: ${category}`;
+                            filterMessage.style.display = 'block';
+                        }
+                        
+                        // Note: Actual filtering will be handled in app.js
+                        console.log('Category filter clicked:', category);
+                    });
+                });
+            }
+
+            // ========== INITIALIZE ALL UI COMPONENTS ========== //
             initializePreloader();
-            
-            // Initialize header scroll effect
             initializeHeader();
-            
-            // Initialize hero carousel
             initializeCarousel();
-            
-            // Render products
-            renderProducts();
-            
-            // Initialize cart and wishlist counts
-            updateWishlistCount();
-            updateCartCount();
-            updateCartTotal();
-            
-            // Setup chat support
+            setupModalPagination();
+            generateSizeGrid();
             setupChatSupport();
-            
-            // Setup category filters
+            setupDropdownToggle();
             setupCategoryFilters();
             
-            // Setup invoice preview
-            setupInvoicePreview();
+            // Setup mobile navigation
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const navOverlay = document.getElementById('navOverlay');
+            const closeNav = document.querySelector('.close-nav');
             
-            // Start toast messages
-            startToastMessages();
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => {
+                    mobileNav.classList.add('active');
+                    navOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
             
-            // Setup dropdown toggle
-            setupDropdownToggle();
+            if (closeNav) {
+                closeNav.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
             
-            // Setup modal pagination
-            setupModalPagination();
+            if (navOverlay) {
+                navOverlay.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
             
-            // Handle window resize for modal pagination
-            window.addEventListener('resize', setupModalPagination);
+            // Setup cart panel
+            const cartIcon = document.getElementById('cartIcon');
+            const cartPanel = document.getElementById('cartPanel');
+            const cartOverlay = document.getElementById('cartOverlay');
+            const closeCart = document.querySelector('.close-cart');
+            
+            if (cartIcon) {
+                cartIcon.addEventListener('click', () => {
+                    cartPanel.classList.add('active');
+                    cartOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+            
+            if (closeCart) {
+                closeCart.addEventListener('click', () => {
+                    cartPanel.classList.remove('active');
+                    cartOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            if (cartOverlay) {
+                cartOverlay.addEventListener('click', () => {
+                    cartPanel.classList.remove('active');
+                    cartOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            // Setup modal close
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalClose = document.getElementById('modalClose');
+            
+            if (modalClose) {
+                modalClose.addEventListener('click', () => {
+                    modalOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            console.log('✅ All UI components initialized for men\'s footwear');
         });
-
-        // ========== DROPDOWN TOGGLE ========== //
-        function setupDropdownToggle() {
-            // Desktop dropdown toggle
-            const desktopDropdown = document.querySelector('.nav-links .dropdown');
-            if (desktopDropdown) {
-                const dropdownLink = desktopDropdown.querySelector('a');
-                dropdownLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    desktopDropdown.classList.toggle('active');
-                });
-            }
-            
-            // Mobile dropdown toggle
-            const mobileDropdown = document.querySelector('.mobile-nav .mobile-dropdown');
-            if (mobileDropdown) {
-                const mobileDropdownLink = mobileDropdown.querySelector('a');
-                mobileDropdownLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    mobileDropdown.classList.toggle('active');
-                });
-            }
-        }
-
-        // ========== PRELOADER FUNCTIONS ========== //
-        function initializePreloader() {
-            const letters = document.querySelectorAll('.preloader-text span');
-            letters.forEach((letter, index) => {
-                setTimeout(() => {
-                    letter.style.transform = 'translateY(0)';
-                    letter.style.opacity = '1';
-                }, index * 150);
-            });
-            
-            // Hide preloader after 3 seconds
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                preloader.style.visibility = 'hidden';
-            }, 3000);
-        }
-
-        // ========== HEADER FUNCTIONS ========== //
-        function initializeHeader() {
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
-                }
-            });
-        }
-
-        // ========== HERO CAROUSEL FUNCTIONS ========== //
-        function initializeCarousel() {
-            const slides = document.querySelectorAll('.hero-slide');
-            let currentSlide = 0;
-            
-            setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }, 5000);
-        }
-
-        // ========== PRODUCT FUNCTIONS ========== //
-        function renderProducts() {
-            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-            
-            // Clear the grid
-            productsGrid.innerHTML = '';
-            
-            // Add products to the grid
-            paginatedProducts.forEach(product => {
-                // Generate fake price (₦5,000–₦10,000 higher than real price)
-                const fakePrice = product.price + Math.floor(Math.random() * 5000) + 5000;
-                
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.setAttribute('data-aos', 'fade-up');
-                productCard.innerHTML = `
-                    <div class="product-image">
-                        <div class="product-badge">-${product.displayDiscount}%</div>
-                        <img src="assets/images/menfootwear/${product.image}" alt="${product.name}" loading="lazy">
-                        <button class="wishlist-btn ${wishlist.some(item => item.id === product.id) ? 'active' : ''}" data-id="${product.id}">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">${product.name}</h3>
-                        <div class="product-price">
-                            <del class="price-fake">₦${fakePrice.toLocaleString()}</del>
-                            <span class="price-real">₦${product.price.toLocaleString()}</span>
-                        </div>
-                        <div class="availability">
-                            <i class="fas fa-check-circle"></i> In Stock
-                        </div>
-                        <div class="sizes">
-                            Sizes Available: <span>36 - 45</span>
-                        </div>
-                        
-                        <!-- Quantity selector -->
-                        <div class="quantity-selector">
-                            <button class="toggle-bulk-options">
-                                Bulk Options <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="quantity-options">
-                                <div class="quantity-option selected" data-qty="1">1 Unit</div>
-                                <div class="quantity-option" data-qty="10">10 Units</div>
-                                <div class="quantity-option" data-qty="25">25 Units</div>
-                                <div class="quantity-option" data-qty="50">50 Units</div>
-                                <div class="quantity-option" data-qty="100">100 Units</div>
-                            </div>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button class="btn-add-cart" data-id="${product.id}">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
-                            </button>
-                            <button class="btn-view-details" data-id="${product.id}">
-                                <i class="fas fa-eye"></i> View Details
-                            </button>
-                        </div>
-                    </div>
-                `;
-                productsGrid.appendChild(productCard);
-            });
-            
-            // Setup event listeners for the new products
-            setupProductInteractions();
-            
-            // Render pagination
-            renderPagination(totalPages);
-        }
-
-        function renderPagination(totalPages) {
-            pagination.innerHTML = '';
-            
-            const maxVisiblePages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-            
-            if (endPage - startPage < maxVisiblePages - 1) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-            }
-            
-            // Previous button
-            if (currentPage > 1) {
-                const prevBtn = document.createElement('button');
-                prevBtn.className = 'page-btn';
-                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-                prevBtn.addEventListener('click', () => {
-                    currentPage--;
-                    renderProducts();
-                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
-                });
-                pagination.appendChild(prevBtn);
-            }
-            
-            // Page buttons
-            for (let i = startPage; i <= endPage; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                pageBtn.textContent = i;
-                pageBtn.addEventListener('click', () => {
-                    currentPage = i;
-                    renderProducts();
-                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
-                });
-                pagination.appendChild(pageBtn);
-            }
-            
-            // Next button
-            if (currentPage < totalPages) {
-                const nextBtn = document.createElement('button');
-                nextBtn.className = 'page-btn';
-                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-                nextBtn.addEventListener('click', () => {
-                    currentPage++;
-                    renderProducts();
-                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
-                });
-                pagination.appendChild(nextBtn);
-            }
-        }
-
-        function setupProductInteractions() {
-            // Add to Cart buttons
-            document.querySelectorAll('.btn-add-cart').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    // Get selected quantity
-                    const card = this.closest('.product-card');
-                    const selectedQty = card.querySelector('.quantity-option.selected');
-                    const quantity = selectedQty ? parseInt(selectedQty.getAttribute('data-qty')) : 1;
-                    
-                    addToCart(product, quantity);
-                    showToast(`${product.name} added to cart!`, 'success');
-                });
-            });
-            
-            // View Details buttons
-            document.querySelectorAll('.btn-view-details').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    openProductModal(product);
-                });
-            });
-            
-            // Wishlist buttons
-            document.querySelectorAll('.wishlist-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    toggleWishlist(product);
-                });
-            });
-            
-            // Quantity options
-            document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const options = this.nextElementSibling;
-                    options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
-                });
-            });
-            
-            document.querySelectorAll('.quantity-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options in this container
-                    const container = this.closest('.quantity-options');
-                    container.querySelectorAll('.quantity-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                });
-            });
-        }
-
-        function openProductModal(product) {
-            currentProduct = product;
-            
-            // Set product details
-            modalImage.src = `assets/images/menfootwear/${product.image}`;
-            modalImage.alt = product.name;
-            productName.textContent = product.name;
-            productRealPrice.textContent = `₦${product.price.toLocaleString()}`;
-            
-            // Generate fake price for display
-            const fakePrice = product.price + Math.floor(Math.random() * 5000) + 5000;
-            productFakePrice.textContent = `₦${fakePrice.toLocaleString()}`;
-            
-            // Generate product description
-            const descriptions = [
-                `Premium ${product.name} crafted with attention to detail and superior materials. Designed for comfort and style.`,
-                `Experience luxury with our ${product.name}. Perfect for both casual and formal occasions with exceptional durability.`,
-                `Elevate your footwear collection with ${product.name}. Engineered for comfort, built for style, made to last.`,
-                `The ${product.name} combines contemporary design with traditional craftsmanship for a truly exceptional shoe.`,
-                `Discover the perfect blend of style and comfort with our ${product.name}. Ideal for the modern gentleman.`
-            ];
-            productDescription.textContent = descriptions[product.id % descriptions.length];
-            
-            // Generate bulk pricing table
-            bulkPricingBody.innerHTML = '';
-            const quantities = [1, 10, 25, 50, 100];
-            quantities.forEach(qty => {
-                const discount = qty === 1 ? 0 : Math.min(30, Math.floor(qty / 10) * 5);
-                const unitPrice = Math.round(product.price * (1 - discount / 100));
-                const totalPrice = unitPrice * qty;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${qty} Unit${qty > 1 ? 's' : ''}</td>
-                    <td>₦${unitPrice.toLocaleString()}</td>
-                    <td>₦${totalPrice.toLocaleString()}</td>
-                `;
-                bulkPricingBody.appendChild(row);
-            });
-            
-            // Generate quantity options
-            generateQuantityOptions(product);
-            
-            // Generate reviews
-            reviewsList.innerHTML = '';
-            const numReviews = 3 + (product.id % 3); // 3-5 reviews per product
-            for (let i = 0; i < numReviews; i++) {
-                const review = fakeReviews[(product.id + i) % fakeReviews.length];
-                const reviewEl = document.createElement('div');
-                reviewEl.className = 'review';
-                reviewEl.innerHTML = `
-                    <div class="review-header">
-                        <div class="review-avatar">${review.user.charAt(0)}</div>
-                        <div class="review-user">${review.user}</div>
-                        <div class="review-rating">
-                            ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
-                        </div>
-                    </div>
-                    <div class="review-text">${review.text}</div>
-                `;
-                reviewsList.appendChild(reviewEl);
-            }
-            
-            // Generate analytics slides
-            generateAnalyticsSlides(product);
-            
-            // Reset modal pagination for mobile
-            setupModalPagination();
-            
-            // Generate size grid
-            generateSizeGrid();
-            selectedSize = null; // Reset selected size
-            
-            // Open modal
-            modalOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // ========== SIZE SELECTION FUNCTIONS ========== //
-        function generateSizeGrid() {
-            sizeGrid.innerHTML = '';
-            const sizes = [38, 39, 40, 41, 42, 43, 44, 45, 46];
-            
-            sizes.forEach(size => {
-                const sizeOption = document.createElement('button');
-                sizeOption.className = 'size-option';
-                sizeOption.textContent = size;
-                sizeOption.dataset.size = size;
-                
-                sizeOption.addEventListener('click', function() {
-                    // Remove selected class from all size options
-                    sizeGrid.querySelectorAll('.size-option').forEach(option => {
-                        option.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                    selectedSize = size;
-                });
-                
-                sizeGrid.appendChild(sizeOption);
-            });
-        }
-
-        // ========== MODAL PAGINATION FUNCTIONS ========== //
-        function setupModalPagination() {
-            // Check if we're in mobile view
-            isMobileView = window.innerWidth <= 768;
-            
-            if (isMobileView) {
-                // Hide analytics page initially
-                analyticsPage.classList.remove('active');
-                productDetailsPage.classList.add('active');
-                
-                // Reset to page 1 when modal opens
-                currentPageIndicator.textContent = '1';
-                currentPageIndicator2.textContent = '2';
-                
-                // Setup navigation buttons
-                modalNextBtn.addEventListener('click', goToAnalyticsPage);
-                modalNextBtn2.addEventListener('click', goToAnalyticsPage);
-                modalBackBtn.addEventListener('click', goToProductDetailsPage);
-                modalBackBtn2.addEventListener('click', goToProductDetailsPage);
-                
-                // Enable/disable buttons appropriately
-                modalBackBtn.disabled = true;
-                modalBackBtn2.disabled = false;
-                modalNextBtn.disabled = false;
-                modalNextBtn2.disabled = true;
-            } else {
-                // Desktop view - show both pages
-                analyticsPage.classList.add('active');
-                productDetailsPage.classList.add('active');
-            }
-        }
-        
-        function goToAnalyticsPage() {
-            if (!isMobileView) return;
-            
-            productDetailsPage.classList.remove('active');
-            analyticsPage.classList.add('active');
-            
-            currentPageIndicator.textContent = '2';
-            currentPageIndicator2.textContent = '2';
-            
-            modalBackBtn.disabled = false;
-            modalBackBtn2.disabled = false;
-            modalNextBtn.disabled = true;
-            modalNextBtn2.disabled = true;
-        }
-        
-        function goToProductDetailsPage() {
-            if (!isMobileView) return;
-            
-            analyticsPage.classList.remove('active');
-            productDetailsPage.classList.add('active');
-            
-            currentPageIndicator.textContent = '1';
-            currentPageIndicator2.textContent = '1';
-            
-            modalBackBtn.disabled = true;
-            modalBackBtn2.disabled = true;
-            modalNextBtn.disabled = false;
-            modalNextBtn2.disabled = false;
-        }
-
-        // ========== CART FUNCTIONS ========== //
-        function addToCart(product, quantity = 1, unitPrice = null) {
-            const priceToUse = unitPrice !== null ? unitPrice : product.price;
-            const existingItem = cart.find(item => item.id === product.id && item.unitPrice === priceToUse);
-            
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({
-                    id: product.id,
-                    name: product.name,
-                    price: priceToUse, // Use the custom unit price if provided
-                    image: product.image,
-                    quantity: quantity,
-                    unitPrice: priceToUse // Store the actual unit price used
-                });
-            }
-            
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            updateCartTotal();
-            renderCartItems();
-            
-            // Update cart icon animation
-            cartIcon.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                cartIcon.style.transform = 'scale(1)';
-            }, 300);
-        }
-
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            updateCartTotal();
-            renderCartItems();
-        }
-
-        function updateCartCount() {
-            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-            cartCount.textContent = totalItems;
-        }
-
-        function updateCartTotal() {
-            const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-            cartTotal.textContent = `₦${total.toLocaleString()}`;
-        }
-
-        function renderCartItems() {
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
-                return;
-            }
-            
-            cartItems.innerHTML = '';
-            cart.forEach(item => {
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <div class="cart-item-image">
-                        <img src="assets/images/menfootwear/${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="cart-item-details">
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">₦${item.price.toLocaleString()}</div>
-                        <div class="cart-item-quantity">
-                            <button class="decrease-quantity" data-id="${item.id}">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="increase-quantity" data-id="${item.id}">+</button>
-                        </div>
-                    </div>
-                    <button class="cart-item-remove" data-id="${item.id}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-                cartItems.appendChild(cartItem);
-            });
-            
-            // Add event listeners for quantity changes and removal
-            document.querySelectorAll('.decrease-quantity').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const item = cart.find(item => item.id === productId);
-                    
-                    if (item.quantity > 1) {
-                        item.quantity--;
-                    } else {
-                        removeFromCart(productId);
-                    }
-                    
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    updateCartCount();
-                    updateCartTotal();
-                    renderCartItems();
-                });
-            });
-            
-            document.querySelectorAll('.increase-quantity').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const item = cart.find(item => item.id === productId);
-                    
-                    item.quantity++;
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    updateCartCount();
-                    updateCartTotal();
-                    renderCartItems();
-                });
-            });
-            
-            document.querySelectorAll('.cart-item-remove').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    removeFromCart(productId);
-                });
-            });
-        }
-
-        // ========== WISHLIST FUNCTIONS ========== //
-        function toggleWishlist(product) {
-            const existingIndex = wishlist.findIndex(item => item.id === product.id);
-            
-            if (existingIndex !== -1) {
-                wishlist.splice(existingIndex, 1);
-                showToast(`${product.name} removed from wishlist`, 'info');
-            } else {
-                wishlist.push(product);
-                showToast(`${product.name} added to wishlist!`, 'success');
-            }
-            
-            localStorage.setItem('wishlist', JSON.stringify(wishlist));
-            updateWishlistCount();
-            
-            // Update wishlist button state
-            const wishlistBtn = document.querySelector(`.wishlist-btn[data-id="${product.id}"]`);
-            if (wishlistBtn) {
-                if (existingIndex !== -1) {
-                    wishlistBtn.classList.remove('active');
-                } else {
-                    wishlistBtn.classList.add('active');
-                }
-            }
-            
-            // Update wishlist icon animation
-            wishlistIcon.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                wishlistIcon.style.transform = 'scale(1)';
-            }, 300);
-        }
-
-        function updateWishlistCount() {
-            wishlistCount.textContent = wishlist.length;
-        }
-
-        // ========== NAVIGATION FUNCTIONS ========== //
-        mobileToggle.addEventListener('click', () => {
-            mobileNav.classList.add('active');
-            navOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-
-        closeNav.addEventListener('click', () => {
-            mobileNav.classList.remove('active');
-            navOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        navOverlay.addEventListener('click', () => {
-            mobileNav.classList.remove('active');
-            navOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        cartIcon.addEventListener('click', () => {
-            cartPanel.classList.add('active');
-            cartOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-
-        closeCart.addEventListener('click', () => {
-            cartPanel.classList.remove('active');
-            cartOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        cartOverlay.addEventListener('click', () => {
-            cartPanel.classList.remove('active');
-            cartOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        modalClose.addEventListener('click', () => {
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-            modalChartsInitialized = false;
-        });
-
-        // ========== MODAL ADD TO CART ========== //
-        modalAddCart.addEventListener('click', () => {
-            if (!currentProduct) return;
-            
-            // Check if a size is selected (only for mobile)
-            if (isMobileView && !selectedSize) {
-                showToast('Please select a size before adding to cart', 'warning');
-                return;
-            }
-            
-            // Use the selected quantity from the bulk selector
-            addToCart(currentProduct, currentSelectedQuantity, currentSelectedUnitPrice);
-            showToast(`${currentProduct.name} (${currentSelectedQuantity} units) added to cart!`, 'success');
-        });
-
-        // ========== TOAST MESSAGES ========== //
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icons = {
-                success: 'fas fa-check-circle',
-                error: 'fas fa-exclamation-circle',
-                warning: 'fas fa-exclamation-triangle',
-                info: 'fas fa-info-circle'
-            };
-            
-            toast.innerHTML = `
-                <i class="${icons[type] || icons.info} toast-icon"></i>
-                <span>${message}</span>
-            `;
-            
-            toastContainer.appendChild(toast);
-            
-            // Show toast
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 100);
-            
-            // Hide and remove toast after 5 seconds
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    toast.remove();
-                }, 500);
-            }, 5000);
-        }
-
-        function startToastMessages() {
-            setInterval(() => {
-                if (Math.random() < 0.7) { // 70% chance to show a toast
-                    const randomMessage = toastMessages[Math.floor(Math.random() * toastMessages.length)];
-                    const randomName = fakeNames[Math.floor(Math.random() * fakeNames.length)];
-                    const randomLocation = fakeLocations[Math.floor(Math.random() * fakeLocations.length)];
-                    const randomProduct = fakeProducts[Math.floor(Math.random() * fakeProducts.length)];
-                    const randomQuantity = Math.floor(Math.random() * 5) + 1;
-                    const randomAmount = (Math.floor(Math.random() * 20) + 5) * 1000;
-                    const randomDiscount = [10, 15, 20, 25, 30][Math.floor(Math.random() * 5)];
-                    
-                    const message = randomMessage
-                        .replace('{name}', randomName)
-                        .replace('{location}', randomLocation)
-                        .replace('{product}', randomProduct)
-                        .replace('{quantity}', randomQuantity)
-                        .replace('{amount}', randomAmount.toLocaleString())
-                        .replace('{discount}', randomDiscount);
-                    
-                    showToast(message, 'info');
-                }
-            }, 8000); // Every 8 seconds
-        }
-
-        // ========== CHAT SUPPORT ========== //
-        function setupChatSupport() {
-            chatFloat.addEventListener('click', () => {
-                chatModal.classList.toggle('active');
-            });
-            
-            closeChat.addEventListener('click', () => {
-                chatModal.classList.remove('active');
-            });
-            
-            // Close chat when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!chatFloat.contains(e.target) && !chatModal.contains(e.target)) {
-                    chatModal.classList.remove('active');
-                }
-            });
-        }
-
-        // ========== CATEGORY FILTERS ========== //
-        function setupCategoryFilters() {
-            categoryFilters.forEach(filter => {
-                filter.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    const category = this.getAttribute('data-category');
-                    currentFilter = category;
-                    
-                    if (category === 'all') {
-                        filteredProducts = [...products];
-                        filterMessage.style.display = 'none';
-                    } else {
-                        filteredProducts = products.filter(product => 
-                            product.name.toLowerCase().includes(category)
-                        );
-                        filterMessage.textContent = `Showing ${filteredProducts.length} ${category} products`;
-                        filterMessage.style.display = 'block';
-                    }
-                    
-                    currentPage = 1;
-                    renderProducts();
-                    window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
-                });
-            });
-        }
-
-        // ========== INVOICE PREVIEW ========== //
-        function setupInvoicePreview() {
-            previewInvoice.addEventListener('click', () => {
-                if (cart.length === 0) {
-                    showToast('Your cart is empty', 'warning');
-                    return;
-                }
-                
-                // Set customer name if available
-                const storedName = localStorage.getItem('customerName');
-                if (storedName) {
-                    customerName.value = storedName;
-                }
-                
-                // Render invoice items
-                invoiceItems.innerHTML = '';
-                let total = 0;
-                
-                cart.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    total += itemTotal;
-                    
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>₦${item.price.toLocaleString()}</td>
-                        <td>₦${itemTotal.toLocaleString()}</td>
-                    `;
-                    invoiceItems.appendChild(row);
-                });
-                
-                invoiceTotal.textContent = `₦${total.toLocaleString()}`;
-                
-                // Show invoice modal
-                invoiceOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-            
-            invoiceClose.addEventListener('click', () => {
-                invoiceOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-            
-            printInvoice.addEventListener('click', () => {
-                // Store customer name
-                if (customerName.value.trim()) {
-                    localStorage.setItem('customerName', customerName.value.trim());
-                }
-                
-                // Generate WhatsApp message
-                const customer = customerName.value.trim() || 'Customer';
-                let message = `*INVOICE - JMPOTTERS MEN'S FOOTWEAR*%0A%0A`;
-                message += `*Customer:* ${customer}%0A%0A`;
-                message += `*Order Summary:*%0A`;
-                
-                cart.forEach(item => {
-                    message += `• ${item.name} x${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}%0A`;
-                });
-                
-                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                message += `%0A*Total: ₦${total.toLocaleString()}*%0A%0A`;
-                message += `Please confirm this order and provide delivery details.`;
-                
-                // Update WhatsApp checkout link
-                whatsappCheckout.href = `https://wa.me/2348139583320?text=${message}`;
-                
-                // Show success message
-                showToast('Invoice ready for WhatsApp confirmation!', 'success');
-                
-                // Close invoice modal
-                invoiceOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-                
-                // Close cart panel
-                cartPanel.classList.remove('active');
-                cartOverlay.classList.remove('active');
-            });
-        }
-
-        // Update WhatsApp checkout link on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            let message = `Hello! I'm interested in purchasing these items from JMPOTTERS:%0A%0A`;
-            
-            cart.forEach(item => {
-                message += `• ${item.name} x${item.quantity}%0A`;
-            });
-            
-            message += `%0ATotal: ₦${total.toLocaleString()}%0A%0ACan you provide more details?`;
-            
-            whatsappCheckout.href = `https://wa.me/2348139583320?text=${message}`;
-        });
-
-        // ========== ANALYTICS FUNCTIONS ========== //
-        function generateAnalyticsSlides(product) {
-            // Central data storage for analytics
-            const analyticsData = {
-                line: null,
-                countryBar: null,
-                doughnut: null,
-                pie: null,
-                kpi: null,
-                composite: null
-            };
-            
-            // Generate all analytics data for a product
-            function generateAllAnalyticsData(product) {
-                // Unique seed based on product ID for consistent randomness
-                const seed = product.id;
-                
-                // Line chart data
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                const lineData = Array.from({ length: 12 }, (_, i) => {
-                    // Base value with seasonal fluctuations
-                    let value = 200 + Math.sin(i * 0.5) * 150;
-                    
-                    // Add randomness based on product ID
-                    value += (seed % 100) + (i * (seed % 10));
-                    
-                    // Ensure positive values
-                    return Math.max(100, Math.round(value));
-                });
-                
-                analyticsData.line = { 
-                    labels: months, 
-                    data: lineData
-                };
-                
-                // Country bar data
-                const countries = [
-                    { flag: '🇳🇬', name: 'Nigeria' },
-                    { flag: '🇰🇪', name: 'Kenya' },
-                    { flag: '🇬🇭', name: 'Ghana' },
-                    { flag: '🇺🇬', name: 'Uganda' },
-                    { flag: '🇿🇦', name: 'South Africa' },
-                    { flag: '🇹🇿', name: 'Tanzania' },
-                    { flag: '🇷🇼', name: 'Rwanda' }
-                ];
-                
-                const salesData = countries.map((_, i) => {
-                    // Base sales with country bias
-                    let sales = 200 + Math.cos(i * 0.8) * 150;
-                    
-                    // Add product-specific randomness
-                    sales += (seed % 50) + (i * (seed % 5));
-                    
-                    return Math.max(80, Math.round(sales));
-                });
-                
-                analyticsData.countryBar = { 
-                    countries, 
-                    sales: salesData 
-                };
-                
-                // Doughnut chart data
-                const sold = 60 + (seed % 25);
-                const stuck = 15 + (seed % 10);
-                const newStock = 100 - sold - stuck;
-                analyticsData.doughnut = { sold, stuck, newStock };
-                
-                // Pie chart data
-                const bulk = 40 + (seed % 30);
-                const retail = 25 + (seed % 20);
-                const b2b = 100 - bulk - retail;
-                analyticsData.pie = { bulk, retail, b2b };
-                
-                // KPI data
-                analyticsData.kpi = {
-                    unitsSold: 1500 + (seed % 1000),
-                    returnRate: (1 + (seed % 30)/10).toFixed(1),
-                    sellThrough: 70 + (seed % 25),
-                    stockLevel: 15 + (seed % 20)
-                };
-                
-                // Composite data
-                analyticsData.composite = {
-                    trustScore: 85 + (seed % 15),
-                    avgRating: (4.0 + (seed % 10)/10).toFixed(1),
-                    recommendRate: 85 + (seed % 15)
-                };
-            }
-            
-            // Generate all analytics data for this product
-            generateAllAnalyticsData(product);
-            
-            statsSlides.innerHTML = '';
-            slidePagination.innerHTML = '';
-            
-            const slideTemplates = [
-                {
-                    title: "📈 Purchase Frequency",
-                    chart: "line",
-                    description: "Monthly sales trend showing peak purchasing periods"
-                },
-                {
-                    title: "📊 Business KPIs",
-                    chart: "kpi",
-                    description: "Key performance indicators for this product"
-                },
-                {
-                    title: "🌍 Country Sales",
-                    chart: "countryBar",
-                    description: "Sales volume by country"
-                },
-                {
-                    title: "🔄 Inventory Turnover",
-                    chart: "doughnut",
-                    description: "Ratio of good vs stuck inventory stock"
-                },
-                {
-                    title: "💰 Revenue Sources",
-                    chart: "pie",
-                    description: "Revenue distribution across sales channels"
-                },
-                {
-                    title: "🏆 Performance Summary",
-                    chart: "composite",
-                    description: "Overall performance metrics and trust score"
-                }
-            ];
-            
-            slideTemplates.forEach((slide, index) => {
-                const slideEl = document.createElement('div');
-                slideEl.className = 'stats-slide';
-                slideEl.dataset.index = index;
-                
-                slideEl.innerHTML = `
-                    <div class="slide-title">
-                        <i class="${slide.chart === 'line' ? 'fas fa-chart-line' : 
-                                  slide.chart === 'kpi' ? 'fas fa-tachometer-alt' : 
-                                  slide.chart === 'countryBar' ? 'fas fa-globe-africa' : 
-                                  slide.chart === 'doughnut' ? 'fas fa-chart-pie' : 
-                                  slide.chart === 'pie' ? 'fas fa-chart-pie' : 
-                                  'fas fa-star'}"></i>
-                        ${slide.title}
-                    </div>
-                    <div class="chart-container" id="chart-${index}">
-                        <canvas></canvas>
-                    </div>
-                    <div class="insight-text" id="insight-${index}">
-                        Detailed analytics for ${product.name} show strong market performance with consistent growth and high customer satisfaction.
-                    </div>
-                `;
-                statsSlides.appendChild(slideEl);
-                
-                // Create pagination dot
-                const dot = document.createElement('div');
-                dot.className = 'slide-dot';
-                dot.dataset.index = index;
-                if (index === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => {
-                    scrollToSlide(index);
-                });
-                slidePagination.appendChild(dot);
-            });
-            
-            // Initialize first slide
-            currentSlideIndex = 0;
-            
-            // Setup scroll events
-            statsSlides.addEventListener('scroll', handleSlideScroll);
-            
-            // Initialize charts for first slide
-            setTimeout(() => {
-                initializeChartForSlide(0);
-            }, 300);
-        }
-        
-        function initializeChartForSlide(index) {
-            const slide = statsSlides.querySelector(`.stats-slide[data-index="${index}"]`);
-            if (!slide) return;
-            
-            const canvas = slide.querySelector('canvas');
-            if (!canvas) return;
-            
-            const chartType = [
-                "line", "kpi", "countryBar", "doughnut", "pie", "composite"
-            ][index];
-            
-            // For demo purposes, we'll create simple charts
-            // In a real implementation, you would use the analyticsData to create proper charts
-            
-            const ctx = canvas.getContext('2d');
-            
-            // Create a simple chart based on type
-            switch(chartType) {
-                case "line":
-                    // Create a simple line chart
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                            datasets: [{
-                                label: 'Sales',
-                                data: [65, 59, 80, 81, 56, 55, 40, 45, 60, 70, 75, 80],
-                                borderColor: '#d4af37',
-                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                tension: 0.4,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
-                            }
-                        }
-                    });
-                    break;
-                    
-                case "kpi":
-                    // Create KPI cards instead of a chart
-                    const container = slide.querySelector('.chart-container');
-                    container.innerHTML = `
-                        <div class="metric-grid">
-                            <div class="metric-card">
-                                <div class="metric-value metric-success">1,500</div>
-                                <div class="metric-label">Units Sold</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-value metric-warning">2.5%</div>
-                                <div class="metric-label">Return Rate</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-value metric-success">75%</div>
-                                <div class="metric-label">Sell-Through Rate</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-value metric-danger">18</div>
-                                <div class="metric-label">Days of Stock</div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "countryBar":
-                    // Create a simple bar chart
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Nigeria', 'Kenya', 'Ghana', 'Uganda', 'South Africa', 'Tanzania', 'Rwanda'],
-                            datasets: [{
-                                label: 'Sales',
-                                data: [65, 59, 80, 81, 56, 55, 40],
-                                backgroundColor: '#d4af37'
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
-                            }
-                        }
-                    });
-                    break;
-                    
-                case "doughnut":
-                    // Create a simple doughnut chart
-                    new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Sold', 'Stuck', 'New'],
-                            datasets: [{
-                                data: [60, 15, 25],
-                                backgroundColor: [
-                                    '#27ae60',
-                                    '#e74c3c',
-                                    '#f39c12'
-                                ]
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
-                    });
-                    break;
-                    
-                case "pie":
-                    // Create a simple pie chart
-                    new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: ['Bulk Orders', 'Retail Stores', 'B2B Partnerships'],
-                            datasets: [{
-                                data: [40, 35, 25],
-                                backgroundColor: [
-                                    '#d4af37',
-                                    '#3498db',
-                                    '#9b59b6'
-                                ]
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
-                    });
-                    break;
-                    
-                case "composite":
-                    // Create trust score visualization
-                    const compositeContainer = slide.querySelector('.chart-container');
-                    compositeContainer.innerHTML = `
-                        <div class="metric-card">
-                            <div class="metric-value">88/100</div>
-                            <div class="metric-label">Trust Score</div>
-                            <div class="trust-score">
-                                <span>Low</span>
-                                <div class="trust-bar">
-                                    <div class="trust-fill" style="width: 88%"></div>
-                                </div>
-                                <span class="trust-value">High</span>
-                            </div>
-                        </div>
-                        <div class="metric-grid">
-                            <div class="metric-card">
-                                <div class="metric-value metric-success">4.5</div>
-                                <div class="metric-label">Avg. Rating</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-value metric-success">92%</div>
-                                <div class="metric-label">Recommend</div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-            }
-        }
-        
-        function scrollToSlide(index) {
-            const slide = statsSlides.querySelector(`.stats-slide[data-index="${index}"]`);
-            if (slide) {
-                statsSlides.scrollTo({
-                    left: slide.offsetLeft,
-                    behavior: 'smooth'
-                });
-            }
-        }
-        
-        function handleSlideScroll() {
-            const slides = statsSlides.querySelectorAll('.stats-slide');
-            const scrollPosition = statsSlides.scrollLeft + statsSlides.offsetWidth / 2;
-            
-            let closestSlide = null;
-            let closestDistance = Infinity;
-            
-            slides.forEach(slide => {
-                const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-                const distance = Math.abs(scrollPosition - slideCenter);
-                
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestSlide = slide;
-                }
-            });
-            
-            if (closestSlide) {
-                const newIndex = parseInt(closestSlide.dataset.index);
-                if (newIndex !== currentSlideIndex) {
-                    currentSlideIndex = newIndex;
-                    updateSlidePagination();
-                    initializeChartForSlide(newIndex);
-                }
-            }
-        }
-        
-        function updateSlidePagination() {
-            const dots = slidePagination.querySelectorAll('.slide-dot');
-            dots.forEach((dot, index) => {
-                if (index === currentSlideIndex) {
-                    dot.classList.add('active');
-                } else {
-                    dot.classList.remove('active');
-                }
-            });
-        }
     </script>
-    <!-- Add these right before the closing </body> tag -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
 </body>
 </html>
