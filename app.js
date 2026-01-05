@@ -1,44 +1,33 @@
 // ====================
 // CONFIGURATION
 // ====================
-// ====================
-// CONFIGURATION
-// ====================
-const SUPABASE_URL = window.SUPABASE_URL || 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
+const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
 
-// Initialize Supabase - CHECK IF ALREADY EXISTS TO AVOID DUPLICATE
+// Initialize Supabase
 let supabase;
-if (window.supabase && window.supabase.createClient) {
-    if (!window.globalSupabaseClient) {
-        window.globalSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+try {
+    if (window.supabase && window.supabase.createClient) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseClient = supabase;
+        console.log('✅ Supabase client created');
+    } else {
+        throw new Error('Supabase library not loaded');
     }
-    supabase = window.globalSupabaseClient;
-} else {
-    console.error('Supabase library not loaded!');
-    // Create placeholder to prevent errors
-    supabase = { 
-        from: () => ({ 
-            select: () => ({ 
-                eq: () => ({ 
-                    single: async () => ({ data: null, error: { message: 'Supabase not loaded' } })
-                })
-            })
-        })
-    };
+} catch (error) {
+    console.error('❌ Supabase initialization failed:', error);
+    supabase = null;
 }
 
-console.log('✅ Supabase initialized');
 // ====================
-// IMAGE PATH CONFIGURATION
+// IMAGE PATH CONFIGURATION - CORRECTED!
 // ====================
-const IMAGE_BASE_URL = 'https://ebuzome.io/JMPOTTERS/assets/images/';
+const IMAGE_BASE_URL = 'https://ebuzome.github.io/JMPOTTERS/assets/images/';
 
-// Image paths for each category
 const CATEGORY_IMAGE_PATHS = {
     'mensfootwear': IMAGE_BASE_URL + 'mensfootwear/',
-    'womensfootwear': IMAGE_BASE_URL,  // Root images folder
-    'bags': IMAGE_BASE_URL,            // Same as womensfootwear
+    'womensfootwear': IMAGE_BASE_URL,
+    'bags': IMAGE_BASE_URL,
     'household': IMAGE_BASE_URL + 'household2/',
     'kids': IMAGE_BASE_URL + 'kids/',
     'accessories': IMAGE_BASE_URL + 'accessories/'
@@ -47,52 +36,51 @@ const CATEGORY_IMAGE_PATHS = {
 // ====================
 // UTILITY FUNCTIONS
 // ====================
-function getSessionId() {
-    let sessionId = localStorage.getItem('session_id');
-    if (!sessionId) {
-        sessionId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('session_id', sessionId);
-    }
-    return sessionId;
-}
-
 function getImageUrl(categorySlug, imageFilename) {
+    if (!imageFilename) return IMAGE_BASE_URL + 'placeholder.jpg';
     const basePath = CATEGORY_IMAGE_PATHS[categorySlug] || IMAGE_BASE_URL;
     return basePath + imageFilename;
 }
 
 function showNotification(message, type = 'success') {
-    // Remove existing notifications
-    document.querySelectorAll('.notification').forEach(el => el.remove());
+    console.log(`${type.toUpperCase()}: ${message}`);
     
-    // Create notification
+    // Create a simple notification
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
     notification.textContent = message;
     notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        padding: 12px 20px;
-        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+        background: ${type === 'success' ? '#4CAF50' : '#f44336'};
         color: white;
+        padding: 12px 20px;
         border-radius: 4px;
         z-index: 9999;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        animation: slideIn 0.3s ease;
+        animation: fadeInOut 3s ease;
     `;
     
     document.body.appendChild(notification);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    setTimeout(() => notification.remove(), 3000);
+}
+
+// Add notification animation
+if (!document.querySelector('#notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'notification-styles';
+    style.textContent = `
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // ====================
-// PRODUCT FUNCTIONS
+// PRODUCT FUNCTIONS - UPDATED FOR ACCESSORIES.HTML
 // ====================
 async function loadProductsByCategory(categorySlug) {
     console.log(`📦 Loading products for: ${categorySlug}`);
@@ -103,13 +91,24 @@ async function loadProductsByCategory(categorySlug) {
         return;
     }
     
-    // Show loading
+    // Show loading with CORRECT CSS class
     productsGrid.innerHTML = `
-        <div class="loading" style="grid-column: 1/-1; text-align: center; padding: 40px;">
-            <i class="fas fa-spinner fa-spin fa-2x"></i>
-            <p>Loading products...</p>
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading accessories...</p>
         </div>
     `;
+    
+    if (!supabase) {
+        productsGrid.innerHTML = `
+            <div class="error-message">
+                <h3>⚠️ Database Connection Error</h3>
+                <p>Supabase client not initialized</p>
+                <button onclick="location.reload()" class="btn">Retry</button>
+            </div>
+        `;
+        return;
+    }
     
     try {
         // Get category ID
@@ -120,20 +119,18 @@ async function loadProductsByCategory(categorySlug) {
             .single();
         
         if (catError || !category) {
-            throw new Error(`Category "${categorySlug}" not found`);
+            console.error('Category error:', catError);
+            productsGrid.innerHTML = `
+                <div class="error-message">
+                    <h3>⚠️ Category Not Found</h3>
+                    <p>Category "${categorySlug}" does not exist in database</p>
+                    <button onclick="location.reload()" class="btn">Retry</button>
+                </div>
+            `;
+            return;
         }
         
-        // Update page title if exists
-        const pageTitle = document.getElementById('page-title');
-        if (pageTitle) {
-            pageTitle.textContent = category.name;
-        }
-        
-        // Update page description if exists
-        const pageDesc = document.getElementById('page-description');
-        if (pageDesc && category.description) {
-            pageDesc.textContent = category.description;
-        }
+        console.log(`✅ Found category: ${category.name} (ID: ${category.id})`);
         
         // Get products
         const { data: products, error: prodError } = await supabase
@@ -143,23 +140,27 @@ async function loadProductsByCategory(categorySlug) {
             .eq('is_active', true)
             .order('created_at', { ascending: false });
         
-        if (prodError) throw prodError;
+        if (prodError) {
+            console.error('Products error:', prodError);
+            throw prodError;
+        }
+        
+        console.log(`✅ Loaded ${products ? products.length : 0} products`);
         
         if (!products || products.length === 0) {
-            showNoProducts(categorySlug);
+            showNoProducts();
             return;
         }
         
-        console.log(`✅ Loaded ${products.length} products for ${categorySlug}`);
         renderProducts(products, categorySlug);
         
     } catch (error) {
         console.error('❌ Error loading products:', error);
         productsGrid.innerHTML = `
-            <div class="error" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+            <div class="error-message">
                 <h3>⚠️ Error Loading Products</h3>
-                <p>${error.message}</p>
-                <button onclick="location.reload()" class="retry-btn">Retry</button>
+                <p>${error.message || 'Unknown error'}</p>
+                <button onclick="location.reload()" class="btn">Retry</button>
             </div>
         `;
     }
@@ -172,74 +173,68 @@ function renderProducts(products, categorySlug) {
     // Clear grid
     productsGrid.innerHTML = '';
     
-    // Render each product
+    // Render each product using the EXACT HTML structure from accessories.html
     products.forEach(product => {
         const productCard = document.createElement('div');
         productCard.className = 'product-card';
         productCard.dataset.id = product.id;
         
-        // Build image URL using correct path
+        // Build image URL
         const imageUrl = getImageUrl(categorySlug, product.image_url);
         const placeholderUrl = IMAGE_BASE_URL + 'placeholder.jpg';
         
-        // Calculate discount for display (optional)
-        const fakePrice = Math.round(product.price * 1.3);
-        const discount = Math.floor((fakePrice - product.price) / fakePrice * 100);
-        
+        // Create product card HTML matching accessories.html structure
         productCard.innerHTML = `
             <div class="product-image">
-                ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
                 <img src="${imageUrl}" alt="${product.name}" 
                      loading="lazy"
                      onerror="this.onerror=null; this.src='${placeholderUrl}'">
-                <div class="quick-actions">
-                    <button class="quick-view" onclick="quickView(${product.id})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
             </div>
             <div class="product-info">
-                <h3 class="product-name">${product.name}</h3>
-                ${product.description ? `<p class="product-desc">${product.description}</p>` : ''}
-                <div class="product-price">
-                    ${discount > 0 ? `<span class="old-price">₦${fakePrice.toLocaleString()}</span>` : ''}
-                    <span class="current-price">₦${product.price.toLocaleString()}</span>
-                </div>
-                <div class="product-meta">
-                    <span class="product-stock ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}">
-                        <i class="fas ${product.stock > 0 ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                        ${product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-                    </span>
-                </div>
-                <div class="product-actions">
-                    <button class="btn-add-cart" onclick="addToCart(${product.id})" 
-                            ${product.stock < 1 ? 'disabled' : ''}>
-                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                    </button>
-                </div>
+                <h3 class="product-title">${product.name}</h3>
+                <div class="product-price">₦${product.price.toLocaleString()}</div>
+                <button class="product-toggle" onclick="toggleProductDetails(${product.id})">
+                    View Details
+                </button>
+                <button class="cart-btn" onclick="addToCart(${product.id})">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+                <button class="wishlist-btn" onclick="toggleWishlist(${product.id})" id="wishlist-${product.id}">
+                    <i class="fas fa-heart"></i> Wishlist
+                </button>
+                <a href="https://wa.me/2348139583320?text=I'm interested in ${encodeURIComponent(product.name)} - ₦${product.price}" 
+                   class="whatsapp-btn btn" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Buy Now
+                </a>
+            </div>
+            <div class="product-details" id="details-${product.id}">
+                <p>${product.description || 'No description available.'}</p>
+                <p><strong>Stock:</strong> ${product.stock > 0 ? `${product.stock} available` : 'Out of stock'}</p>
             </div>
         `;
         
         productsGrid.appendChild(productCard);
     });
     
-    // Update product count display
-    const productCount = document.getElementById('productCount');
-    if (productCount) {
-        productCount.textContent = `${products.length} products`;
+    console.log(`✅ Rendered ${products.length} products`);
+}
+
+function toggleProductDetails(productId) {
+    const details = document.getElementById(`details-${productId}`);
+    if (details) {
+        details.classList.toggle('active');
     }
 }
 
-function showNoProducts(categorySlug) {
+function showNoProducts() {
     const productsGrid = document.getElementById('productsGrid');
     if (!productsGrid) return;
     
     productsGrid.innerHTML = `
-        <div class="no-products" style="grid-column: 1/-1; text-align: center; padding: 60px;">
-            <i class="fas fa-box-open fa-3x" style="color: #ccc; margin-bottom: 20px;"></i>
+        <div class="no-products">
+            <i class="fas fa-box-open"></i>
             <h3>No Products Found</h3>
-            <p>Check back later for new arrivals in ${categorySlug}!</p>
-            <a href="index.html" class="btn-shop-all">Browse All Categories</a>
+            <p>No accessories available in this category yet.</p>
         </div>
     `;
 }
@@ -249,6 +244,11 @@ function showNoProducts(categorySlug) {
 // ====================
 async function addToCart(productId) {
     try {
+        if (!supabase) {
+            showNotification('Database not connected', 'error');
+            return;
+        }
+        
         // Get product details
         const { data: product, error } = await supabase
             .from('products')
@@ -263,7 +263,7 @@ async function addToCart(productId) {
             return;
         }
         
-        // Get or create cart
+        // Get or create cart in localStorage
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         const existingItem = cart.find(item => item.product_id === productId);
         
@@ -299,9 +299,6 @@ async function addToCart(productId) {
         updateCartUI();
         showNotification('✅ Added to cart!', 'success');
         
-        // Update cart count animation
-        animateCartIcon();
-        
     } catch (error) {
         console.error('Error adding to cart:', error);
         showNotification('Failed to add to cart', 'error');
@@ -315,161 +312,48 @@ function updateCartUI() {
     // Update cart count in navbar
     document.querySelectorAll('.cart-count').forEach(el => {
         el.textContent = totalItems;
-        el.style.display = totalItems > 0 ? 'inline-block' : 'none';
-    });
-    
-    // Update cart total if on cart page
-    if (window.location.pathname.includes('cart.html')) {
-        updateCartTotal();
-    }
-}
-
-function animateCartIcon() {
-    const cartIcons = document.querySelectorAll('.cart-count');
-    cartIcons.forEach(icon => {
-        icon.style.transform = 'scale(1.5)';
-        setTimeout(() => {
-            icon.style.transform = 'scale(1)';
-        }, 300);
+        el.style.display = totalItems > 0 ? 'flex' : 'none';
     });
 }
 
-function removeFromCart(productId) {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    cart = cart.filter(item => item.product_id !== productId);
-    localStorage.setItem('cart', JSON.stringify(cart));
+// ====================
+// WISHLIST FUNCTIONS
+// ====================
+function toggleWishlist(productId) {
+    let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    const index = wishlist.indexOf(productId);
+    const button = document.getElementById(`wishlist-${productId}`);
     
-    updateCartUI();
-    showNotification('Item removed from cart', 'info');
-    
-    // If on cart page, refresh display
-    if (window.location.pathname.includes('cart.html')) {
-        loadCartPage();
-    }
-}
-
-function updateQuantity(productId, newQuantity) {
-    if (newQuantity < 1) {
-        removeFromCart(productId);
-        return;
-    }
-    
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const item = cart.find(i => i.product_id === productId);
-    if (item) {
-        item.quantity = newQuantity;
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartUI();
-        
-        // Reload cart page if on it
-        if (window.location.pathname.includes('cart.html')) {
-            loadCartPage();
+    if (index === -1) {
+        wishlist.push(productId);
+        if (button) {
+            button.classList.add('active');
+            button.innerHTML = '<i class="fas fa-heart"></i> In Wishlist';
         }
-    }
-}
-
-// ====================
-// CART PAGE FUNCTIONS
-// ====================
-async function loadCartPage() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartContainer = document.getElementById('cartContainer');
-    const cartTotal = document.getElementById('cartTotal');
-    const cartCount = document.getElementById('cartItemCount');
-    const emptyCart = document.getElementById('emptyCart');
-    const cartItems = document.getElementById('cartItems');
-    const cartSummary = document.getElementById('cartSummary');
-    
-    if (!cartContainer) return;
-    
-    if (cart.length === 0) {
-        if (emptyCart) emptyCart.style.display = 'block';
-        if (cartItems) cartItems.style.display = 'none';
-        if (cartSummary) cartSummary.style.display = 'none';
-        if (cartTotal) cartTotal.textContent = '₦0';
-        if (cartCount) cartCount.textContent = '0 items';
-        return;
+        showNotification('Added to wishlist', 'success');
+    } else {
+        wishlist.splice(index, 1);
+        if (button) {
+            button.classList.remove('active');
+            button.innerHTML = '<i class="fas fa-heart"></i> Wishlist';
+        }
+        showNotification('Removed from wishlist', 'info');
     }
     
-    // Show cart items and summary
-    if (emptyCart) emptyCart.style.display = 'none';
-    if (cartItems) cartItems.style.display = 'block';
-    if (cartSummary) cartSummary.style.display = 'block';
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
     
-    // Calculate totals
-    let subtotal = 0;
-    let html = '';
-    
-    for (const item of cart) {
-        const itemTotal = item.price * item.quantity;
-        subtotal += itemTotal;
-        
-        // Get image URL
-        const imageUrl = getImageUrl(item.category_slug, item.image_url);
-        
-        html += `
-            <div class="cart-item" data-id="${item.product_id}">
-                <div class="cart-item-image">
-                    <img src="${imageUrl}" alt="${item.name}"
-                         onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'">
-                </div>
-                <div class="cart-item-details">
-                    <h4>${item.name}</h4>
-                    <p class="price">₦${item.price.toLocaleString()}</p>
-                    <div class="quantity-controls">
-                        <button onclick="updateQuantity(${item.product_id}, ${item.quantity - 1})">-</button>
-                        <span>${item.quantity}</span>
-                        <button onclick="updateQuantity(${item.product_id}, ${item.quantity + 1})">+</button>
-                    </div>
-                </div>
-                <div class="cart-item-total">
-                    <p class="item-total">₦${itemTotal.toLocaleString()}</p>
-                    <button onclick="removeFromCart(${item.product_id})" class="remove-btn">
-                        <i class="fas fa-trash"></i> Remove
-                    </button>
-                </div>
-            </div>
-        `;
-    }
-    
-    if (cartItems) cartItems.innerHTML = html;
-    
-    // Calculate shipping and total
-    const shipping = subtotal > 0 ? 1500 : 0; // Free shipping over certain amount?
-    const total = subtotal + shipping;
-    
-    // Update summary
-    if (cartSummary) {
-        const subtotalEl = document.getElementById('cartSubtotal');
-        const shippingEl = document.getElementById('cartShipping');
-        const totalEl = document.getElementById('cartTotal');
-        
-        if (subtotalEl) subtotalEl.textContent = `₦${subtotal.toLocaleString()}`;
-        if (shippingEl) shippingEl.textContent = `₦${shipping.toLocaleString()}`;
-        if (totalEl) totalEl.textContent = `₦${total.toLocaleString()}`;
-    }
-    
-    if (cartCount) cartCount.textContent = `${cart.reduce((sum, item) => sum + item.quantity, 0)} items`;
-}
-
-function updateCartTotal() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shipping = subtotal > 0 ? 1500 : 0;
-    const total = subtotal + shipping;
-    
-    const totalEl = document.getElementById('cartTotal');
-    if (totalEl) totalEl.textContent = `₦${total.toLocaleString()}`;
+    // Update wishlist count
+    document.getElementById('wishlistCount').textContent = wishlist.length;
 }
 
 // ====================
 // PAGE INITIALIZATION
 // ====================
 function detectCurrentCategory() {
-    // Try window.currentCategory first (set in HTML)
+    // Check if set in HTML
     if (window.currentCategory) return window.currentCategory;
     
-    // Detect from URL pathname
+    // Detect from URL
     const path = window.location.pathname;
     const page = path.split('/').pop().replace('.html', '');
     
@@ -479,278 +363,101 @@ function detectCurrentCategory() {
         'bags': 'bags',
         'household': 'household',
         'kids': 'kids',
-        'accessories': 'accessories',
-        'index': 'featured' // Special case for homepage
+        'accessories': 'accessories'
     };
     
-    return pageToCategory[page] || 'mensfootwear';
+    return pageToCategory[page] || 'accessories';
 }
 
 async function initializePage() {
     console.log('🚀 Initializing page...');
+    
+    // Load wishlist count
+    const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    document.getElementById('wishlistCount').textContent = wishlist.length;
     
     // Update cart UI
     updateCartUI();
     
     // Load products if on category page
     const currentCategory = detectCurrentCategory();
-    if (document.getElementById('productsGrid') && currentCategory !== 'featured') {
+    console.log(`Current category detected: ${currentCategory}`);
+    
+    if (document.getElementById('productsGrid')) {
         await loadProductsByCategory(currentCategory);
-    }
-    
-    // Load featured products for homepage
-    if (currentCategory === 'featured' && document.getElementById('featuredProducts')) {
-        await loadFeaturedProducts();
-    }
-    
-    // Initialize cart page if needed
-    if (window.location.pathname.includes('cart.html')) {
-        loadCartPage();
-    }
-    
-    // Initialize checkout page if needed
-    if (window.location.pathname.includes('checkout.html')) {
-        initializeCheckout();
     }
     
     console.log('✅ Page initialized');
 }
 
 // ====================
-// HOMEPAGE FUNCTIONS
+// CART PANEL FUNCTIONS
 // ====================
-async function loadFeaturedProducts() {
-    try {
-        // Get 6 random products from different categories
-        const { data: products, error } = await supabase
-            .from('products')
-            .select('*, categories(slug)')
-            .eq('is_active', true)
-            .order('created_at', { ascending: false })
-            .limit(12);
-        
-        if (error) throw error;
-        
-        if (!products || products.length === 0) return;
-        
-        renderFeaturedProducts(products);
-        
-    } catch (error) {
-        console.error('Error loading featured products:', error);
-    }
-}
-
-function renderFeaturedProducts(products) {
-    const container = document.getElementById('featuredProducts');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    products.forEach(product => {
-        const categorySlug = product.categories?.slug || 'products';
-        const imageUrl = getImageUrl(categorySlug, product.image_url);
-        
-        const productCard = `
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="${imageUrl}" alt="${product.name}">
-                </div>
-                <div class="product-info">
-                    <h3>${product.name}</h3>
-                    <p class="price">₦${product.price.toLocaleString()}</p>
-                    <button onclick="addToCart(${product.id})" class="btn-add-cart">
-                        Add to Cart
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        container.insertAdjacentHTML('beforeend', productCard);
-    });
-}
-
-// ====================
-// CHECKOUT FUNCTIONS
-// ====================
-function initializeCheckout() {
+function loadCartPanel() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const orderSummary = document.getElementById('orderSummary');
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
     
-    if (!orderSummary || cart.length === 0) return;
+    if (!cartItems || !cartTotal) return;
     
-    let subtotal = 0;
+    if (cart.length === 0) {
+        cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+        cartTotal.textContent = '₦0';
+        return;
+    }
+    
+    let total = 0;
     let html = '';
     
     cart.forEach(item => {
         const itemTotal = item.price * item.quantity;
-        subtotal += itemTotal;
+        total += itemTotal;
         
         html += `
-            <div class="order-item">
-                <span>${item.name} × ${item.quantity}</span>
-                <span>₦${itemTotal.toLocaleString()}</span>
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <h4>${item.name}</h4>
+                    <p>₦${item.price.toLocaleString()} × ${item.quantity}</p>
+                </div>
+                <div class="cart-item-total">
+                    <span>₦${itemTotal.toLocaleString()}</span>
+                    <button onclick="removeFromCart(${item.product_id})" class="remove-item">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
         `;
     });
     
-    const shipping = 1500;
-    const total = subtotal + shipping;
+    cartItems.innerHTML = html;
+    cartTotal.textContent = `₦${total.toLocaleString()}`;
+}
+
+function removeFromCart(productId) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart = cart.filter(item => item.product_id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cart));
     
-    html += `
-        <div class="order-totals">
-            <div class="total-row">
-                <span>Subtotal</span>
-                <span>₦${subtotal.toLocaleString()}</span>
-            </div>
-            <div class="total-row">
-                <span>Shipping</span>
-                <span>₦${shipping.toLocaleString()}</span>
-            </div>
-            <div class="total-row grand-total">
-                <span>Total</span>
-                <span>₦${total.toLocaleString()}</span>
-            </div>
-        </div>
-    `;
-    
-    orderSummary.innerHTML = html;
-    
-    // Update checkout form total
-    const totalInput = document.getElementById('checkoutTotal');
-    if (totalInput) {
-        totalInput.value = total;
-    }
+    updateCartUI();
+    loadCartPanel();
+    showNotification('Item removed from cart', 'info');
 }
 
 // ====================
-// QUICK VIEW FUNCTION
+// GLOBAL EXPORTS
 // ====================
-async function quickView(productId) {
-    try {
-        const { data: product, error } = await supabase
-            .from('products')
-            .select('*, categories(slug, name)')
-            .eq('id', productId)
-            .single();
-        
-        if (error) throw error;
-        
-        // Create modal
-        const modal = document.createElement('div');
-        modal.className = 'quick-view-modal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            padding: 20px;
-        `;
-        
-        const imageUrl = getImageUrl(product.categories.slug, product.image_url);
-        
-        modal.innerHTML = `
-            <div class="modal-content" style="
-                background: white;
-                max-width: 800px;
-                width: 100%;
-                border-radius: 10px;
-                padding: 30px;
-                position: relative;
-                max-height: 90vh;
-                overflow-y: auto;
-            ">
-                <button class="close-modal" onclick="this.parentElement.parentElement.remove()" 
-                        style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer;">
-                    ×
-                </button>
-                <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                    <div class="modal-image">
-                        <img src="${imageUrl}" alt="${product.name}" 
-                             style="width: 100%; border-radius: 5px;">
-                    </div>
-                    <div class="modal-details">
-                        <h2 style="margin-top: 0;">${product.name}</h2>
-                        <p class="price" style="font-size: 24px; color: #d4af37; font-weight: bold;">
-                            ₦${product.price.toLocaleString()}
-                        </p>
-                        ${product.description ? `<p>${product.description}</p>` : ''}
-                        <p><strong>Category:</strong> ${product.categories.name}</p>
-                        <p><strong>Stock:</strong> ${product.stock} available</p>
-                        <div class="modal-actions" style="margin-top: 30px;">
-                            <button onclick="addToCart(${product.id})" 
-                                    style="padding: 12px 30px; background: #000; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-    } catch (error) {
-        console.error('Error in quick view:', error);
-        showNotification('Failed to load product details', 'error');
-    }
-}
+window.toggleProductDetails = toggleProductDetails;
+window.addToCart = addToCart;
+window.toggleWishlist = toggleWishlist;
+window.removeFromCart = removeFromCart;
 
 // ====================
 // START APPLICATION
 // ====================
-document.addEventListener('DOMContentLoaded', initializePage);
-
-// Add CSS for notifications and animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    
-    .cart-count {
-        transition: transform 0.3s ease;
-    }
-    
-    .loading {
-        color: #666;
-    }
-    
-    .loading .fa-spinner {
-        color: #d4af37;
-        margin-bottom: 10px;
-    }
-    
-    .retry-btn {
-        padding: 8px 20px;
-        background: #d4af37;
-        color: #000;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-top: 15px;
-    }
-    
-    .btn-shop-all {
-        display: inline-block;
-        margin-top: 20px;
-        padding: 10px 25px;
-        background: #000;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-    }
-`;
-document.head.appendChild(style);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePage);
+} else {
+    initializePage();
+}
 
 console.log('✅ app.js loaded with correct image paths');
