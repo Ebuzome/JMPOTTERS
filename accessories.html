@@ -737,25 +737,40 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- ========= SUPABASE INTEGRATION ========= -->
-    <!-- Supabase Client -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+ <!-- ========= SUPABASE INTEGRATION ========= -->
+<!-- Supabase Client (loaded once) -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<!-- Set configuration BEFORE app.js -->
+<script>
+    // SAFE CONFIGURATION - Only set if not already set
+    if (!window.SUPABASE_CONFIG) {
+        window.SUPABASE_CONFIG = {
+            url: 'https://tmpggeeuwdvlngvfncaa.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+        };
+    }
     
-    <!-- Configuration ONLY - NO Supabase initialization here -->
-    <script>
-        // Set configuration for app.js to use
-        window.SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-        window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
+    if (!window.currentCategory) {
         window.currentCategory = 'accessories';
+    }
+    
+    console.log('⚙️ Safe configuration set');
+</script>
+
+<!-- Main app.js (safe from duplicates) -->
+<script src="app.js"></script>
+
+<!-- Page-specific UI (no Supabase logic) -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Accessories page UI initialized');
         
-        console.log('⚙️ Configuration set for accessories category');
-    </script>
-    
-    <!-- Main app.js (handles ALL Supabase logic) -->
-    <script src="app.js"></script>
-    
-    <!-- Page-specific UI interactions ONLY -->
-    <script>
+        // Only UI code here - no database logic
+        const mobileToggle = document.getElementById('mobileToggle');
+        // ... (rest of UI code as before)
+    });
+</script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Accessories page UI initialized');
             
