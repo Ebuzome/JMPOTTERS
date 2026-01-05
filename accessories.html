@@ -4,8 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessorize with Elegance | JMPOTTERS</title>
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Configuration - NO SUPABASE INITIALIZATION HERE -->
+    <script>
+        // Safe configuration - set in window object to avoid duplicates
+        (function() {
+            'use strict';
+            if (!window.JMPOTTERS_CONFIG) {
+                window.JMPOTTERS_CONFIG = {
+                    currentCategory: 'accessories'
+                };
+            }
+            console.log('⚙️ JMPOTTERS config set');
+        })();
+    </script>
+    
     <style>
         :root {
             --primary-color: #1abc9c;      /* Teal */
@@ -220,7 +237,7 @@
             align-items: center;
             position: relative;
             background: linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)),
-                        url('https://ebuzome.github.io/JMPOTTERS/assets/images/accessories/banner-accessories.jpg') center/cover;
+                        url('assets/images/accessories/banner-accessories.jpg') center/cover;
             color: var(--light-color);
             text-align: center;
             margin-top: 55px;
@@ -522,15 +539,7 @@
             100% { opacity: 0; transform: translate(-50%, 20px); }
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.3rem; }
-            .section-title { font-size: 1.8rem; }
-            .filter-group { width: 100%; }
-            .products-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-        }
-        
-        /* ===== LOADING STATES ===== */
+        /* ===== LOADING & ERROR STATES ===== */
         .loading-spinner {
             grid-column: 1 / -1;
             text-align: center;
@@ -542,6 +551,12 @@
             font-size: 2.5rem;
             color: var(--primary-color);
             margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .no-products {
@@ -556,7 +571,6 @@
             margin-bottom: 20px;
         }
         
-        /* ===== ERROR STATES ===== */
         .error-message {
             grid-column: 1 / -1;
             text-align: center;
@@ -568,6 +582,14 @@
         .error-message h3 {
             color: #d32f2f;
             margin-bottom: 15px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.3rem; }
+            .section-title { font-size: 1.8rem; }
+            .filter-group { width: 100%; }
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
         }
     </style>
 </head>
@@ -590,7 +612,7 @@
                 </div>
                 <div class="header-icon" id="cartIcon">
                     <i class="fas fa-shopping-bag"></i>
-                    <span class="icon-badge cart-count">0</span>
+                    <span class="icon-badge" id="cartCount">0</span>
                 </div>
             </div>
         </div>
@@ -605,12 +627,14 @@
         </div>
         <ul class="mobile-nav-links">
             <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a></li>
-            <li><a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a></li>
+            <li><a href="footwear.html"><i class="fas fa-shoe-prints"></i> Footwear</a></li>
             <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
             <li><a href="accessories.html"><i class="fas fa-gem"></i> Accessories</a></li>
             <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-            <li><a href="kids.html"><i class="fas fa-child"></i> Kids</a></li>
+            <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
+            <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
+            <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
+            <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
         </ul>
     </div>
 
@@ -618,7 +642,7 @@
     <section class="hero">
         <div class="container">
             <h1>Accessorize with Elegance</h1>
-            <p>Discover curated pieces to elevate every outfit — watches, speakers, gadgets & more.</p>
+            <p>Discover curated pieces to elevate every outfit — bags, jewelry, sunglasses & more.</p>
             <a href="#products" class="btn">Shop Collection</a>
         </div>
     </section>
@@ -658,10 +682,10 @@
         <div class="container">
             <h2 class="section-title">Trendy Accessories</h2>
             <div class="products-grid" id="productsGrid">
-                <!-- Loading state -->
+                <!-- Loading state will be shown by app.js -->
                 <div class="loading-spinner">
                     <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading accessories...</p>
+                    <p>Loading accessories from database...</p>
                 </div>
             </div>
             <div class="pagination" id="pagination"></div>
@@ -712,8 +736,6 @@
                     <ul class="footer-links">
                         <li><a href="accessories.html">Accessories</a></li>
                         <li><a href="bags.html">Bags</a></li>
-                        <li><a href="mensfootwear.html">Men's Footwear</a></li>
-                        <li><a href="womensfootwear.html">Women's Footwear</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -727,7 +749,7 @@
                 </div>
             </div>
             <div class="copyright">
-                &copy; 2024 JMPOTTERS. All rights reserved.
+                &copy; 2023 JMPOTTERS. All rights reserved.
             </div>
         </div>
     </footer>
@@ -737,40 +759,15 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
- <!-- ========= SUPABASE INTEGRATION ========= -->
-<!-- Supabase Client (loaded once) -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
-<!-- Set configuration BEFORE app.js -->
-<script>
-    // SAFE CONFIGURATION - Only set if not already set
-    if (!window.SUPABASE_CONFIG) {
-        window.SUPABASE_CONFIG = {
-            url: 'https://tmpggeeuwdvlngvfncaa.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
-        };
-    }
+    <!-- ========= SUPABASE INTEGRATION ========= -->
+    <!-- Supabase Client Library -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
-    if (!window.currentCategory) {
-        window.currentCategory = 'accessories';
-    }
+    <!-- Main app.js (Supabase logic) -->
+    <script src="app.js"></script>
     
-    console.log('⚙️ Safe configuration set');
-</script>
-
-<!-- Main app.js (safe from duplicates) -->
-<script src="app.js"></script>
-
-<!-- Page-specific UI (no Supabase logic) -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Accessories page UI initialized');
-        
-        // Only UI code here - no database logic
-        const mobileToggle = document.getElementById('mobileToggle');
-        // ... (rest of UI code as before)
-    });
-</script>
+    <!-- Page-specific UI interactions ONLY -->
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Accessories page UI initialized');
             
@@ -864,18 +861,17 @@
                 });
             }
             
-            // Filter event listeners (will be enhanced in app.js later)
+            // Filter event listeners (will be implemented in app.js)
             const searchBar = document.getElementById('searchBar');
             const minPrice = document.getElementById('minPrice');
             const maxPrice = document.getElementById('maxPrice');
             const sortBy = document.getElementById('sortBy');
             
-            // Simple filter logging for now
+            // Simple logging for now - real filtering will be in app.js
             [searchBar, minPrice, maxPrice, sortBy].forEach(element => {
                 if (element) {
                     element.addEventListener('input', function() {
                         console.log('Filter changed:', this.id, '=', this.value);
-                        // Real filtering will be implemented in app.js
                     });
                 }
             });
