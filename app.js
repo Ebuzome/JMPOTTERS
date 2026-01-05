@@ -29,7 +29,7 @@
     
     // Set image configuration
     window.JMPOTTERS_CONFIG.images = {
-        baseUrl: 'https://ebuzome.github.io/JMPOTTERS/assets/images/',
+        baseUrl: 'https://ebuzome.github.io/JMPOTTERS/assets/images/accessories/',
         paths: {
             'mensfootwear': 'mensfootwear/',
             'womensfootwear': '',
