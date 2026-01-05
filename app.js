@@ -14,41 +14,77 @@
     window.JMPOTTERS_APP_INITIALIZED = true;
     
     // ====================
-    // CONFIGURATION
+    // CONFIGURATION - DEFINE HERE TO ENSURE IT EXISTS
     // ====================
+    // Define config if it doesn't exist
     if (!window.JMPOTTERS_CONFIG) {
-        window.JMPOTTERS_CONFIG = {
-            supabase: {
-                url: 'https://tmpggeeuwdvlngvfncaa.supabase.co',
-                key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
-            },
-            images: {
-                baseUrl: 'https://ebuzome.github.io/JMPOTTERS/assets/images/',
-                paths: {
-                    'mensfootwear': 'mensfootwear/',
-                    'womensfootwear': '',
-                    'bags': '',
-                    'household': 'household2/',
-                    'kids': 'kids/',
-                    'accessories': 'accessories/'
-                }
-            }
-        };
+        window.JMPOTTERS_CONFIG = {};
     }
+    
+    // Set Supabase configuration (ALWAYS set it here)
+    window.JMPOTTERS_CONFIG.supabase = {
+        url: 'https://tmpggeeuwdvlngvfncaa.supabase.co',
+        key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+    };
+    
+    // Set image configuration
+    window.JMPOTTERS_CONFIG.images = {
+        baseUrl: 'https://ebuzome.github.io/JMPOTTERS/assets/images/',
+        paths: {
+            'mensfootwear': 'mensfootwear/',
+            'womensfootwear': '',
+            'bags': '',
+            'household': 'household2/',
+            'kids': 'kids/',
+            'accessories': 'accessories/'
+        }
+    };
+    
+    // Set current category if not already set
+    if (!window.JMPOTTERS_CONFIG.currentCategory) {
+        // Try to detect from URL
+        const path = window.location.pathname;
+        const page = path.split('/').pop().replace('.html', '');
+        
+        const pageToCategory = {
+            'mensfootwear': 'mensfootwear',
+            'womensfootwear': 'womensfootwear',
+            'bags': 'bags',
+            'household': 'household',
+            'kids': 'kids',
+            'accessories': 'accessories'
+        };
+        
+        window.JMPOTTERS_CONFIG.currentCategory = pageToCategory[page] || 'accessories';
+    }
+    
+    console.log('⚙️ Configuration loaded:', window.JMPOTTERS_CONFIG);
     
     // ====================
     // GET SUPABASE CLIENT
     // ====================
     function getSupabaseClient() {
         if (window.JMPOTTERS_SUPABASE_CLIENT) {
+            console.log('✅ Using existing Supabase client');
             return window.JMPOTTERS_SUPABASE_CLIENT;
         }
         
+        // Check if Supabase library is loaded
         if (window.supabase && window.supabase.createClient) {
             const config = window.JMPOTTERS_CONFIG.supabase;
-            window.JMPOTTERS_SUPABASE_CLIENT = window.supabase.createClient(config.url, config.key);
-            console.log('✅ Created Supabase client');
-            return window.JMPOTTERS_SUPABASE_CLIENT;
+            if (!config || !config.url || !config.key) {
+                console.error('❌ Supabase configuration missing');
+                return null;
+            }
+            
+            try {
+                window.JMPOTTERS_SUPABASE_CLIENT = window.supabase.createClient(config.url, config.key);
+                console.log('✅ Created new Supabase client');
+                return window.JMPOTTERS_SUPABASE_CLIENT;
+            } catch (error) {
+                console.error('❌ Failed to create Supabase client:', error);
+                return null;
+            }
         }
         
         console.error('❌ Supabase library not loaded');
@@ -129,7 +165,7 @@
             productsGrid.innerHTML = `
                 <div class="error-message">
                     <h3>⚠️ Database Connection Error</h3>
-                    <p>Supabase client not available. Please refresh the page.</p>
+                    <p>Failed to connect to Supabase. Please check your internet connection and refresh.</p>
                     <button onclick="location.reload()" class="btn">Retry</button>
                 </div>
             `;
@@ -137,6 +173,8 @@
         }
         
         try {
+            console.log('🔍 Fetching category from Supabase...');
+            
             // Get category ID
             const { data: category, error: catError } = await supabase
                 .from('categories')
@@ -144,13 +182,19 @@
                 .eq('slug', categorySlug)
                 .single();
             
-            if (catError || !category) {
-                throw new Error(`Category "${categorySlug}" not found in database`);
+            if (catError) {
+                console.error('❌ Category error:', catError);
+                throw new Error(`Category "${categorySlug}" not found: ${catError.message}`);
+            }
+            
+            if (!category) {
+                throw new Error(`Category "${categorySlug}" does not exist in database`);
             }
             
             console.log(`✅ Found category: ${category.name} (ID: ${category.id})`);
             
             // Get products
+            console.log('🔍 Fetching products from Supabase...');
             const { data: products, error: prodError } = await supabase
                 .from('products')
                 .select('*')
@@ -158,13 +202,27 @@
                 .eq('is_active', true)
                 .order('created_at', { ascending: false });
             
-            if (prodError) throw prodError;
+            if (prodError) {
+                console.error('❌ Products error:', prodError);
+                throw prodError;
+            }
             
             console.log(`✅ Loaded ${products ? products.length : 0} products`);
             
             if (!products || products.length === 0) {
                 showNoProducts();
                 return;
+            }
+            
+            // Debug: Log first product to verify data
+            if (products.length > 0) {
+                console.log('📝 Sample product data:', {
+                    id: products[0].id,
+                    name: products[0].name,
+                    price: products[0].price,
+                    image_url: products[0].image_url,
+                    category_id: products[0].category_id
+                });
             }
             
             renderProducts(products, categorySlug);
@@ -174,7 +232,8 @@
             productsGrid.innerHTML = `
                 <div class="error-message">
                     <h3>⚠️ Error Loading Products</h3>
-                    <p>${error.message || 'Database connection failed'}</p>
+                    <p>${error.message || 'Failed to load products from database'}</p>
+                    <p><small>Error details: ${error.toString()}</small></p>
                     <button onclick="location.reload()" class="btn">Retry</button>
                 </div>
             `;
@@ -458,23 +517,7 @@
     // INITIALIZATION
     // ====================
     function detectCurrentCategory() {
-        if (window.JMPOTTERS_CONFIG && window.JMPOTTERS_CONFIG.currentCategory) {
-            return window.JMPOTTERS_CONFIG.currentCategory;
-        }
-        
-        const path = window.location.pathname;
-        const page = path.split('/').pop().replace('.html', '');
-        
-        const pageToCategory = {
-            'mensfootwear': 'mensfootwear',
-            'womensfootwear': 'womensfootwear',
-            'bags': 'bags',
-            'household': 'household',
-            'kids': 'kids',
-            'accessories': 'accessories'
-        };
-        
-        return pageToCategory[page] || 'accessories';
+        return window.JMPOTTERS_CONFIG.currentCategory || 'accessories';
     }
     
     async function initializePage() {
