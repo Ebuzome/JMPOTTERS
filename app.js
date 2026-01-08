@@ -1,16 +1,15 @@
 // ====================
-// UPDATED JMPOTTERS APP - COMPLETE MODAL FROM SUPABASE
+// JMPOTTERS APP - FIXED MODAL ISSUES
 // ====================
 (function() {
     'use strict';
     
-    // Prevent duplicate initialization
     if (window.JMPOTTERS_APP_INITIALIZED) {
         console.warn('⚠️ JMPOTTERS app already initialized, skipping...');
         return;
     }
     
-    console.log('🚀 JMPOTTERS app starting (Complete Supabase modal)...');
+    console.log('🚀 JMPOTTERS app starting...');
     window.JMPOTTERS_APP_INITIALIZED = true;
     
     // ====================
@@ -39,27 +38,10 @@
         }
     };
     
-    // Page to category mapping
-    window.JMPOTTERS_CONFIG.pageToCategory = {
-        'mensfootwear': 'mensfootwear',
-        'womensfootwear': 'womensfootwear',
-        'bags': 'bags',
-        'household': 'household',
-        'kids': 'kids',
-        'accessories': 'accessories'
-    };
-    
     // Current product state
     let currentProduct = null;
     let currentModalConfig = null;
-    let currentProductReviews = [];
-    let currentProductAnalytics = null;
-    let currentProductSizes = [];
-    let currentProductColors = [];
-    let currentBulkPricing = [];
     let currentSelectedQuantity = 1;
-    let currentSelectedUnitPrice = 0;
-    let currentSelectedSize = null;
     
     // ====================
     // UTILITY FUNCTIONS
@@ -67,7 +49,15 @@
     function getCurrentCategory() {
         const path = window.location.pathname;
         const page = path.split('/').pop().replace('.html', '');
-        return window.JMPOTTERS_CONFIG.pageToCategory[page] || 'mensfootwear';
+        const pageToCategory = {
+            'mensfootwear': 'mensfootwear',
+            'womensfootwear': 'womensfootwear',
+            'bags': 'bags',
+            'household': 'household',
+            'kids': 'kids',
+            'accessories': 'accessories'
+        };
+        return pageToCategory[page] || 'mensfootwear';
     }
     
     function getImageUrl(categorySlug, imageFilename) {
@@ -168,27 +158,32 @@
                 .eq('slug', categorySlug)
                 .single();
             
-            if (catError) throw new Error(`Category "${categorySlug}" not found`);
-            if (!category) throw new Error(`Category "${categorySlug}" does not exist`);
+            if (catError) {
+                console.error('❌ Category error:', catError);
+                showNotification('Category not found', 'error');
+                return;
+            }
+            
+            if (!category) {
+                throw new Error(`Category "${categorySlug}" not found`);
+            }
             
             console.log(`✅ Found category: ${category.name} (ID: ${category.id})`);
             
-            // Get products
+            // Get ONLY basic product data first (no joins to avoid issues)
             const { data: products, error: prodError } = await supabase
                 .from('products')
-                .select(`
-                    *,
-                    product_modals (*),
-                    product_sizes (*),
-                    product_colors (*)
-                `)
+                .select('*')
                 .eq('category_id', category.id)
                 .eq('is_active', true)
                 .order('created_at', { ascending: false });
             
-            if (prodError) throw prodError;
+            if (prodError) {
+                console.error('❌ Products error:', prodError);
+                throw prodError;
+            }
             
-            console.log(`✅ Loaded ${products?.length || 0} products`);
+            console.log(`✅ Loaded ${products?.length || 0} basic products`);
             
             if (!products || products.length === 0) {
                 showNoProducts();
@@ -198,7 +193,7 @@
             // Cache products
             window.JMPOTTERS_PRODUCTS_CACHE = products;
             
-            // Render products
+            // Render products WITHOUT sizes in product cards
             renderProducts(products, categorySlug);
             
         } catch (error) {
@@ -225,9 +220,8 @@
             const fakePrice = Math.round(product.price * (1 + displayDiscount/100));
             const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
             const isInWishlist = wishlist.some(item => item.id === product.id);
-            const modalConfig = product.product_modals?.[0];
-            const showBulkOptions = modalConfig?.show_bulk_pricing ?? true;
             
+            // FIXED: Remove sizes from product card to avoid display issues
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.setAttribute('data-aos', 'fade-up');
@@ -250,13 +244,9 @@
                     <div class="availability">
                         <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                     </div>
-                    ${product.product_sizes?.length > 0 ? 
-                        `<div class="sizes">
-                            Sizes: <span>${product.product_sizes.map(s => s.size_value).join(', ')}</span>
-                        </div>` : ''
-                    }
                     
-                    ${showBulkOptions ? `
+                    <!-- REMOVED SIZES FROM PRODUCT CARD -->
+                    
                     <div class="quantity-selector">
                         <button class="toggle-bulk-options">
                             Bulk Options <i class="fas fa-chevron-down"></i>
@@ -267,7 +257,6 @@
                             `).join('')}
                         </div>
                     </div>
-                    ` : ''}
                     
                     <div class="action-buttons">
                         <button class="btn-add-cart" data-id="${product.id}">
@@ -288,7 +277,7 @@
     }
     
     // ====================
-    // MODAL FUNCTIONS - FROM SUPABASE
+    // MODAL FUNCTIONS - SIMPLIFIED
     // ====================
     async function openProductModal(productId) {
         console.log(`📊 Opening modal for product ID: ${productId}`);
@@ -300,70 +289,130 @@
         }
         
         try {
-            // Fetch ALL product data from Supabase
-            const { data: product, error } = await supabase
+            // 1. First get basic product data
+            const { data: product, error: productError } = await supabase
                 .from('products')
-                .select(`
-                    *,
-                    product_modals (*),
-                    product_sizes (*),
-                    product_colors (*),
-                    product_reviews (*),
-                    product_analytics (*),
-                    bulk_pricing_tiers (*)
-                `)
+                .select('*')
                 .eq('id', productId)
                 .single();
             
-            if (error) throw error;
-            if (!product) throw new Error('Product not found');
+            if (productError) {
+                console.error('❌ Product fetch error:', productError);
+                throw new Error('Product not found in database');
+            }
             
-            // Store all data
+            if (!product) {
+                throw new Error('Product data is empty');
+            }
+            
+            console.log('✅ Loaded basic product:', product.name);
+            
+            // 2. Get modal configuration (optional)
+            let modalConfig = null;
+            try {
+                const { data: modalData } = await supabase
+                    .from('product_modals')
+                    .select('*')
+                    .eq('product_id', productId)
+                    .maybeSingle(); // Use maybeSingle to handle no rows
+                
+                modalConfig = modalData;
+                console.log('✅ Modal config:', modalConfig ? 'found' : 'not found');
+            } catch (modalError) {
+                console.log('⚠️ No modal config or table missing:', modalError.message);
+            }
+            
             currentProduct = product;
-            currentModalConfig = product.product_modals?.[0];
-            currentProductReviews = product.product_reviews || [];
-            currentProductAnalytics = product.product_analytics?.[0];
-            currentProductSizes = product.product_sizes || [];
-            currentProductColors = product.product_colors || [];
-            currentBulkPricing = product.bulk_pricing_tiers || [];
+            currentModalConfig = modalConfig;
             
-            // Render the modal with ALL data
-            renderProductModal(product);
+            // 3. Get sizes (optional)
+            let sizes = [];
+            try {
+                const { data: sizesData } = await supabase
+                    .from('product_sizes')
+                    .select('*')
+                    .eq('product_id', productId)
+                    .order('size_value');
+                
+                sizes = sizesData || [];
+                console.log(`✅ Loaded ${sizes.length} sizes`);
+            } catch (sizeError) {
+                console.log('⚠️ No sizes or table missing:', sizeError.message);
+            }
             
-            // Open modal
+            // 4. Get reviews (optional)
+            let reviews = [];
+            try {
+                const { data: reviewsData } = await supabase
+                    .from('product_reviews')
+                    .select('*')
+                    .eq('product_id', productId)
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                reviews = reviewsData || [];
+                console.log(`✅ Loaded ${reviews.length} reviews`);
+            } catch (reviewError) {
+                console.log('⚠️ No reviews or table missing:', reviewError.message);
+            }
+            
+            // 5. Get bulk pricing (optional)
+            let bulkPricing = [];
+            try {
+                const { data: pricingData } = await supabase
+                    .from('bulk_pricing_tiers')
+                    .select('*')
+                    .eq('product_id', productId)
+                    .order('min_quantity');
+                
+                bulkPricing = pricingData || [];
+                console.log(`✅ Loaded ${bulkPricing.length} bulk pricing tiers`);
+            } catch (pricingError) {
+                console.log('⚠️ No bulk pricing or table missing:', pricingError.message);
+            }
+            
+            // 6. Render the modal with all collected data
+            renderProductModal(product, {
+                modalConfig,
+                sizes,
+                reviews,
+                bulkPricing
+            });
+            
+            // 7. Open modal
             const modalOverlay = document.getElementById('modalOverlay');
             if (modalOverlay) {
                 modalOverlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                console.log('✅ Modal opened successfully');
             }
             
         } catch (error) {
-            console.error('❌ Error loading modal data:', error);
-            showNotification('Failed to load product details', 'error');
+            console.error('❌ Detailed modal error:', error);
+            console.error('Error stack:', error.stack);
+            showNotification(`Failed to load product details: ${error.message}`, 'error');
         }
     }
     
-    function renderProductModal(product) {
-        // Get category for image URL
+    function renderProductModal(product, data) {
+        console.log('🎨 Rendering modal for:', product.name);
+        
         const currentCategory = getCurrentCategory();
         
         // ====================
-        // 1. SET BASIC PRODUCT INFO - FROM SUPABASE
+        // 1. BASIC PRODUCT INFO
         // ====================
         // Product Image
         const modalImage = document.getElementById('modalImage');
         if (modalImage) {
             modalImage.src = getImageUrl(currentCategory, product.image_url);
             modalImage.alt = product.name;
-            modalImage.onerror = function() {
-                this.src = window.JMPOTTERS_CONFIG.images.baseUrl + 'placeholder.jpg';
-            };
         }
         
         // Product Name
         const productName = document.getElementById('productName');
         if (productName) {
-            productName.textContent = product.name || 'Product Name';
+            productName.textContent = product.name;
         }
         
         // Product Prices
@@ -378,64 +427,57 @@
             productFakePrice.textContent = `₦${fakePrice.toLocaleString()}`;
         }
         
-        // Product Description - FROM SUPABASE
+        // Product Description
         const productDescription = document.getElementById('productDescription');
         if (productDescription) {
             productDescription.textContent = product.description || 
-                `Premium ${product.name} crafted with attention to detail. ${product.name} features high-quality materials and superior craftsmanship for lasting comfort and style.`;
+                `${product.name} - Premium quality footwear designed for comfort and style.`;
         }
         
         // ====================
-        // 2. SIZE SELECTOR - FROM SUPABASE product_sizes
+        // 2. SIZE SELECTOR
         // ====================
         const sizeGrid = document.getElementById('sizeGrid');
         if (sizeGrid) {
             sizeGrid.innerHTML = '';
             
-            if (currentModalConfig?.show_size_selector && currentProductSizes.length > 0) {
-                currentProductSizes.forEach(size => {
+            const { sizes = [] } = data;
+            const showSizeSelector = data.modalConfig?.show_size_selector !== false;
+            
+            if (showSizeSelector && sizes.length > 0) {
+                sizes.forEach(size => {
                     const sizeOption = document.createElement('button');
                     sizeOption.className = 'size-option';
+                    sizeOption.textContent = size.size_value;
                     sizeOption.dataset.size = size.size_value;
-                    sizeOption.dataset.stock = size.stock;
-                    
-                    let sizeHtml = size.size_value;
-                    if (size.stock <= 0) {
-                        sizeOption.disabled = true;
-                        sizeHtml += `<br><small style="color: #ff6b6b;">Out of stock</small>`;
-                    } else if (size.stock < 10) {
-                        sizeHtml += `<br><small style="color: #f39c12;">Only ${size.stock} left</small>`;
-                    }
-                    
-                    sizeOption.innerHTML = sizeHtml;
                     
                     sizeOption.addEventListener('click', function() {
                         sizeGrid.querySelectorAll('.size-option').forEach(opt => {
                             opt.classList.remove('selected');
                         });
                         this.classList.add('selected');
-                        currentSelectedSize = size.size_value;
                     });
                     
                     sizeGrid.appendChild(sizeOption);
                 });
             } else {
-                sizeGrid.innerHTML = '<p style="color: #ccc; text-align: center; grid-column: 1 / -1;">Size selection not available</p>';
+                sizeGrid.innerHTML = '<p style="color: #ccc; text-align: center; grid-column: 1 / -1;">Select size in cart</p>';
             }
         }
         
         // ====================
-        // 3. BULK PRICING TABLE - FROM SUPABASE bulk_pricing_tiers
+        // 3. BULK PRICING
         // ====================
         const bulkPricingBody = document.getElementById('bulkPricingBody');
         if (bulkPricingBody) {
             bulkPricingBody.innerHTML = '';
             
-            if (currentModalConfig?.show_bulk_pricing) {
-                if (currentBulkPricing.length > 0) {
-                    // Use actual bulk pricing from database
-                    currentBulkPricing.sort((a, b) => a.min_quantity - b.min_quantity);
-                    currentBulkPricing.forEach(tier => {
+            const { bulkPricing = [] } = data;
+            const showBulkPricing = data.modalConfig?.show_bulk_pricing !== false;
+            
+            if (showBulkPricing) {
+                if (bulkPricing.length > 0) {
+                    bulkPricing.forEach(tier => {
                         const row = document.createElement('tr');
                         const totalPrice = tier.price_per_unit * tier.min_quantity;
                         row.innerHTML = `
@@ -446,7 +488,7 @@
                         bulkPricingBody.appendChild(row);
                     });
                 } else {
-                    // Fallback to generated pricing
+                    // Fallback pricing
                     [1, 10, 25, 50, 100].forEach(qty => {
                         const discount = qty === 1 ? 0 : Math.min(30, Math.floor(qty / 10) * 5);
                         const unitPrice = Math.round(product.price * (1 - discount / 100));
@@ -459,19 +501,11 @@
                         bulkPricingBody.appendChild(row);
                     });
                 }
-            } else {
-                bulkPricingBody.innerHTML = `
-                    <tr>
-                        <td colspan="3" style="text-align: center; color: #ccc; padding: 20px;">
-                            Bulk pricing not enabled for this product
-                        </td>
-                    </tr>
-                `;
             }
         }
         
         // ====================
-        // 4. QUANTITY OPTIONS - FROM SUPABASE product_modals.default_quantity_options
+        // 4. QUANTITY OPTIONS
         // ====================
         const quantityOptionsModal = document.getElementById('quantityOptionsModal');
         const quantityTotalPrice = document.getElementById('quantityTotalPrice');
@@ -480,23 +514,13 @@
             quantityOptionsModal.innerHTML = '';
             
             // Get quantity options from modal config or use defaults
-            const defaultOptions = currentModalConfig?.default_quantity_options || [1, 5, 10, 25, 50, 100];
+            const defaultOptions = data.modalConfig?.default_quantity_options || [1, 5, 10, 25, 50, 100];
             
             defaultOptions.forEach((qty, index) => {
-                // Calculate price
+                // Simple price calculation
                 let unitPrice = product.price;
-                let discount = 0;
-                
-                if (currentBulkPricing.length > 0) {
-                    const tier = [...currentBulkPricing]
-                        .sort((a, b) => b.min_quantity - a.min_quantity)
-                        .find(t => qty >= t.min_quantity);
-                    if (tier) {
-                        unitPrice = tier.price_per_unit;
-                        discount = Math.round((1 - unitPrice/product.price) * 100);
-                    }
-                } else if (qty > 1) {
-                    discount = Math.min(30, Math.floor(qty / 10) * 5);
+                if (qty > 1) {
+                    const discount = Math.min(30, Math.floor(qty / 10) * 5);
                     unitPrice = Math.round(product.price * (1 - discount / 100));
                 }
                 
@@ -508,13 +532,10 @@
                 option.dataset.unitPrice = unitPrice;
                 option.dataset.totalPrice = totalPrice;
                 
-                let optionHtml = `<div style="font-weight: 600;">${qty} Unit${qty > 1 ? 's' : ''}</div>`;
-                if (discount > 0) {
-                    optionHtml += `<div style="font-size: 0.8rem; color: #4CAF50;">Save ${discount}%</div>`;
-                }
-                optionHtml += `<div style="font-size: 0.8rem; opacity: 0.8;">₦${unitPrice.toLocaleString()}/unit</div>`;
-                
-                option.innerHTML = optionHtml;
+                option.innerHTML = `
+                    <div style="font-weight: 600;">${qty} Unit${qty > 1 ? 's' : ''}</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">₦${unitPrice.toLocaleString()}/unit</div>
+                `;
                 
                 option.addEventListener('click', function() {
                     quantityOptionsModal.querySelectorAll('.quantity-option-modal').forEach(opt => {
@@ -524,7 +545,6 @@
                     
                     quantityTotalPrice.textContent = `₦${totalPrice.toLocaleString()}`;
                     currentSelectedQuantity = qty;
-                    currentSelectedUnitPrice = unitPrice;
                 });
                 
                 quantityOptionsModal.appendChild(option);
@@ -533,30 +553,28 @@
                 if (index === 0) {
                     quantityTotalPrice.textContent = `₦${totalPrice.toLocaleString()}`;
                     currentSelectedQuantity = qty;
-                    currentSelectedUnitPrice = unitPrice;
                 }
             });
         }
         
         // ====================
-        // 5. REVIEWS - FROM SUPABASE product_reviews
+        // 5. REVIEWS
         // ====================
         const reviewsList = document.getElementById('reviewsList');
         if (reviewsList) {
             reviewsList.innerHTML = '';
             
-            if (currentModalConfig?.show_reviews) {
-                if (currentProductReviews.length > 0) {
-                    currentProductReviews.slice(0, 5).forEach(review => {
+            const { reviews = [] } = data;
+            const showReviews = data.modalConfig?.show_reviews !== false;
+            
+            if (showReviews) {
+                if (reviews.length > 0) {
+                    reviews.forEach(review => {
                         const reviewEl = document.createElement('div');
                         reviewEl.className = 'review';
                         
                         const date = review.created_at ? 
-                            new Date(review.created_at).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                            }) : '';
+                            new Date(review.created_at).toLocaleDateString() : '';
                         
                         reviewEl.innerHTML = `
                             <div class="review-header">
@@ -565,196 +583,53 @@
                                 </div>
                                 <div class="review-user">
                                     ${review.customer_name || 'Customer'}
-                                    ${date ? `<br><small style="opacity: 0.7;">${date}</small>` : ''}
                                 </div>
                                 <div class="review-rating">
                                     ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
                                 </div>
                             </div>
                             <div class="review-text">${review.comment || 'Great product!'}</div>
+                            ${date ? `<small style="color: #888;">${date}</small>` : ''}
                         `;
                         reviewsList.appendChild(reviewEl);
                     });
-                    
-                    // Show review count
-                    const reviewCount = document.createElement('div');
-                    reviewCount.style.marginTop = '20px';
-                    reviewCount.style.color = '#ccc';
-                    reviewCount.style.textAlign = 'center';
-                    reviewCount.textContent = `Showing ${Math.min(5, currentProductReviews.length)} of ${currentProductReviews.length} reviews`;
-                    reviewsList.appendChild(reviewCount);
                 } else {
                     reviewsList.innerHTML = `
-                        <div style="text-align: center; color: #ccc; padding: 40px 20px;">
-                            <i class="fas fa-comment-alt" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
-                            <p>No reviews yet. Be the first to review this product!</p>
+                        <div style="text-align: center; color: #ccc; padding: 20px;">
+                            No reviews yet. Be the first to review!
                         </div>
                     `;
                 }
-            } else {
-                reviewsList.innerHTML = `
-                    <div style="text-align: center; color: #ccc; padding: 40px 20px;">
-                        <i class="fas fa-eye-slash" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
-                        <p>Reviews are not available for this product.</p>
-                    </div>
-                `;
             }
         }
         
-        // ====================
-        // 6. ANALYTICS - FROM SUPABASE product_analytics
-        // ====================
-        if (currentModalConfig?.show_analytics) {
-            renderAnalyticsSlides();
-        }
-        
-        console.log('✅ Modal rendered with complete Supabase data');
-    }
-    
-    function renderAnalyticsSlides() {
-        const statsSlides = document.getElementById('statsSlides');
-        const slidePagination = document.getElementById('slidePagination');
-        
-        if (!statsSlides || !slidePagination) return;
-        
-        statsSlides.innerHTML = '';
-        slidePagination.innerHTML = '';
-        
-        // Only render if we have analytics data
-        if (!currentProductAnalytics) {
-            statsSlides.innerHTML = `
-                <div class="stats-slide" style="text-align: center; padding: 40px; color: #ccc;">
-                    <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.5;"></i>
-                    <h3>Analytics Data</h3>
-                    <p>Analytics data will be available soon for this product.</p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Slide 1: Sales Analytics
-        const salesSlide = document.createElement('div');
-        salesSlide.className = 'stats-slide';
-        salesSlide.innerHTML = `
-            <h3 class="slide-title"><i class="fas fa-chart-line"></i> Sales Analytics</h3>
-            <div class="chart-container">
-                <canvas id="salesChart" width="400" height="300"></canvas>
-            </div>
-            <div class="metric-grid">
-                <div class="metric-card">
-                    <div class="metric-label">Total Sales</div>
-                    <div class="metric-value">${currentProductAnalytics.total_sales || 0}</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Conversion Rate</div>
-                    <div class="metric-value metric-success">${currentProductAnalytics.conversion_rate || 0}%</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Avg. Views</div>
-                    <div class="metric-value">${currentProductAnalytics.average_views || 0}/day</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Return Rate</div>
-                    <div class="metric-value metric-warning">${currentProductAnalytics.return_rate || 0}%</div>
-                </div>
-            </div>
-        `;
-        statsSlides.appendChild(salesSlide);
-        
-        // Slide 2: Performance Insights
-        const perfSlide = document.createElement('div');
-        perfSlide.className = 'stats-slide';
-        perfSlide.innerHTML = `
-            <h3 class="slide-title"><i class="fas fa-chart-pie"></i> Performance Insights</h3>
-            <div class="chart-container">
-                <canvas id="performanceChart" width="400" height="300"></canvas>
-            </div>
-            <div class="insight-text">
-                <p><strong>Product Performance:</strong> ${getPerformanceDescription()}</p>
-                ${currentProductAnalytics.top_countries ? 
-                    `<p><strong>Popular in:</strong> ${currentProductAnalytics.top_countries.join(', ')}</p>` : ''
-                }
-                <p><strong>Customer Rating:</strong> ${calculateAverageRating()} / 5 stars</p>
-            </div>
-        `;
-        statsSlides.appendChild(perfSlide);
-        
-        // Add pagination dots
-        [1, 2].forEach((_, index) => {
-            const dot = document.createElement('div');
-            dot.className = `slide-dot ${index === 0 ? 'active' : ''}`;
-            dot.addEventListener('click', () => {
-                statsSlides.scrollTo({ left: index * statsSlides.clientWidth, behavior: 'smooth' });
-                slidePagination.querySelectorAll('.slide-dot').forEach((d, i) => {
-                    d.classList.toggle('active', i === index);
-                });
-            });
-            slidePagination.appendChild(dot);
-        });
-        
-        // Initialize charts after a brief delay
-        setTimeout(initializeCharts, 100);
-    }
-    
-    function calculateAverageRating() {
-        if (!currentProductReviews.length) return 'No ratings';
-        const sum = currentProductReviews.reduce((acc, review) => acc + (review.rating || 0), 0);
-        return (sum / currentProductReviews.length).toFixed(1);
-    }
-    
-    function getPerformanceDescription() {
-        if (!currentProductAnalytics) return 'Performance data being collected.';
-        
-        const desc = [];
-        if (currentProductAnalytics.conversion_rate > 15) desc.push('High conversion rate');
-        if (currentProductAnalytics.return_rate < 5) desc.push('Low return rate');
-        if (currentProductAnalytics.total_sales > 50) desc.push('Strong sales');
-        
-        return desc.length > 0 ? desc.join(', ') + '.' : 'Average performance metrics.';
-    }
-    
-    function initializeCharts() {
-        // Sales Chart
-        const salesCtx = document.getElementById('salesChart')?.getContext('2d');
-        if (salesCtx && window.Chart) {
-            new Chart(salesCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Monthly Sales',
-                        data: [12, 19, 15, 25, 22, 30],
-                        borderColor: '#d4af37',
-                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
+        console.log('✅ Modal rendered successfully');
     }
     
     // ====================
     // PRODUCT INTERACTIONS
     // ====================
     function setupProductInteractions() {
-        // View Details buttons
-        document.querySelectorAll('.btn-view-details').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const productId = parseInt(this.getAttribute('data-id'));
+        console.log('🔧 Setting up product interactions...');
+        
+        // View Details buttons - FIXED: Use event delegation
+        document.addEventListener('click', function(event) {
+            // Check if clicked element is a view details button or its child
+            const viewDetailsBtn = event.target.closest('.btn-view-details');
+            if (viewDetailsBtn) {
+                event.preventDefault();
+                const productId = parseInt(viewDetailsBtn.getAttribute('data-id'));
+                console.log('👁️ View details clicked for product:', productId);
                 openProductModal(productId);
-            });
+            }
         });
         
         // Add to Cart buttons
-        document.querySelectorAll('.btn-add-cart').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                const productId = parseInt(this.getAttribute('data-id'));
+        document.addEventListener('click', function(event) {
+            const addCartBtn = event.target.closest('.btn-add-cart');
+            if (addCartBtn) {
+                event.preventDefault();
+                const productId = parseInt(addCartBtn.getAttribute('data-id'));
                 const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
                 
                 if (!product) {
@@ -762,38 +637,37 @@
                     return;
                 }
                 
-                // Get selected quantity
-                const card = this.closest('.product-card');
-                const selectedQty = card.querySelector('.quantity-option.selected');
-                const quantity = selectedQty ? parseInt(selectedQty.getAttribute('data-qty')) : 1;
-                
-                addToCart(product, quantity);
+                addToCart(product, 1);
                 showNotification(`${product.name} added to cart!`, 'success');
-            });
+            }
         });
         
         // Wishlist buttons
-        document.querySelectorAll('.wishlist-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const productId = parseInt(this.getAttribute('data-id'));
+        document.addEventListener('click', function(event) {
+            const wishlistBtn = event.target.closest('.wishlist-btn');
+            if (wishlistBtn) {
+                event.preventDefault();
+                const productId = parseInt(wishlistBtn.getAttribute('data-id'));
                 const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
                 
                 if (product) {
                     toggleWishlist(product);
                 }
-            });
+            }
         });
         
         // Quantity toggles
         document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
                 const options = this.nextElementSibling;
                 options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
             });
         });
         
         document.querySelectorAll('.quantity-option').forEach(option => {
-            option.addEventListener('click', function() {
+            option.addEventListener('click', function(e) {
+                e.stopPropagation();
                 const container = this.closest('.quantity-options');
                 container.querySelectorAll('.quantity-option').forEach(opt => {
                     opt.classList.remove('selected');
@@ -801,14 +675,14 @@
                 this.classList.add('selected');
             });
         });
+        
+        console.log('✅ Product interactions setup complete');
     }
     
     // ====================
     // CART & WISHLIST FUNCTIONS
     // ====================
-    function addToCart(product, quantity = 1, unitPrice = null) {
-        const priceToUse = unitPrice !== null ? unitPrice : product.price;
-        
+    function addToCart(product, quantity = 1) {
         let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
         const existingItem = cart.find(item => item.product_id === product.id);
         
@@ -819,7 +693,7 @@
                 product_id: product.id,
                 quantity: quantity,
                 name: product.name,
-                price: priceToUse,
+                price: product.price,
                 image_url: product.image_url,
                 category_slug: getCurrentCategory()
             });
@@ -894,13 +768,7 @@
             modalAddCart.addEventListener('click', () => {
                 if (!currentProduct) return;
                 
-                // Check size selection if enabled
-                if (currentModalConfig?.show_size_selector && !currentSelectedSize) {
-                    showNotification('Please select a size', 'warning');
-                    return;
-                }
-                
-                addToCart(currentProduct, currentSelectedQuantity, currentSelectedUnitPrice);
+                addToCart(currentProduct, currentSelectedQuantity);
                 showNotification(`${currentProduct.name} added to cart!`, 'success');
                 
                 // Close modal
@@ -912,7 +780,19 @@
             });
         }
         
-        console.log('✅ JMPOTTERS initialized with complete Supabase modal');
+        // Setup modal close button
+        const modalClose = document.getElementById('modalClose');
+        if (modalClose) {
+            modalClose.addEventListener('click', () => {
+                const modalOverlay = document.getElementById('modalOverlay');
+                if (modalOverlay) {
+                    modalOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+        
+        console.log('✅ JMPOTTERS initialized');
     }
     
     // ====================
@@ -936,5 +816,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded - Modal now fully from Supabase');
+    console.log('✅ JMPOTTERS app loaded');
 })();
