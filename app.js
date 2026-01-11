@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - FIXED MODAL ISSUES
+// JMPOTTERS APP - WITH COLOR & SIZE SELECTION
 // ====================
 (function() {
     'use strict';
@@ -42,6 +42,11 @@
     let currentProduct = null;
     let currentModalConfig = null;
     let currentSelectedQuantity = 1;
+    let currentSelectedColor = null;
+    let currentSelectedSize = null;
+    let currentProductColors = [];
+    let currentProductSizes = [];
+    let colorSizeMap = {}; // Maps color -> available sizes
     
     // ====================
     // UTILITY FUNCTIONS
@@ -68,6 +73,14 @@
         const config = window.JMPOTTERS_CONFIG.images;
         const folder = config.paths[categorySlug] || '';
         return config.baseUrl + folder + imageFilename;
+    }
+    
+    function formatPrice(price) {
+        if (!price && price !== 0) {
+            console.warn('⚠️ Price is undefined or null:', price);
+            return '₦0';
+        }
+        return `₦${parseInt(price).toLocaleString()}`;
     }
     
     function showNotification(message, type = 'success') {
@@ -170,7 +183,7 @@
             
             console.log(`✅ Found category: ${category.name} (ID: ${category.id})`);
             
-            // Get ONLY basic product data first (no joins to avoid issues)
+            // Get basic product data
             const { data: products, error: prodError } = await supabase
                 .from('products')
                 .select('*')
@@ -193,7 +206,7 @@
             // Cache products
             window.JMPOTTERS_PRODUCTS_CACHE = products;
             
-            // Render products WITHOUT sizes in product cards
+            // Render products
             renderProducts(products, categorySlug);
             
         } catch (error) {
@@ -217,11 +230,10 @@
         products.forEach((product, index) => {
             const imageUrl = getImageUrl(categorySlug, product.image_url);
             const displayDiscount = [10, 20, 35][index % 3];
-            const fakePrice = Math.round(product.price * (1 + displayDiscount/100));
+            const fakePrice = product.price ? Math.round(product.price * (1 + displayDiscount/100)) : 0;
             const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
             const isInWishlist = wishlist.some(item => item.id === product.id);
             
-            // FIXED: Remove sizes from product card to avoid display issues
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.setAttribute('data-aos', 'fade-up');
@@ -238,14 +250,12 @@
                 <div class="product-info">
                     <h3 class="product-title">${product.name}</h3>
                     <div class="product-price">
-                        <del class="price-fake">₦${fakePrice.toLocaleString()}</del>
-                        <span class="price-real">₦${product.price.toLocaleString()}</span>
+                        <del class="price-fake">${formatPrice(fakePrice)}</del>
+                        <span class="price-real">${formatPrice(product.price)}</span>
                     </div>
                     <div class="availability">
                         <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                     </div>
-                    
-                    <!-- REMOVED SIZES FROM PRODUCT CARD -->
                     
                     <div class="quantity-selector">
                         <button class="toggle-bulk-options">
@@ -277,7 +287,7 @@
     }
     
     // ====================
-    // MODAL FUNCTIONS - SIMPLIFIED
+    // MODAL FUNCTIONS - WITH COLOR & SIZE SELECTION
     // ====================
     async function openProductModal(productId) {
         console.log(`📊 Opening modal for product ID: ${productId}`);
@@ -289,7 +299,7 @@
         }
         
         try {
-            // 1. First get basic product data
+            // 1. Get basic product data
             const { data: product, error: productError } = await supabase
                 .from('products')
                 .select('*')
@@ -307,25 +317,22 @@
             
             console.log('✅ Loaded basic product:', product.name);
             
-            // 2. Get modal configuration (optional)
-            let modalConfig = null;
+            // 2. Get colors
+            let colors = [];
             try {
-                const { data: modalData } = await supabase
-                    .from('product_modals')
+                const { data: colorsData } = await supabase
+                    .from('product_colors')
                     .select('*')
                     .eq('product_id', productId)
-                    .maybeSingle(); // Use maybeSingle to handle no rows
+                    .order('color_name');
                 
-                modalConfig = modalData;
-                console.log('✅ Modal config:', modalConfig ? 'found' : 'not found');
-            } catch (modalError) {
-                console.log('⚠️ No modal config or table missing:', modalError.message);
+                colors = colorsData || [];
+                console.log(`✅ Loaded ${colors.length} colors`);
+            } catch (colorError) {
+                console.log('⚠️ No colors or table missing:', colorError.message);
             }
             
-            currentProduct = product;
-            currentModalConfig = modalConfig;
-            
-            // 3. Get sizes (optional)
+            // 3. Get sizes
             let sizes = [];
             try {
                 const { data: sizesData } = await supabase
@@ -340,7 +347,32 @@
                 console.log('⚠️ No sizes or table missing:', sizeError.message);
             }
             
-            // 4. Get reviews (optional)
+            // 4. Build color-size map
+            const colorSizeMap = {};
+            if (colors.length > 0 && sizes.length > 0) {
+                // Assuming all sizes are available for all colors
+                // In a real app, you might have a color_size_availability table
+                colors.forEach(color => {
+                    colorSizeMap[color.id] = sizes;
+                });
+            }
+            
+            // 5. Get modal configuration
+            let modalConfig = null;
+            try {
+                const { data: modalData } = await supabase
+                    .from('product_modals')
+                    .select('*')
+                    .eq('product_id', productId)
+                    .maybeSingle();
+                
+                modalConfig = modalData;
+                console.log('✅ Modal config:', modalConfig ? 'found' : 'not found');
+            } catch (modalError) {
+                console.log('⚠️ No modal config:', modalError.message);
+            }
+            
+            // 6. Get reviews
             let reviews = [];
             try {
                 const { data: reviewsData } = await supabase
@@ -353,10 +385,10 @@
                 reviews = reviewsData || [];
                 console.log(`✅ Loaded ${reviews.length} reviews`);
             } catch (reviewError) {
-                console.log('⚠️ No reviews or table missing:', reviewError.message);
+                console.log('⚠️ No reviews:', reviewError.message);
             }
             
-            // 5. Get bulk pricing (optional)
+            // 7. Get bulk pricing
             let bulkPricing = [];
             try {
                 const { data: pricingData } = await supabase
@@ -368,18 +400,28 @@
                 bulkPricing = pricingData || [];
                 console.log(`✅ Loaded ${bulkPricing.length} bulk pricing tiers`);
             } catch (pricingError) {
-                console.log('⚠️ No bulk pricing or table missing:', pricingError.message);
+                console.log('⚠️ No bulk pricing:', pricingError.message);
             }
             
-            // 6. Render the modal with all collected data
+            // Store data globally
+            currentProduct = product;
+            currentModalConfig = modalConfig;
+            currentProductColors = colors;
+            currentProductSizes = sizes;
+            currentSelectedColor = colors.length > 0 ? colors[0] : null;
+            currentSelectedSize = null;
+            
+            // 8. Render the modal
             renderProductModal(product, {
                 modalConfig,
+                colors,
                 sizes,
                 reviews,
-                bulkPricing
+                bulkPricing,
+                colorSizeMap
             });
             
-            // 7. Open modal
+            // 9. Open modal
             const modalOverlay = document.getElementById('modalOverlay');
             if (modalOverlay) {
                 modalOverlay.classList.add('active');
@@ -389,7 +431,6 @@
             
         } catch (error) {
             console.error('❌ Detailed modal error:', error);
-            console.error('Error stack:', error.stack);
             showNotification(`Failed to load product details: ${error.message}`, 'error');
         }
     }
@@ -415,16 +456,16 @@
             productName.textContent = product.name;
         }
         
-        // Product Prices
+        // Product Prices - FIXED: Use formatPrice to handle undefined
         const productRealPrice = document.getElementById('productRealPrice');
         if (productRealPrice) {
-            productRealPrice.textContent = `₦${(product.price || 0).toLocaleString()}`;
+            productRealPrice.textContent = formatPrice(product.price);
         }
         
         const productFakePrice = document.getElementById('productFakePrice');
         if (productFakePrice) {
-            const fakePrice = Math.round((product.price || 0) * 1.35);
-            productFakePrice.textContent = `₦${fakePrice.toLocaleString()}`;
+            const fakePrice = product.price ? Math.round(product.price * 1.35) : 0;
+            productFakePrice.textContent = formatPrice(fakePrice);
         }
         
         // Product Description
@@ -435,38 +476,163 @@
         }
         
         // ====================
-        // 2. SIZE SELECTOR
+        // 2. COLOR SELECTOR
         // ====================
-        const sizeGrid = document.getElementById('sizeGrid');
-        if (sizeGrid) {
+        const colorSelector = document.getElementById('colorSelector');
+        if (!colorSelector) {
+            // Create color selector if it doesn't exist
+            const sizeSelectionDiv = document.querySelector('.size-selection');
+            if (sizeSelectionDiv) {
+                const colorSelectorHTML = `
+                    <div class="color-selection" style="margin-bottom: 30px;">
+                        <h4><i class="fas fa-palette"></i> Select Color</h4>
+                        <div class="color-grid" id="colorGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                            <!-- Colors will be added here -->
+                        </div>
+                    </div>
+                `;
+                sizeSelectionDiv.insertAdjacentHTML('beforebegin', colorSelectorHTML);
+            }
+        }
+        
+        const colorGrid = document.getElementById('colorGrid');
+        if (colorGrid) {
+            colorGrid.innerHTML = '';
+            
+            const { colors = [] } = data;
+            
+            if (colors.length > 0) {
+                colors.forEach(color => {
+                    const colorOption = document.createElement('button');
+                    colorOption.className = 'color-option';
+                    colorOption.dataset.colorId = color.id;
+                    colorOption.dataset.colorName = color.color_name;
+                    colorOption.dataset.hexCode = color.hex_code;
+                    
+                    // Create color swatch
+                    const colorSwatch = document.createElement('div');
+                    colorSwatch.style.width = '40px';
+                    colorSwatch.style.height = '40px';
+                    colorSwatch.style.backgroundColor = color.hex_code || '#ccc';
+                    colorSwatch.style.borderRadius = '4px';
+                    colorSwatch.style.margin = '0 auto 5px';
+                    colorSwatch.style.border = '2px solid #333';
+                    
+                    colorOption.appendChild(colorSwatch);
+                    
+                    const colorName = document.createElement('div');
+                    colorName.textContent = color.color_name;
+                    colorName.style.fontSize = '0.8rem';
+                    colorName.style.marginTop = '5px';
+                    colorOption.appendChild(colorName);
+                    
+                    colorOption.style.display = 'flex';
+                    colorOption.style.flexDirection = 'column';
+                    colorOption.style.alignItems = 'center';
+                    colorOption.style.padding = '10px';
+                    colorOption.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+                    colorOption.style.background = 'transparent';
+                    colorOption.style.color = 'white';
+                    colorOption.style.cursor = 'pointer';
+                    colorOption.style.transition = 'all 0.3s ease';
+                    colorOption.style.borderRadius = '4px';
+                    
+                    colorOption.addEventListener('click', function() {
+                        // Remove selected class from all color options
+                        colorGrid.querySelectorAll('.color-option').forEach(opt => {
+                            opt.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                            opt.style.boxShadow = 'none';
+                        });
+                        
+                        // Add selected style
+                        this.style.borderColor = '#d4af37';
+                        this.style.boxShadow = '0 0 10px rgba(212, 175, 55, 0.5)';
+                        
+                        // Update selected color
+                        currentSelectedColor = {
+                            id: this.dataset.colorId,
+                            name: this.dataset.colorName,
+                            hex: this.dataset.hexCode
+                        };
+                        
+                        console.log('Selected color:', currentSelectedColor);
+                        
+                        // Update size grid based on selected color
+                        updateSizeGridForColor(data.colorSizeMap?.[color.id] || data.sizes || []);
+                    });
+                    
+                    colorGrid.appendChild(colorOption);
+                    
+                    // Select first color by default
+                    if (colors.indexOf(color) === 0) {
+                        setTimeout(() => {
+                            colorOption.click();
+                        }, 100);
+                    }
+                });
+            } else {
+                colorGrid.innerHTML = '<p style="color: #ccc; text-align: center; grid-column: 1 / -1;">No colors available</p>';
+            }
+        }
+        
+        // ====================
+        // 3. SIZE SELECTOR
+        // ====================
+        function updateSizeGridForColor(availableSizes = []) {
+            const sizeGrid = document.getElementById('sizeGrid');
+            if (!sizeGrid) return;
+            
             sizeGrid.innerHTML = '';
+            currentSelectedSize = null;
             
-            const { sizes = [] } = data;
-            const showSizeSelector = data.modalConfig?.show_size_selector !== false;
-            
-            if (showSizeSelector && sizes.length > 0) {
-                sizes.forEach(size => {
+            if (availableSizes.length > 0) {
+                availableSizes.forEach(size => {
                     const sizeOption = document.createElement('button');
                     sizeOption.className = 'size-option';
                     sizeOption.textContent = size.size_value;
-                    sizeOption.dataset.size = size.size_value;
+                    sizeOption.dataset.sizeId = size.id;
+                    sizeOption.dataset.sizeValue = size.size_value;
+                    sizeOption.dataset.stock = size.stock;
+                    
+                    // Add stock indicator
+                    if (size.stock <= 0) {
+                        sizeOption.disabled = true;
+                        sizeOption.style.opacity = '0.5';
+                        sizeOption.style.cursor = 'not-allowed';
+                        sizeOption.innerHTML += `<br><small style="color: #ff6b6b;">Out of stock</small>`;
+                    } else if (size.stock < 10) {
+                        sizeOption.innerHTML += `<br><small style="color: #f39c12;">${size.stock} left</small>`;
+                    }
                     
                     sizeOption.addEventListener('click', function() {
+                        // Remove selected class from all size options
                         sizeGrid.querySelectorAll('.size-option').forEach(opt => {
                             opt.classList.remove('selected');
                         });
+                        
+                        // Add selected class to clicked option
                         this.classList.add('selected');
+                        currentSelectedSize = {
+                            id: this.dataset.sizeId,
+                            value: this.dataset.sizeValue,
+                            stock: this.dataset.stock
+                        };
+                        
+                        console.log('Selected size:', currentSelectedSize);
                     });
                     
                     sizeGrid.appendChild(sizeOption);
                 });
             } else {
-                sizeGrid.innerHTML = '<p style="color: #ccc; text-align: center; grid-column: 1 / -1;">Select size in cart</p>';
+                sizeGrid.innerHTML = '<p style="color: #ccc; text-align: center; grid-column: 1 / -1;">No sizes available for this color</p>';
             }
         }
         
+        // Initialize size grid with all sizes
+        updateSizeGridForColor(data.sizes || []);
+        
         // ====================
-        // 3. BULK PRICING
+        // 4. BULK PRICING
         // ====================
         const bulkPricingBody = document.getElementById('bulkPricingBody');
         if (bulkPricingBody) {
@@ -479,24 +645,25 @@
                 if (bulkPricing.length > 0) {
                     bulkPricing.forEach(tier => {
                         const row = document.createElement('tr');
-                        const totalPrice = tier.price_per_unit * tier.min_quantity;
+                        const totalPrice = (tier.price_per_unit || 0) * (tier.min_quantity || 1);
                         row.innerHTML = `
-                            <td>${tier.min_quantity}+ Units</td>
-                            <td>₦${tier.price_per_unit.toLocaleString()}</td>
-                            <td>₦${totalPrice.toLocaleString()}</td>
+                            <td>${tier.min_quantity || 1}+ Units</td>
+                            <td>${formatPrice(tier.price_per_unit)}</td>
+                            <td>${formatPrice(totalPrice)}</td>
                         `;
                         bulkPricingBody.appendChild(row);
                     });
                 } else {
                     // Fallback pricing
                     [1, 10, 25, 50, 100].forEach(qty => {
+                        const basePrice = product.price || 0;
                         const discount = qty === 1 ? 0 : Math.min(30, Math.floor(qty / 10) * 5);
-                        const unitPrice = Math.round(product.price * (1 - discount / 100));
+                        const unitPrice = Math.round(basePrice * (1 - discount / 100));
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${qty} Unit${qty > 1 ? 's' : ''}</td>
-                            <td>₦${unitPrice.toLocaleString()}</td>
-                            <td>₦${(unitPrice * qty).toLocaleString()}</td>
+                            <td>${formatPrice(unitPrice)}</td>
+                            <td>${formatPrice(unitPrice * qty)}</td>
                         `;
                         bulkPricingBody.appendChild(row);
                     });
@@ -505,7 +672,7 @@
         }
         
         // ====================
-        // 4. QUANTITY OPTIONS
+        // 5. QUANTITY OPTIONS
         // ====================
         const quantityOptionsModal = document.getElementById('quantityOptionsModal');
         const quantityTotalPrice = document.getElementById('quantityTotalPrice');
@@ -518,10 +685,11 @@
             
             defaultOptions.forEach((qty, index) => {
                 // Simple price calculation
-                let unitPrice = product.price;
+                const basePrice = product.price || 0;
+                let unitPrice = basePrice;
                 if (qty > 1) {
                     const discount = Math.min(30, Math.floor(qty / 10) * 5);
-                    unitPrice = Math.round(product.price * (1 - discount / 100));
+                    unitPrice = Math.round(basePrice * (1 - discount / 100));
                 }
                 
                 const totalPrice = unitPrice * qty;
@@ -534,7 +702,7 @@
                 
                 option.innerHTML = `
                     <div style="font-weight: 600;">${qty} Unit${qty > 1 ? 's' : ''}</div>
-                    <div style="font-size: 0.8rem; opacity: 0.8;">₦${unitPrice.toLocaleString()}/unit</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">${formatPrice(unitPrice)}/unit</div>
                 `;
                 
                 option.addEventListener('click', function() {
@@ -543,7 +711,7 @@
                     });
                     this.classList.add('selected');
                     
-                    quantityTotalPrice.textContent = `₦${totalPrice.toLocaleString()}`;
+                    quantityTotalPrice.textContent = formatPrice(totalPrice);
                     currentSelectedQuantity = qty;
                 });
                 
@@ -551,14 +719,14 @@
                 
                 // Set initial values
                 if (index === 0) {
-                    quantityTotalPrice.textContent = `₦${totalPrice.toLocaleString()}`;
+                    quantityTotalPrice.textContent = formatPrice(totalPrice);
                     currentSelectedQuantity = qty;
                 }
             });
         }
         
         // ====================
-        // 5. REVIEWS
+        // 6. REVIEWS
         // ====================
         const reviewsList = document.getElementById('reviewsList');
         if (reviewsList) {
@@ -612,9 +780,8 @@
     function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // View Details buttons - FIXED: Use event delegation
+        // View Details buttons
         document.addEventListener('click', function(event) {
-            // Check if clicked element is a view details button or its child
             const viewDetailsBtn = event.target.closest('.btn-view-details');
             if (viewDetailsBtn) {
                 event.preventDefault();
@@ -624,7 +791,7 @@
             }
         });
         
-        // Add to Cart buttons
+        // Add to Cart buttons (from product cards)
         document.addEventListener('click', function(event) {
             const addCartBtn = event.target.closest('.btn-add-cart');
             if (addCartBtn) {
@@ -680,28 +847,48 @@
     }
     
     // ====================
-    // CART & WISHLIST FUNCTIONS
+    // CART FUNCTIONS - UPDATED FOR COLOR & SIZE
     // ====================
-    function addToCart(product, quantity = 1) {
+    function addToCart(product, quantity = 1, options = {}) {
         let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-        const existingItem = cart.find(item => item.product_id === product.id);
         
-        if (existingItem) {
-            existingItem.quantity += quantity;
+        // Create cart item with color and size
+        const cartItem = {
+            product_id: product.id,
+            quantity: quantity,
+            name: product.name,
+            price: product.price || 0,
+            image_url: product.image_url,
+            category_slug: getCurrentCategory(),
+            color: options.color || null,
+            size: options.size || null,
+            color_name: options.color_name || null,
+            size_value: options.size_value || null
+        };
+        
+        // Check if same product with same color/size already in cart
+        const existingIndex = cart.findIndex(item => 
+            item.product_id === product.id && 
+            item.color_name === cartItem.color_name && 
+            item.size_value === cartItem.size_value
+        );
+        
+        if (existingIndex !== -1) {
+            cart[existingIndex].quantity += quantity;
         } else {
-            cart.push({
-                product_id: product.id,
-                quantity: quantity,
-                name: product.name,
-                price: product.price,
-                image_url: product.image_url,
-                category_slug: getCurrentCategory()
-            });
+            cart.push(cartItem);
         }
         
         localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
         updateCartUI();
-        showNotification(`${product.name} added to cart!`, 'success');
+        
+        // Show detailed notification
+        let notificationText = `${product.name}`;
+        if (options.color_name) notificationText += ` (${options.color_name})`;
+        if (options.size_value) notificationText += ` - Size: ${options.size_value}`;
+        notificationText += ' added to cart!';
+        
+        showNotification(notificationText, 'success');
     }
     
     function updateCartUI() {
@@ -713,6 +900,127 @@
             cartCount.textContent = totalItems;
             cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
         }
+        
+        // Update cart panel if it's open
+        updateCartPanel();
+    }
+    
+    function updateCartPanel() {
+        const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        const whatsappCheckout = document.getElementById('whatsappCheckout');
+        
+        if (!cartItems || !cartTotal) return;
+        
+        if (cart.length === 0) {
+            cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+            cartTotal.textContent = '₦0';
+            if (whatsappCheckout) whatsappCheckout.href = '#';
+            return;
+        }
+        
+        let html = '';
+        let total = 0;
+        
+        cart.forEach((item, index) => {
+            const itemTotal = (item.price || 0) * item.quantity;
+            total += itemTotal;
+            
+            // Build item description with color and size
+            let itemDescription = item.name;
+            if (item.color_name) itemDescription += ` (${item.color_name})`;
+            if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
+            
+            html += `
+                <div class="cart-item">
+                    <div class="cart-item-image">
+                        <img src="${getImageUrl(item.category_slug, item.image_url)}" alt="${item.name}">
+                    </div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${itemDescription}</div>
+                        <div class="cart-item-price">${formatPrice(item.price)}</div>
+                        <div class="cart-item-quantity">
+                            <button class="decrease-quantity" data-index="${index}">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="increase-quantity" data-index="${index}">+</button>
+                        </div>
+                    </div>
+                    <button class="cart-item-remove" data-index="${index}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+        });
+        
+        cartItems.innerHTML = html;
+        cartTotal.textContent = formatPrice(total);
+        
+        // Setup cart interactions
+        setupCartInteractions();
+        
+        // Update WhatsApp checkout link
+        if (whatsappCheckout) {
+            let text = "I would like to purchase:\n";
+            cart.forEach(item => {
+                let itemDescription = item.name;
+                if (item.color_name) itemDescription += ` (${item.color_name})`;
+                if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
+                
+                const itemTotal = (item.price || 0) * item.quantity;
+                text += `- ${itemDescription} (${item.quantity} × ${formatPrice(item.price)}) = ${formatPrice(itemTotal)}\n`;
+            });
+            text += `\n*Total: ${formatPrice(total)}*\n\nPlease confirm order & shipping details.`;
+            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
+        }
+    }
+    
+    function setupCartInteractions() {
+        // Decrease quantity
+        document.querySelectorAll('.decrease-quantity').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity--;
+                } else {
+                    cart.splice(index, 1);
+                }
+                
+                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
+                updateCartUI();
+                showNotification('Cart updated', 'info');
+            });
+        });
+        
+        // Increase quantity
+        document.querySelectorAll('.increase-quantity').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                
+                cart[index].quantity++;
+                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
+                updateCartUI();
+                showNotification('Cart updated', 'info');
+            });
+        });
+        
+        // Remove item
+        document.querySelectorAll('.cart-item-remove').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                const removedItem = cart[index];
+                
+                cart.splice(index, 1);
+                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
+                updateCartUI();
+                
+                showNotification(`${removedItem.name} removed from cart`, 'info');
+            });
+        });
     }
     
     function toggleWishlist(product) {
@@ -768,8 +1076,24 @@
             modalAddCart.addEventListener('click', () => {
                 if (!currentProduct) return;
                 
-                addToCart(currentProduct, currentSelectedQuantity);
-                showNotification(`${currentProduct.name} added to cart!`, 'success');
+                // Validate selection
+                if (currentProductColors.length > 0 && !currentSelectedColor) {
+                    showNotification('Please select a color', 'warning');
+                    return;
+                }
+                
+                if (currentProductSizes.length > 0 && !currentSelectedSize) {
+                    showNotification('Please select a size', 'warning');
+                    return;
+                }
+                
+                // Add to cart with color and size
+                addToCart(currentProduct, currentSelectedQuantity, {
+                    color: currentSelectedColor?.id,
+                    color_name: currentSelectedColor?.name,
+                    size: currentSelectedSize?.id,
+                    size_value: currentSelectedSize?.value
+                });
                 
                 // Close modal
                 const modalOverlay = document.getElementById('modalOverlay');
@@ -803,7 +1127,8 @@
             openProductModal,
             addToCart,
             toggleWishlist,
-            initializePage
+            initializePage,
+            formatPrice // Expose for debugging
         };
     }
     
@@ -816,5 +1141,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded');
+    console.log('✅ JMPOTTERS app loaded with color & size selection');
 })();
