@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - WITH COLOR & SIZE SELECTION
+// JMPOTTERS APP - COMPLETE IMPROVED VERSION
 // ====================
 (function() {
     'use strict';
@@ -9,7 +9,7 @@
         return;
     }
     
-    console.log('🚀 JMPOTTERS app starting...');
+    console.log('🚀 JMPOTTERS app starting (Improved v2)...');
     window.JMPOTTERS_APP_INITIALIZED = true;
     
     // ====================
@@ -44,9 +44,11 @@
     let currentSelectedQuantity = 1;
     let currentSelectedColor = null;
     let currentSelectedSize = null;
+    let currentSelectedVariant = null;
     let currentProductColors = [];
     let currentProductSizes = [];
-    let colorSizeMap = {}; // Maps color -> available sizes
+    let colorSizeMap = {};
+    let sizeColorMap = {};
     
     // ====================
     // UTILITY FUNCTIONS
@@ -287,7 +289,7 @@
     }
     
     // ====================
-    // MODAL FUNCTIONS - WITH COLOR & SIZE SELECTION
+    // MODAL FUNCTIONS - WITH IMPROVED DROPDOWNS
     // ====================
     async function openProductModal(productId) {
         console.log(`📊 Opening modal for product ID: ${productId}`);
@@ -317,47 +319,35 @@
             
             console.log('✅ Loaded basic product:', product.name);
             
-            // 2. Get colors
-            let colors = [];
-            try {
-                const { data: colorsData } = await supabase
-                    .from('product_colors')
-                    .select('*')
-                    .eq('product_id', productId)
-                    .order('color_name');
-                
-                colors = colorsData || [];
-                console.log(`✅ Loaded ${colors.length} colors`);
-            } catch (colorError) {
-                console.log('⚠️ No colors or table missing:', colorError.message);
+            // 2. Get colors for this product
+            const { data: colors, error: colorsError } = await supabase
+                .from('product_colors')
+                .select('*')
+                .eq('product_id', productId)
+                .order('sort_order');
+            
+            if (colorsError) {
+                console.error('❌ Colors fetch error:', colorsError);
+                throw new Error('Failed to load colors');
             }
             
-            // 3. Get sizes
-            let sizes = [];
-            try {
-                const { data: sizesData } = await supabase
-                    .from('product_sizes')
-                    .select('*')
-                    .eq('product_id', productId)
-                    .order('size_value');
-                
-                sizes = sizesData || [];
-                console.log(`✅ Loaded ${sizes.length} sizes`);
-            } catch (sizeError) {
-                console.log('⚠️ No sizes or table missing:', sizeError.message);
+            console.log(`✅ Loaded ${colors?.length || 0} colors`);
+            
+            // 3. Get sizes with stock for this product
+            const { data: sizes, error: sizesError } = await supabase
+                .from('product_sizes')
+                .select('*')
+                .eq('product_id', productId)
+                .order('size_value');
+            
+            if (sizesError) {
+                console.error('❌ Sizes fetch error:', sizesError);
+                throw new Error('Failed to load sizes');
             }
             
-            // 4. Build color-size map
-            const colorSizeMap = {};
-            if (colors.length > 0 && sizes.length > 0) {
-                // Assuming all sizes are available for all colors
-                // In a real app, you might have a color_size_availability table
-                colors.forEach(color => {
-                    colorSizeMap[color.id] = sizes;
-                });
-            }
+            console.log(`✅ Loaded ${sizes?.length || 0} size variants`);
             
-            // 5. Get modal configuration
+            // 4. Get modal configuration
             let modalConfig = null;
             try {
                 const { data: modalData } = await supabase
@@ -372,56 +362,21 @@
                 console.log('⚠️ No modal config:', modalError.message);
             }
             
-            // 6. Get reviews
-            let reviews = [];
-            try {
-                const { data: reviewsData } = await supabase
-                    .from('product_reviews')
-                    .select('*')
-                    .eq('product_id', productId)
-                    .order('created_at', { ascending: false })
-                    .limit(5);
-                
-                reviews = reviewsData || [];
-                console.log(`✅ Loaded ${reviews.length} reviews`);
-            } catch (reviewError) {
-                console.log('⚠️ No reviews:', reviewError.message);
-            }
-            
-            // 7. Get bulk pricing
-            let bulkPricing = [];
-            try {
-                const { data: pricingData } = await supabase
-                    .from('bulk_pricing_tiers')
-                    .select('*')
-                    .eq('product_id', productId)
-                    .order('min_quantity');
-                
-                bulkPricing = pricingData || [];
-                console.log(`✅ Loaded ${bulkPricing.length} bulk pricing tiers`);
-            } catch (pricingError) {
-                console.log('⚠️ No bulk pricing:', pricingError.message);
-            }
-            
-            // Store data globally
+            // 5. Build mappings
             currentProduct = product;
             currentModalConfig = modalConfig;
-            currentProductColors = colors;
-            currentProductSizes = sizes;
-            currentSelectedColor = colors.length > 0 ? colors[0] : null;
+            currentProductColors = colors || [];
+            currentProductSizes = sizes || [];
+            currentSelectedColor = null;
             currentSelectedSize = null;
+            currentSelectedVariant = null;
             
-            // 8. Render the modal
-            renderProductModal(product, {
-                modalConfig,
-                colors,
-                sizes,
-                reviews,
-                bulkPricing,
-                colorSizeMap
-            });
+            buildColorSizeMappings(colors || [], sizes || []);
             
-            // 9. Open modal
+            // 6. Render modal with new dropdown interface
+            renderModalWithDropdowns(product, colors || [], sizes || [], modalConfig);
+            
+            // 7. Open modal
             const modalOverlay = document.getElementById('modalOverlay');
             if (modalOverlay) {
                 modalOverlay.classList.add('active');
@@ -435,8 +390,35 @@
         }
     }
     
-    function renderProductModal(product, data) {
-        console.log('🎨 Rendering modal for:', product.name);
+    function buildColorSizeMappings(colors, sizes) {
+        // Reset mappings
+        colorSizeMap = {};
+        sizeColorMap = {};
+        
+        // Build color -> sizes map
+        colors.forEach(color => {
+            colorSizeMap[color.id] = sizes.filter(size => size.color_id === color.id);
+        });
+        
+        // Build size -> colors map
+        const uniqueSizes = [...new Set(sizes.map(s => s.size_value))];
+        uniqueSizes.forEach(sizeValue => {
+            const sizeVariants = sizes.filter(s => s.size_value === sizeValue);
+            sizeColorMap[sizeValue] = colors.filter(color => 
+                sizeVariants.some(s => s.color_id === color.id)
+            );
+        });
+        
+        console.log('🗺️ Built color-size mappings:', {
+            colors: colors.length,
+            sizes: sizes.length,
+            colorSizeMapEntries: Object.keys(colorSizeMap).length,
+            sizeColorMapEntries: Object.keys(sizeColorMap).length
+        });
+    }
+    
+    function renderModalWithDropdowns(product, colors, sizes, modalConfig) {
+        console.log('🎨 Rendering modal with dropdowns for:', product.name);
         
         const currentCategory = getCurrentCategory();
         
@@ -456,7 +438,7 @@
             productName.textContent = product.name;
         }
         
-        // Product Prices - FIXED: Use formatPrice to handle undefined
+        // Product Prices
         const productRealPrice = document.getElementById('productRealPrice');
         if (productRealPrice) {
             productRealPrice.textContent = formatPrice(product.price);
@@ -476,203 +458,105 @@
         }
         
         // ====================
-        // 2. COLOR SELECTOR
+        // 2. REPLACE GRIDS WITH DROPDOWNS
         // ====================
-        const colorSelector = document.getElementById('colorSelector');
-        if (!colorSelector) {
-            // Create color selector if it doesn't exist
-            const sizeSelectionDiv = document.querySelector('.size-selection');
-            if (sizeSelectionDiv) {
-                const colorSelectorHTML = `
-                    <div class="color-selection" style="margin-bottom: 30px;">
-                        <h4><i class="fas fa-palette"></i> Select Color</h4>
-                        <div class="color-grid" id="colorGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 20px;">
-                            <!-- Colors will be added here -->
+        const sizeSelectionDiv = document.querySelector('.size-selection');
+        if (sizeSelectionDiv) {
+            sizeSelectionDiv.innerHTML = '';
+            
+            // Create dropdown container
+            const dropdownContainer = document.createElement('div');
+            dropdownContainer.className = 'variant-selector-dropdown';
+            dropdownContainer.innerHTML = `
+                <div class="dropdown-section">
+                    <h4><i class="fas fa-palette"></i> Select Color</h4>
+                    <div class="dropdown-wrapper">
+                        <button class="dropdown-btn" id="colorDropdownBtn">
+                            <span class="dropdown-text">Choose Color</span>
+                            <i class="fas fa-chevron-down dropdown-icon"></i>
+                        </button>
+                        <div class="dropdown-menu" id="colorDropdownMenu">
+                            ${colors.length > 0 ? colors.map(color => `
+                                <div class="dropdown-item" data-color-id="${color.id}" data-color-name="${color.color_name}">
+                                    <span class="color-indicator" style="background-color: ${color.color_code || '#666'}"></span>
+                                    ${color.color_name}
+                                    <span class="color-stock-count">
+                                        (${colorSizeMap[color.id]?.length || 0} sizes)
+                                    </span>
+                                </div>
+                            `).join('') : `
+                                <div class="dropdown-item empty">No colors available</div>
+                            `}
                         </div>
                     </div>
-                `;
-                sizeSelectionDiv.insertAdjacentHTML('beforebegin', colorSelectorHTML);
-            }
-        }
-        
-        const colorGrid = document.getElementById('colorGrid');
-        if (colorGrid) {
-            colorGrid.innerHTML = '';
+                </div>
+                
+                <div class="dropdown-section">
+                    <h4><i class="fas fa-ruler"></i> Select Size</h4>
+                    <div class="dropdown-wrapper">
+                        <button class="dropdown-btn" id="sizeDropdownBtn" disabled>
+                            <span class="dropdown-text">Select Color First</span>
+                            <i class="fas fa-chevron-down dropdown-icon"></i>
+                        </button>
+                        <div class="dropdown-menu" id="sizeDropdownMenu">
+                            <div class="dropdown-item empty">Please select a color first</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="selection-info" id="selectionInfo" style="display: none;">
+                    <div class="selected-combination">
+                        <span id="selectedColorDisplay"></span>
+                        <span class="separator">-</span>
+                        <span id="selectedSizeDisplay"></span>
+                    </div>
+                    <div class="stock-info">
+                        <i class="fas fa-box"></i>
+                        <span>Stock Available:</span>
+                        <strong id="stockQuantityDisplay">0</strong>
+                    </div>
+                    <div class="action-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Select both color and size to see stock</span>
+                    </div>
+                </div>
+            `;
             
-            const { colors = [] } = data;
+            sizeSelectionDiv.appendChild(dropdownContainer);
             
-            if (colors.length > 0) {
-                colors.forEach(color => {
-                    const colorOption = document.createElement('button');
-                    colorOption.className = 'color-option';
-                    colorOption.dataset.colorId = color.id;
-                    colorOption.dataset.colorName = color.color_name;
-                    colorOption.dataset.hexCode = color.hex_code;
-                    
-                    // Create color swatch
-                    const colorSwatch = document.createElement('div');
-                    colorSwatch.style.width = '40px';
-                    colorSwatch.style.height = '40px';
-                    colorSwatch.style.backgroundColor = color.hex_code || '#ccc';
-                    colorSwatch.style.borderRadius = '4px';
-                    colorSwatch.style.margin = '0 auto 5px';
-                    colorSwatch.style.border = '2px solid #333';
-                    
-                    colorOption.appendChild(colorSwatch);
-                    
-                    const colorName = document.createElement('div');
-                    colorName.textContent = color.color_name;
-                    colorName.style.fontSize = '0.8rem';
-                    colorName.style.marginTop = '5px';
-                    colorOption.appendChild(colorName);
-                    
-                    colorOption.style.display = 'flex';
-                    colorOption.style.flexDirection = 'column';
-                    colorOption.style.alignItems = 'center';
-                    colorOption.style.padding = '10px';
-                    colorOption.style.border = '1px solid rgba(255, 255, 255, 0.3)';
-                    colorOption.style.background = 'transparent';
-                    colorOption.style.color = 'white';
-                    colorOption.style.cursor = 'pointer';
-                    colorOption.style.transition = 'all 0.3s ease';
-                    colorOption.style.borderRadius = '4px';
-                    
-                    colorOption.addEventListener('click', function() {
-                        // Remove selected class from all color options
-                        colorGrid.querySelectorAll('.color-option').forEach(opt => {
-                            opt.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-                            opt.style.boxShadow = 'none';
-                        });
-                        
-                        // Add selected style
-                        this.style.borderColor = '#d4af37';
-                        this.style.boxShadow = '0 0 10px rgba(212, 175, 55, 0.5)';
-                        
-                        // Update selected color
-                        currentSelectedColor = {
-                            id: this.dataset.colorId,
-                            name: this.dataset.colorName,
-                            hex: this.dataset.hexCode
-                        };
-                        
-                        console.log('Selected color:', currentSelectedColor);
-                        
-                        // Update size grid based on selected color
-                        updateSizeGridForColor(data.colorSizeMap?.[color.id] || data.sizes || []);
-                    });
-                    
-                    colorGrid.appendChild(colorOption);
-                    
-                    // Select first color by default
-                    if (colors.indexOf(color) === 0) {
-                        setTimeout(() => {
-                            colorOption.click();
-                        }, 100);
-                    }
-                });
-            } else {
-                colorGrid.innerHTML = '<p style="color: #ccc; text-align: center; grid-column: 1 / -1;">No colors available</p>';
-            }
+            // Add custom styles
+            addDropdownStyles();
+            
+            // Initialize dropdown interactions
+            setupDropdownInteractions();
         }
         
         // ====================
-        // 3. SIZE SELECTOR
-        // ====================
-        function updateSizeGridForColor(availableSizes = []) {
-            const sizeGrid = document.getElementById('sizeGrid');
-            if (!sizeGrid) return;
-            
-            sizeGrid.innerHTML = '';
-            currentSelectedSize = null;
-            
-            if (availableSizes.length > 0) {
-                availableSizes.forEach(size => {
-                    const sizeOption = document.createElement('button');
-                    sizeOption.className = 'size-option';
-                    sizeOption.textContent = size.size_value;
-                    sizeOption.dataset.sizeId = size.id;
-                    sizeOption.dataset.sizeValue = size.size_value;
-                    sizeOption.dataset.stock = size.stock;
-                    
-                    // Add stock indicator
-                    if (size.stock <= 0) {
-                        sizeOption.disabled = true;
-                        sizeOption.style.opacity = '0.5';
-                        sizeOption.style.cursor = 'not-allowed';
-                        sizeOption.innerHTML += `<br><small style="color: #ff6b6b;">Out of stock</small>`;
-                    } else if (size.stock < 10) {
-                        sizeOption.innerHTML += `<br><small style="color: #f39c12;">${size.stock} left</small>`;
-                    }
-                    
-                    sizeOption.addEventListener('click', function() {
-                        // Remove selected class from all size options
-                        sizeGrid.querySelectorAll('.size-option').forEach(opt => {
-                            opt.classList.remove('selected');
-                        });
-                        
-                        // Add selected class to clicked option
-                        this.classList.add('selected');
-                        currentSelectedSize = {
-                            id: this.dataset.sizeId,
-                            value: this.dataset.sizeValue,
-                            stock: this.dataset.stock
-                        };
-                        
-                        console.log('Selected size:', currentSelectedSize);
-                    });
-                    
-                    sizeGrid.appendChild(sizeOption);
-                });
-            } else {
-                sizeGrid.innerHTML = '<p style="color: #ccc; text-align: center; grid-column: 1 / -1;">No sizes available for this color</p>';
-            }
-        }
-        
-        // Initialize size grid with all sizes
-        updateSizeGridForColor(data.sizes || []);
-        
-        // ====================
-        // 4. BULK PRICING
+        // 3. BULK PRICING
         // ====================
         const bulkPricingBody = document.getElementById('bulkPricingBody');
         if (bulkPricingBody) {
             bulkPricingBody.innerHTML = '';
             
-            const { bulkPricing = [] } = data;
-            const showBulkPricing = data.modalConfig?.show_bulk_pricing !== false;
-            
-            if (showBulkPricing) {
-                if (bulkPricing.length > 0) {
-                    bulkPricing.forEach(tier => {
-                        const row = document.createElement('tr');
-                        const totalPrice = (tier.price_per_unit || 0) * (tier.min_quantity || 1);
-                        row.innerHTML = `
-                            <td>${tier.min_quantity || 1}+ Units</td>
-                            <td>${formatPrice(tier.price_per_unit)}</td>
-                            <td>${formatPrice(totalPrice)}</td>
-                        `;
-                        bulkPricingBody.appendChild(row);
-                    });
-                } else {
-                    // Fallback pricing
-                    [1, 10, 25, 50, 100].forEach(qty => {
-                        const basePrice = product.price || 0;
-                        const discount = qty === 1 ? 0 : Math.min(30, Math.floor(qty / 10) * 5);
-                        const unitPrice = Math.round(basePrice * (1 - discount / 100));
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${qty} Unit${qty > 1 ? 's' : ''}</td>
-                            <td>${formatPrice(unitPrice)}</td>
-                            <td>${formatPrice(unitPrice * qty)}</td>
-                        `;
-                        bulkPricingBody.appendChild(row);
-                    });
-                }
+            if (modalConfig?.show_bulk_pricing !== false) {
+                // Fallback pricing
+                [1, 10, 25, 50, 100].forEach(qty => {
+                    const basePrice = product.price || 0;
+                    const discount = qty === 1 ? 0 : Math.min(30, Math.floor(qty / 10) * 5);
+                    const unitPrice = Math.round(basePrice * (1 - discount / 100));
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${qty} Unit${qty > 1 ? 's' : ''}</td>
+                        <td>${formatPrice(unitPrice)}</td>
+                        <td>${formatPrice(unitPrice * qty)}</td>
+                    `;
+                    bulkPricingBody.appendChild(row);
+                });
             }
         }
         
         // ====================
-        // 5. QUANTITY OPTIONS
+        // 4. QUANTITY OPTIONS
         // ====================
         const quantityOptionsModal = document.getElementById('quantityOptionsModal');
         const quantityTotalPrice = document.getElementById('quantityTotalPrice');
@@ -681,7 +565,7 @@
             quantityOptionsModal.innerHTML = '';
             
             // Get quantity options from modal config or use defaults
-            const defaultOptions = data.modalConfig?.default_quantity_options || [1, 5, 10, 25, 50, 100];
+            const defaultOptions = modalConfig?.default_quantity_options || [1, 5, 10, 25, 50, 100];
             
             defaultOptions.forEach((qty, index) => {
                 // Simple price calculation
@@ -713,6 +597,9 @@
                     
                     quantityTotalPrice.textContent = formatPrice(totalPrice);
                     currentSelectedQuantity = qty;
+                    
+                    // Update add to cart button if variant is selected
+                    updateAddToCartButton();
                 });
                 
                 quantityOptionsModal.appendChild(option);
@@ -725,53 +612,444 @@
             });
         }
         
-        // ====================
-        // 6. REVIEWS
-        // ====================
-        const reviewsList = document.getElementById('reviewsList');
-        if (reviewsList) {
-            reviewsList.innerHTML = '';
-            
-            const { reviews = [] } = data;
-            const showReviews = data.modalConfig?.show_reviews !== false;
-            
-            if (showReviews) {
-                if (reviews.length > 0) {
-                    reviews.forEach(review => {
-                        const reviewEl = document.createElement('div');
-                        reviewEl.className = 'review';
-                        
-                        const date = review.created_at ? 
-                            new Date(review.created_at).toLocaleDateString() : '';
-                        
-                        reviewEl.innerHTML = `
-                            <div class="review-header">
-                                <div class="review-avatar">
-                                    ${review.customer_name?.charAt(0) || 'C'}
-                                </div>
-                                <div class="review-user">
-                                    ${review.customer_name || 'Customer'}
-                                </div>
-                                <div class="review-rating">
-                                    ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
-                                </div>
-                            </div>
-                            <div class="review-text">${review.comment || 'Great product!'}</div>
-                            ${date ? `<small style="color: #888;">${date}</small>` : ''}
-                        `;
-                        reviewsList.appendChild(reviewEl);
-                    });
-                } else {
-                    reviewsList.innerHTML = `
-                        <div style="text-align: center; color: #ccc; padding: 20px;">
-                            No reviews yet. Be the first to review!
-                        </div>
-                    `;
-                }
+        console.log('✅ Modal dropdowns rendered successfully');
+    }
+    
+    function addDropdownStyles() {
+        // Only add styles once
+        if (document.getElementById('dropdown-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'dropdown-styles';
+        style.textContent = `
+            .variant-selector-dropdown {
+                margin: 25px 0;
+                padding: 20px;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
+            
+            .dropdown-section {
+                margin-bottom: 25px;
+            }
+            
+            .dropdown-section h4 {
+                color: var(--gold);
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .dropdown-wrapper {
+                position: relative;
+            }
+            
+            .dropdown-btn {
+                width: 100%;
+                padding: 14px 16px;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                color: white;
+                text-align: left;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+                font-size: 1rem;
+            }
+            
+            .dropdown-btn:hover:not(:disabled) {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: var(--gold);
+            }
+            
+            .dropdown-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            
+            .dropdown-text {
+                flex: 1;
+            }
+            
+            .dropdown-icon {
+                transition: transform 0.3s ease;
+            }
+            
+            .dropdown-btn.active .dropdown-icon {
+                transform: rotate(180deg);
+            }
+            
+            .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                max-height: 300px;
+                overflow-y: auto;
+                background: #1a1a1a;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 6px;
+                margin-top: 5px;
+                z-index: 1000;
+                display: none;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            }
+            
+            .dropdown-menu.show {
+                display: block;
+            }
+            
+            .dropdown-item {
+                padding: 12px 16px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                color: #ddd;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .dropdown-item:last-child {
+                border-bottom: none;
+            }
+            
+            .dropdown-item:hover {
+                background: rgba(212, 175, 55, 0.15);
+                color: white;
+            }
+            
+            .dropdown-item.selected {
+                background: rgba(212, 175, 55, 0.25);
+                color: white;
+            }
+            
+            .dropdown-item.empty {
+                cursor: default;
+                opacity: 0.7;
+                font-style: italic;
+            }
+            
+            .dropdown-item.empty:hover {
+                background: transparent;
+            }
+            
+            .color-indicator {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2px solid rgba(255, 255, 255, 0.5);
+                flex-shrink: 0;
+            }
+            
+            .color-stock-count {
+                margin-left: auto;
+                font-size: 0.85rem;
+                opacity: 0.7;
+            }
+            
+            .selection-info {
+                margin-top: 25px;
+                padding: 20px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 6px;
+                border-left: 3px solid var(--gold);
+                animation: fadeIn 0.3s ease;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .selected-combination {
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin-bottom: 15px;
+                color: white;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .separator {
+                opacity: 0.5;
+            }
+            
+            .stock-info {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 10px;
+                color: #ddd;
+            }
+            
+            .stock-info i {
+                color: var(--gold);
+            }
+            
+            #stockQuantityDisplay {
+                color: var(--gold);
+                font-size: 1.2rem;
+                margin-left: 5px;
+            }
+            
+            .action-hint {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 0.9rem;
+                color: #aaa;
+            }
+            
+            .action-hint i {
+                color: #4d96ff;
+            }
+            
+            .size-with-stock {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+            }
+            
+            .size-stock-badge {
+                font-size: 0.8rem;
+                padding: 2px 8px;
+                border-radius: 10px;
+                background: rgba(212, 175, 55, 0.2);
+                color: var(--gold);
+            }
+            
+            .size-stock-badge.low {
+                background: rgba(243, 156, 18, 0.2);
+                color: #f39c12;
+            }
+            
+            .size-stock-badge.out {
+                background: rgba(231, 76, 60, 0.2);
+                color: #e74c3c;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    function setupDropdownInteractions() {
+        const colorDropdownBtn = document.getElementById('colorDropdownBtn');
+        const colorDropdownMenu = document.getElementById('colorDropdownMenu');
+        const sizeDropdownBtn = document.getElementById('sizeDropdownBtn');
+        const sizeDropdownMenu = document.getElementById('sizeDropdownMenu');
+        const selectionInfo = document.getElementById('selectionInfo');
+        
+        if (!colorDropdownBtn || !sizeDropdownBtn) return;
+        
+        // Toggle dropdowns
+        colorDropdownBtn.addEventListener('click', () => {
+            colorDropdownMenu.classList.toggle('show');
+            colorDropdownBtn.classList.toggle('active');
+            sizeDropdownMenu.classList.remove('show');
+            sizeDropdownBtn.classList.remove('active');
+        });
+        
+        sizeDropdownBtn.addEventListener('click', () => {
+            if (sizeDropdownBtn.disabled) return;
+            sizeDropdownMenu.classList.toggle('show');
+            sizeDropdownBtn.classList.toggle('active');
+            colorDropdownMenu.classList.remove('show');
+            colorDropdownBtn.classList.remove('active');
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!colorDropdownBtn.contains(event.target) && !colorDropdownMenu.contains(event.target)) {
+                colorDropdownMenu.classList.remove('show');
+                colorDropdownBtn.classList.remove('active');
+            }
+            if (!sizeDropdownBtn.contains(event.target) && !sizeDropdownMenu.contains(event.target)) {
+                sizeDropdownMenu.classList.remove('show');
+                sizeDropdownBtn.classList.remove('active');
+            }
+        });
+        
+        // Color selection
+        colorDropdownMenu.querySelectorAll('.dropdown-item:not(.empty)').forEach(item => {
+            item.addEventListener('click', () => {
+                const colorId = parseInt(item.dataset.colorId);
+                const colorName = item.dataset.colorName;
+                
+                // Update selected color
+                currentSelectedColor = {
+                    id: colorId,
+                    name: colorName
+                };
+                
+                // Update UI
+                colorDropdownBtn.querySelector('.dropdown-text').textContent = colorName;
+                colorDropdownMenu.classList.remove('show');
+                colorDropdownBtn.classList.remove('active');
+                
+                // Remove selected class from all color items
+                colorDropdownMenu.querySelectorAll('.dropdown-item').forEach(i => {
+                    i.classList.remove('selected');
+                });
+                item.classList.add('selected');
+                
+                // Enable and update size dropdown
+                sizeDropdownBtn.disabled = false;
+                sizeDropdownBtn.querySelector('.dropdown-text').textContent = 'Choose Size';
+                updateSizeDropdownForColor(colorId);
+                
+                // If size is already selected, update stock display
+                if (currentSelectedSize) {
+                    updateStockDisplay();
+                }
+            });
+        });
+        
+        // Size selection
+        // This will be populated dynamically
+    }
+    
+    function updateSizeDropdownForColor(colorId) {
+        const sizeDropdownMenu = document.getElementById('sizeDropdownMenu');
+        const sizeDropdownBtn = document.getElementById('sizeDropdownBtn');
+        
+        if (!sizeDropdownMenu || !sizeDropdownBtn) return;
+        
+        // Get sizes for this color
+        const availableSizes = colorSizeMap[colorId] || [];
+        
+        if (availableSizes.length === 0) {
+            sizeDropdownMenu.innerHTML = '<div class="dropdown-item empty">No sizes available for this color</div>';
+            sizeDropdownBtn.disabled = true;
+            currentSelectedSize = null;
+            updateStockDisplay();
+            return;
         }
         
-        console.log('✅ Modal rendered successfully');
+        // Populate size dropdown
+        sizeDropdownMenu.innerHTML = availableSizes.map(size => {
+            const stockBadgeClass = size.stock_quantity === 0 ? 'out' : 
+                                   size.stock_quantity < 5 ? 'low' : '';
+            
+            return `
+                <div class="dropdown-item" data-size-id="${size.id}" data-size-value="${size.size_value}" data-stock="${size.stock_quantity}">
+                    <div class="size-with-stock">
+                        <span>${size.size_value}</span>
+                        <span class="size-stock-badge ${stockBadgeClass}">
+                            ${size.stock_quantity === 0 ? 'Out of stock' : 
+                              size.stock_quantity < 5 ? `${size.stock_quantity} left` : 
+                              'In stock'}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Add size selection event listeners
+        sizeDropdownMenu.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const sizeId = parseInt(item.dataset.sizeId);
+                const sizeValue = item.dataset.sizeValue;
+                const stock = parseInt(item.dataset.stock);
+                
+                // Update selected size
+                currentSelectedSize = {
+                    id: sizeId,
+                    value: sizeValue,
+                    stock: stock
+                };
+                
+                // Find the exact variant
+                currentSelectedVariant = currentProductSizes.find(s => 
+                    s.id === sizeId && s.color_id === currentSelectedColor?.id
+                );
+                
+                // Update UI
+                sizeDropdownBtn.querySelector('.dropdown-text').textContent = sizeValue;
+                sizeDropdownMenu.classList.remove('show');
+                sizeDropdownBtn.classList.remove('active');
+                
+                // Remove selected class from all size items
+                sizeDropdownMenu.querySelectorAll('.dropdown-item').forEach(i => {
+                    i.classList.remove('selected');
+                });
+                item.classList.add('selected');
+                
+                // Update stock display
+                updateStockDisplay();
+            });
+        });
+        
+        // If we have a previously selected size that's also available for this color,
+        // automatically select it
+        if (currentSelectedSize) {
+            const matchingSize = availableSizes.find(s => s.size_value === currentSelectedSize.value);
+            if (matchingSize) {
+                setTimeout(() => {
+                    const sizeItem = sizeDropdownMenu.querySelector(`[data-size-value="${matchingSize.size_value}"]`);
+                    if (sizeItem) {
+                        sizeItem.click();
+                    }
+                }, 100);
+            }
+        }
+    }
+    
+    function updateStockDisplay() {
+        const selectionInfo = document.getElementById('selectionInfo');
+        const selectedColorDisplay = document.getElementById('selectedColorDisplay');
+        const selectedSizeDisplay = document.getElementById('selectedSizeDisplay');
+        const stockQuantityDisplay = document.getElementById('stockQuantityDisplay');
+        
+        if (!selectionInfo || !selectedColorDisplay || !selectedSizeDisplay || !stockQuantityDisplay) return;
+        
+        if (currentSelectedColor && currentSelectedSize) {
+            // Show selection info
+            selectedColorDisplay.textContent = currentSelectedColor.name;
+            selectedSizeDisplay.textContent = currentSelectedSize.value;
+            stockQuantityDisplay.textContent = currentSelectedSize.stock;
+            
+            // Add stock status class
+            stockQuantityDisplay.className = '';
+            if (currentSelectedSize.stock === 0) {
+                stockQuantityDisplay.classList.add('out-of-stock');
+            } else if (currentSelectedSize.stock < 5) {
+                stockQuantityDisplay.classList.add('low-stock');
+            } else {
+                stockQuantityDisplay.classList.add('in-stock');
+            }
+            
+            selectionInfo.style.display = 'block';
+            
+            // Update add to cart button
+            updateAddToCartButton();
+        } else {
+            selectionInfo.style.display = 'none';
+        }
+    }
+    
+    function updateAddToCartButton() {
+        const modalAddCart = document.getElementById('modalAddCart');
+        if (!modalAddCart) return;
+        
+        if (currentSelectedColor && currentSelectedSize && currentSelectedSize.stock > 0) {
+            modalAddCart.disabled = false;
+            modalAddCart.innerHTML = `<i class="fas fa-shopping-cart"></i> Add to Cart (${currentSelectedQuantity} units)`;
+            modalAddCart.style.opacity = '1';
+            modalAddCart.style.cursor = 'pointer';
+        } else {
+            modalAddCart.disabled = true;
+            modalAddCart.innerHTML = `<i class="fas fa-shopping-cart"></i> Select Color & Size`;
+            modalAddCart.style.opacity = '0.6';
+            modalAddCart.style.cursor = 'not-allowed';
+        }
     }
     
     // ====================
@@ -847,12 +1125,12 @@
     }
     
     // ====================
-    // CART FUNCTIONS - UPDATED FOR COLOR & SIZE
+    // CART FUNCTIONS
     // ====================
     function addToCart(product, quantity = 1, options = {}) {
         let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
         
-        // Create cart item with color and size
+        // Create cart item
         const cartItem = {
             product_id: product.id,
             quantity: quantity,
@@ -860,17 +1138,19 @@
             price: product.price || 0,
             image_url: product.image_url,
             category_slug: getCurrentCategory(),
-            color: options.color || null,
-            size: options.size || null,
+            color_id: options.color_id || null,
             color_name: options.color_name || null,
-            size_value: options.size_value || null
+            size_id: options.size_id || null,
+            size_value: options.size_value || null,
+            variant_id: options.variant_id || null,
+            added_at: new Date().toISOString()
         };
         
-        // Check if same product with same color/size already in cart
+        // Check if same variant already in cart
         const existingIndex = cart.findIndex(item => 
-            item.product_id === product.id && 
-            item.color_name === cartItem.color_name && 
-            item.size_value === cartItem.size_value
+            item.product_id === cartItem.product_id && 
+            item.color_id === cartItem.color_id && 
+            item.size_id === cartItem.size_id
         );
         
         if (existingIndex !== -1) {
@@ -885,7 +1165,7 @@
         // Show detailed notification
         let notificationText = `${product.name}`;
         if (options.color_name) notificationText += ` (${options.color_name})`;
-        if (options.size_value) notificationText += ` - Size: ${options.size_value}`;
+        if (options.size_value) notificationText += ` - Size ${options.size_value}`;
         notificationText += ' added to cart!';
         
         showNotification(notificationText, 'success');
@@ -901,7 +1181,6 @@
             cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
         }
         
-        // Update cart panel if it's open
         updateCartPanel();
     }
     
@@ -927,7 +1206,7 @@
             const itemTotal = (item.price || 0) * item.quantity;
             total += itemTotal;
             
-            // Build item description with color and size
+            // Build item description
             let itemDescription = item.name;
             if (item.color_name) itemDescription += ` (${item.color_name})`;
             if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
@@ -956,7 +1235,6 @@
         cartItems.innerHTML = html;
         cartTotal.textContent = formatPrice(total);
         
-        // Setup cart interactions
         setupCartInteractions();
         
         // Update WhatsApp checkout link
@@ -1077,22 +1355,33 @@
                 if (!currentProduct) return;
                 
                 // Validate selection
-                if (currentProductColors.length > 0 && !currentSelectedColor) {
+                if (!currentSelectedColor) {
                     showNotification('Please select a color', 'warning');
                     return;
                 }
                 
-                if (currentProductSizes.length > 0 && !currentSelectedSize) {
+                if (!currentSelectedSize) {
                     showNotification('Please select a size', 'warning');
                     return;
                 }
                 
-                // Add to cart with color and size
+                if (currentSelectedSize.stock === 0) {
+                    showNotification('This size is out of stock', 'error');
+                    return;
+                }
+                
+                if (currentSelectedQuantity > currentSelectedSize.stock) {
+                    showNotification(`Only ${currentSelectedSize.stock} units available`, 'error');
+                    return;
+                }
+                
+                // Add to cart with all details
                 addToCart(currentProduct, currentSelectedQuantity, {
-                    color: currentSelectedColor?.id,
-                    color_name: currentSelectedColor?.name,
-                    size: currentSelectedSize?.id,
-                    size_value: currentSelectedSize?.value
+                    color_id: currentSelectedColor.id,
+                    color_name: currentSelectedColor.name,
+                    size_id: currentSelectedSize.id,
+                    size_value: currentSelectedSize.value,
+                    variant_id: currentSelectedVariant?.id
                 });
                 
                 // Close modal
@@ -1128,7 +1417,7 @@
             addToCart,
             toggleWishlist,
             initializePage,
-            formatPrice // Expose for debugging
+            formatPrice
         };
     }
     
@@ -1141,5 +1430,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with color & size selection');
+    console.log('✅ JMPOTTERS app loaded with improved dropdowns');
 })();
