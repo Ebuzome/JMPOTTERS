@@ -320,6 +320,39 @@
             border-left-color: #2196F3;
         }
         
+        .debug-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .debug-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .debug-log {
+            color: #6c757d;
+            margin: 5px 0;
+        }
+        
+        .debug-error {
+            color: #dc3545;
+            margin: 5px 0;
+        }
+        
+        .debug-success {
+            color: #28a745;
+            margin: 5px 0;
+        }
+        
         @media (max-width: 768px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
@@ -341,7 +374,7 @@
             <h1><i class="fas fa-cogs"></i> JMPOTTERS Admin Dashboard</h1>
             <div class="status-bar">
                 <div class="status-item connecting" id="connectionStatus">
-                    <i class="fas fa-spinner fa-spin"></i> Connecting...
+                    <i class="fas fa-spinner fa-spin"></i> Initializing...
                 </div>
                 <div class="status-item" id="productCountBadge">
                     <i class="fas fa-box"></i> <span id="productCount">0</span> Products
@@ -355,6 +388,12 @@
         <!-- Toast Messages -->
         <div id="toastContainer" class="toast-container"></div>
         
+        <!-- Connection Debug Panel -->
+        <div id="debugPanel" class="debug-panel" style="display: none;">
+            <div class="debug-title">Connection Debug</div>
+            <div id="debugLogs"></div>
+        </div>
+        
         <!-- Error/Success Messages -->
         <div id="messageContainer"></div>
         
@@ -365,7 +404,7 @@
                 <div class="form-group">
                     <label>Select Product:</label>
                     <select id="productSelect" class="form-control" onchange="loadProductDetails()">
-                        <option value="">Loading products...</option>
+                        <option value="">Waiting for connection...</option>
                     </select>
                 </div>
                 
@@ -412,7 +451,7 @@
                 <div class="form-group">
                     <label>For Product:</label>
                     <select id="colorProductSelect" class="form-control" onchange="loadColorsForProduct()">
-                        <option value="">Loading products...</option>
+                        <option value="">Waiting for connection...</option>
                     </select>
                 </div>
                 
@@ -450,7 +489,7 @@
                 <div class="form-group">
                     <label>For Product:</label>
                     <select id="sizeProductSelect" class="form-control" onchange="loadColorsForSizeProduct()">
-                        <option value="">Loading products...</option>
+                        <option value="">Waiting for connection...</option>
                     </select>
                 </div>
                 
@@ -503,6 +542,26 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Connection Test Panel -->
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-network-wired"></i> Connection Diagnostics</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="testConnection()">
+                    <i class="fas fa-plug"></i> Test Connection
+                </button>
+                <button class="btn" onclick="showDebugPanel()" style="background: #6c757d; color: white;">
+                    <i class="fas fa-bug"></i> Show Debug Logs
+                </button>
+                <button class="btn" onclick="loadAllData()" style="background: #17a2b8; color: white;">
+                    <i class="fas fa-redo"></i> Reload All Data
+                </button>
+            </div>
+            
+            <div id="diagnosticResults" style="font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                Click "Test Connection" to run diagnostics...
+            </div>
+        </div>
     </div>
 
     <!-- Stock Update Modal -->
@@ -524,53 +583,48 @@
         </div>
     </div>
 
-    <!-- Supabase JS -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- IMPORTANT: We are NOT including Supabase JS here - we'll use the existing client from app.js -->
     
     <script>
         // ============================================
-        // SIMPLE & WORKING ADMIN DASHBOARD
+        // ADMIN DASHBOARD USING EXISTING SUPABASE CLIENT
         // ============================================
         
-        // Configuration
-        const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
+        // Configuration - Use the same as app.js
+        const SUPABASE_CONFIG = {
+            url: 'https://tmpggeeuwdvlngvfncaa.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+        };
         
         // Global variables
         let supabase = null;
         let allProducts = [];
         let allCategories = [];
         let currentEditingVariantId = null;
+        let debugLogs = [];
         
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Initializing JMPOTTERS Admin Dashboard...');
+        // Debug logging
+        function debugLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            debugLogs.push({ message: logEntry, type });
             
-            try {
-                // Initialize Supabase
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                console.log('✅ Supabase client created');
-                
-                // Test connection
-                await testConnection();
-                
-                // Load initial data
-                await loadCategories();
-                await loadProducts();
-                
-                console.log('✅ Admin dashboard initialized successfully');
-                
-            } catch (error) {
-                console.error('❌ Initialization error:', error);
-                showToast('Failed to initialize dashboard: ' + error.message, 'error');
-                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Connection Failed';
-                document.getElementById('connectionStatus').className = 'status-item error';
+            console.log(`🔧 ADMIN DEBUG: ${message}`);
+            
+            // Update debug panel if visible
+            const debugPanel = document.getElementById('debugLogs');
+            if (debugPanel) {
+                const logElement = document.createElement('div');
+                logElement.className = `debug-${type}`;
+                logElement.textContent = logEntry;
+                debugPanel.appendChild(logElement);
+                debugPanel.scrollTop = debugPanel.scrollHeight;
             }
-        });
+        }
         
-        // ============================================
-        // UTILITY FUNCTIONS
-        // ============================================
+        function showDebugPanel() {
+            document.getElementById('debugPanel').style.display = 'block';
+        }
         
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
@@ -587,42 +641,205 @@
             
             container.appendChild(toast);
             
-            // Auto-remove after 5 seconds
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateX(100%)';
                 setTimeout(() => toast.remove(), 300);
             }, 5000);
+            
+            debugLog(`Toast: ${message}`, type);
         }
         
-        async function testConnection() {
-            try {
-                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing connection...';
+        // ============================================
+        // SUPABASE CLIENT MANAGEMENT
+        // ============================================
+        
+        async function getSupabaseClient() {
+            debugLog('Getting Supabase client...');
+            
+            // Strategy 1: Use existing client from app.js if available
+            if (window.JMPOTTERS_SUPABASE_CLIENT) {
+                debugLog('Found existing Supabase client from app.js');
+                return window.JMPOTTERS_SUPABASE_CLIENT;
+            }
+            
+            // Strategy 2: Use global supabase client if available
+            if (window.supabase && window.supabase.createClient) {
+                debugLog('Creating new Supabase client from global library');
+                window.JMPOTTERS_SUPABASE_CLIENT = window.supabase.createClient(
+                    SUPABASE_CONFIG.url, 
+                    SUPABASE_CONFIG.key
+                );
+                return window.JMPOTTERS_SUPABASE_CLIENT;
+            }
+            
+            // Strategy 3: Load Supabase library dynamically
+            debugLog('Loading Supabase library dynamically...');
+            
+            return new Promise((resolve, reject) => {
+                // Check if already loaded
+                if (typeof supabase !== 'undefined' && window.supabase) {
+                    debugLog('Supabase library already loaded');
+                    window.JMPOTTERS_SUPABASE_CLIENT = window.supabase.createClient(
+                        SUPABASE_CONFIG.url, 
+                        SUPABASE_CONFIG.key
+                    );
+                    resolve(window.JMPOTTERS_SUPABASE_CLIENT);
+                    return;
+                }
                 
-                const { data, error } = await supabase
+                // Load Supabase library
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+                script.onload = () => {
+                    debugLog('Supabase library loaded successfully');
+                    window.JMPOTTERS_SUPABASE_CLIENT = window.supabase.createClient(
+                        SUPABASE_CONFIG.url, 
+                        SUPABASE_CONFIG.key
+                    );
+                    resolve(window.JMPOTTERS_SUPABASE_CLIENT);
+                };
+                script.onerror = () => {
+                    debugLog('Failed to load Supabase library', 'error');
+                    reject(new Error('Failed to load Supabase library'));
+                };
+                document.head.appendChild(script);
+            });
+        }
+        
+        // ============================================
+        // CONNECTION TESTING
+        // ============================================
+        
+        async function testConnection() {
+            const resultsDiv = document.getElementById('diagnosticResults');
+            resultsDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running diagnostics...';
+            
+            debugLog('Starting connection test...');
+            
+            try {
+                // Get client
+                supabase = await getSupabaseClient();
+                debugLog('Supabase client obtained');
+                
+                // Test 1: Simple query to products table
+                resultsDiv.innerHTML = 'Test 1: Connecting to Supabase...<br>';
+                
+                const { data: testData, error: testError } = await supabase
                     .from('products')
                     .select('count', { count: 'exact', head: true });
                 
-                if (error) throw error;
+                if (testError) {
+                    resultsDiv.innerHTML += `<span style="color: #dc3545;">❌ Failed: ${testError.message}</span><br>`;
+                    debugLog(`Connection test failed: ${testError.message}`, 'error');
+                    throw testError;
+                }
                 
+                resultsDiv.innerHTML += `<span style="color: #28a745;">✅ Connected successfully</span><br>`;
+                debugLog('Connection test passed');
+                
+                // Test 2: Check tables
+                resultsDiv.innerHTML += 'Test 2: Checking database tables...<br>';
+                
+                const tablesToCheck = ['categories', 'products', 'product_colors', 'product_sizes'];
+                for (const table of tablesToCheck) {
+                    const { data, error } = await supabase
+                        .from(table)
+                        .select('count', { count: 'exact', head: true })
+                        .limit(1);
+                    
+                    if (error) {
+                        resultsDiv.innerHTML += `<span style="color: #dc3545;">❌ Table ${table}: ${error.message}</span><br>`;
+                    } else {
+                        resultsDiv.innerHTML += `<span style="color: #28a745;">✅ Table ${table}: Accessible</span><br>`;
+                    }
+                }
+                
+                // Test 3: Load sample data
+                resultsDiv.innerHTML += 'Test 3: Loading sample data...<br>';
+                
+                const { data: sampleProducts, error: sampleError } = await supabase
+                    .from('products')
+                    .select('id, name')
+                    .limit(3);
+                
+                if (sampleError) {
+                    resultsDiv.innerHTML += `<span style="color: #dc3545;">❌ Sample data failed: ${sampleError.message}</span><br>`;
+                } else {
+                    resultsDiv.innerHTML += `<span style="color: #28a745;">✅ Sample data loaded: ${sampleProducts.length} products</span><br>`;
+                }
+                
+                // Update connection status
                 document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-check-circle"></i> Connected';
                 document.getElementById('connectionStatus').className = 'status-item connected';
-                console.log('✅ Supabase connection successful');
+                
+                showToast('Connection test successful!', 'success');
+                
+                // Load data after successful connection
+                await loadAllData();
                 
             } catch (error) {
-                console.error('❌ Connection test failed:', error);
+                debugLog(`Connection test failed: ${error.message}`, 'error');
+                resultsDiv.innerHTML += `<span style="color: #dc3545;">❌ Overall test failed: ${error.message}</span><br>`;
                 document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Connection Failed';
                 document.getElementById('connectionStatus').className = 'status-item error';
-                throw error;
+                showToast(`Connection failed: ${error.message}`, 'error');
             }
         }
         
         // ============================================
-        // CATEGORY MANAGEMENT
+        // INITIALIZATION
         // ============================================
+        
+        async function initializeDashboard() {
+            debugLog('Initializing admin dashboard...');
+            
+            try {
+                // Get Supabase client
+                supabase = await getSupabaseClient();
+                debugLog('Supabase client initialized');
+                
+                // Update status
+                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing connection...';
+                
+                // Test connection immediately
+                await testConnection();
+                
+                debugLog('Admin dashboard initialized successfully');
+                
+            } catch (error) {
+                debugLog(`Initialization failed: ${error.message}`, 'error');
+                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Initialization Failed';
+                document.getElementById('connectionStatus').className = 'status-item error';
+                showToast(`Initialization failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // ============================================
+        // DATA LOADING FUNCTIONS
+        // ============================================
+        
+        async function loadAllData() {
+            debugLog('Loading all data...');
+            
+            try {
+                await Promise.all([
+                    loadCategories(),
+                    loadProducts()
+                ]);
+                
+                showToast('All data loaded successfully', 'success');
+                
+            } catch (error) {
+                debugLog(`Failed to load data: ${error.message}`, 'error');
+                showToast(`Failed to load data: ${error.message}`, 'error');
+            }
+        }
         
         async function loadCategories() {
             try {
+                debugLog('Loading categories...');
+                
                 const { data: categories, error } = await supabase
                     .from('categories')
                     .select('*')
@@ -631,6 +848,7 @@
                 if (error) throw error;
                 
                 allCategories = categories || [];
+                debugLog(`Loaded ${allCategories.length} categories`);
                 
                 // Populate category dropdown
                 const categorySelect = document.getElementById('productCategory');
@@ -639,20 +857,14 @@
                         allCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
                 }
                 
-                console.log(`✅ Loaded ${allCategories.length} categories`);
-                
             } catch (error) {
-                console.error('❌ Error loading categories:', error);
+                debugLog(`Error loading categories: ${error.message}`, 'error');
             }
         }
         
-        // ============================================
-        // PRODUCT MANAGEMENT
-        // ============================================
-        
         async function loadProducts() {
             try {
-                console.log('📦 Loading products...');
+                debugLog('Loading products...');
                 
                 const { data: products, error } = await supabase
                     .from('products')
@@ -662,6 +874,7 @@
                 if (error) throw error;
                 
                 allProducts = products || [];
+                debugLog(`Loaded ${allProducts.length} products`);
                 
                 // Update product count
                 document.getElementById('productCount').textContent = allProducts.length;
@@ -676,7 +889,7 @@
                     }
                 });
                 
-                // Get variant count from product_sizes table
+                // Get variant count
                 const { data: variants, error: variantsError } = await supabase
                     .from('product_sizes')
                     .select('count', { count: 'exact', head: true });
@@ -685,23 +898,14 @@
                     document.getElementById('variantCount').textContent = variants.count || 0;
                 }
                 
-                console.log(`✅ Loaded ${allProducts.length} products`);
-                showToast(`Loaded ${allProducts.length} products`, 'success');
-                
             } catch (error) {
-                console.error('❌ Error loading products:', error);
-                showToast('Failed to load products: ' + error.message, 'error');
-                
-                // Show error in dropdowns
-                const selects = ['productSelect', 'colorProductSelect', 'sizeProductSelect'];
-                selects.forEach(selectId => {
-                    const select = document.getElementById(selectId);
-                    if (select) {
-                        select.innerHTML = '<option value="">Error loading products</option>';
-                    }
-                });
+                debugLog(`Error loading products: ${error.message}`, 'error');
             }
         }
+        
+        // ============================================
+        // PRODUCT MANAGEMENT
+        // ============================================
         
         async function loadProductDetails() {
             const productId = document.getElementById('productSelect').value;
@@ -711,6 +915,8 @@
             }
             
             try {
+                debugLog(`Loading product details for ID: ${productId}`);
+                
                 const { data: product, error } = await supabase
                     .from('products')
                     .select('*')
@@ -729,8 +935,10 @@
                 // Show form
                 document.getElementById('productForm').style.display = 'block';
                 
+                debugLog(`Product details loaded: ${product.name}`);
+                
             } catch (error) {
-                console.error('❌ Error loading product details:', error);
+                debugLog(`Error loading product details: ${error.message}`, 'error');
                 showToast('Failed to load product details: ' + error.message, 'error');
             }
         }
@@ -757,6 +965,8 @@
             }
             
             try {
+                debugLog(`Updating product ID: ${productId}`);
+                
                 const { error } = await supabase
                     .from('products')
                     .update(updates)
@@ -765,10 +975,12 @@
                 if (error) throw error;
                 
                 showToast('✅ Product updated successfully!', 'success');
-                await loadProducts(); // Refresh the list
+                await loadProducts();
+                
+                debugLog(`Product updated successfully`);
                 
             } catch (error) {
-                console.error('❌ Error updating product:', error);
+                debugLog(`Error updating product: ${error.message}`, 'error');
                 showToast('Failed to update product: ' + error.message, 'error');
             }
         }
@@ -785,6 +997,8 @@
             }
             
             try {
+                debugLog(`Deleting product ID: ${productId}`);
+                
                 // Delete related variants first
                 await supabase.from('product_sizes').delete().eq('product_id', productId);
                 await supabase.from('product_colors').delete().eq('product_id', productId);
@@ -803,8 +1017,10 @@
                 document.getElementById('productForm').style.display = 'none';
                 await loadProducts();
                 
+                debugLog(`Product deleted successfully`);
+                
             } catch (error) {
-                console.error('❌ Error deleting product:', error);
+                debugLog(`Error deleting product: ${error.message}`, 'error');
                 showToast('Failed to delete product: ' + error.message, 'error');
             }
         }
@@ -827,6 +1043,8 @@
             }
             
             try {
+                debugLog(`Loading colors for product ID: ${productId}`);
+                
                 document.getElementById('colorForm').style.display = 'block';
                 document.getElementById('colorsList').innerHTML = `
                     <div class="loading">
@@ -835,7 +1053,6 @@
                     </div>
                 `;
                 
-                // Use the admin view if it exists, otherwise use the base table
                 const { data: colors, error } = await supabase
                     .from('product_colors')
                     .select('*')
@@ -870,8 +1087,10 @@
                 
                 document.getElementById('colorsList').innerHTML = html;
                 
+                debugLog(`Loaded ${colors?.length || 0} colors`);
+                
             } catch (error) {
-                console.error('❌ Error loading colors:', error);
+                debugLog(`Error loading colors: ${error.message}`, 'error');
                 document.getElementById('colorsList').innerHTML = `
                     <div class="error">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -892,6 +1111,8 @@
             }
             
             try {
+                debugLog(`Adding color "${colorName}" to product ID: ${productId}`);
+                
                 const newColor = {
                     product_id: parseInt(productId),
                     color_name: colorName,
@@ -910,8 +1131,10 @@
                 document.getElementById('colorName').value = '';
                 await loadColorsForProduct();
                 
+                debugLog(`Color added successfully`);
+                
             } catch (error) {
-                console.error('❌ Error adding color:', error);
+                debugLog(`Error adding color: ${error.message}`, 'error');
                 showToast('Failed to add color: ' + error.message, 'error');
             }
         }
@@ -922,6 +1145,8 @@
             }
             
             try {
+                debugLog(`Deleting color ID: ${colorId}`);
+                
                 // Delete associated sizes first
                 await supabase.from('product_sizes').delete().eq('color_id', colorId);
                 
@@ -936,8 +1161,10 @@
                 showToast('✅ Color deleted!', 'success');
                 await loadColorsForProduct();
                 
+                debugLog(`Color deleted successfully`);
+                
             } catch (error) {
-                console.error('❌ Error deleting color:', error);
+                debugLog(`Error deleting color: ${error.message}`, 'error');
                 showToast('Failed to delete color: ' + error.message, 'error');
             }
         }
@@ -954,6 +1181,8 @@
             }
             
             try {
+                debugLog(`Loading colors for size management, product ID: ${productId}`);
+                
                 document.getElementById('sizeForm').style.display = 'block';
                 
                 const { data: colors, error } = await supabase
@@ -972,8 +1201,10 @@
                     select.innerHTML = '<option value="">No colors available</option>';
                 }
                 
+                debugLog(`Loaded ${colors?.length || 0} colors for size management`);
+                
             } catch (error) {
-                console.error('❌ Error loading colors:', error);
+                debugLog(`Error loading colors for size product: ${error.message}`, 'error');
             }
         }
         
@@ -992,6 +1223,8 @@
             }
             
             try {
+                debugLog(`Loading sizes for product ID: ${productId}, color ID: ${colorId}`);
+                
                 document.getElementById('sizesList').innerHTML = `
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i>
@@ -1039,8 +1272,10 @@
                 
                 document.getElementById('sizesList').innerHTML = html;
                 
+                debugLog(`Loaded ${sizes?.length || 0} sizes`);
+                
             } catch (error) {
-                console.error('❌ Error loading sizes:', error);
+                debugLog(`Error loading sizes: ${error.message}`, 'error');
                 document.getElementById('sizesList').innerHTML = `
                     <div class="error">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -1062,6 +1297,8 @@
             }
             
             try {
+                debugLog(`Adding/updating size ${sizeValue} for product ID: ${productId}, color ID: ${colorId}`);
+                
                 // Check if size already exists
                 const { data: existing, error: checkError } = await supabase
                     .from('product_sizes')
@@ -1086,6 +1323,7 @@
                     
                     if (error) throw error;
                     showToast('✅ Size stock updated successfully!', 'success');
+                    debugLog(`Updated existing size ID: ${existing.id}`);
                 } else {
                     // Insert new
                     const { error } = await supabase
@@ -1100,6 +1338,7 @@
                     
                     if (error) throw error;
                     showToast('✅ Size variant added successfully!', 'success');
+                    debugLog(`Created new size variant`);
                 }
                 
                 // Reset form and refresh
@@ -1107,7 +1346,7 @@
                 await loadSizesForColor();
                 
             } catch (error) {
-                console.error('❌ Error adding/updating size:', error);
+                debugLog(`Error adding/updating size: ${error.message}`, 'error');
                 showToast('Failed to save size: ' + error.message, 'error');
             }
         }
@@ -1116,11 +1355,13 @@
             currentEditingVariantId = sizeId;
             document.getElementById('modalStockQuantity').value = currentStock;
             document.getElementById('stockModal').style.display = 'flex';
+            debugLog(`Editing stock for size ID: ${sizeId}, current stock: ${currentStock}`);
         }
         
         function closeStockModal() {
             document.getElementById('stockModal').style.display = 'none';
             currentEditingVariantId = null;
+            debugLog('Closed stock modal');
         }
         
         async function updateVariantStock() {
@@ -1129,6 +1370,8 @@
             const newStock = parseInt(document.getElementById('modalStockQuantity').value) || 0;
             
             try {
+                debugLog(`Updating stock for variant ID: ${currentEditingVariantId} to ${newStock}`);
+                
                 const { error } = await supabase
                     .from('product_sizes')
                     .update({ 
@@ -1144,8 +1387,10 @@
                 closeStockModal();
                 await loadSizesForColor();
                 
+                debugLog(`Stock updated successfully`);
+                
             } catch (error) {
-                console.error('❌ Error updating stock:', error);
+                debugLog(`Error updating stock: ${error.message}`, 'error');
                 showToast('Failed to update stock: ' + error.message, 'error');
             }
         }
@@ -1154,6 +1399,8 @@
             if (!confirm('Delete this size variant?')) return;
             
             try {
+                debugLog(`Deleting size variant ID: ${sizeId}`);
+                
                 const { error } = await supabase
                     .from('product_sizes')
                     .delete()
@@ -1164,19 +1411,21 @@
                 showToast('✅ Size deleted!', 'success');
                 await loadSizesForColor();
                 
+                debugLog(`Size deleted successfully`);
+                
             } catch (error) {
-                console.error('❌ Error deleting size:', error);
+                debugLog(`Error deleting size: ${error.message}`, 'error');
                 showToast('Failed to delete size: ' + error.message, 'error');
             }
         }
         
         // ============================================
-        // GLOBAL ERROR HANDLING
+        // INITIALIZE ON LOAD
         // ============================================
         
-        window.addEventListener('error', function(event) {
-            console.error('🚨 Global error:', event.error);
-            showToast('JavaScript Error: ' + event.message, 'error');
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('DOM loaded, starting initialization...');
+            initializeDashboard();
         });
         
         // Make functions globally available
@@ -1193,6 +1442,9 @@
         window.closeStockModal = closeStockModal;
         window.updateVariantStock = updateVariantStock;
         window.deleteSize = deleteSize;
+        window.testConnection = testConnection;
+        window.showDebugPanel = showDebugPanel;
+        window.loadAllData = loadAllData;
     </script>
 </body>
 </html>
