@@ -5,866 +5,326 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JMPOTTERS Admin Dashboard</title>
     <style>
-        :root {
-            --primary: #4CAF50;
-            --danger: #f44336;
-            --warning: #ff9800;
-            --info: #2196F3;
-            --dark: #333;
-            --light: #f8f9fa;
-            --border: #dee2e6;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; color: #333; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        .header { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .debug-panel {
+            background: #1e1e1e;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
         }
         
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-        }
+        .debug-panel.active { display: block; }
         
-        .admin-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .header h1 {
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .header h1 i {
-            color: #4CAF50;
-        }
-        
-        .status-bar {
-            display: flex;
-            gap: 20px;
-            font-size: 0.9rem;
-        }
-        
-        .status-item {
-            padding: 8px 15px;
-            background: #e8f5e9;
-            border-radius: 20px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .status-item.connecting {
-            background: #fff3e0;
-            color: #ef6c00;
-        }
-        
-        .status-item.connected {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        
-        .status-item.error {
-            background: #ffebee;
-            color: #c62828;
-        }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 30px;
-        }
+        .debug-log { margin: 5px 0; }
+        .debug-success { color: #4CAF50; }
+        .debug-error { color: #f44336; }
+        .debug-info { color: #2196F3; }
         
         .card {
             background: white;
+            padding: 20px;
             border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-        }
-        
-        .card-title {
-            font-size: 1.2rem;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .card h3 { margin-bottom: 15px; color: #333; }
         
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #555;
-        }
-        
-        .form-control {
+        select, input, button {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
         }
         
-        .form-control:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-        }
-        
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
+        button {
             background: #4CAF50;
             color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
         }
         
-        .btn-primary:hover {
-            background: #3d8b40;
-            transform: translateY(-2px);
-        }
-        
-        .btn-danger {
-            background: #f44336;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #d32f2f;
-        }
-        
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.9rem;
-        }
+        button:hover { background: #45a049; }
+        button.danger { background: #f44336; }
+        button.danger:hover { background: #d32f2f; }
         
         .data-list {
             max-height: 400px;
             overflow-y: auto;
-            margin-top: 20px;
+            margin-top: 15px;
             border: 1px solid #eee;
-            border-radius: 6px;
+            border-radius: 5px;
+            padding: 10px;
         }
         
         .data-item {
-            padding: 15px;
+            padding: 10px;
             border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
-        .data-item:last-child {
-            border-bottom: none;
-        }
+        .data-item:last-child { border-bottom: none; }
         
-        .data-item:hover {
-            background: #f9f9f9;
-        }
-        
-        .data-info h4 {
-            margin-bottom: 5px;
-            color: #333;
-        }
-        
-        .data-info p {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .data-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .color-swatch {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid #ddd;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-        
-        .stock-badge {
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        
-        .stock-in {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        
-        .stock-low {
-            background: #fff3e0;
-            color: #ef6c00;
-        }
-        
-        .stock-out {
-            background: #ffebee;
-            color: #c62828;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-        
-        .loading i {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            color: #4CAF50;
-        }
-        
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border-left: 4px solid #c62828;
-        }
-        
-        .success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border-left: 4px solid #2e7d32;
-        }
-        
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            width: 350px;
-        }
-        
-        .toast {
-            padding: 16px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideIn 0.3s ease;
-            background: white;
-            border-left: 4px solid;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .toast.success {
-            border-left-color: #4CAF50;
-        }
-        
-        .toast.error {
-            border-left-color: #f44336;
-        }
-        
-        .toast.info {
-            border-left-color: #2196F3;
-        }
-        
-        .debug-panel {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 30px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .debug-title {
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
             font-weight: bold;
-            margin-bottom: 10px;
-            color: #495057;
         }
         
-        .debug-log {
-            color: #6c757d;
-            margin: 5px 0;
-        }
-        
-        .debug-error {
-            color: #dc3545;
-            margin: 5px 0;
-        }
-        
-        .debug-success {
-            color: #28a745;
-            margin: 5px 0;
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-        }
+        .status.connected { background: #4CAF50; color: white; }
+        .status.disconnected { background: #f44336; color: white; }
+        .status.connecting { background: #ff9800; color: white; }
     </style>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="admin-container">
+    <div class="container">
         <div class="header">
-            <h1><i class="fas fa-cogs"></i> JMPOTTERS Admin Dashboard</h1>
-            <div class="status-bar">
-                <div class="status-item connecting" id="connectionStatus">
-                    <i class="fas fa-spinner fa-spin"></i> Initializing...
-                </div>
-                <div class="status-item" id="productCountBadge">
-                    <i class="fas fa-box"></i> <span id="productCount">0</span> Products
-                </div>
-                <div class="status-item" id="variantCountBadge">
-                    <i class="fas fa-layer-group"></i> <span id="variantCount">0</span> Variants
-                </div>
+            <h1>🔧 JMPOTTERS Admin Dashboard</h1>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button onclick="testDirectConnection()">🔗 Test Direct Connection</button>
+                <button onclick="toggleDebug()">🐛 Toggle Debug</button>
+                <button onclick="clearLocalStorage()">🗑️ Clear Cache</button>
+                <span class="status" id="connectionStatus">❓ Unknown</span>
             </div>
         </div>
         
-        <!-- Toast Messages -->
-        <div id="toastContainer" class="toast-container"></div>
-        
-        <!-- Connection Debug Panel -->
-        <div id="debugPanel" class="debug-panel" style="display: none;">
-            <div class="debug-title">Connection Debug</div>
+        <div id="debugPanel" class="debug-panel">
+            <div style="margin-bottom: 10px; font-weight: bold;">Debug Console</div>
             <div id="debugLogs"></div>
         </div>
         
-        <!-- Error/Success Messages -->
-        <div id="messageContainer"></div>
-        
-        <div class="dashboard-grid">
-            <!-- Product Management -->
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-box"></i> Product Management</h2>
-                <div class="form-group">
-                    <label>Select Product:</label>
-                    <select id="productSelect" class="form-control" onchange="loadProductDetails()">
-                        <option value="">Waiting for connection...</option>
-                    </select>
-                </div>
-                
-                <div id="productForm" style="display: none;">
-                    <div class="form-group">
-                        <label>Product Name:</label>
-                        <input type="text" id="productName" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Price (₦):</label>
-                        <input type="number" id="productPrice" class="form-control" min="0" step="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Stock (Global):</label>
-                        <input type="number" id="productStock" class="form-control" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Category:</label>
-                        <select id="productCategory" class="form-control">
-                            <option value="">Select category...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Status:</label>
-                        <select id="productStatus" class="form-control">
-                            <option value="true">Active</option>
-                            <option value="false">Inactive</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-primary" onclick="updateProduct()">
-                            <i class="fas fa-save"></i> Update Product
-                        </button>
-                        <button class="btn btn-danger" onclick="deleteProduct()">
-                            <i class="fas fa-trash"></i> Delete Product
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Color Management -->
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-palette"></i> Color Management</h2>
-                <div class="form-group">
-                    <label>For Product:</label>
-                    <select id="colorProductSelect" class="form-control" onchange="loadColorsForProduct()">
-                        <option value="">Waiting for connection...</option>
-                    </select>
-                </div>
-                
-                <div id="colorForm" style="display: none;">
-                    <div class="form-group">
-                        <label>Color Name:</label>
-                        <input type="text" id="colorName" class="form-control" placeholder="e.g., Midnight Black">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Color Code:</label>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="color" id="colorHex" value="#000000" style="width: 60px; height: 40px; border-radius: 4px;">
-                            <input type="text" id="colorHexText" class="form-control" placeholder="#000000" 
-                                   onchange="document.getElementById('colorHex').value = this.value">
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="addColor()">
-                        <i class="fas fa-plus"></i> Add Color
-                    </button>
-                </div>
-                
-                <div id="colorsList" class="data-list">
-                    <div class="loading">
-                        <i class="fas fa-info-circle"></i>
-                        <p>Select a product to view colors</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Size & Stock Management -->
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-ruler"></i> Size & Stock Management</h2>
-                <div class="form-group">
-                    <label>For Product:</label>
-                    <select id="sizeProductSelect" class="form-control" onchange="loadColorsForSizeProduct()">
-                        <option value="">Waiting for connection...</option>
-                    </select>
-                </div>
-                
-                <div id="sizeForm" style="display: none;">
-                    <div class="form-group">
-                        <label>For Color:</label>
-                        <select id="sizeColorSelect" class="form-control" onchange="loadSizesForColor()">
-                            <option value="">Select color...</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Size:</label>
-                        <select id="sizeValue" class="form-control">
-                            <option value="">Select size...</option>
-                            <option value="36">36</option>
-                            <option value="37">37</option>
-                            <option value="38">38</option>
-                            <option value="39">39</option>
-                            <option value="40">40</option>
-                            <option value="41">41</option>
-                            <option value="42">42</option>
-                            <option value="43">43</option>
-                            <option value="44">44</option>
-                            <option value="45">45</option>
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                            <option value="XXL">XXL</option>
-                            <option value="One Size">One Size</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Stock Quantity:</label>
-                        <input type="number" id="sizeStock" class="form-control" value="0" min="0">
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="addSize()">
-                        <i class="fas fa-plus"></i> Add/Update Size Stock
-                    </button>
-                </div>
-                
-                <div id="sizesList" class="data-list">
-                    <div class="loading">
-                        <i class="fas fa-info-circle"></i>
-                        <p>Select product and color to view sizes</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Connection Test Panel -->
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-network-wired"></i> Connection Diagnostics</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button class="btn btn-primary" onclick="testConnection()">
-                    <i class="fas fa-plug"></i> Test Connection
-                </button>
-                <button class="btn" onclick="showDebugPanel()" style="background: #6c757d; color: white;">
-                    <i class="fas fa-bug"></i> Show Debug Logs
-                </button>
-                <button class="btn" onclick="loadAllData()" style="background: #17a2b8; color: white;">
-                    <i class="fas fa-redo"></i> Reload All Data
-                </button>
+            <h3>📊 Database Connection Test</h3>
+            <div id="connectionTestResults">
+                Click "Test Direct Connection" above to start...
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>📦 Product Management</h3>
+            <select id="productSelect" onchange="loadProductDetails()">
+                <option value="">Loading products...</option>
+            </select>
+            
+            <div id="productForm" style="display: none;">
+                <input type="text" id="productName" placeholder="Product Name">
+                <input type="number" id="productPrice" placeholder="Price (₦)" min="0" step="100">
+                <input type="number" id="productStock" placeholder="Stock" min="0">
+                
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button onclick="updateProduct()">💾 Update Product</button>
+                    <button class="danger" onclick="deleteProduct()">🗑️ Delete Product</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>🎨 Color Management</h3>
+            <select id="colorProductSelect" onchange="loadColorsForProduct()">
+                <option value="">Select product...</option>
+            </select>
+            
+            <div id="colorForm" style="display: none;">
+                <input type="text" id="colorName" placeholder="Color Name">
+                <input type="color" id="colorHex" value="#000000">
+                <button onclick="addColor()">➕ Add Color</button>
             </div>
             
-            <div id="diagnosticResults" style="font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                Click "Test Connection" to run diagnostics...
+            <div id="colorsList" class="data-list">
+                Select a product to view colors...
             </div>
         </div>
     </div>
 
-    <!-- Stock Update Modal -->
-    <div id="stockModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px;">
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-edit"></i> Update Stock</h3>
-            <div class="form-group">
-                <label>New Stock Quantity:</label>
-                <input type="number" id="modalStockQuantity" class="form-control" min="0" value="0">
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn btn-primary" onclick="updateVariantStock()" style="flex: 1;">
-                    <i class="fas fa-save"></i> Update
-                </button>
-                <button class="btn" onclick="closeStockModal()" style="flex: 1; background: #f5f5f5;">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- IMPORTANT: We are NOT including Supabase JS here - we'll use the existing client from app.js -->
-    
     <script>
         // ============================================
-        // ADMIN DASHBOARD USING EXISTING SUPABASE CLIENT
+        // DEBUG UTILITIES
         // ============================================
         
-        // Configuration - Use the same as app.js
-        const SUPABASE_CONFIG = {
-            url: 'https://tmpggeeuwdvlngvfncaa.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
-        };
-        
-        // Global variables
-        let supabase = null;
-        let allProducts = [];
-        let allCategories = [];
-        let currentEditingVariantId = null;
+        let debugEnabled = false;
         let debugLogs = [];
         
-        // Debug logging
-        function debugLog(message, type = 'info') {
+        function debug(message, type = 'info') {
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = `[${timestamp}] ${message}`;
             debugLogs.push({ message: logEntry, type });
             
-            console.log(`🔧 ADMIN DEBUG: ${message}`);
+            console.log(`[ADMIN] ${message}`);
             
-            // Update debug panel if visible
-            const debugPanel = document.getElementById('debugLogs');
-            if (debugPanel) {
-                const logElement = document.createElement('div');
-                logElement.className = `debug-${type}`;
-                logElement.textContent = logEntry;
-                debugPanel.appendChild(logElement);
-                debugPanel.scrollTop = debugPanel.scrollHeight;
-            }
-        }
-        
-        function showDebugPanel() {
-            document.getElementById('debugPanel').style.display = 'block';
-        }
-        
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-            
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 
-                                  type === 'error' ? 'exclamation-circle' : 
-                                  'info-circle'}"></i>
-                <span>${message}</span>
-            `;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                setTimeout(() => toast.remove(), 300);
-            }, 5000);
-            
-            debugLog(`Toast: ${message}`, type);
-        }
-        
-        // ============================================
-        // SUPABASE CLIENT MANAGEMENT
-        // ============================================
-        
-        async function getSupabaseClient() {
-            debugLog('Getting Supabase client...');
-            
-            // Strategy 1: Use existing client from app.js if available
-            if (window.JMPOTTERS_SUPABASE_CLIENT) {
-                debugLog('Found existing Supabase client from app.js');
-                return window.JMPOTTERS_SUPABASE_CLIENT;
-            }
-            
-            // Strategy 2: Use global supabase client if available
-            if (window.supabase && window.supabase.createClient) {
-                debugLog('Creating new Supabase client from global library');
-                window.JMPOTTERS_SUPABASE_CLIENT = window.supabase.createClient(
-                    SUPABASE_CONFIG.url, 
-                    SUPABASE_CONFIG.key
-                );
-                return window.JMPOTTERS_SUPABASE_CLIENT;
-            }
-            
-            // Strategy 3: Load Supabase library dynamically
-            debugLog('Loading Supabase library dynamically...');
-            
-            return new Promise((resolve, reject) => {
-                // Check if already loaded
-                if (typeof supabase !== 'undefined' && window.supabase) {
-                    debugLog('Supabase library already loaded');
-                    window.JMPOTTERS_SUPABASE_CLIENT = window.supabase.createClient(
-                        SUPABASE_CONFIG.url, 
-                        SUPABASE_CONFIG.key
-                    );
-                    resolve(window.JMPOTTERS_SUPABASE_CLIENT);
-                    return;
+            if (debugEnabled) {
+                const debugPanel = document.getElementById('debugLogs');
+                if (debugPanel) {
+                    const logElement = document.createElement('div');
+                    logElement.className = `debug-log debug-${type}`;
+                    logElement.textContent = logEntry;
+                    debugPanel.appendChild(logElement);
+                    debugPanel.scrollTop = debugPanel.scrollHeight;
                 }
-                
-                // Load Supabase library
-                const script = document.createElement('script');
-                script.src = 'https://unpkg.com/@supabase/supabase-js@2';
-                script.onload = () => {
-                    debugLog('Supabase library loaded successfully');
-                    window.JMPOTTERS_SUPABASE_CLIENT = window.supabase.createClient(
-                        SUPABASE_CONFIG.url, 
-                        SUPABASE_CONFIG.key
-                    );
-                    resolve(window.JMPOTTERS_SUPABASE_CLIENT);
-                };
-                script.onerror = () => {
-                    debugLog('Failed to load Supabase library', 'error');
-                    reject(new Error('Failed to load Supabase library'));
-                };
-                document.head.appendChild(script);
-            });
+            }
+        }
+        
+        function toggleDebug() {
+            debugEnabled = !debugEnabled;
+            document.getElementById('debugPanel').classList.toggle('active', debugEnabled);
+            debug(`Debug mode ${debugEnabled ? 'enabled' : 'disabled'}`);
+        }
+        
+        function clearLocalStorage() {
+            localStorage.clear();
+            debug('Local storage cleared');
+            alert('Cache cleared! Reload the page.');
+            location.reload();
         }
         
         // ============================================
-        // CONNECTION TESTING
+        // DIRECT SUPABASE CONNECTION TEST
         // ============================================
         
-        async function testConnection() {
-            const resultsDiv = document.getElementById('diagnosticResults');
-            resultsDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running diagnostics...';
+        async function testDirectConnection() {
+            debug('Starting direct connection test...', 'info');
+            updateStatus('connecting', '🔄 Testing...');
             
-            debugLog('Starting connection test...');
+            const resultsDiv = document.getElementById('connectionTestResults');
+            resultsDiv.innerHTML = '<div style="color: #ff9800;">🔄 Testing connection...</div>';
             
             try {
-                // Get client
-                supabase = await getSupabaseClient();
-                debugLog('Supabase client obtained');
+                // Test 1: Direct API call without Supabase client
+                debug('Test 1: Testing direct REST API...', 'info');
+                resultsDiv.innerHTML += '<div>📡 Testing REST API endpoint...</div>';
                 
-                // Test 1: Simple query to products table
-                resultsDiv.innerHTML = 'Test 1: Connecting to Supabase...<br>';
-                
-                const { data: testData, error: testError } = await supabase
-                    .from('products')
-                    .select('count', { count: 'exact', head: true });
-                
-                if (testError) {
-                    resultsDiv.innerHTML += `<span style="color: #dc3545;">❌ Failed: ${testError.message}</span><br>`;
-                    debugLog(`Connection test failed: ${testError.message}`, 'error');
-                    throw testError;
-                }
-                
-                resultsDiv.innerHTML += `<span style="color: #28a745;">✅ Connected successfully</span><br>`;
-                debugLog('Connection test passed');
-                
-                // Test 2: Check tables
-                resultsDiv.innerHTML += 'Test 2: Checking database tables...<br>';
-                
-                const tablesToCheck = ['categories', 'products', 'product_colors', 'product_sizes'];
-                for (const table of tablesToCheck) {
-                    const { data, error } = await supabase
-                        .from(table)
-                        .select('count', { count: 'exact', head: true })
-                        .limit(1);
-                    
-                    if (error) {
-                        resultsDiv.innerHTML += `<span style="color: #dc3545;">❌ Table ${table}: ${error.message}</span><br>`;
-                    } else {
-                        resultsDiv.innerHTML += `<span style="color: #28a745;">✅ Table ${table}: Accessible</span><br>`;
+                const response = await fetch('https://tmpggeeuwdvlngvfncaa.supabase.co/rest/v1/products?select=id,name&limit=1', {
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4',
+                        'Content-Type': 'application/json'
                     }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                // Test 3: Load sample data
-                resultsDiv.innerHTML += 'Test 3: Loading sample data...<br>';
+                const data = await response.json();
+                debug(`✓ REST API connected. Response: ${JSON.stringify(data)}`, 'success');
+                resultsDiv.innerHTML += `<div style="color: #4CAF50;">✅ REST API: Connected (${data.length} products)</div>`;
                 
-                const { data: sampleProducts, error: sampleError } = await supabase
+                // Test 2: Check if Supabase client exists
+                debug('Test 2: Checking for existing Supabase client...', 'info');
+                resultsDiv.innerHTML += '<div>🔍 Checking for Supabase client...</div>';
+                
+                if (window.JMPOTTERS_SUPABASE_CLIENT) {
+                    debug('✓ Found existing Supabase client from app.js', 'success');
+                    resultsDiv.innerHTML += '<div style="color: #4CAF50;">✅ Found existing Supabase client</div>';
+                    supabase = window.JMPOTTERS_SUPABASE_CLIENT;
+                } else if (window.supabase && window.supabase.createClient) {
+                    debug('✓ Creating new Supabase client', 'success');
+                    resultsDiv.innerHTML += '<div style="color: #4CAF50;">✅ Creating new Supabase client</div>';
+                    supabase = window.supabase.createClient(
+                        'https://tmpggeeuwdvlngvfncaa.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+                    );
+                    window.JMPOTTERS_SUPABASE_CLIENT = supabase;
+                } else {
+                    debug('Loading Supabase library dynamically...', 'info');
+                    resultsDiv.innerHTML += '<div>📦 Loading Supabase library...</div>';
+                    
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+                        script.onload = () => {
+                            debug('✓ Supabase library loaded', 'success');
+                            resultsDiv.innerHTML += '<div style="color: #4CAF50;">✅ Supabase library loaded</div>';
+                            supabase = window.supabase.createClient(
+                                'https://tmpggeeuwdvlngvfncaa.supabase.co',
+                                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+                            );
+                            window.JMPOTTERS_SUPABASE_CLIENT = supabase;
+                            resolve();
+                        };
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+                
+                // Test 3: Test with Supabase client
+                debug('Test 3: Testing Supabase client query...', 'info');
+                resultsDiv.innerHTML += '<div>🔍 Testing Supabase query...</div>';
+                
+                const { data: products, error } = await supabase
                     .from('products')
                     .select('id, name')
-                    .limit(3);
-                
-                if (sampleError) {
-                    resultsDiv.innerHTML += `<span style="color: #dc3545;">❌ Sample data failed: ${sampleError.message}</span><br>`;
-                } else {
-                    resultsDiv.innerHTML += `<span style="color: #28a745;">✅ Sample data loaded: ${sampleProducts.length} products</span><br>`;
-                }
-                
-                // Update connection status
-                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-check-circle"></i> Connected';
-                document.getElementById('connectionStatus').className = 'status-item connected';
-                
-                showToast('Connection test successful!', 'success');
-                
-                // Load data after successful connection
-                await loadAllData();
-                
-            } catch (error) {
-                debugLog(`Connection test failed: ${error.message}`, 'error');
-                resultsDiv.innerHTML += `<span style="color: #dc3545;">❌ Overall test failed: ${error.message}</span><br>`;
-                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Connection Failed';
-                document.getElementById('connectionStatus').className = 'status-item error';
-                showToast(`Connection failed: ${error.message}`, 'error');
-            }
-        }
-        
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        
-        async function initializeDashboard() {
-            debugLog('Initializing admin dashboard...');
-            
-            try {
-                // Get Supabase client
-                supabase = await getSupabaseClient();
-                debugLog('Supabase client initialized');
-                
-                // Update status
-                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing connection...';
-                
-                // Test connection immediately
-                await testConnection();
-                
-                debugLog('Admin dashboard initialized successfully');
-                
-            } catch (error) {
-                debugLog(`Initialization failed: ${error.message}`, 'error');
-                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Initialization Failed';
-                document.getElementById('connectionStatus').className = 'status-item error';
-                showToast(`Initialization failed: ${error.message}`, 'error');
-            }
-        }
-        
-        // ============================================
-        // DATA LOADING FUNCTIONS
-        // ============================================
-        
-        async function loadAllData() {
-            debugLog('Loading all data...');
-            
-            try {
-                await Promise.all([
-                    loadCategories(),
-                    loadProducts()
-                ]);
-                
-                showToast('All data loaded successfully', 'success');
-                
-            } catch (error) {
-                debugLog(`Failed to load data: ${error.message}`, 'error');
-                showToast(`Failed to load data: ${error.message}`, 'error');
-            }
-        }
-        
-        async function loadCategories() {
-            try {
-                debugLog('Loading categories...');
-                
-                const { data: categories, error } = await supabase
-                    .from('categories')
-                    .select('*')
-                    .order('name');
+                    .limit(5);
                 
                 if (error) throw error;
                 
-                allCategories = categories || [];
-                debugLog(`Loaded ${allCategories.length} categories`);
+                debug(`✓ Supabase query successful: ${products.length} products`, 'success');
+                resultsDiv.innerHTML += `<div style="color: #4CAF50;">✅ Supabase client: Working (${products.length} products loaded)</div>`;
                 
-                // Populate category dropdown
-                const categorySelect = document.getElementById('productCategory');
-                if (categorySelect) {
-                    categorySelect.innerHTML = '<option value="">Select category...</option>' +
-                        allCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
-                }
+                // Update UI
+                updateStatus('connected', '✅ Connected');
+                resultsDiv.innerHTML += `<div style="color: #4CAF50; font-weight: bold; margin-top: 10px;">🎉 All tests passed! Loading products...</div>`;
+                
+                // Load products
+                await loadProducts();
                 
             } catch (error) {
-                debugLog(`Error loading categories: ${error.message}`, 'error');
+                debug(`✗ Connection test failed: ${error.message}`, 'error');
+                resultsDiv.innerHTML += `<div style="color: #f44336;">❌ Error: ${error.message}</div>`;
+                updateStatus('disconnected', '❌ Failed');
+                
+                // Show detailed error info
+                resultsDiv.innerHTML += `
+                    <div style="margin-top: 20px; background: #fff3cd; padding: 10px; border-radius: 5px;">
+                        <strong>💡 Troubleshooting Tips:</strong>
+                        <ol style="margin: 10px 0 0 20px;">
+                            <li>Check browser console (F12) for CORS errors</li>
+                            <li>Verify Supabase API key is correct</li>
+                            <li>Check RLS policies in Supabase dashboard</li>
+                            <li>Try opening in Incognito mode</li>
+                        </ol>
+                    </div>
+                `;
             }
         }
         
+        function updateStatus(status, text) {
+            const statusElement = document.getElementById('connectionStatus');
+            statusElement.className = `status ${status}`;
+            statusElement.textContent = text;
+        }
+        
+        // ============================================
+        // PRODUCT FUNCTIONS
+        // ============================================
+        
+        let supabase = null;
+        let allProducts = [];
+        
         async function loadProducts() {
             try {
-                debugLog('Loading products...');
+                debug('Loading products from Supabase...', 'info');
                 
                 const { data: products, error } = await supabase
                     .from('products')
@@ -874,13 +334,10 @@
                 if (error) throw error;
                 
                 allProducts = products || [];
-                debugLog(`Loaded ${allProducts.length} products`);
+                debug(`Loaded ${allProducts.length} products`, 'success');
                 
-                // Update product count
-                document.getElementById('productCount').textContent = allProducts.length;
-                
-                // Populate product dropdowns
-                const selects = ['productSelect', 'colorProductSelect', 'sizeProductSelect'];
+                // Update dropdowns
+                const selects = ['productSelect', 'colorProductSelect'];
                 selects.forEach(selectId => {
                     const select = document.getElementById(selectId);
                     if (select) {
@@ -889,23 +346,16 @@
                     }
                 });
                 
-                // Get variant count
-                const { data: variants, error: variantsError } = await supabase
-                    .from('product_sizes')
-                    .select('count', { count: 'exact', head: true });
-                
-                if (!variantsError && variants) {
-                    document.getElementById('variantCount').textContent = variants.count || 0;
-                }
+                // Show success message
+                const resultsDiv = document.getElementById('connectionTestResults');
+                resultsDiv.innerHTML += `<div style="color: #4CAF50; font-weight: bold;">✅ Loaded ${allProducts.length} products successfully!</div>`;
                 
             } catch (error) {
-                debugLog(`Error loading products: ${error.message}`, 'error');
+                debug(`Error loading products: ${error.message}`, 'error');
+                const resultsDiv = document.getElementById('connectionTestResults');
+                resultsDiv.innerHTML += `<div style="color: #f44336;">❌ Failed to load products: ${error.message}</div>`;
             }
         }
-        
-        // ============================================
-        // PRODUCT MANAGEMENT
-        // ============================================
         
         async function loadProductDetails() {
             const productId = document.getElementById('productSelect').value;
@@ -915,8 +365,6 @@
             }
             
             try {
-                debugLog(`Loading product details for ID: ${productId}`);
-                
                 const { data: product, error } = await supabase
                     .from('products')
                     .select('*')
@@ -925,28 +373,23 @@
                 
                 if (error) throw error;
                 
-                // Populate form
                 document.getElementById('productName').value = product.name || '';
                 document.getElementById('productPrice').value = product.price || 0;
                 document.getElementById('productStock').value = product.stock || 0;
-                document.getElementById('productCategory').value = product.category_id || '';
-                document.getElementById('productStatus').value = product.is_active ? 'true' : 'false';
-                
-                // Show form
                 document.getElementById('productForm').style.display = 'block';
                 
-                debugLog(`Product details loaded: ${product.name}`);
+                debug(`Loaded details for product: ${product.name}`, 'success');
                 
             } catch (error) {
-                debugLog(`Error loading product details: ${error.message}`, 'error');
-                showToast('Failed to load product details: ' + error.message, 'error');
+                debug(`Error loading product details: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
             }
         }
         
         async function updateProduct() {
             const productId = document.getElementById('productSelect').value;
             if (!productId) {
-                showToast('Please select a product', 'error');
+                alert('Please select a product first');
                 return;
             }
             
@@ -954,19 +397,15 @@
                 name: document.getElementById('productName').value.trim(),
                 price: parseFloat(document.getElementById('productPrice').value) || 0,
                 stock: parseInt(document.getElementById('productStock').value) || 0,
-                category_id: parseInt(document.getElementById('productCategory').value) || null,
-                is_active: document.getElementById('productStatus').value === 'true',
                 updated_at: new Date().toISOString()
             };
             
             if (!updates.name) {
-                showToast('Product name is required', 'error');
+                alert('Product name is required');
                 return;
             }
             
             try {
-                debugLog(`Updating product ID: ${productId}`);
-                
                 const { error } = await supabase
                     .from('products')
                     .update(updates)
@@ -974,36 +413,31 @@
                 
                 if (error) throw error;
                 
-                showToast('✅ Product updated successfully!', 'success');
+                debug(`Updated product ID ${productId}`, 'success');
+                alert('Product updated successfully!');
                 await loadProducts();
                 
-                debugLog(`Product updated successfully`);
-                
             } catch (error) {
-                debugLog(`Error updating product: ${error.message}`, 'error');
-                showToast('Failed to update product: ' + error.message, 'error');
+                debug(`Error updating product: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
             }
         }
         
         async function deleteProduct() {
             const productId = document.getElementById('productSelect').value;
             if (!productId) {
-                showToast('Please select a product', 'error');
+                alert('Please select a product first');
                 return;
             }
             
-            if (!confirm('Are you sure you want to delete this product? This will also delete all its variants!')) {
+            if (!confirm('Delete this product? This will also delete all its variants!')) {
                 return;
             }
             
             try {
-                debugLog(`Deleting product ID: ${productId}`);
-                
-                // Delete related variants first
                 await supabase.from('product_sizes').delete().eq('product_id', productId);
                 await supabase.from('product_colors').delete().eq('product_id', productId);
                 
-                // Delete the product
                 const { error } = await supabase
                     .from('products')
                     .delete()
@@ -1011,47 +445,29 @@
                 
                 if (error) throw error;
                 
-                showToast('✅ Product deleted successfully!', 'success');
+                debug(`Deleted product ID ${productId}`, 'success');
+                alert('Product deleted successfully!');
                 
-                // Reset form and refresh
                 document.getElementById('productForm').style.display = 'none';
                 await loadProducts();
                 
-                debugLog(`Product deleted successfully`);
-                
             } catch (error) {
-                debugLog(`Error deleting product: ${error.message}`, 'error');
-                showToast('Failed to delete product: ' + error.message, 'error');
+                debug(`Error deleting product: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
             }
         }
-        
-        // ============================================
-        // COLOR MANAGEMENT
-        // ============================================
         
         async function loadColorsForProduct() {
             const productId = document.getElementById('colorProductSelect').value;
             if (!productId) {
                 document.getElementById('colorForm').style.display = 'none';
-                document.getElementById('colorsList').innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-info-circle"></i>
-                        <p>Select a product to view colors</p>
-                    </div>
-                `;
+                document.getElementById('colorsList').innerHTML = 'Select a product to view colors...';
                 return;
             }
             
             try {
-                debugLog(`Loading colors for product ID: ${productId}`);
-                
                 document.getElementById('colorForm').style.display = 'block';
-                document.getElementById('colorsList').innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Loading colors...</p>
-                    </div>
-                `;
+                document.getElementById('colorsList').innerHTML = '<div style="color: #666;">Loading colors...</div>';
                 
                 const { data: colors, error } = await supabase
                     .from('product_colors')
@@ -1066,37 +482,24 @@
                     colors.forEach(color => {
                         html += `
                             <div class="data-item">
-                                <div class="data-info">
-                                    <h4>
-                                        <span class="color-swatch" style="background: ${color.color_code || '#ccc'}"></span>
-                                        ${color.color_name}
-                                    </h4>
-                                    <p>ID: ${color.id} | Code: ${color.color_code || 'N/A'} ${color.is_default ? '| ★ Default' : ''}</p>
-                                </div>
-                                <div class="data-actions">
-                                    <button class="btn btn-danger btn-sm" onclick="deleteColor(${color.id})">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                <div>${color.color_name}</div>
+                                <div>
+                                    <span style="display: inline-block; width: 20px; height: 20px; background: ${color.color_code || '#ccc'}; border-radius: 50%; margin-right: 10px;"></span>
+                                    <button onclick="deleteColor(${color.id})" style="background: #f44336; padding: 5px 10px; font-size: 12px;">Delete</button>
                                 </div>
                             </div>
                         `;
                     });
                 } else {
-                    html = '<div class="loading">No colors defined for this product</div>';
+                    html = '<div style="color: #666;">No colors defined for this product</div>';
                 }
                 
                 document.getElementById('colorsList').innerHTML = html;
-                
-                debugLog(`Loaded ${colors?.length || 0} colors`);
+                debug(`Loaded ${colors?.length || 0} colors for product ${productId}`, 'success');
                 
             } catch (error) {
-                debugLog(`Error loading colors: ${error.message}`, 'error');
-                document.getElementById('colorsList').innerHTML = `
-                    <div class="error">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Failed to load colors: ${error.message}</p>
-                    </div>
-                `;
+                debug(`Error loading colors: ${error.message}`, 'error');
+                document.getElementById('colorsList').innerHTML = `<div style="color: #f44336;">Error: ${error.message}</div>`;
             }
         }
         
@@ -1106,13 +509,11 @@
             const colorHex = document.getElementById('colorHex').value;
             
             if (!productId || !colorName) {
-                showToast('Please select a product and enter color name', 'error');
+                alert('Please select a product and enter color name');
                 return;
             }
             
             try {
-                debugLog(`Adding color "${colorName}" to product ID: ${productId}`);
-                
                 const newColor = {
                     product_id: parseInt(productId),
                     color_name: colorName,
@@ -1127,30 +528,24 @@
                 
                 if (error) throw error;
                 
-                showToast('✅ Color added successfully!', 'success');
+                debug(`Added color "${colorName}" to product ${productId}`, 'success');
                 document.getElementById('colorName').value = '';
                 await loadColorsForProduct();
                 
-                debugLog(`Color added successfully`);
-                
             } catch (error) {
-                debugLog(`Error adding color: ${error.message}`, 'error');
-                showToast('Failed to add color: ' + error.message, 'error');
+                debug(`Error adding color: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
             }
         }
         
         async function deleteColor(colorId) {
-            if (!confirm('Are you sure you want to delete this color? All associated sizes will also be deleted.')) {
+            if (!confirm('Delete this color? All associated sizes will also be deleted.')) {
                 return;
             }
             
             try {
-                debugLog(`Deleting color ID: ${colorId}`);
-                
-                // Delete associated sizes first
                 await supabase.from('product_sizes').delete().eq('color_id', colorId);
                 
-                // Delete the color
                 const { error } = await supabase
                     .from('product_colors')
                     .delete()
@@ -1158,293 +553,35 @@
                 
                 if (error) throw error;
                 
-                showToast('✅ Color deleted!', 'success');
+                debug(`Deleted color ID ${colorId}`, 'success');
                 await loadColorsForProduct();
                 
-                debugLog(`Color deleted successfully`);
-                
             } catch (error) {
-                debugLog(`Error deleting color: ${error.message}`, 'error');
-                showToast('Failed to delete color: ' + error.message, 'error');
+                debug(`Error deleting color: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
             }
         }
         
         // ============================================
-        // SIZE & STOCK MANAGEMENT
-        // ============================================
-        
-        async function loadColorsForSizeProduct() {
-            const productId = document.getElementById('sizeProductSelect').value;
-            if (!productId) {
-                document.getElementById('sizeForm').style.display = 'none';
-                return;
-            }
-            
-            try {
-                debugLog(`Loading colors for size management, product ID: ${productId}`);
-                
-                document.getElementById('sizeForm').style.display = 'block';
-                
-                const { data: colors, error } = await supabase
-                    .from('product_colors')
-                    .select('id, color_name')
-                    .eq('product_id', productId)
-                    .order('color_name');
-                
-                if (error) throw error;
-                
-                const select = document.getElementById('sizeColorSelect');
-                if (colors && colors.length > 0) {
-                    select.innerHTML = '<option value="">Select color...</option>' +
-                        colors.map(c => `<option value="${c.id}">${c.color_name}</option>`).join('');
-                } else {
-                    select.innerHTML = '<option value="">No colors available</option>';
-                }
-                
-                debugLog(`Loaded ${colors?.length || 0} colors for size management`);
-                
-            } catch (error) {
-                debugLog(`Error loading colors for size product: ${error.message}`, 'error');
-            }
-        }
-        
-        async function loadSizesForColor() {
-            const colorId = document.getElementById('sizeColorSelect').value;
-            const productId = document.getElementById('sizeProductSelect').value;
-            
-            if (!colorId || !productId) {
-                document.getElementById('sizesList').innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-info-circle"></i>
-                        <p>Select product and color to view sizes</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            try {
-                debugLog(`Loading sizes for product ID: ${productId}, color ID: ${colorId}`);
-                
-                document.getElementById('sizesList').innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Loading sizes...</p>
-                    </div>
-                `;
-                
-                const { data: sizes, error } = await supabase
-                    .from('product_sizes')
-                    .select('*')
-                    .eq('product_id', productId)
-                    .eq('color_id', colorId)
-                    .order('size_value');
-                
-                if (error) throw error;
-                
-                let html = '';
-                if (sizes && sizes.length > 0) {
-                    sizes.forEach(size => {
-                        const stockClass = size.stock_quantity === 0 ? 'stock-out' : 
-                                         size.stock_quantity < 5 ? 'stock-low' : 'stock-in';
-                        const stockText = size.stock_quantity === 0 ? 'Out of stock' : 
-                                         size.stock_quantity < 5 ? `${size.stock_quantity} left` : 'In stock';
-                        
-                        html += `
-                            <div class="data-item">
-                                <div class="data-info">
-                                    <h4>Size ${size.size_value}</h4>
-                                    <p>ID: ${size.id} | <span class="stock-badge ${stockClass}">${stockText}</span></p>
-                                </div>
-                                <div class="data-actions">
-                                    <button class="btn btn-sm" onclick="editSizeStock(${size.id}, ${size.stock_quantity})" style="background: #f0f0f0;">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteSize(${size.id})">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    html = '<div class="loading">No sizes defined for this color</div>';
-                }
-                
-                document.getElementById('sizesList').innerHTML = html;
-                
-                debugLog(`Loaded ${sizes?.length || 0} sizes`);
-                
-            } catch (error) {
-                debugLog(`Error loading sizes: ${error.message}`, 'error');
-                document.getElementById('sizesList').innerHTML = `
-                    <div class="error">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Failed to load sizes: ${error.message}</p>
-                    </div>
-                `;
-            }
-        }
-        
-        async function addSize() {
-            const productId = document.getElementById('sizeProductSelect').value;
-            const colorId = document.getElementById('sizeColorSelect').value;
-            const sizeValue = document.getElementById('sizeValue').value;
-            const stock = parseInt(document.getElementById('sizeStock').value) || 0;
-            
-            if (!productId || !colorId || !sizeValue) {
-                showToast('Please select product, color, and size', 'error');
-                return;
-            }
-            
-            try {
-                debugLog(`Adding/updating size ${sizeValue} for product ID: ${productId}, color ID: ${colorId}`);
-                
-                // Check if size already exists
-                const { data: existing, error: checkError } = await supabase
-                    .from('product_sizes')
-                    .select('id')
-                    .eq('product_id', productId)
-                    .eq('color_id', colorId)
-                    .eq('size_value', sizeValue)
-                    .maybeSingle();
-                
-                if (checkError && checkError.code !== 'PGRST116') throw checkError;
-                
-                if (existing) {
-                    // Update existing
-                    const { error } = await supabase
-                        .from('product_sizes')
-                        .update({ 
-                            stock_quantity: stock, 
-                            is_available: stock > 0,
-                            updated_at: new Date().toISOString() 
-                        })
-                        .eq('id', existing.id);
-                    
-                    if (error) throw error;
-                    showToast('✅ Size stock updated successfully!', 'success');
-                    debugLog(`Updated existing size ID: ${existing.id}`);
-                } else {
-                    // Insert new
-                    const { error } = await supabase
-                        .from('product_sizes')
-                        .insert([{
-                            product_id: productId,
-                            color_id: colorId,
-                            size_value: sizeValue,
-                            stock_quantity: stock,
-                            is_available: stock > 0
-                        }]);
-                    
-                    if (error) throw error;
-                    showToast('✅ Size variant added successfully!', 'success');
-                    debugLog(`Created new size variant`);
-                }
-                
-                // Reset form and refresh
-                document.getElementById('sizeStock').value = '0';
-                await loadSizesForColor();
-                
-            } catch (error) {
-                debugLog(`Error adding/updating size: ${error.message}`, 'error');
-                showToast('Failed to save size: ' + error.message, 'error');
-            }
-        }
-        
-        function editSizeStock(sizeId, currentStock) {
-            currentEditingVariantId = sizeId;
-            document.getElementById('modalStockQuantity').value = currentStock;
-            document.getElementById('stockModal').style.display = 'flex';
-            debugLog(`Editing stock for size ID: ${sizeId}, current stock: ${currentStock}`);
-        }
-        
-        function closeStockModal() {
-            document.getElementById('stockModal').style.display = 'none';
-            currentEditingVariantId = null;
-            debugLog('Closed stock modal');
-        }
-        
-        async function updateVariantStock() {
-            if (!currentEditingVariantId) return;
-            
-            const newStock = parseInt(document.getElementById('modalStockQuantity').value) || 0;
-            
-            try {
-                debugLog(`Updating stock for variant ID: ${currentEditingVariantId} to ${newStock}`);
-                
-                const { error } = await supabase
-                    .from('product_sizes')
-                    .update({ 
-                        stock_quantity: newStock, 
-                        is_available: newStock > 0,
-                        updated_at: new Date().toISOString() 
-                    })
-                    .eq('id', currentEditingVariantId);
-                
-                if (error) throw error;
-                
-                showToast('✅ Stock updated!', 'success');
-                closeStockModal();
-                await loadSizesForColor();
-                
-                debugLog(`Stock updated successfully`);
-                
-            } catch (error) {
-                debugLog(`Error updating stock: ${error.message}`, 'error');
-                showToast('Failed to update stock: ' + error.message, 'error');
-            }
-        }
-        
-        async function deleteSize(sizeId) {
-            if (!confirm('Delete this size variant?')) return;
-            
-            try {
-                debugLog(`Deleting size variant ID: ${sizeId}`);
-                
-                const { error } = await supabase
-                    .from('product_sizes')
-                    .delete()
-                    .eq('id', sizeId);
-                
-                if (error) throw error;
-                
-                showToast('✅ Size deleted!', 'success');
-                await loadSizesForColor();
-                
-                debugLog(`Size deleted successfully`);
-                
-            } catch (error) {
-                debugLog(`Error deleting size: ${error.message}`, 'error');
-                showToast('Failed to delete size: ' + error.message, 'error');
-            }
-        }
-        
-        // ============================================
-        // INITIALIZE ON LOAD
+        // INITIALIZE
         // ============================================
         
         document.addEventListener('DOMContentLoaded', function() {
-            debugLog('DOM loaded, starting initialization...');
-            initializeDashboard();
+            debug('Admin dashboard loaded', 'info');
+            // Start connection test automatically
+            setTimeout(testDirectConnection, 1000);
         });
         
-        // Make functions globally available
+        // Make functions global
+        window.testDirectConnection = testDirectConnection;
+        window.toggleDebug = toggleDebug;
+        window.clearLocalStorage = clearLocalStorage;
         window.loadProductDetails = loadProductDetails;
         window.updateProduct = updateProduct;
         window.deleteProduct = deleteProduct;
         window.loadColorsForProduct = loadColorsForProduct;
         window.addColor = addColor;
         window.deleteColor = deleteColor;
-        window.loadColorsForSizeProduct = loadColorsForSizeProduct;
-        window.loadSizesForColor = loadSizesForColor;
-        window.addSize = addSize;
-        window.editSizeStock = editSizeStock;
-        window.closeStockModal = closeStockModal;
-        window.updateVariantStock = updateVariantStock;
-        window.deleteSize = deleteSize;
-        window.testConnection = testConnection;
-        window.showDebugPanel = showDebugPanel;
-        window.loadAllData = loadAllData;
     </script>
 </body>
 </html>
