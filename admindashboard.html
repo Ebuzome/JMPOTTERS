@@ -1,18 +1,25 @@
 <!-- admin-dashboard.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>JMPOTTERS Admin Dashboard | Stock Management</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JMPOTTERS Admin | Stock Management</title>
     <style>
         :root {
-            --primary: #3498db;
-            --success: #2ecc71;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --info: #1abc9c;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --border: #bdc3c7;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --sidebar: #111827;
+            --card-bg: #ffffff;
+            --border: #e5e7eb;
+            --text: #374151;
+            --text-light: #9ca3af;
         }
         
         * {
@@ -22,276 +29,383 @@
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text);
+            line-height: 1.5;
             min-height: 100vh;
-            color: #333;
+            overflow-x: hidden;
         }
         
-        .admin-wrapper {
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .admin-container {
-            max-width: 1600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        
-        .admin-header {
-            background: var(--dark);
-            color: white;
-            padding: 25px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid var(--primary);
-        }
-        
-        .header-left h1 {
-            font-size: 28px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .header-left h1 i {
-            color: var(--success);
-            background: rgba(255,255,255,0.1);
-            padding: 12px;
-            border-radius: 12px;
-        }
-        
-        .header-stats {
-            display: flex;
-            gap: 25px;
-            font-size: 0.9rem;
-        }
-        
-        .stat-item {
-            background: rgba(255,255,255,0.1);
-            padding: 12px 20px;
-            border-radius: 10px;
-            text-align: center;
-            min-width: 120px;
+        /* Glass Morphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
+        .glass-dark {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .admin-body {
+        /* Dashboard Layout */
+        .dashboard {
             display: grid;
             grid-template-columns: 280px 1fr;
-            min-height: 800px;
+            min-height: 100vh;
         }
         
+        /* Sidebar */
         .sidebar {
-            background: #f8f9fa;
-            border-right: 1px solid #e9ecef;
-            padding: 30px 0;
+            background: var(--sidebar);
+            color: white;
+            position: fixed;
+            width: 280px;
+            height: 100vh;
+            padding: 2rem 0;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        
+        .brand {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .brand h1 i {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            padding: 0.75rem;
+            border-radius: 12px;
         }
         
         .nav-menu {
             list-style: none;
+            padding: 0 1rem;
         }
         
         .nav-item {
-            padding: 15px 30px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-link {
             display: flex;
             align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-left: 4px solid transparent;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
         }
         
-        .nav-item:hover {
-            background: #e9ecef;
-            border-left-color: var(--primary);
-        }
-        
-        .nav-item.active {
-            background: var(--primary);
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
             color: white;
-            border-left-color: var(--success);
+            transform: translateX(5px);
         }
         
-        .nav-item i {
-            width: 20px;
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .nav-link i {
+            font-size: 1.25rem;
+            width: 24px;
             text-align: center;
         }
         
+        /* Main Content */
         .main-content {
-            padding: 40px;
-            background: #fff;
+            grid-column: 2;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            min-height: 100vh;
         }
         
-        .content-header {
-            margin-bottom: 40px;
-        }
-        
-        .content-header h2 {
-            font-size: 28px;
-            color: var(--dark);
-            margin-bottom: 10px;
-        }
-        
-        .content-header p {
-            color: #7f8c8d;
-            font-size: 16px;
-        }
-        
-        /* Tabs */
-        .tabs {
+        /* Header */
+        .header {
             display: flex;
-            border-bottom: 2px solid #e9ecef;
-            margin-bottom: 30px;
-            gap: 5px;
-        }
-        
-        .tab {
-            padding: 15px 30px;
-            background: none;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            position: relative;
-            color: #7f8c8d;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .tab:hover {
-            color: var(--primary);
-        }
-        
-        .tab.active {
-            color: var(--primary);
-        }
-        
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--primary);
-        }
-        
-        /* Category Cards */
-        .category-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        
-        .category-card {
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 20px;
             background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 15px;
-            overflow: hidden;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
         }
         
-        .category-card:hover {
+        .header-title h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .header-title p {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            min-width: 160px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
         
-        .category-header {
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .action-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 50px rgba(99, 102, 241, 0.2);
+        }
+        
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .action-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .action-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .category-tab {
+            padding: 1rem 2rem;
+            border: none;
+            background: none;
+            border-radius: 12px;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .category-tab:hover {
+            background: #f3f4f6;
+            color: var(--dark);
+        }
+        
+        .category-tab.active {
             background: var(--primary);
             color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
         }
         
-        .category-title {
-            font-size: 18px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .category-tab i {
+            font-size: 1.25rem;
         }
         
-        .category-count {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 12px;
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .product-card {
+            background: white;
             border-radius: 20px;
-            font-size: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border);
         }
         
-        .category-products {
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 15px;
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
         }
         
-        .product-item {
-            padding: 15px;
-            border-bottom: 1px solid #f1f1f1;
+        .product-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .product-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background 0.3s;
         }
         
-        .product-item:hover {
-            background: #f8f9fa;
+        .product-category {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
         
-        .product-info h4 {
-            font-size: 15px;
-            margin-bottom: 5px;
-            color: #2c3e50;
+        .product-body {
+            padding: 1.5rem;
         }
         
-        .product-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 13px;
-            color: #7f8c8d;
+        .product-info {
+            margin-bottom: 1.5rem;
         }
         
         .product-price {
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: var(--success);
+            margin-bottom: 0.5rem;
         }
         
         .product-stock {
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
+            display: inline-block;
+            padding: 0.375rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
         
-        .stock-ok { background: #d4edda; color: #155724; }
-        .stock-low { background: #fff3cd; color: #856404; }
-        .stock-out { background: #f8d7da; color: #721c24; }
+        .stock-high { background: #d1fae5; color: #065f46; }
+        .stock-medium { background: #fef3c7; color: #92400e; }
+        .stock-low { background: #fee2e2; color: #991b1b; }
         
         .product-actions {
             display: flex;
-            gap: 10px;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text);
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
         }
         
         /* Modal */
@@ -301,225 +415,162 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
+            z-index: 2000;
+            backdrop-filter: blur(10px);
         }
         
         .modal-content {
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             width: 90%;
             max-width: 800px;
             max-height: 90vh;
             overflow-y: auto;
-            animation: modalSlide 0.3s ease;
+            animation: modalSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.3);
         }
         
         @keyframes modalSlide {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         
         .modal-header {
-            padding: 25px 30px;
-            border-bottom: 1px solid #e9ecef;
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
-        .modal-header h3 {
-            font-size: 24px;
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
             color: var(--dark);
-        }
-        
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #7f8c8d;
-            transition: color 0.3s;
-        }
-        
-        .close-modal:hover {
-            color: var(--danger);
         }
         
         .modal-body {
-            padding: 30px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
+            padding: 2rem;
         }
         
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 1.5rem;
         }
         
-        .form-group label {
+        .form-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 0.5rem;
             font-weight: 600;
             color: var(--dark);
-            font-size: 14px;
+            font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .form-control {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
         
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
         
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            margin-top: 40px;
-            padding-top: 25px;
-            border-top: 1px solid #e9ecef;
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 3000;
         }
         
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(52, 152, 219, 0.3);
-        }
-        
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-        
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 14px;
-        }
-        
-        .alert {
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
+        .toast {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             display: flex;
             align-items: center;
-            gap: 15px;
-            animation: slideDown 0.3s ease;
+            gap: 1rem;
+            animation: toastSlide 0.3s ease;
+            min-width: 300px;
+            border-left: 4px solid var(--primary);
         }
         
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
+        .toast.warning { border-color: var(--warning); }
+        
+        @keyframes toastSlide {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
         
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 5px solid #28a745;
+        .toast-icon {
+            font-size: 1.25rem;
         }
         
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 5px solid #dc3545;
-        }
-        
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border-left: 5px solid #ffc107;
-        }
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .toast.warning .toast-icon { color: var(--warning); }
         
         /* Loading States */
         .loading {
             text-align: center;
-            padding: 60px;
-            color: #7f8c8d;
+            padding: 3rem;
+            color: var(--text-light);
         }
         
         .loading i {
-            font-size: 40px;
-            margin-bottom: 20px;
+            font-size: 3rem;
+            margin-bottom: 1rem;
             color: var(--primary);
             animation: spin 1s linear infinite;
         }
         
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
         
         /* Responsive */
-        @media (max-width: 1200px) {
-            .admin-body {
+        @media (max-width: 1024px) {
+            .dashboard {
                 grid-template-columns: 1fr;
             }
             
             .sidebar {
                 display: none;
             }
-        }
-        
-        @media (max-width: 768px) {
-            .admin-header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
+            
+            .main-content {
+                grid-column: 1;
+                padding: 1rem;
             }
             
-            .header-stats {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .category-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-row {
+            .products-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -527,175 +578,228 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="admin-wrapper">
-        <div class="admin-container">
-            <!-- Header -->
-            <div class="admin-header">
-                <div class="header-left">
-                    <h1><i class="fas fa-store"></i> JMPOTTERS Admin Dashboard</h1>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Dashboard Layout -->
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-dark">
+            <div class="brand">
+                <h1><i class="fas fa-store-alt"></i> JMPOTTERS</h1>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" data-section="overview">
+                            <i class="fas fa-chart-pie"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="products">
+                            <i class="fas fa-box"></i>
+                            Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="categories">
+                            <i class="fas fa-tags"></i>
+                            Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="orders">
+                            <i class="fas fa-shopping-cart"></i>
+                            Orders
+                            <span class="badge" style="margin-left: auto; background: var(--primary); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">12</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="customers">
+                            <i class="fas fa-users"></i>
+                            Customers
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="analytics">
+                            <i class="fas fa-chart-line"></i>
+                            Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="settings">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div style="position: absolute; bottom: 2rem; left: 0; right: 0; padding: 0 2rem;">
+                <div class="connection-status" style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 12px; text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <div id="dbStatus" style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></div>
+                        <span>Supabase Connected</span>
+                    </div>
+                    <small style="font-size: 0.75rem; color: #9ca3af;">Sync: <span id="lastSync">Just now</span></small>
                 </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header glass">
+                <div class="header-title">
+                    <h1>Stock Management Dashboard</h1>
+                    <p>Manage inventory, track stock levels, and update product details in real-time</p>
+                </div>
+                
                 <div class="header-stats">
-                    <div class="stat-item">
+                    <div class="stat-card">
                         <div class="stat-value" id="totalProducts">0</div>
-                        <div class="stat-label">Products</div>
+                        <div class="stat-label">Total Products</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="totalCategories">6</div>
-                        <div class="stat-label">Categories</div>
-                    </div>
-                    <div class="stat-item">
+                    <div class="stat-card">
                         <div class="stat-value" id="lowStock">0</div>
                         <div class="stat-label">Low Stock</div>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-card">
                         <div class="stat-value" id="outOfStock">0</div>
                         <div class="stat-label">Out of Stock</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="categoriesCount">6</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <h3 class="action-title">Add New Product</h3>
+                    <p class="action-description">Create new product with variants, pricing, and images</p>
+                    <button class="btn btn-primary" onclick="AdminDashboard.openCreateModal()">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
+                
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3 class="action-title">Bulk Update</h3>
+                    <p class="action-description">Update multiple products at once with CSV import</p>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-upload"></i> Import CSV
+                    </button>
+                </div>
+                
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 class="action-title">Stock Analytics</h3>
+                    <p class="action-description">View stock trends and predict restock needs</p>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-chart-line"></i> View Analytics
+                    </button>
+                </div>
+                
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3 class="action-title">Stock Alerts</h3>
+                    <p class="action-description">Set up alerts for low stock levels</p>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-cog"></i> Configure
+                    </button>
                 </div>
             </div>
             
-            <!-- Body -->
-            <div class="admin-body">
-                <!-- Sidebar -->
-                <div class="sidebar">
-                    <ul class="nav-menu">
-                        <li class="nav-item active" data-tab="stock">
-                            <i class="fas fa-boxes"></i> Stock Management
-                        </li>
-                        <li class="nav-item" data-tab="products">
-                            <i class="fas fa-box"></i> Product Management
-                        </li>
-                        <li class="nav-item" data-tab="categories">
-                            <i class="fas fa-tags"></i> Category Management
-                        </li>
-                        <li class="nav-item" data-tab="orders">
-                            <i class="fas fa-shopping-cart"></i> Orders (Dummy)
-                        </li>
-                        <li class="nav-item" data-tab="analytics">
-                            <i class="fas fa-chart-line"></i> Analytics (Dummy)
-                        </li>
-                        <li class="nav-item" data-tab="settings">
-                            <i class="fas fa-cog"></i> Settings
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Main Content -->
-                <div class="main-content">
-                    <!-- Tabs -->
-                    <div class="tabs" id="contentTabs">
-                        <button class="tab active" data-tab="stock">Stock Management</button>
-                        <button class="tab" data-tab="quick-edit">Quick Edit</button>
-                        <button class="tab" data-tab="bulk-update">Bulk Update</button>
-                    </div>
-                    
-                    <!-- Alerts Container -->
-                    <div id="alertsContainer"></div>
-                    
-                    <!-- Stock Management Content -->
-                    <div id="stockContent" class="tab-content">
-                        <div class="content-header">
-                            <h2>Stock Management</h2>
-                            <p>Manage inventory across all categories. Footwear products require color and size tracking.</p>
-                        </div>
-                        
-                        <!-- Category Filters -->
-                        <div style="margin-bottom: 30px;">
-                            <select id="categoryFilter" class="form-control" style="max-width: 300px;">
-                                <option value="">All Categories</option>
-                                <!-- Categories will be loaded here -->
-                            </select>
-                        </div>
-                        
-                        <!-- Categories Grid -->
-                        <div class="category-cards" id="categoriesGrid">
-                            <!-- Categories will be loaded here -->
-                            <div class="loading">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading categories and products...</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Other tab contents (dummy for now) -->
-                    <div id="otherContent" style="display: none;">
-                        <!-- Other tabs will be implemented later -->
-                    </div>
+            <!-- Category Tabs -->
+            <div class="category-tabs" id="categoryTabs">
+                <button class="category-tab active" data-category="all">
+                    <i class="fas fa-th"></i> All Products
+                </button>
+                <!-- Categories will be loaded here -->
+            </div>
+            
+            <!-- Products Grid -->
+            <div class="products-grid" id="productsGrid">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading products...</p>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
     
     <!-- Product Edit Modal -->
-    <div class="modal-overlay" id="productModal">
+    <div class="modal-overlay" id="editModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Edit Product</h3>
-                <button class="close-modal" onclick="AdminDashboard.closeModal()">
+                <h2 id="modalTitle">Edit Product</h2>
+                <button class="btn btn-outline btn-sm" onclick="AdminDashboard.closeModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="productForm">
-                    <input type="hidden" id="editProductId">
-                    <input type="hidden" id="editCategoryId">
-                    <input type="hidden" id="editIsFootwear">
+                <form id="productForm" onsubmit="return AdminDashboard.handleSubmit(event)">
+                    <input type="hidden" id="productId">
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Product Name</label>
-                            <input type="text" id="editName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Price (₦)</label>
-                            <input type="number" id="editPrice" class="form-control" min="0" step="100" required>
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" id="productName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Price (₦)</label>
+                        <input type="number" id="productPrice" class="form-control" min="0" step="100" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="productCategory" class="form-control" required>
+                            <!-- Categories will be loaded here -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Stock Status</label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="radio" name="stockStatus" value="in_stock" checked> In Stock
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="radio" name="stockStatus" value="low_stock"> Low Stock
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="radio" name="stockStatus" value="out_of_stock"> Out of Stock
+                            </label>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label>Description</label>
-                        <textarea id="editDescription" class="form-control" rows="3"></textarea>
+                        <label class="form-label">Stock Quantity</label>
+                        <input type="number" id="stockQuantity" class="form-control" min="0" value="0">
                     </div>
                     
-                    <!-- For Footwear: Color & Size Management -->
-                    <div id="footwearSection" style="display: none;">
-                        <h4 style="margin: 30px 0 20px; color: var(--dark);">Footwear Variants</h4>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Colors</label>
-                                <div id="colorManagement">
-                                    <!-- Colors will be loaded here -->
-                                </div>
-                                <button type="button" class="btn btn-sm" onclick="AdminDashboard.addColorInput()" style="margin-top: 10px;">
-                                    <i class="fas fa-plus"></i> Add Color
-                                </button>
-                            </div>
-                            <div class="form-group">
-                                <label>Sizes (with stock)</label>
-                                <div id="sizeManagement">
-                                    <!-- Sizes will be loaded here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- For Non-Footwear: Simple Stock -->
-                    <div id="simpleStockSection" style="display: none;">
-                        <div class="form-group">
-                            <label>Stock Quantity</label>
-                            <input type="number" id="editStock" class="form-control" min="0" value="0">
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn" onclick="AdminDashboard.closeModal()">
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="button" class="btn btn-outline" style="flex: 1;" onclick="AdminDashboard.closeModal()">
                             Cancel
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">
                             <i class="fas fa-save"></i> Save Changes
                         </button>
                     </div>
@@ -708,92 +812,78 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
     <script>
-        // Admin Dashboard Singleton
-        const AdminDashboard = (function() {
-            let instance;
-            let supabase;
-            let categories = [];
-            let products = [];
+        // Enhanced Admin Dashboard with Working Write Operations
+        class AdminDashboard {
+            static supabase = null;
+            static categories = [];
+            static products = [];
+            static currentCategory = 'all';
             
-            function init() {
-                if (instance) return instance;
-                
+            static async init() {
                 console.log('🚀 Initializing Admin Dashboard...');
                 
-                // Initialize Supabase client
-                supabase = window.supabase.createClient(
-                    'https://tmpggeeuwdvlngvfncaa.supabase.co',
-                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
-                );
-                
-                // Set up event listeners
-                setupEventListeners();
-                
-                // Load initial data
-                loadDashboard();
-                
-                instance = {
-                    supabase,
-                    loadDashboard,
-                    showAlert,
-                    closeModal,
-                    openProductEdit,
-                    updateProduct,
-                    addColorInput,
-                    updateStock
-                };
-                
-                return instance;
-            }
-            
-            function setupEventListeners() {
-                // Tab navigation
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                        this.classList.add('active');
-                        // For now, only stock management is implemented
-                        showAlert('Feature coming soon!', 'warning');
-                    });
-                });
-                
-                // Content tabs
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.addEventListener('click', function() {
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        this.classList.add('active');
-                        // For now, only show stock content
-                        showAlert('Feature coming soon!', 'warning');
-                    });
-                });
-                
-                // Category filter
-                document.getElementById('categoryFilter')?.addEventListener('change', function() {
-                    displayProductsByCategory(this.value);
-                });
-                
-                // Product form submission
-                document.getElementById('productForm')?.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    updateProduct();
-                });
-            }
-            
-            async function loadDashboard() {
+                // Initialize Supabase with error handling
                 try {
-                    showAlert('Loading dashboard data...', 'info');
+                    this.supabase = window.supabase.createClient(
+                        'https://tmpggeeuwdvlngvfncaa.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+                    );
                     
+                    // Test connection immediately
+                    await this.testConnection();
+                    
+                    // Setup event listeners
+                    this.setupEventListeners();
+                    
+                    // Load dashboard data
+                    await this.loadDashboard();
+                    
+                } catch (error) {
+                    this.showToast('Failed to initialize dashboard: ' + error.message, 'error');
+                    console.error('Initialization error:', error);
+                }
+            }
+            
+            static async testConnection() {
+                try {
+                    console.log('🔌 Testing Supabase connection...');
+                    
+                    const { data, error } = await this.supabase
+                        .from('products')
+                        .select('count', { count: 'exact', head: true });
+                    
+                    if (error) {
+                        if (error.code === '42501') {
+                            throw new Error('RLS Policy Error: Please disable RLS in Supabase SQL Editor');
+                        }
+                        throw error;
+                    }
+                    
+                    console.log('✅ Supabase connection successful');
+                    document.getElementById('dbStatus').style.background = '#10b981';
+                    
+                } catch (error) {
+                    console.error('❌ Connection test failed:', error);
+                    document.getElementById('dbStatus').style.background = '#ef4444';
+                    this.showToast('Database Connection Failed: ' + error.message, 'error');
+                }
+            }
+            
+            static async loadDashboard() {
+                this.showToast('Loading dashboard data...', 'info');
+                
+                try {
                     // Load categories
-                    const { data: cats, error: catError } = await supabase
+                    const { data: categories, error: catError } = await this.supabase
                         .from('categories')
                         .select('*')
                         .order('name');
                     
                     if (catError) throw catError;
-                    categories = cats;
+                    this.categories = categories;
                     
                     // Load products with category info
-                    const { data: prods, error: prodError } = await supabase
+                    const { data: products, error: prodError } = await this.supabase
                         .from('products')
                         .select(`
                             *,
@@ -802,471 +892,347 @@
                         .order('name');
                     
                     if (prodError) throw prodError;
-                    products = prods;
+                    this.products = products;
                     
-                    // Update stats
-                    updateStats();
+                    // Update UI
+                    this.updateStats();
+                    this.renderCategoryTabs();
+                    this.renderProducts();
                     
-                    // Display categories and products
-                    displayCategories();
-                    populateCategoryFilter();
-                    
-                    showAlert('Dashboard loaded successfully!', 'success');
+                    this.showToast('Dashboard loaded successfully!', 'success');
                     
                 } catch (error) {
-                    console.error('Error loading dashboard:', error);
-                    showAlert(`Failed to load data: ${error.message}`, 'error');
+                    this.showToast('Failed to load data: ' + error.message, 'error');
+                    console.error('Load error:', error);
                 }
             }
             
-            function updateStats() {
-                const totalProducts = products.length;
-                const totalCategories = categories.length;
-                
-                // Calculate low stock and out of stock
-                let lowStock = 0;
-                let outOfStock = 0;
-                
-                // This logic depends on your stock tracking method
-                // For now, using a placeholder
-                lowStock = Math.floor(totalProducts * 0.1); // 10% low stock
-                outOfStock = Math.floor(totalProducts * 0.05); // 5% out of stock
+            static updateStats() {
+                const totalProducts = this.products.length;
+                const lowStock = this.products.filter(p => (p.stock || 0) < 10 && (p.stock || 0) > 0).length;
+                const outOfStock = this.products.filter(p => (p.stock || 0) === 0).length;
                 
                 document.getElementById('totalProducts').textContent = totalProducts;
-                document.getElementById('totalCategories').textContent = totalCategories;
                 document.getElementById('lowStock').textContent = lowStock;
                 document.getElementById('outOfStock').textContent = outOfStock;
+                document.getElementById('categoriesCount').textContent = this.categories.length;
             }
             
-            function displayCategories() {
-                const container = document.getElementById('categoriesGrid');
+            static renderCategoryTabs() {
+                const container = document.getElementById('categoryTabs');
                 if (!container) return;
                 
-                let html = '';
-                
-                categories.forEach(category => {
-                    const categoryProducts = products.filter(p => p.category_id === category.id);
-                    const categorySlug = category.slug || category.name.toLowerCase();
-                    
-                    // Check if it's footwear category
-                    const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
-                    
-                    html += `
-                        <div class="category-card">
-                            <div class="category-header">
-                                <div class="category-title">
-                                    <i class="fas fa-${isFootwear ? 'shoe-prints' : 'tag'}"></i>
-                                    ${category.name}
-                                </div>
-                                <div class="category-count">${categoryProducts.length} products</div>
-                            </div>
-                            <div class="category-products">
-                    `;
-                    
-                    if (categoryProducts.length === 0) {
-                        html += `<div class="loading">No products in this category</div>`;
-                    } else {
-                        categoryProducts.forEach(product => {
-                            const stockClass = product.stock > 10 ? 'stock-ok' : 
-                                             product.stock > 0 ? 'stock-low' : 'stock-out';
-                            const stockText = product.stock > 10 ? 'In stock' : 
-                                            product.stock > 0 ? 'Low stock' : 'Out of stock';
-                            
-                            html += `
-                                <div class="product-item" data-product-id="${product.id}">
-                                    <div class="product-info">
-                                        <h4>${product.name}</h4>
-                                        <div class="product-meta">
-                                            <span class="product-price">₦${product.price?.toLocaleString() || '0'}</span>
-                                            <span class="product-stock ${stockClass}">${stockText} (${product.stock || 0})</span>
-                                            ${isFootwear ? '<span><i class="fas fa-palette"></i> Color/Size</span>' : ''}
-                                        </div>
-                                    </div>
-                                    <div class="product-actions">
-                                        <button class="btn btn-sm" onclick="AdminDashboard.openProductEdit(${product.id}, ${isFootwear})">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="AdminDashboard.deleteProduct(${product.id})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    }
-                    
-                    html += `</div></div>`;
-                });
-                
-                container.innerHTML = html;
-            }
-            
-            function populateCategoryFilter() {
-                const filter = document.getElementById('categoryFilter');
-                if (!filter) return;
-                
-                let options = '<option value="">All Categories</option>';
-                categories.forEach(category => {
-                    options += `<option value="${category.id}">${category.name}</option>`;
-                });
-                
-                filter.innerHTML = options;
-            }
-            
-            function displayProductsByCategory(categoryId) {
-                const filteredProducts = categoryId ? 
-                    products.filter(p => p.category_id === parseInt(categoryId)) : 
-                    products;
-                
-                // Update display based on filter
-                // This is a simplified version - you might want to hide/show categories
-            }
-            
-            async function openProductEdit(productId, isFootwear = false) {
-                try {
-                    const product = products.find(p => p.id === productId);
-                    if (!product) {
-                        showAlert('Product not found!', 'error');
-                        return;
-                    }
-                    
-                    // Set modal title
-                    document.getElementById('modalTitle').textContent = `Edit: ${product.name}`;
-                    document.getElementById('editProductId').value = product.id;
-                    document.getElementById('editCategoryId').value = product.category_id;
-                    document.getElementById('editIsFootwear').value = isFootwear;
-                    document.getElementById('editName').value = product.name || '';
-                    document.getElementById('editPrice').value = product.price || 0;
-                    document.getElementById('editDescription').value = product.description || '';
-                    document.getElementById('editStock').value = product.stock || 0;
-                    
-                    // Show/hide appropriate sections
-                    if (isFootwear) {
-                        document.getElementById('footwearSection').style.display = 'block';
-                        document.getElementById('simpleStockSection').style.display = 'none';
-                        
-                        // Load colors for this product
-                        await loadProductColors(productId);
-                        // Load sizes for this product
-                        await loadProductSizes(productId);
-                    } else {
-                        document.getElementById('footwearSection').style.display = 'none';
-                        document.getElementById('simpleStockSection').style.display = 'block';
-                    }
-                    
-                    // Show modal
-                    document.getElementById('productModal').style.display = 'flex';
-                    
-                } catch (error) {
-                    console.error('Error opening product edit:', error);
-                    showAlert(`Failed to load product details: ${error.message}`, 'error');
-                }
-            }
-            
-            async function loadProductColors(productId) {
-                try {
-                    const { data: colors, error } = await supabase
-                        .from('product_colors')
-                        .select('*')
-                        .eq('product_id', productId)
-                        .order('color_name');
-                    
-                    if (error) throw error;
-                    
-                    const container = document.getElementById('colorManagement');
-                    if (!container) return;
-                    
-                    let html = '';
-                    colors.forEach(color => {
-                        html += `
-                            <div class="color-item" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                                <input type="color" value="${color.color_code || '#000000'}" 
-                                       onchange="AdminDashboard.updateColor(${color.id}, this.value)">
-                                <input type="text" value="${color.color_name}" 
-                                       onchange="AdminDashboard.updateColorName(${color.id}, this.value)"
-                                       class="form-control" style="flex: 1;">
-                                <button class="btn btn-danger btn-sm" onclick="AdminDashboard.deleteColor(${color.id})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        `;
-                    });
-                    
-                    container.innerHTML = html || '<p>No colors defined</p>';
-                    
-                } catch (error) {
-                    console.error('Error loading colors:', error);
-                    document.getElementById('colorManagement').innerHTML = 
-                        `<p class="error">Failed to load colors: ${error.message}</p>`;
-                }
-            }
-            
-            async function loadProductSizes(productId) {
-                try {
-                    const { data: sizes, error } = await supabase
-                        .from('product_sizes')
-                        .select('*')
-                        .eq('product_id', productId)
-                        .order('size_value');
-                    
-                    if (error) throw error;
-                    
-                    const container = document.getElementById('sizeManagement');
-                    if (!container) return;
-                    
-                    let html = '<div class="size-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">';
-                    
-                    // Common shoe sizes
-                    const commonSizes = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
-                    
-                    commonSizes.forEach(size => {
-                        const sizeData = sizes.find(s => s.size_value == size);
-                        const stock = sizeData ? sizeData.stock_quantity : 0;
-                        const sizeId = sizeData ? sizeData.id : null;
-                        
-                        html += `
-                            <div class="size-item" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
-                                <label style="font-weight: 600; display: block; margin-bottom: 5px;">Size ${size}</label>
-                                <input type="number" value="${stock}" min="0" 
-                                       onchange="AdminDashboard.updateSizeStock(${productId}, ${size}, this.value, ${sizeId})"
-                                       class="form-control" placeholder="Stock">
-                            </div>
-                        `;
-                    });
-                    
-                    html += '</div>';
-                    container.innerHTML = html;
-                    
-                } catch (error) {
-                    console.error('Error loading sizes:', error);
-                    document.getElementById('sizeManagement').innerHTML = 
-                        `<p class="error">Failed to load sizes: ${error.message}</p>`;
-                }
-            }
-            
-            async function updateProduct() {
-                const productId = document.getElementById('editProductId').value;
-                const isFootwear = document.getElementById('editIsFootwear').value === 'true';
-                
-                const updates = {
-                    name: document.getElementById('editName').value.trim(),
-                    price: parseFloat(document.getElementById('editPrice').value),
-                    description: document.getElementById('editDescription').value.trim(),
-                    updated_at: new Date().toISOString()
-                };
-                
-                // For non-footwear, update stock in products table
-                if (!isFootwear) {
-                    updates.stock = parseInt(document.getElementById('editStock').value) || 0;
-                }
-                
-                try {
-                    const { error } = await supabase
-                        .from('products')
-                        .update(updates)
-                        .eq('id', productId);
-                    
-                    if (error) throw error;
-                    
-                    showAlert('Product updated successfully!', 'success');
-                    
-                    // Reload dashboard data
-                    await loadDashboard();
-                    
-                    // Close modal
-                    closeModal();
-                    
-                } catch (error) {
-                    console.error('Error updating product:', error);
-                    showAlert(`Failed to update product: ${error.message}`, 'error');
-                }
-            }
-            
-            async function updateStock(productId, stock) {
-                try {
-                    const { error } = await supabase
-                        .from('products')
-                        .update({ stock: parseInt(stock), updated_at: new Date().toISOString() })
-                        .eq('id', productId);
-                    
-                    if (error) throw error;
-                    
-                    showAlert('Stock updated successfully!', 'success');
-                    await loadDashboard();
-                    
-                } catch (error) {
-                    console.error('Error updating stock:', error);
-                    showAlert(`Failed to update stock: ${error.message}`, 'error');
-                }
-            }
-            
-            async function updateSizeStock(productId, sizeValue, stock, sizeId = null) {
-                try {
-                    if (sizeId) {
-                        // Update existing size
-                        const { error } = await supabase
-                            .from('product_sizes')
-                            .update({ 
-                                stock_quantity: parseInt(stock), 
-                                updated_at: new Date().toISOString() 
-                            })
-                            .eq('id', sizeId);
-                        
-                        if (error) throw error;
-                    } else {
-                        // Create new size entry
-                        // Note: This needs color_id - we need to get the default color
-                        const { data: colors } = await supabase
-                            .from('product_colors')
-                            .select('id')
-                            .eq('product_id', productId)
-                            .limit(1);
-                        
-                        if (colors && colors[0]) {
-                            const { error } = await supabase
-                                .from('product_sizes')
-                                .insert([{
-                                    product_id: productId,
-                                    color_id: colors[0].id,
-                                    size_value: sizeValue,
-                                    stock_quantity: parseInt(stock),
-                                    is_available: true
-                                }]);
-                            
-                            if (error) throw error;
-                        }
-                    }
-                    
-                    showAlert('Size stock updated!', 'success');
-                    
-                } catch (error) {
-                    console.error('Error updating size stock:', error);
-                    showAlert(`Failed to update size stock: ${error.message}`, 'error');
-                }
-            }
-            
-            function addColorInput() {
-                const container = document.getElementById('colorManagement');
-                const colorCount = container.children.length;
-                
-                const div = document.createElement('div');
-                div.className = 'color-item';
-                div.style.cssText = 'margin-bottom: 10px; display: flex; align-items: center; gap: 10px;';
-                div.innerHTML = `
-                    <input type="color" value="#000000" class="color-picker">
-                    <input type="text" placeholder="Color name" class="form-control color-name" style="flex: 1;">
-                    <button class="btn btn-success btn-sm" onclick="AdminDashboard.saveNewColor(this)">
-                        <i class="fas fa-check"></i>
+                let tabs = `
+                    <button class="category-tab active" data-category="all">
+                        <i class="fas fa-th"></i> All Products
                     </button>
                 `;
                 
-                container.appendChild(div);
+                this.categories.forEach(category => {
+                    const count = this.products.filter(p => p.category_id === category.id).length;
+                    tabs += `
+                        <button class="category-tab" data-category="${category.id}">
+                            <i class="fas fa-${category.slug.includes('footwear') ? 'shoe-prints' : 'tag'}"></i>
+                            ${category.name}
+                            <span style="margin-left: 0.5rem; background: #e5e7eb; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">${count}</span>
+                        </button>
+                    `;
+                });
+                
+                container.innerHTML = tabs;
+                
+                // Add click handlers
+                container.querySelectorAll('.category-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        this.currentCategory = tab.dataset.category;
+                        this.renderProducts();
+                    });
+                });
             }
             
-            async function saveNewColor(button) {
-                const colorItem = button.closest('.color-item');
-                const colorPicker = colorItem.querySelector('.color-picker');
-                const colorName = colorItem.querySelector('.color-name');
-                const productId = document.getElementById('editProductId').value;
+            static renderProducts() {
+                const container = document.getElementById('productsGrid');
+                if (!container) return;
                 
-                if (!colorName.value.trim()) {
-                    showAlert('Please enter a color name', 'warning');
+                // Filter products by category
+                let filteredProducts = this.products;
+                if (this.currentCategory !== 'all') {
+                    filteredProducts = this.products.filter(p => p.category_id == this.currentCategory);
+                }
+                
+                if (filteredProducts.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                            <i class="fas fa-box-open" style="font-size: 3rem; color: #9ca3af; margin-bottom: 1rem;"></i>
+                            <h3>No products found</h3>
+                            <p>Try selecting a different category</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let productsHTML = '';
+                
+                filteredProducts.forEach(product => {
+                    const stock = product.stock || 0;
+                    const stockClass = stock > 10 ? 'stock-high' : stock > 0 ? 'stock-medium' : 'stock-low';
+                    const stockText = stock > 10 ? 'In Stock' : stock > 0 ? 'Low Stock' : 'Out of Stock';
+                    const categoryName = product.category?.name || 'Uncategorized';
+                    
+                    productsHTML += `
+                        <div class="product-card">
+                            <div class="product-header">
+                                <div class="product-title">
+                                    <span>${product.name}</span>
+                                    <span class="product-category">${categoryName}</span>
+                                </div>
+                            </div>
+                            <div class="product-body">
+                                <div class="product-info">
+                                    <div class="product-price">₦${product.price?.toLocaleString() || '0'}</div>
+                                    <div>
+                                        <span class="product-stock ${stockClass}">${stockText} (${stock})</span>
+                                    </div>
+                                    <p style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280;">${product.description || 'No description'}</p>
+                                </div>
+                                <div class="product-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="AdminDashboard.editProduct(${product.id})">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="btn btn-outline btn-sm" onclick="AdminDashboard.viewDetails(${product.id})">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="AdminDashboard.deleteProduct(${product.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = productsHTML;
+            }
+            
+            static async editProduct(productId) {
+                try {
+                    const product = this.products.find(p => p.id === productId);
+                    if (!product) {
+                        this.showToast('Product not found!', 'error');
+                        return;
+                    }
+                    
+                    // Populate modal
+                    document.getElementById('productId').value = product.id;
+                    document.getElementById('productName').value = product.name || '';
+                    document.getElementById('productPrice').value = product.price || 0;
+                    document.getElementById('stockQuantity').value = product.stock || 0;
+                    
+                    // Populate category dropdown
+                    const categorySelect = document.getElementById('productCategory');
+                    categorySelect.innerHTML = this.categories.map(cat => 
+                        `<option value="${cat.id}" ${cat.id === product.category_id ? 'selected' : ''}>${cat.name}</option>`
+                    ).join('');
+                    
+                    // Set stock status
+                    const stock = product.stock || 0;
+                    const status = stock > 10 ? 'in_stock' : stock > 0 ? 'low_stock' : 'out_of_stock';
+                    document.querySelector(`input[name="stockStatus"][value="${status}"]`).checked = true;
+                    
+                    // Show modal
+                    document.getElementById('modalTitle').textContent = `Edit: ${product.name}`;
+                    document.getElementById('editModal').style.display = 'flex';
+                    
+                } catch (error) {
+                    this.showToast('Failed to load product: ' + error.message, 'error');
+                }
+            }
+            
+            static async handleSubmit(event) {
+                event.preventDefault();
+                
+                const productId = document.getElementById('productId').value;
+                const updates = {
+                    name: document.getElementById('productName').value.trim(),
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    category_id: parseInt(document.getElementById('productCategory').value),
+                    stock: parseInt(document.getElementById('stockQuantity').value) || 0,
+                    updated_at: new Date().toISOString()
+                };
+                
+                // Validate
+                if (!updates.name || updates.price <= 0) {
+                    this.showToast('Please fill all required fields correctly', 'warning');
                     return;
                 }
                 
                 try {
-                    const { error } = await supabase
-                        .from('product_colors')
-                        .insert([{
-                            product_id: productId,
-                            color_name: colorName.value.trim(),
-                            color_code: colorPicker.value,
-                            is_default: false,
-                            sort_order: 0
-                        }]);
+                    console.log('📝 Attempting update:', updates);
                     
-                    if (error) throw error;
+                    const { data, error } = await this.supabase
+                        .from('products')
+                        .update(updates)
+                        .eq('id', productId)
+                        .select();
                     
-                    showAlert('Color added successfully!', 'success');
-                    await loadProductColors(productId);
+                    if (error) {
+                        console.error('❌ Supabase Error:', error);
+                        
+                        if (error.code === '42501') {
+                            this.showToast('Permission Denied: Disable RLS in Supabase', 'error');
+                            alert('🚨 RLS Error: Go to Supabase SQL Editor and run:\n\nALTER TABLE products DISABLE ROW LEVEL SECURITY;\n\nThen refresh this page.');
+                            return;
+                        }
+                        
+                        throw error;
+                    }
+                    
+                    console.log('✅ Update successful:', data);
+                    
+                    // Update local data
+                    const index = this.products.findIndex(p => p.id === productId);
+                    if (index !== -1) {
+                        this.products[index] = { ...this.products[index], ...updates };
+                    }
+                    
+                    // Update UI
+                    this.updateStats();
+                    this.renderProducts();
+                    
+                    // Show success and close modal
+                    this.showToast('Product updated successfully!', 'success');
+                    this.closeModal();
                     
                 } catch (error) {
-                    console.error('Error adding color:', error);
-                    showAlert(`Failed to add color: ${error.message}`, 'error');
+                    console.error('❌ Update failed:', error);
+                    this.showToast('Failed to update product: ' + error.message, 'error');
                 }
             }
             
-            async function deleteProduct(productId) {
+            static async deleteProduct(productId) {
                 if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
                     return;
                 }
                 
                 try {
-                    const { error } = await supabase
+                    const { error } = await this.supabase
                         .from('products')
                         .delete()
                         .eq('id', productId);
                     
-                    if (error) throw error;
+                    if (error) {
+                        if (error.code === '42501') {
+                            this.showToast('Permission Denied: Disable RLS for delete operations', 'error');
+                            return;
+                        }
+                        throw error;
+                    }
                     
-                    showAlert('Product deleted successfully!', 'success');
-                    await loadDashboard();
+                    // Remove from local array
+                    this.products = this.products.filter(p => p.id !== productId);
+                    
+                    // Update UI
+                    this.updateStats();
+                    this.renderProducts();
+                    
+                    this.showToast('Product deleted successfully!', 'success');
                     
                 } catch (error) {
-                    console.error('Error deleting product:', error);
-                    showAlert(`Failed to delete product: ${error.message}`, 'error');
+                    this.showToast('Failed to delete product: ' + error.message, 'error');
                 }
             }
             
-            function showAlert(message, type = 'info') {
-                const container = document.getElementById('alertsContainer');
+            static async testWrite() {
+                // Simple test function for debugging
+                const testData = {
+                    name: 'Test Product ' + Date.now(),
+                    price: 1000,
+                    stock: 10,
+                    category_id: 1,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                
+                try {
+                    console.log('🧪 Testing write operation...');
+                    
+                    const { data, error } = await this.supabase
+                        .from('products')
+                        .insert([testData])
+                        .select();
+                    
+                    if (error) {
+                        console.error('❌ Write test failed:', error);
+                        this.showToast('Write test failed: ' + error.message, 'error');
+                        return;
+                    }
+                    
+                    console.log('✅ Write test successful:', data);
+                    this.showToast('Write test successful!', 'success');
+                    
+                    // Reload data
+                    await this.loadDashboard();
+                    
+                } catch (error) {
+                    console.error('❌ Unexpected error:', error);
+                    this.showToast('Unexpected error: ' + error.message, 'error');
+                }
+            }
+            
+            static showToast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
                 if (!container) return;
                 
-                const alert = document.createElement('div');
-                alert.className = `alert alert-${type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'success'}`;
-                
-                const icon = type === 'error' ? 'exclamation-triangle' : 
-                            type === 'warning' ? 'exclamation-circle' : 
-                            type === 'info' ? 'info-circle' : 'check-circle';
-                
-                alert.innerHTML = `
-                    <i class="fas fa-${icon}"></i>
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    </div>
                     <div>${message}</div>
                 `;
                 
-                container.appendChild(alert);
+                container.appendChild(toast);
                 
-                // Auto-remove after 5 seconds
-                setTimeout(() => alert.remove(), 5000);
+                // Auto-remove
+                setTimeout(() => {
+                    toast.style.animation = 'toastSlide 0.3s ease reverse';
+                    setTimeout(() => toast.remove(), 300);
+                }, 5000);
             }
             
-            function closeModal() {
-                document.getElementById('productModal').style.display = 'none';
+            static closeModal() {
+                document.getElementById('editModal').style.display = 'none';
+                document.getElementById('productForm').reset();
             }
             
-            return {
-                init,
-                showAlert,
-                closeModal,
-                openProductEdit,
-                updateProduct,
-                addColorInput,
-                updateStock,
-                updateSizeStock,
-                saveNewColor,
-                deleteProduct
-            };
-        })();
+            static setupEventListeners() {
+                // Navigation
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                        // Implement section switching here
+                    });
+                });
+                
+                // Add test button to header
+                const header = document.querySelector('.header');
+                const testBtn = document.createElement('button');
+                testBtn.className = 'btn btn-warning btn-sm';
+                testBtn.innerHTML = '<i class="fas fa-bug"></i> Test Write';
+                testBtn.onclick = () => this.testWrite();
+                testBtn.style.marginLeft = 'auto';
+                header.querySelector('.header-title').appendChild(testBtn);
+            }
+        }
         
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
             AdminDashboard.init();
-        });
-        
-        // Global error handler
-        window.addEventListener('error', function(event) {
-            console.error('Global error:', event.error);
-            AdminDashboard.showAlert(`JavaScript Error: ${event.message}`, 'error');
         });
     </script>
 </body>
