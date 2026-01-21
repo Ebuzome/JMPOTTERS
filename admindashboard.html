@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>JMPOTTERS Admin Dashboard | Stock Management</title>
+    <title>JMPOTTERS Admin Dashboard | Professional Stock Management</title>
     <style>
         :root {
             --primary: #3498db;
@@ -22,7 +22,7 @@
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
@@ -36,14 +36,16 @@
         .admin-container {
             max-width: 1600px;
             margin: 0 auto;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .admin-header {
-            background: var(--dark);
+            background: linear-gradient(135deg, var(--dark), #34495e);
             color: white;
             padding: 25px 40px;
             display: flex;
@@ -80,6 +82,11 @@
             text-align: center;
             min-width: 120px;
             backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
         }
         
         .stat-value {
@@ -102,8 +109,8 @@
         }
         
         .sidebar {
-            background: #f8f9fa;
-            border-right: 1px solid #e9ecef;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-right: 1px solid rgba(255,255,255,0.1);
             padding: 30px 0;
         }
         
@@ -119,15 +126,17 @@
             cursor: pointer;
             transition: all 0.3s;
             border-left: 4px solid transparent;
+            color: #ecf0f1;
+            text-decoration: none;
         }
         
         .nav-item:hover {
-            background: #e9ecef;
+            background: rgba(255,255,255,0.1);
             border-left-color: var(--primary);
         }
         
         .nav-item.active {
-            background: var(--primary);
+            background: linear-gradient(90deg, rgba(52, 152, 219, 0.2), transparent);
             color: white;
             border-left-color: var(--success);
         }
@@ -150,6 +159,7 @@
             font-size: 28px;
             color: var(--dark);
             margin-bottom: 10px;
+            font-weight: 700;
         }
         
         .content-header p {
@@ -157,42 +167,45 @@
             font-size: 16px;
         }
         
-        /* Tabs */
-        .tabs {
+        /* Category Filter */
+        .category-filter {
             display: flex;
-            border-bottom: 2px solid #e9ecef;
+            gap: 10px;
             margin-bottom: 30px;
-            gap: 5px;
+            flex-wrap: wrap;
         }
         
-        .tab {
-            padding: 15px 30px;
-            background: none;
-            border: none;
-            font-size: 16px;
+        .cat-btn {
+            padding: 12px 24px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-weight: 600;
             cursor: pointer;
-            position: relative;
-            color: #7f8c8d;
-            font-weight: 500;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .tab:hover {
-            color: var(--primary);
+        .cat-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
         }
         
-        .tab.active {
-            color: var(--primary);
+        .cat-btn.active {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
         }
         
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--primary);
+        .cat-count {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
         }
         
         /* Category Cards */
@@ -208,17 +221,18 @@
             border: 1px solid #e9ecef;
             border-radius: 15px;
             overflow: hidden;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
         
         .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: var(--primary);
         }
         
         .category-header {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #2980b9);
             color: white;
             padding: 20px;
             display: flex;
@@ -257,13 +271,14 @@
         }
         
         .product-item:hover {
-            background: #f8f9fa;
+            background: linear-gradient(90deg, rgba(52, 152, 219, 0.05), transparent);
         }
         
         .product-info h4 {
             font-size: 15px;
             margin-bottom: 5px;
             color: #2c3e50;
+            font-weight: 600;
         }
         
         .product-meta {
@@ -274,24 +289,24 @@
         }
         
         .product-price {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--success);
         }
         
         .product-stock {
-            padding: 3px 10px;
+            padding: 4px 10px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
         }
         
-        .stock-ok { background: #d4edda; color: #155724; }
-        .stock-low { background: #fff3cd; color: #856404; }
-        .stock-out { background: #f8d7da; color: #721c24; }
+        .stock-high { background: #d4edda; color: #155724; }
+        .stock-medium { background: #fff3cd; color: #856404; }
+        .stock-low { background: #f8d7da; color: #721c24; }
         
         .product-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
         
         /* Modal */
@@ -301,7 +316,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             display: none;
             justify-content: center;
             align-items: center;
@@ -317,11 +332,12 @@
             max-height: 90vh;
             overflow-y: auto;
             animation: modalSlide 0.3s ease;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
         }
         
         @keyframes modalSlide {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from { transform: translateY(50px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
         }
         
         .modal-header {
@@ -330,24 +346,32 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
         }
         
         .modal-header h3 {
             font-size: 24px;
-            color: var(--dark);
+            font-weight: 600;
         }
         
         .close-modal {
-            background: none;
+            background: rgba(255,255,255,0.2);
             border: none;
-            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             cursor: pointer;
-            color: #7f8c8d;
-            transition: color 0.3s;
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
         }
         
         .close-modal:hover {
-            color: var(--danger);
+            background: rgba(255,255,255,0.3);
         }
         
         .modal-body {
@@ -415,23 +439,27 @@
         }
         
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #2980b9);
             color: white;
         }
         
         .btn-primary:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(52, 152, 219, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
         }
         
         .btn-success {
-            background: var(--success);
+            background: linear-gradient(135deg, var(--success), #27ae60);
             color: white;
         }
         
         .btn-danger {
-            background: var(--danger);
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #d35400);
             color: white;
         }
         
@@ -440,40 +468,46 @@
             font-size: 14px;
         }
         
-        .alert {
-            padding: 20px;
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+        }
+        
+        .toast {
+            background: white;
+            padding: 15px 20px;
             border-radius: 10px;
-            margin-bottom: 25px;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             gap: 15px;
-            animation: slideDown 0.3s ease;
+            animation: toastSlide 0.3s ease;
+            min-width: 300px;
+            border-left: 5px solid var(--primary);
         }
         
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
+        .toast.warning { border-color: var(--warning); }
+        
+        @keyframes toastSlide {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 5px solid #28a745;
+        .toast-icon {
+            font-size: 20px;
         }
         
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 5px solid #dc3545;
-        }
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .toast.warning .toast-icon { color: var(--warning); }
         
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border-left: 5px solid #ffc107;
-        }
-        
-        /* Loading States */
+        /* Loading */
         .loading {
             text-align: center;
             padding: 60px;
@@ -492,8 +526,32 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Responsive */
-        @media (max-width: 1200px) {
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e74c3c;
+        }
+        
+        .status-dot.connected { background: #2ecc71; }
+        
+        @media (max-width: 768px) {
             .admin-body {
                 grid-template-columns: 1fr;
             }
@@ -501,9 +559,7 @@
             .sidebar {
                 display: none;
             }
-        }
-        
-        @media (max-width: 768px) {
+            
             .admin-header {
                 flex-direction: column;
                 gap: 20px;
@@ -518,10 +574,6 @@
             .category-cards {
                 grid-template-columns: 1fr;
             }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
     <!-- Font Awesome -->
@@ -530,17 +582,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Connection Status -->
+    <div class="connection-status">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Connecting to Supabase...</span>
+    </div>
+    
     <div class="admin-wrapper">
         <div class="admin-container">
             <!-- Header -->
             <div class="admin-header">
                 <div class="header-left">
                     <h1><i class="fas fa-store"></i> JMPOTTERS Admin Dashboard</h1>
+                    <button class="btn btn-warning btn-sm" onclick="AdminDashboard.testWrite()" style="margin-top: 10px;">
+                        <i class="fas fa-bug"></i> Test Write Operation
+                    </button>
                 </div>
                 <div class="header-stats">
                     <div class="stat-item">
                         <div class="stat-value" id="totalProducts">0</div>
-                        <div class="stat-label">Products</div>
+                        <div class="stat-label">Total Products</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="totalCategories">6</div>
@@ -562,67 +626,49 @@
                 <!-- Sidebar -->
                 <div class="sidebar">
                     <ul class="nav-menu">
-                        <li class="nav-item active" data-tab="stock">
-                            <i class="fas fa-boxes"></i> Stock Management
+                        <li class="nav-item active" onclick="AdminDashboard.showSection('overview')">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard Overview
                         </li>
-                        <li class="nav-item" data-tab="products">
+                        <li class="nav-item" onclick="AdminDashboard.showSection('products')">
                             <i class="fas fa-box"></i> Product Management
                         </li>
-                        <li class="nav-item" data-tab="categories">
+                        <li class="nav-item" onclick="AdminDashboard.showSection('categories')">
                             <i class="fas fa-tags"></i> Category Management
                         </li>
-                        <li class="nav-item" data-tab="orders">
-                            <i class="fas fa-shopping-cart"></i> Orders (Dummy)
+                        <li class="nav-item" onclick="AdminDashboard.showSection('orders')">
+                            <i class="fas fa-shopping-cart"></i> Order Management
                         </li>
-                        <li class="nav-item" data-tab="analytics">
-                            <i class="fas fa-chart-line"></i> Analytics (Dummy)
+                        <li class="nav-item" onclick="AdminDashboard.showSection('analytics')">
+                            <i class="fas fa-chart-line"></i> Sales Analytics
                         </li>
-                        <li class="nav-item" data-tab="settings">
-                            <i class="fas fa-cog"></i> Settings
+                        <li class="nav-item" onclick="AdminDashboard.showSection('settings')">
+                            <i class="fas fa-cogs"></i> Settings
                         </li>
                     </ul>
                 </div>
                 
                 <!-- Main Content -->
                 <div class="main-content">
-                    <!-- Tabs -->
-                    <div class="tabs" id="contentTabs">
-                        <button class="tab active" data-tab="stock">Stock Management</button>
-                        <button class="tab" data-tab="quick-edit">Quick Edit</button>
-                        <button class="tab" data-tab="bulk-update">Bulk Update</button>
+                    <div class="content-header">
+                        <h2>Stock Management Dashboard</h2>
+                        <p>Manage inventory across all product categories. Real-time updates with Supabase backend.</p>
                     </div>
                     
-                    <!-- Alerts Container -->
-                    <div id="alertsContainer"></div>
-                    
-                    <!-- Stock Management Content -->
-                    <div id="stockContent" class="tab-content">
-                        <div class="content-header">
-                            <h2>Stock Management</h2>
-                            <p>Manage inventory across all categories. Footwear products require color and size tracking.</p>
-                        </div>
-                        
-                        <!-- Category Filters -->
-                        <div style="margin-bottom: 30px;">
-                            <select id="categoryFilter" class="form-control" style="max-width: 300px;">
-                                <option value="">All Categories</option>
-                                <!-- Categories will be loaded here -->
-                            </select>
-                        </div>
-                        
-                        <!-- Categories Grid -->
-                        <div class="category-cards" id="categoriesGrid">
-                            <!-- Categories will be loaded here -->
-                            <div class="loading">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading categories and products...</p>
-                            </div>
-                        </div>
+                    <!-- Category Filter -->
+                    <div class="category-filter" id="categoryFilter">
+                        <button class="cat-btn active" data-category="all">
+                            <i class="fas fa-th"></i> All Products
+                            <span class="cat-count" id="countAll">0</span>
+                        </button>
+                        <!-- Categories will be loaded here -->
                     </div>
                     
-                    <!-- Other tab contents (dummy for now) -->
-                    <div id="otherContent" style="display: none;">
-                        <!-- Other tabs will be implemented later -->
+                    <!-- Products Grid -->
+                    <div class="category-cards" id="productsGrid">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading products from Supabase...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -639,19 +685,31 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="productForm">
+                <form id="productForm" onsubmit="return AdminDashboard.saveProduct(event)">
                     <input type="hidden" id="editProductId">
-                    <input type="hidden" id="editCategoryId">
                     <input type="hidden" id="editIsFootwear">
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Product Name</label>
+                            <label>Product Name *</label>
                             <input type="text" id="editName" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Price (₦)</label>
+                            <label>Price (₦) *</label>
                             <input type="number" id="editPrice" class="form-control" min="0" step="100" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select id="editCategory" class="form-control" required>
+                                <!-- Categories will be loaded -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock Quantity</label>
+                            <input type="number" id="editStock" class="form-control" min="0" value="0">
                         </div>
                     </div>
                     
@@ -660,38 +718,16 @@
                         <textarea id="editDescription" class="form-control" rows="3"></textarea>
                     </div>
                     
-                    <!-- For Footwear: Color & Size Management -->
-                    <div id="footwearSection" style="display: none;">
-                        <h4 style="margin: 30px 0 20px; color: var(--dark);">Footwear Variants</h4>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Colors</label>
-                                <div id="colorManagement">
-                                    <!-- Colors will be loaded here -->
-                                </div>
-                                <button type="button" class="btn btn-sm" onclick="AdminDashboard.addColorInput()" style="margin-top: 10px;">
-                                    <i class="fas fa-plus"></i> Add Color
-                                </button>
-                            </div>
-                            <div class="form-group">
-                                <label>Sizes (with stock)</label>
-                                <div id="sizeManagement">
-                                    <!-- Sizes will be loaded here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- For Non-Footwear: Simple Stock -->
-                    <div id="simpleStockSection" style="display: none;">
-                        <div class="form-group">
-                            <label>Stock Quantity</label>
-                            <input type="number" id="editStock" class="form-control" min="0" value="0">
-                        </div>
+                    <!-- Conditional Fields (will be shown based on category) -->
+                    <div id="conditionalFields" style="display: none;">
+                        <!-- Color/Size fields will be added here dynamically -->
                     </div>
                     
                     <div class="form-actions">
+                        <button type="button" class="btn btn-danger" onclick="AdminDashboard.deleteCurrentProduct()">
+                            <i class="fas fa-trash"></i> Delete Product
+                        </button>
+                        <div style="flex: 1;"></div>
                         <button type="button" class="btn" onclick="AdminDashboard.closeModal()">
                             Cancel
                         </button>
@@ -708,81 +744,82 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
     <script>
-        // Admin Dashboard Singleton
+        // Enhanced Admin Dashboard with Working Write Operations
         const AdminDashboard = (function() {
-            let instance;
-            let supabase;
+            let supabase = null;
             let categories = [];
             let products = [];
+            let currentCategory = 'all';
             
             function init() {
-                if (instance) return instance;
-                
                 console.log('🚀 Initializing Admin Dashboard...');
                 
-                // Initialize Supabase client
-                supabase = window.supabase.createClient(
-                    'https://tmpggeeuwdvlngvfncaa.supabase.co',
-                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
-                );
-                
-                // Set up event listeners
-                setupEventListeners();
-                
-                // Load initial data
-                loadDashboard();
-                
-                instance = {
-                    supabase,
-                    loadDashboard,
-                    showAlert,
-                    closeModal,
-                    openProductEdit,
-                    updateProduct,
-                    addColorInput,
-                    updateStock
-                };
-                
-                return instance;
+                try {
+                    // Initialize Supabase client
+                    supabase = window.supabase.createClient(
+                        'https://tmpggeeuwdvlngvfncaa.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+                    );
+                    
+                    // Update connection status
+                    updateConnectionStatus('Connecting...', 'warning');
+                    
+                    // Setup event listeners
+                    setupEventListeners();
+                    
+                    // Test connection and load data
+                    testConnection();
+                    
+                } catch (error) {
+                    console.error('❌ Initialization error:', error);
+                    showToast('Failed to initialize: ' + error.message, 'error');
+                }
             }
             
-            function setupEventListeners() {
-                // Tab navigation
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                        this.classList.add('active');
-                        // For now, only stock management is implemented
-                        showAlert('Feature coming soon!', 'warning');
-                    });
-                });
-                
-                // Content tabs
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.addEventListener('click', function() {
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        this.classList.add('active');
-                        // For now, only show stock content
-                        showAlert('Feature coming soon!', 'warning');
-                    });
-                });
-                
-                // Category filter
-                document.getElementById('categoryFilter')?.addEventListener('change', function() {
-                    displayProductsByCategory(this.value);
-                });
-                
-                // Product form submission
-                document.getElementById('productForm')?.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    updateProduct();
-                });
+            async function testConnection() {
+                try {
+                    console.log('🔌 Testing Supabase connection...');
+                    
+                    const { data, error } = await supabase
+                        .from('products')
+                        .select('count', { count: 'exact', head: true });
+                    
+                    if (error) {
+                        console.error('❌ Connection test failed:', error);
+                        
+                        if (error.code === '42501') {
+                            showToast('RLS Policy Error: Please disable RLS in Supabase', 'error');
+                            updateConnectionStatus('RLS Error', 'error');
+                            
+                            // Show detailed instructions
+                            setTimeout(() => {
+                                alert('🚨 ROW LEVEL SECURITY ERROR\n\nTo fix this:\n\n1. Go to Supabase Dashboard\n2. Open SQL Editor\n3. Run: ALTER TABLE products DISABLE ROW LEVEL SECURITY;\n4. Run: ALTER TABLE product_colors DISABLE ROW LEVEL SECURITY;\n5. Run: ALTER TABLE product_sizes DISABLE ROW LEVEL SECURITY;\n\nThen refresh this page.');
+                            }, 1000);
+                            
+                            return;
+                        }
+                        
+                        throw error;
+                    }
+                    
+                    console.log('✅ Connection successful!');
+                    updateConnectionStatus('Connected', 'success');
+                    showToast('Successfully connected to Supabase!', 'success');
+                    
+                    // Load data
+                    await loadDashboard();
+                    
+                } catch (error) {
+                    console.error('❌ Connection error:', error);
+                    updateConnectionStatus('Connection Failed', 'error');
+                    showToast('Database connection failed: ' + error.message, 'error');
+                }
             }
             
             async function loadDashboard() {
+                showToast('Loading dashboard data...', 'info');
+                
                 try {
-                    showAlert('Loading dashboard data...', 'info');
-                    
                     // Load categories
                     const { data: cats, error: catError } = await supabase
                         .from('categories')
@@ -792,7 +829,7 @@
                     if (catError) throw catError;
                     categories = cats;
                     
-                    // Load products with category info
+                    // Load products
                     const { data: prods, error: prodError } = await supabase
                         .from('products')
                         .select(`
@@ -804,33 +841,24 @@
                     if (prodError) throw prodError;
                     products = prods;
                     
-                    // Update stats
+                    // Update UI
                     updateStats();
+                    renderCategoryFilter();
+                    renderProducts();
                     
-                    // Display categories and products
-                    displayCategories();
-                    populateCategoryFilter();
-                    
-                    showAlert('Dashboard loaded successfully!', 'success');
+                    showToast('Dashboard loaded successfully!', 'success');
                     
                 } catch (error) {
-                    console.error('Error loading dashboard:', error);
-                    showAlert(`Failed to load data: ${error.message}`, 'error');
+                    console.error('❌ Load error:', error);
+                    showToast('Failed to load data: ' + error.message, 'error');
                 }
             }
             
             function updateStats() {
                 const totalProducts = products.length;
                 const totalCategories = categories.length;
-                
-                // Calculate low stock and out of stock
-                let lowStock = 0;
-                let outOfStock = 0;
-                
-                // This logic depends on your stock tracking method
-                // For now, using a placeholder
-                lowStock = Math.floor(totalProducts * 0.1); // 10% low stock
-                outOfStock = Math.floor(totalProducts * 0.05); // 5% out of stock
+                const lowStock = products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) < 10).length;
+                const outOfStock = products.filter(p => (p.stock || 0) === 0).length;
                 
                 document.getElementById('totalProducts').textContent = totalProducts;
                 document.getElementById('totalCategories').textContent = totalCategories;
@@ -838,62 +866,131 @@
                 document.getElementById('outOfStock').textContent = outOfStock;
             }
             
-            function displayCategories() {
-                const container = document.getElementById('categoriesGrid');
+            function renderCategoryFilter() {
+                const container = document.getElementById('categoryFilter');
                 if (!container) return;
                 
-                let html = '';
+                // Count products per category
+                const counts = {};
+                products.forEach(product => {
+                    const catId = product.category_id || 'uncategorized';
+                    counts[catId] = (counts[catId] || 0) + 1;
+                });
+                
+                let html = `
+                    <button class="cat-btn active" data-category="all">
+                        <i class="fas fa-th"></i> All Products
+                        <span class="cat-count" id="countAll">${products.length}</span>
+                    </button>
+                `;
                 
                 categories.forEach(category => {
-                    const categoryProducts = products.filter(p => p.category_id === category.id);
-                    const categorySlug = category.slug || category.name.toLowerCase();
+                    const count = counts[category.id] || 0;
+                    const icon = category.slug.includes('footwear') ? 'shoe-prints' : 'tag';
                     
-                    // Check if it's footwear category
-                    const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
+                    html += `
+                        <button class="cat-btn" data-category="${category.id}">
+                            <i class="fas fa-${icon}"></i> ${category.name}
+                            <span class="cat-count">${count}</span>
+                        </button>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                
+                // Add event listeners
+                container.querySelectorAll('.cat-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Update active state
+                        container.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Filter products
+                        currentCategory = this.dataset.category;
+                        renderProducts();
+                    });
+                });
+            }
+            
+            function renderProducts() {
+                const container = document.getElementById('productsGrid');
+                if (!container) return;
+                
+                // Filter products
+                let filteredProducts = products;
+                if (currentCategory !== 'all') {
+                    filteredProducts = products.filter(p => p.category_id == currentCategory);
+                }
+                
+                if (filteredProducts.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+                            <i class="fas fa-box-open" style="font-size: 48px; color: #bdc3c7; margin-bottom: 20px;"></i>
+                            <h3>No products found</h3>
+                            <p>No products in this category. Try selecting a different category.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Group by category
+                const grouped = {};
+                filteredProducts.forEach(product => {
+                    const catId = product.category_id || 'uncategorized';
+                    if (!grouped[catId]) {
+                        const category = categories.find(c => c.id === catId) || { name: 'Uncategorized', slug: '' };
+                        grouped[catId] = {
+                            category: category,
+                            products: []
+                        };
+                    }
+                    grouped[catId].products.push(product);
+                });
+                
+                // Render category cards
+                let html = '';
+                
+                Object.values(grouped).forEach(group => {
+                    const isFootwear = group.category.slug.includes('footwear');
                     
                     html += `
                         <div class="category-card">
                             <div class="category-header">
                                 <div class="category-title">
                                     <i class="fas fa-${isFootwear ? 'shoe-prints' : 'tag'}"></i>
-                                    ${category.name}
+                                    ${group.category.name}
                                 </div>
-                                <div class="category-count">${categoryProducts.length} products</div>
+                                <div class="category-count">${group.products.length} products</div>
                             </div>
                             <div class="category-products">
                     `;
                     
-                    if (categoryProducts.length === 0) {
-                        html += `<div class="loading">No products in this category</div>`;
-                    } else {
-                        categoryProducts.forEach(product => {
-                            const stockClass = product.stock > 10 ? 'stock-ok' : 
-                                             product.stock > 0 ? 'stock-low' : 'stock-out';
-                            const stockText = product.stock > 10 ? 'In stock' : 
-                                            product.stock > 0 ? 'Low stock' : 'Out of stock';
-                            
-                            html += `
-                                <div class="product-item" data-product-id="${product.id}">
-                                    <div class="product-info">
-                                        <h4>${product.name}</h4>
-                                        <div class="product-meta">
-                                            <span class="product-price">₦${product.price?.toLocaleString() || '0'}</span>
-                                            <span class="product-stock ${stockClass}">${stockText} (${product.stock || 0})</span>
-                                            ${isFootwear ? '<span><i class="fas fa-palette"></i> Color/Size</span>' : ''}
-                                        </div>
-                                    </div>
-                                    <div class="product-actions">
-                                        <button class="btn btn-sm" onclick="AdminDashboard.openProductEdit(${product.id}, ${isFootwear})">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="AdminDashboard.deleteProduct(${product.id})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                    group.products.forEach(product => {
+                        const stock = product.stock || 0;
+                        const stockClass = stock > 10 ? 'stock-high' : stock > 0 ? 'stock-medium' : 'stock-low';
+                        const stockText = stock > 10 ? 'In Stock' : stock > 0 ? 'Low Stock' : 'Out of Stock';
+                        
+                        html += `
+                            <div class="product-item" data-product-id="${product.id}">
+                                <div class="product-info">
+                                    <h4>${product.name}</h4>
+                                    <div class="product-meta">
+                                        <span class="product-price">₦${product.price?.toLocaleString() || '0'}</span>
+                                        <span class="product-stock ${stockClass}">${stockText} (${stock})</span>
+                                        ${isFootwear ? '<span><i class="fas fa-palette"></i> Color/Size Variants</span>' : ''}
                                     </div>
                                 </div>
-                            `;
-                        });
-                    }
+                                <div class="product-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="AdminDashboard.editProduct(${product.id})">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="AdminDashboard.confirmDelete(${product.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
                     
                     html += `</div></div>`;
                 });
@@ -901,65 +998,78 @@
                 container.innerHTML = html;
             }
             
-            function populateCategoryFilter() {
-                const filter = document.getElementById('categoryFilter');
-                if (!filter) return;
-                
-                let options = '<option value="">All Categories</option>';
-                categories.forEach(category => {
-                    options += `<option value="${category.id}">${category.name}</option>`;
-                });
-                
-                filter.innerHTML = options;
-            }
-            
-            function displayProductsByCategory(categoryId) {
-                const filteredProducts = categoryId ? 
-                    products.filter(p => p.category_id === parseInt(categoryId)) : 
-                    products;
-                
-                // Update display based on filter
-                // This is a simplified version - you might want to hide/show categories
-            }
-            
-            async function openProductEdit(productId, isFootwear = false) {
+            async function editProduct(productId) {
                 try {
                     const product = products.find(p => p.id === productId);
                     if (!product) {
-                        showAlert('Product not found!', 'error');
+                        showToast('Product not found!', 'error');
                         return;
                     }
                     
-                    // Set modal title
-                    document.getElementById('modalTitle').textContent = `Edit: ${product.name}`;
+                    // Get full product data with colors/sizes if footwear
+                    const isFootwear = product.category?.slug?.includes('footwear');
+                    
+                    // Populate modal
                     document.getElementById('editProductId').value = product.id;
-                    document.getElementById('editCategoryId').value = product.category_id;
                     document.getElementById('editIsFootwear').value = isFootwear;
                     document.getElementById('editName').value = product.name || '';
                     document.getElementById('editPrice').value = product.price || 0;
-                    document.getElementById('editDescription').value = product.description || '';
                     document.getElementById('editStock').value = product.stock || 0;
+                    document.getElementById('editDescription').value = product.description || '';
                     
-                    // Show/hide appropriate sections
+                    // Populate category dropdown
+                    const categorySelect = document.getElementById('editCategory');
+                    categorySelect.innerHTML = categories.map(cat => 
+                        `<option value="${cat.id}" ${cat.id === product.category_id ? 'selected' : ''}>${cat.name}</option>`
+                    ).join('');
+                    
+                    // Set modal title
+                    document.getElementById('modalTitle').textContent = `Edit: ${product.name}`;
+                    
+                    // Show conditional fields for footwear
+                    const conditionalFields = document.getElementById('conditionalFields');
                     if (isFootwear) {
-                        document.getElementById('footwearSection').style.display = 'block';
-                        document.getElementById('simpleStockSection').style.display = 'none';
+                        conditionalFields.style.display = 'block';
+                        conditionalFields.innerHTML = `
+                            <h4 style="margin: 20px 0 15px; color: var(--dark); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                                <i class="fas fa-shoe-prints"></i> Footwear Variants
+                            </h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Colors</label>
+                                    <div id="colorList">
+                                        <div class="loading">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading colors...
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm" onclick="AdminDashboard.addColorField()" style="margin-top: 10px;">
+                                        <i class="fas fa-plus"></i> Add Color
+                                    </button>
+                                </div>
+                                <div class="form-group">
+                                    <label>Sizes & Stock</label>
+                                    <div id="sizeList">
+                                        <div class="loading">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading sizes...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
                         
-                        // Load colors for this product
+                        // Load colors and sizes
                         await loadProductColors(productId);
-                        // Load sizes for this product
                         await loadProductSizes(productId);
                     } else {
-                        document.getElementById('footwearSection').style.display = 'none';
-                        document.getElementById('simpleStockSection').style.display = 'block';
+                        conditionalFields.style.display = 'none';
                     }
                     
                     // Show modal
                     document.getElementById('productModal').style.display = 'flex';
                     
                 } catch (error) {
-                    console.error('Error opening product edit:', error);
-                    showAlert(`Failed to load product details: ${error.message}`, 'error');
+                    console.error('Error editing product:', error);
+                    showToast('Failed to load product: ' + error.message, 'error');
                 }
             }
             
@@ -973,30 +1083,35 @@
                     
                     if (error) throw error;
                     
-                    const container = document.getElementById('colorManagement');
+                    const container = document.getElementById('colorList');
                     if (!container) return;
                     
                     let html = '';
-                    colors.forEach(color => {
-                        html += `
-                            <div class="color-item" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                                <input type="color" value="${color.color_code || '#000000'}" 
-                                       onchange="AdminDashboard.updateColor(${color.id}, this.value)">
-                                <input type="text" value="${color.color_name}" 
-                                       onchange="AdminDashboard.updateColorName(${color.id}, this.value)"
-                                       class="form-control" style="flex: 1;">
-                                <button class="btn btn-danger btn-sm" onclick="AdminDashboard.deleteColor(${color.id})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        `;
-                    });
+                    if (colors && colors.length > 0) {
+                        colors.forEach(color => {
+                            html += `
+                                <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                                    <input type="color" value="${color.color_code || '#000000'}" 
+                                           onchange="AdminDashboard.updateColor(${color.id}, 'color_code', this.value)"
+                                           style="width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;">
+                                    <input type="text" value="${color.color_name}" 
+                                           onchange="AdminDashboard.updateColor(${color.id}, 'color_name', this.value)"
+                                           class="form-control" style="flex: 1;">
+                                    <button class="btn btn-danger btn-sm" onclick="AdminDashboard.deleteColor(${color.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html = '<p style="color: #7f8c8d; text-align: center; padding: 20px;">No colors defined for this product</p>';
+                    }
                     
-                    container.innerHTML = html || '<p>No colors defined</p>';
+                    container.innerHTML = html;
                     
                 } catch (error) {
                     console.error('Error loading colors:', error);
-                    document.getElementById('colorManagement').innerHTML = 
+                    document.getElementById('colorList').innerHTML = 
                         `<p class="error">Failed to load colors: ${error.message}</p>`;
                 }
             }
@@ -1011,46 +1126,61 @@
                     
                     if (error) throw error;
                     
-                    const container = document.getElementById('sizeManagement');
+                    const container = document.getElementById('sizeList');
                     if (!container) return;
                     
-                    let html = '<div class="size-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">';
+                    // Group sizes by color for better display
+                    const grouped = {};
+                    if (sizes && sizes.length > 0) {
+                        sizes.forEach(size => {
+                            if (!grouped[size.color_id]) grouped[size.color_id] = [];
+                            grouped[size.color_id].push(size);
+                        });
+                    }
                     
-                    // Common shoe sizes
-                    const commonSizes = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
+                    let html = '';
+                    if (Object.keys(grouped).length > 0) {
+                        for (const [colorId, sizeList] of Object.entries(grouped)) {
+                            html += `<div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e9ecef;">`;
+                            html += `<h5 style="margin-bottom: 10px; color: #2c3e50;">Color ID: ${colorId}</h5>`;
+                            html += `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px;">`;
+                            
+                            sizeList.forEach(size => {
+                                html += `
+                                    <div style="text-align: center;">
+                                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Size ${size.size_value}</label>
+                                        <input type="number" value="${size.stock_quantity}" 
+                                               onchange="AdminDashboard.updateSizeStock(${size.id}, this.value)"
+                                               class="form-control" min="0" placeholder="Stock">
+                                    </div>
+                                `;
+                            });
+                            
+                            html += `</div></div>`;
+                        }
+                    } else {
+                        html = '<p style="color: #7f8c8d; text-align: center; padding: 20px;">No sizes defined for this product</p>';
+                    }
                     
-                    commonSizes.forEach(size => {
-                        const sizeData = sizes.find(s => s.size_value == size);
-                        const stock = sizeData ? sizeData.stock_quantity : 0;
-                        const sizeId = sizeData ? sizeData.id : null;
-                        
-                        html += `
-                            <div class="size-item" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
-                                <label style="font-weight: 600; display: block; margin-bottom: 5px;">Size ${size}</label>
-                                <input type="number" value="${stock}" min="0" 
-                                       onchange="AdminDashboard.updateSizeStock(${productId}, ${size}, this.value, ${sizeId})"
-                                       class="form-control" placeholder="Stock">
-                            </div>
-                        `;
-                    });
-                    
-                    html += '</div>';
                     container.innerHTML = html;
                     
                 } catch (error) {
                     console.error('Error loading sizes:', error);
-                    document.getElementById('sizeManagement').innerHTML = 
+                    document.getElementById('sizeList').innerHTML = 
                         `<p class="error">Failed to load sizes: ${error.message}</p>`;
                 }
             }
             
-            async function updateProduct() {
+            async function saveProduct(event) {
+                event.preventDefault();
+                
                 const productId = document.getElementById('editProductId').value;
                 const isFootwear = document.getElementById('editIsFootwear').value === 'true';
                 
                 const updates = {
                     name: document.getElementById('editName').value.trim(),
                     price: parseFloat(document.getElementById('editPrice').value),
+                    category_id: parseInt(document.getElementById('editCategory').value),
                     description: document.getElementById('editDescription').value.trim(),
                     updated_at: new Date().toISOString()
                 };
@@ -1060,214 +1190,233 @@
                     updates.stock = parseInt(document.getElementById('editStock').value) || 0;
                 }
                 
-                try {
-                    const { error } = await supabase
-                        .from('products')
-                        .update(updates)
-                        .eq('id', productId);
-                    
-                    if (error) throw error;
-                    
-                    showAlert('Product updated successfully!', 'success');
-                    
-                    // Reload dashboard data
-                    await loadDashboard();
-                    
-                    // Close modal
-                    closeModal();
-                    
-                } catch (error) {
-                    console.error('Error updating product:', error);
-                    showAlert(`Failed to update product: ${error.message}`, 'error');
-                }
-            }
-            
-            async function updateStock(productId, stock) {
-                try {
-                    const { error } = await supabase
-                        .from('products')
-                        .update({ stock: parseInt(stock), updated_at: new Date().toISOString() })
-                        .eq('id', productId);
-                    
-                    if (error) throw error;
-                    
-                    showAlert('Stock updated successfully!', 'success');
-                    await loadDashboard();
-                    
-                } catch (error) {
-                    console.error('Error updating stock:', error);
-                    showAlert(`Failed to update stock: ${error.message}`, 'error');
-                }
-            }
-            
-            async function updateSizeStock(productId, sizeValue, stock, sizeId = null) {
-                try {
-                    if (sizeId) {
-                        // Update existing size
-                        const { error } = await supabase
-                            .from('product_sizes')
-                            .update({ 
-                                stock_quantity: parseInt(stock), 
-                                updated_at: new Date().toISOString() 
-                            })
-                            .eq('id', sizeId);
-                        
-                        if (error) throw error;
-                    } else {
-                        // Create new size entry
-                        // Note: This needs color_id - we need to get the default color
-                        const { data: colors } = await supabase
-                            .from('product_colors')
-                            .select('id')
-                            .eq('product_id', productId)
-                            .limit(1);
-                        
-                        if (colors && colors[0]) {
-                            const { error } = await supabase
-                                .from('product_sizes')
-                                .insert([{
-                                    product_id: productId,
-                                    color_id: colors[0].id,
-                                    size_value: sizeValue,
-                                    stock_quantity: parseInt(stock),
-                                    is_available: true
-                                }]);
-                            
-                            if (error) throw error;
-                        }
-                    }
-                    
-                    showAlert('Size stock updated!', 'success');
-                    
-                } catch (error) {
-                    console.error('Error updating size stock:', error);
-                    showAlert(`Failed to update size stock: ${error.message}`, 'error');
-                }
-            }
-            
-            function addColorInput() {
-                const container = document.getElementById('colorManagement');
-                const colorCount = container.children.length;
-                
-                const div = document.createElement('div');
-                div.className = 'color-item';
-                div.style.cssText = 'margin-bottom: 10px; display: flex; align-items: center; gap: 10px;';
-                div.innerHTML = `
-                    <input type="color" value="#000000" class="color-picker">
-                    <input type="text" placeholder="Color name" class="form-control color-name" style="flex: 1;">
-                    <button class="btn btn-success btn-sm" onclick="AdminDashboard.saveNewColor(this)">
-                        <i class="fas fa-check"></i>
-                    </button>
-                `;
-                
-                container.appendChild(div);
-            }
-            
-            async function saveNewColor(button) {
-                const colorItem = button.closest('.color-item');
-                const colorPicker = colorItem.querySelector('.color-picker');
-                const colorName = colorItem.querySelector('.color-name');
-                const productId = document.getElementById('editProductId').value;
-                
-                if (!colorName.value.trim()) {
-                    showAlert('Please enter a color name', 'warning');
+                // Validate
+                if (!updates.name || updates.price <= 0) {
+                    showToast('Please fill all required fields correctly', 'warning');
                     return;
                 }
                 
                 try {
-                    const { error } = await supabase
-                        .from('product_colors')
-                        .insert([{
-                            product_id: productId,
-                            color_name: colorName.value.trim(),
-                            color_code: colorPicker.value,
-                            is_default: false,
-                            sort_order: 0
-                        }]);
+                    console.log('💾 Saving product:', updates);
                     
-                    if (error) throw error;
+                    const { data, error } = await supabase
+                        .from('products')
+                        .update(updates)
+                        .eq('id', productId)
+                        .select();
                     
-                    showAlert('Color added successfully!', 'success');
-                    await loadProductColors(productId);
+                    if (error) {
+                        console.error('❌ Save error:', error);
+                        
+                        if (error.code === '42501') {
+                            showToast('Permission Denied: Please disable RLS in Supabase', 'error');
+                            alert('🚨 RLS POLICY ERROR\n\nTo fix write operations:\n\n1. Go to Supabase Dashboard → SQL Editor\n2. Run: ALTER TABLE products DISABLE ROW LEVEL SECURITY;\n3. Run: ALTER TABLE product_colors DISABLE ROW LEVEL SECURITY;\n4. Run: ALTER TABLE product_sizes DISABLE ROW LEVEL SECURITY;\n\nThen refresh this page.');
+                            return;
+                        }
+                        
+                        throw error;
+                    }
+                    
+                    console.log('✅ Save successful:', data);
+                    
+                    // Update local data
+                    const index = products.findIndex(p => p.id === productId);
+                    if (index !== -1) {
+                        products[index] = { ...products[index], ...updates };
+                    }
+                    
+                    // Update UI
+                    updateStats();
+                    renderProducts();
+                    
+                    // Show success
+                    showToast('✅ Product updated successfully!', 'success');
+                    
+                    // Close modal after a delay
+                    setTimeout(() => {
+                        closeModal();
+                    }, 1500);
                     
                 } catch (error) {
-                    console.error('Error adding color:', error);
-                    showAlert(`Failed to add color: ${error.message}`, 'error');
+                    console.error('❌ Save failed:', error);
+                    showToast('❌ Failed to save: ' + error.message, 'error');
                 }
             }
             
-            async function deleteProduct(productId) {
+            async function testWrite() {
+                // This function tests write operations to debug RLS issues
+                showToast('Testing write operation...', 'info');
+                
+                const testData = {
+                    name: 'Test Product ' + Date.now(),
+                    price: 1000,
+                    stock: 10,
+                    category_id: 1,
+                    description: 'Test product for debugging',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                
+                try {
+                    console.log('🧪 Testing write with data:', testData);
+                    
+                    const { data, error } = await supabase
+                        .from('products')
+                        .insert([testData])
+                        .select();
+                    
+                    if (error) {
+                        console.error('❌ Write test failed:', error);
+                        
+                        if (error.code === '42501') {
+                            showToast('RLS Error: Cannot write to database', 'error');
+                            alert('🚨 CRITICAL: RLS is blocking writes\n\nFix this in Supabase SQL Editor:\n\nALTER TABLE products DISABLE ROW LEVEL SECURITY;');
+                            return;
+                        }
+                        
+                        showToast('Write test failed: ' + error.message, 'error');
+                        return;
+                    }
+                    
+                    console.log('✅ Write test successful!', data);
+                    showToast('✅ Write test successful! Product created.', 'success');
+                    
+                    // Reload data
+                    await loadDashboard();
+                    
+                } catch (error) {
+                    console.error('❌ Unexpected error:', error);
+                    showToast('Unexpected error: ' + error.message, 'error');
+                }
+            }
+            
+            async function confirmDelete(productId) {
                 if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
                     return;
                 }
                 
+                await deleteProduct(productId);
+            }
+            
+            async function deleteProduct(productId) {
                 try {
+                    showToast('Deleting product...', 'info');
+                    
                     const { error } = await supabase
                         .from('products')
                         .delete()
                         .eq('id', productId);
                     
-                    if (error) throw error;
+                    if (error) {
+                        if (error.code === '42501') {
+                            showToast('Permission denied: RLS prevents deletion', 'error');
+                            return;
+                        }
+                        throw error;
+                    }
                     
-                    showAlert('Product deleted successfully!', 'success');
-                    await loadDashboard();
+                    // Remove from local array
+                    products = products.filter(p => p.id !== productId);
+                    
+                    // Update UI
+                    updateStats();
+                    renderProducts();
+                    
+                    showToast('✅ Product deleted successfully!', 'success');
                     
                 } catch (error) {
-                    console.error('Error deleting product:', error);
-                    showAlert(`Failed to delete product: ${error.message}`, 'error');
+                    showToast('❌ Failed to delete: ' + error.message, 'error');
                 }
             }
             
-            function showAlert(message, type = 'info') {
-                const container = document.getElementById('alertsContainer');
+            function deleteCurrentProduct() {
+                const productId = document.getElementById('editProductId').value;
+                if (productId) {
+                    closeModal();
+                    setTimeout(() => confirmDelete(productId), 300);
+                }
+            }
+            
+            function showToast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
                 if (!container) return;
                 
-                const alert = document.createElement('div');
-                alert.className = `alert alert-${type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'success'}`;
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
                 
-                const icon = type === 'error' ? 'exclamation-triangle' : 
-                            type === 'warning' ? 'exclamation-circle' : 
-                            type === 'info' ? 'info-circle' : 'check-circle';
+                const icon = type === 'success' ? 'check-circle' : 
+                            type === 'error' ? 'exclamation-circle' : 
+                            type === 'warning' ? 'exclamation-triangle' : 'info-circle';
                 
-                alert.innerHTML = `
-                    <i class="fas fa-${icon}"></i>
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="fas fa-${icon}"></i>
+                    </div>
                     <div>${message}</div>
                 `;
                 
-                container.appendChild(alert);
+                container.appendChild(toast);
                 
                 // Auto-remove after 5 seconds
-                setTimeout(() => alert.remove(), 5000);
+                setTimeout(() => {
+                    toast.style.animation = 'toastSlide 0.3s ease reverse';
+                    setTimeout(() => toast.remove(), 300);
+                }, 5000);
+            }
+            
+            function updateConnectionStatus(text, status) {
+                const dot = document.getElementById('statusDot');
+                const textEl = document.getElementById('statusText');
+                
+                if (dot) {
+                    dot.className = 'status-dot';
+                    if (status === 'success') dot.classList.add('connected');
+                    if (status === 'error') dot.style.background = '#e74c3c';
+                    if (status === 'warning') dot.style.background = '#f39c12';
+                }
+                
+                if (textEl) {
+                    textEl.textContent = text;
+                }
             }
             
             function closeModal() {
                 document.getElementById('productModal').style.display = 'none';
+                document.getElementById('productForm').reset();
             }
             
+            function setupEventListeners() {
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        const section = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+                        showToast(`Switching to ${section} section`, 'info');
+                    });
+                });
+            }
+            
+            // Public API
             return {
                 init,
-                showAlert,
+                editProduct,
+                saveProduct,
+                testWrite,
+                confirmDelete,
+                deleteCurrentProduct,
                 closeModal,
-                openProductEdit,
-                updateProduct,
-                addColorInput,
-                updateStock,
-                updateSizeStock,
-                saveNewColor,
-                deleteProduct
+                showToast
             };
         })();
         
-        // Initialize on page load
+        // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             AdminDashboard.init();
         });
         
-        // Global error handler
-        window.addEventListener('error', function(event) {
-            console.error('Global error:', event.error);
-            AdminDashboard.showAlert(`JavaScript Error: ${event.message}`, 'error');
-        });
+        // Make AdminDashboard available globally for onclick handlers
+        window.AdminDashboard = AdminDashboard;
     </script>
 </body>
 </html>
