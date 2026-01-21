@@ -1,587 +1,880 @@
+<!-- admin-dashboard.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JMPOTTERS Admin Dashboard</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f0f2f5; color: #333; }
-        
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        
-        .header { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        :root {
+            --primary: #4CAF50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #2196F3;
+            --dark: #333;
+            --light: #f8f9fa;
+            --border: #dee2e6;
         }
         
-        .debug-panel {
-            background: #1e1e1e;
-            color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        .debug-panel.active { display: block; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
         
-        .debug-log { margin: 5px 0; }
-        .debug-success { color: #4CAF50; }
-        .debug-error { color: #f44336; }
-        .debug-info { color: #2196F3; }
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
         
-        .card {
+        .header {
             background: white;
             padding: 20px;
             border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header h1 i {
+            color: #4CAF50;
+        }
+        
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .status-item {
+            padding: 8px 15px;
+            background: #e8f5e9;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .status-item i {
+            margin-right: 5px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .card h3 { margin-bottom: 15px; color: #333; }
+        .form-group {
+            margin-bottom: 20px;
+        }
         
-        select, input, button {
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-control {
             width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
         }
         
-        button {
+        .form-control:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
             background: #4CAF50;
             color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
         }
         
-        button:hover { background: #45a049; }
-        button.danger { background: #f44336; }
-        button.danger:hover { background: #d32f2f; }
+        .btn-primary:hover {
+            background: #3d8b40;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
         
         .data-list {
             max-height: 400px;
             overflow-y: auto;
-            margin-top: 15px;
+            margin-top: 20px;
             border: 1px solid #eee;
-            border-radius: 5px;
-            padding: 10px;
+            border-radius: 6px;
         }
         
         .data-item {
-            padding: 10px;
+            padding: 15px;
             border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
-        .data-item:last-child { border-bottom: none; }
-        
-        .status {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
+        .data-item:last-child {
+            border-bottom: none;
         }
         
-        .status.connected { background: #4CAF50; color: white; }
-        .status.disconnected { background: #f44336; color: white; }
-        .status.connecting { background: #ff9800; color: white; }
+        .data-item:hover {
+            background: #f9f9f9;
+        }
+        
+        .data-info h4 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .data-info p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        .stock-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .stock-in {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .stock-low {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .stock-out {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
     </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
+    <div class="admin-container">
         <div class="header">
-            <h1>🔧 JMPOTTERS Admin Dashboard</h1>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button onclick="testDirectConnection()">🔗 Test Direct Connection</button>
-                <button onclick="toggleDebug()">🐛 Toggle Debug</button>
-                <button onclick="clearLocalStorage()">🗑️ Clear Cache</button>
-                <span class="status" id="connectionStatus">❓ Unknown</span>
+            <h1><i class="fas fa-cogs"></i> JMPOTTERS Admin Dashboard</h1>
+            <div class="status-bar">
+                <div class="status-item"><i class="fas fa-database"></i> Supabase Connected</div>
+                <div class="status-item"><i class="fas fa-box"></i> <span id="productCount">0</span> Products</div>
+                <div class="status-item"><i class="fas fa-palette"></i> <span id="colorCount">0</span> Colors</div>
             </div>
         </div>
         
-        <div id="debugPanel" class="debug-panel">
-            <div style="margin-bottom: 10px; font-weight: bold;">Debug Console</div>
-            <div id="debugLogs"></div>
-        </div>
+        <!-- Error/Success Messages -->
+        <div id="messageContainer"></div>
         
-        <div class="card">
-            <h3>📊 Database Connection Test</h3>
-            <div id="connectionTestResults">
-                Click "Test Direct Connection" above to start...
-            </div>
-        </div>
-        
-        <div class="card">
-            <h3>📦 Product Management</h3>
-            <select id="productSelect" onchange="loadProductDetails()">
-                <option value="">Loading products...</option>
-            </select>
-            
-            <div id="productForm" style="display: none;">
-                <input type="text" id="productName" placeholder="Product Name">
-                <input type="number" id="productPrice" placeholder="Price (₦)" min="0" step="100">
-                <input type="number" id="productStock" placeholder="Stock" min="0">
+        <div class="dashboard-grid">
+            <!-- Product Management -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-box"></i> Product Management</h2>
+                <div class="form-group">
+                    <label>Select Product:</label>
+                    <select id="productSelect" class="form-control" onchange="loadProductDetails()">
+                        <option value="">Loading products...</option>
+                    </select>
+                </div>
                 
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button onclick="updateProduct()">💾 Update Product</button>
-                    <button class="danger" onclick="deleteProduct()">🗑️ Delete Product</button>
+                <div id="productForm" style="display: none;">
+                    <div class="form-group">
+                        <label>Product Name:</label>
+                        <input type="text" id="productName" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₦):</label>
+                        <input type="number" id="productPrice" class="form-control" min="0" step="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Stock:</label>
+                        <input type="number" id="productStock" class="form-control" min="0">
+                    </div>
+                    <button class="btn btn-primary" onclick="updateProduct()">
+                        <i class="fas fa-save"></i> Update Product
+                    </button>
                 </div>
             </div>
-        </div>
-        
-        <div class="card">
-            <h3>🎨 Color Management</h3>
-            <select id="colorProductSelect" onchange="loadColorsForProduct()">
-                <option value="">Select product...</option>
-            </select>
             
-            <div id="colorForm" style="display: none;">
-                <input type="text" id="colorName" placeholder="Color Name">
-                <input type="color" id="colorHex" value="#000000">
-                <button onclick="addColor()">➕ Add Color</button>
+            <!-- Color Management -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-palette"></i> Color Management</h2>
+                <div class="form-group">
+                    <label>For Product:</label>
+                    <select id="colorProductSelect" class="form-control" onchange="loadColorsForProduct()">
+                        <option value="">Select product...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Color Name:</label>
+                    <input type="text" id="colorName" class="form-control" placeholder="e.g., Midnight Black">
+                </div>
+                
+                <div class="form-group">
+                    <label>Color Code:</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="color" id="colorHex" value="#000000" style="width: 60px; height: 40px;">
+                        <input type="text" id="colorHexText" class="form-control" placeholder="#000000" 
+                               onchange="document.getElementById('colorHex').value = this.value">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="addColor()">
+                    <i class="fas fa-plus"></i> Add Color
+                </button>
+                
+                <div id="colorsList" class="data-list"></div>
             </div>
             
-            <div id="colorsList" class="data-list">
-                Select a product to view colors...
+            <!-- Size & Stock Management -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-ruler"></i> Size & Stock Management</h2>
+                <div class="form-group">
+                    <label>For Product:</label>
+                    <select id="sizeProductSelect" class="form-control" onchange="loadColorsForSizeProduct()">
+                        <option value="">Select product...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>For Color:</label>
+                    <select id="sizeColorSelect" class="form-control" onchange="loadSizesForColor()">
+                        <option value="">Select color...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Size:</label>
+                    <select id="sizeValue" class="form-control">
+                        <option value="36">36</option>
+                        <option value="37">37</option>
+                        <option value="38">38</option>
+                        <option value="39">39</option>
+                        <option value="40">40</option>
+                        <option value="41">41</option>
+                        <option value="42">42</option>
+                        <option value="43">43</option>
+                        <option value="44">44</option>
+                        <option value="45">45</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Stock Quantity:</label>
+                    <input type="number" id="sizeStock" class="form-control" value="0" min="0">
+                </div>
+                
+                <button class="btn btn-primary" onclick="addSize()">
+                    <i class="fas fa-plus"></i> Add/Update Size Stock
+                </button>
+                
+                <div id="sizesList" class="data-list"></div>
             </div>
         </div>
     </div>
 
+    <!-- IMPORTANT: Only include Supabase ONCE -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
     <script>
-        // ============================================
-        // DEBUG UTILITIES
-        // ============================================
-        
-        let debugEnabled = false;
-        let debugLogs = [];
-        
-        function debug(message, type = 'info') {
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = `[${timestamp}] ${message}`;
-            debugLogs.push({ message: logEntry, type });
-            
-            console.log(`[ADMIN] ${message}`);
-            
-            if (debugEnabled) {
-                const debugPanel = document.getElementById('debugLogs');
-                if (debugPanel) {
-                    const logElement = document.createElement('div');
-                    logElement.className = `debug-log debug-${type}`;
-                    logElement.textContent = logEntry;
-                    debugPanel.appendChild(logElement);
-                    debugPanel.scrollTop = debugPanel.scrollHeight;
-                }
-            }
-        }
-        
-        function toggleDebug() {
-            debugEnabled = !debugEnabled;
-            document.getElementById('debugPanel').classList.toggle('active', debugEnabled);
-            debug(`Debug mode ${debugEnabled ? 'enabled' : 'disabled'}`);
-        }
-        
-        function clearLocalStorage() {
-            localStorage.clear();
-            debug('Local storage cleared');
-            alert('Cache cleared! Reload the page.');
-            location.reload();
-        }
-        
-        // ============================================
-        // DIRECT SUPABASE CONNECTION TEST
-        // ============================================
-        
-        async function testDirectConnection() {
-            debug('Starting direct connection test...', 'info');
-            updateStatus('connecting', '🔄 Testing...');
-            
-            const resultsDiv = document.getElementById('connectionTestResults');
-            resultsDiv.innerHTML = '<div style="color: #ff9800;">🔄 Testing connection...</div>';
-            
-            try {
-                // Test 1: Direct API call without Supabase client
-                debug('Test 1: Testing direct REST API...', 'info');
-                resultsDiv.innerHTML += '<div>📡 Testing REST API endpoint...</div>';
+        // Check if Supabase is already loaded to avoid duplicate declaration
+        if (!window.JMPOTTERS_ADMIN) {
+            window.JMPOTTERS_ADMIN = {
+                // SINGLE Supabase client instance
+                supabase: null,
                 
-                const response = await fetch('https://tmpggeeuwdvlngvfncaa.supabase.co/rest/v1/products?select=id,name&limit=1', {
-                    headers: {
-                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                debug(`✓ REST API connected. Response: ${JSON.stringify(data)}`, 'success');
-                resultsDiv.innerHTML += `<div style="color: #4CAF50;">✅ REST API: Connected (${data.length} products)</div>`;
-                
-                // Test 2: Check if Supabase client exists
-                debug('Test 2: Checking for existing Supabase client...', 'info');
-                resultsDiv.innerHTML += '<div>🔍 Checking for Supabase client...</div>';
-                
-                if (window.JMPOTTERS_SUPABASE_CLIENT) {
-                    debug('✓ Found existing Supabase client from app.js', 'success');
-                    resultsDiv.innerHTML += '<div style="color: #4CAF50;">✅ Found existing Supabase client</div>';
-                    supabase = window.JMPOTTERS_SUPABASE_CLIENT;
-                } else if (window.supabase && window.supabase.createClient) {
-                    debug('✓ Creating new Supabase client', 'success');
-                    resultsDiv.innerHTML += '<div style="color: #4CAF50;">✅ Creating new Supabase client</div>';
-                    supabase = window.supabase.createClient(
-                        'https://tmpggeeuwdvlngvfncaa.supabase.co',
-                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
-                    );
-                    window.JMPOTTERS_SUPABASE_CLIENT = supabase;
-                } else {
-                    debug('Loading Supabase library dynamically...', 'info');
-                    resultsDiv.innerHTML += '<div>📦 Loading Supabase library...</div>';
+                // Initialize function
+                init: function() {
+                    console.log('🔄 Initializing JMPOTTERS Admin...');
                     
-                    await new Promise((resolve, reject) => {
-                        const script = document.createElement('script');
-                        script.src = 'https://unpkg.com/@supabase/supabase-js@2';
-                        script.onload = () => {
-                            debug('✓ Supabase library loaded', 'success');
-                            resultsDiv.innerHTML += '<div style="color: #4CAF50;">✅ Supabase library loaded</div>';
-                            supabase = window.supabase.createClient(
-                                'https://tmpggeeuwdvlngvfncaa.supabase.co',
-                                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
-                            );
-                            window.JMPOTTERS_SUPABASE_CLIENT = supabase;
-                            resolve();
-                        };
-                        script.onerror = reject;
-                        document.head.appendChild(script);
-                    });
-                }
-                
-                // Test 3: Test with Supabase client
-                debug('Test 3: Testing Supabase client query...', 'info');
-                resultsDiv.innerHTML += '<div>🔍 Testing Supabase query...</div>';
-                
-                const { data: products, error } = await supabase
-                    .from('products')
-                    .select('id, name')
-                    .limit(5);
-                
-                if (error) throw error;
-                
-                debug(`✓ Supabase query successful: ${products.length} products`, 'success');
-                resultsDiv.innerHTML += `<div style="color: #4CAF50;">✅ Supabase client: Working (${products.length} products loaded)</div>`;
-                
-                // Update UI
-                updateStatus('connected', '✅ Connected');
-                resultsDiv.innerHTML += `<div style="color: #4CAF50; font-weight: bold; margin-top: 10px;">🎉 All tests passed! Loading products...</div>`;
-                
-                // Load products
-                await loadProducts();
-                
-            } catch (error) {
-                debug(`✗ Connection test failed: ${error.message}`, 'error');
-                resultsDiv.innerHTML += `<div style="color: #f44336;">❌ Error: ${error.message}</div>`;
-                updateStatus('disconnected', '❌ Failed');
-                
-                // Show detailed error info
-                resultsDiv.innerHTML += `
-                    <div style="margin-top: 20px; background: #fff3cd; padding: 10px; border-radius: 5px;">
-                        <strong>💡 Troubleshooting Tips:</strong>
-                        <ol style="margin: 10px 0 0 20px;">
-                            <li>Check browser console (F12) for CORS errors</li>
-                            <li>Verify Supabase API key is correct</li>
-                            <li>Check RLS policies in Supabase dashboard</li>
-                            <li>Try opening in Incognito mode</li>
-                        </ol>
-                    </div>
-                `;
-            }
-        }
-        
-        function updateStatus(status, text) {
-            const statusElement = document.getElementById('connectionStatus');
-            statusElement.className = `status ${status}`;
-            statusElement.textContent = text;
-        }
-        
-        // ============================================
-        // PRODUCT FUNCTIONS
-        // ============================================
-        
-        let supabase = null;
-        let allProducts = [];
-        
-        async function loadProducts() {
-            try {
-                debug('Loading products from Supabase...', 'info');
-                
-                const { data: products, error } = await supabase
-                    .from('products')
-                    .select('*')
-                    .order('name');
-                
-                if (error) throw error;
-                
-                allProducts = products || [];
-                debug(`Loaded ${allProducts.length} products`, 'success');
-                
-                // Update dropdowns
-                const selects = ['productSelect', 'colorProductSelect'];
-                selects.forEach(selectId => {
-                    const select = document.getElementById(selectId);
-                    if (select) {
-                        select.innerHTML = '<option value="">Select product...</option>' +
-                            allProducts.map(p => `<option value="${p.id}">${p.name} (ID: ${p.id})</option>`).join('');
+                    // Create Supabase client ONLY if it doesn't exist
+                    if (!this.supabase && window.supabase && window.supabase.createClient) {
+                        this.supabase = window.supabase.createClient(
+                            'https://tmpggeeuwdvlngvfncaa.supabase.co',
+                            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+                        );
+                        console.log('✅ Supabase client created for admin');
                     }
-                });
+                    
+                    // Initialize dashboard
+                    this.initializeDashboard();
+                },
                 
-                // Show success message
-                const resultsDiv = document.getElementById('connectionTestResults');
-                resultsDiv.innerHTML += `<div style="color: #4CAF50; font-weight: bold;">✅ Loaded ${allProducts.length} products successfully!</div>`;
+                // Show message
+                showMessage: function(text, type = 'success') {
+                    const container = document.getElementById('messageContainer');
+                    const message = document.createElement('div');
+                    message.className = type;
+                    message.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${text}`;
+                    container.appendChild(message);
+                    
+                    // Auto-remove after 5 seconds
+                    setTimeout(() => message.remove(), 5000);
+                },
                 
-            } catch (error) {
-                debug(`Error loading products: ${error.message}`, 'error');
-                const resultsDiv = document.getElementById('connectionTestResults');
-                resultsDiv.innerHTML += `<div style="color: #f44336;">❌ Failed to load products: ${error.message}</div>`;
-            }
-        }
-        
-        async function loadProductDetails() {
-            const productId = document.getElementById('productSelect').value;
-            if (!productId) {
-                document.getElementById('productForm').style.display = 'none';
-                return;
-            }
-            
-            try {
-                const { data: product, error } = await supabase
-                    .from('products')
-                    .select('*')
-                    .eq('id', productId)
-                    .single();
+                // Load products dropdown
+                loadProductsDropdown: async function() {
+                    try {
+                        console.log('📦 Loading products...');
+                        const { data: products, error } = await this.supabase
+                            .from('products')
+                            .select('id, name')
+                            .order('name');
+                        
+                        if (error) throw error;
+                        
+                        const selects = ['productSelect', 'colorProductSelect', 'sizeProductSelect'];
+                        selects.forEach(selectId => {
+                            const select = document.getElementById(selectId);
+                            if (select) {
+                                select.innerHTML = '<option value="">Select product...</option>' +
+                                    products.map(p => `<option value="${p.id}">${p.name} (ID: ${p.id})</option>`).join('');
+                            }
+                        });
+                        
+                        // Update counts
+                        document.getElementById('productCount').textContent = products.length;
+                        
+                        console.log(`✅ Loaded ${products.length} products`);
+                    } catch (error) {
+                        console.error('❌ Error loading products:', error);
+                        this.showMessage('Failed to load products: ' + error.message, 'error');
+                    }
+                },
                 
-                if (error) throw error;
+                // Load product details
+                loadProductDetails: async function() {
+                    const productId = document.getElementById('productSelect').value;
+                    if (!productId) {
+                        document.getElementById('productForm').style.display = 'none';
+                        return;
+                    }
+                    
+                    try {
+                        const { data: product, error } = await this.supabase
+                            .from('products')
+                            .select('*')
+                            .eq('id', productId)
+                            .single();
+                        
+                        if (error) throw error;
+                        
+                        document.getElementById('productName').value = product.name || '';
+                        document.getElementById('productPrice').value = product.price || 0;
+                        document.getElementById('productStock').value = product.stock || 0;
+                        document.getElementById('productForm').style.display = 'block';
+                    } catch (error) {
+                        this.showMessage('Failed to load product details', 'error');
+                    }
+                },
                 
-                document.getElementById('productName').value = product.name || '';
-                document.getElementById('productPrice').value = product.price || 0;
-                document.getElementById('productStock').value = product.stock || 0;
-                document.getElementById('productForm').style.display = 'block';
+                // Update product
+                updateProduct: async function() {
+                    const productId = document.getElementById('productSelect').value;
+                    if (!productId) {
+                        this.showMessage('Please select a product', 'error');
+                        return;
+                    }
+                    
+                    const updates = {
+                        name: document.getElementById('productName').value.trim(),
+                        price: parseFloat(document.getElementById('productPrice').value),
+                        stock: parseInt(document.getElementById('productStock').value),
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    if (!updates.name) {
+                        this.showMessage('Product name is required', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        const { error } = await this.supabase
+                            .from('products')
+                            .update(updates)
+                            .eq('id', productId);
+                        
+                        if (error) throw error;
+                        
+                        this.showMessage('✅ Product updated successfully!');
+                        await this.loadProductsDropdown();
+                    } catch (error) {
+                        this.showMessage('❌ Error updating product: ' + error.message, 'error');
+                    }
+                },
                 
-                debug(`Loaded details for product: ${product.name}`, 'success');
-                
-            } catch (error) {
-                debug(`Error loading product details: ${error.message}`, 'error');
-                alert(`Error: ${error.message}`);
-            }
-        }
-        
-        async function updateProduct() {
-            const productId = document.getElementById('productSelect').value;
-            if (!productId) {
-                alert('Please select a product first');
-                return;
-            }
-            
-            const updates = {
-                name: document.getElementById('productName').value.trim(),
-                price: parseFloat(document.getElementById('productPrice').value) || 0,
-                stock: parseInt(document.getElementById('productStock').value) || 0,
-                updated_at: new Date().toISOString()
-            };
-            
-            if (!updates.name) {
-                alert('Product name is required');
-                return;
-            }
-            
-            try {
-                const { error } = await supabase
-                    .from('products')
-                    .update(updates)
-                    .eq('id', productId);
-                
-                if (error) throw error;
-                
-                debug(`Updated product ID ${productId}`, 'success');
-                alert('Product updated successfully!');
-                await loadProducts();
-                
-            } catch (error) {
-                debug(`Error updating product: ${error.message}`, 'error');
-                alert(`Error: ${error.message}`);
-            }
-        }
-        
-        async function deleteProduct() {
-            const productId = document.getElementById('productSelect').value;
-            if (!productId) {
-                alert('Please select a product first');
-                return;
-            }
-            
-            if (!confirm('Delete this product? This will also delete all its variants!')) {
-                return;
-            }
-            
-            try {
-                await supabase.from('product_sizes').delete().eq('product_id', productId);
-                await supabase.from('product_colors').delete().eq('product_id', productId);
-                
-                const { error } = await supabase
-                    .from('products')
-                    .delete()
-                    .eq('id', productId);
-                
-                if (error) throw error;
-                
-                debug(`Deleted product ID ${productId}`, 'success');
-                alert('Product deleted successfully!');
-                
-                document.getElementById('productForm').style.display = 'none';
-                await loadProducts();
-                
-            } catch (error) {
-                debug(`Error deleting product: ${error.message}`, 'error');
-                alert(`Error: ${error.message}`);
-            }
-        }
-        
-        async function loadColorsForProduct() {
-            const productId = document.getElementById('colorProductSelect').value;
-            if (!productId) {
-                document.getElementById('colorForm').style.display = 'none';
-                document.getElementById('colorsList').innerHTML = 'Select a product to view colors...';
-                return;
-            }
-            
-            try {
-                document.getElementById('colorForm').style.display = 'block';
-                document.getElementById('colorsList').innerHTML = '<div style="color: #666;">Loading colors...</div>';
-                
-                const { data: colors, error } = await supabase
-                    .from('product_colors')
-                    .select('*')
-                    .eq('product_id', productId)
-                    .order('color_name');
-                
-                if (error) throw error;
-                
-                let html = '';
-                if (colors && colors.length > 0) {
-                    colors.forEach(color => {
-                        html += `
-                            <div class="data-item">
-                                <div>${color.color_name}</div>
-                                <div>
-                                    <span style="display: inline-block; width: 20px; height: 20px; background: ${color.color_code || '#ccc'}; border-radius: 50%; margin-right: 10px;"></span>
-                                    <button onclick="deleteColor(${color.id})" style="background: #f44336; padding: 5px 10px; font-size: 12px;">Delete</button>
+                // Load colors for product
+                loadColorsForProduct: async function() {
+                    const productId = document.getElementById('colorProductSelect').value;
+                    if (!productId) {
+                        document.getElementById('colorsList').innerHTML = '<div class="loading">Select a product to view colors</div>';
+                        return;
+                    }
+                    
+                    try {
+                        document.getElementById('colorsList').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><br>Loading colors...</div>';
+                        
+                        const { data: colors, error } = await this.supabase
+                            .from('product_colors')
+                            .select('*')
+                            .eq('product_id', productId)
+                            .order('color_name');
+                        
+                        if (error) throw error;
+                        
+                        let html = '';
+                        if (colors.length > 0) {
+                            html = colors.map(c => `
+                                <div class="data-item">
+                                    <div class="data-info">
+                                        <h4>
+                                            <span class="color-swatch" style="background: ${c.color_code || '#ccc'}"></span>
+                                            ${c.color_name}
+                                        </h4>
+                                        <p>ID: ${c.id} | Code: ${c.color_code || 'N/A'} ${c.is_default ? '| ★ Default' : ''}</p>
+                                    </div>
+                                    <div class="data-actions">
+                                        <button class="btn btn-danger btn-sm" onclick="JMPOTTERS_ADMIN.deleteColor(${c.id})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    html = '<div style="color: #666;">No colors defined for this product</div>';
+                            `).join('');
+                        } else {
+                            html = '<div class="loading">No colors defined for this product</div>';
+                        }
+                        
+                        document.getElementById('colorsList').innerHTML = html;
+                        document.getElementById('colorCount').textContent = colors.length;
+                    } catch (error) {
+                        document.getElementById('colorsList').innerHTML = `<div class="error">Failed to load colors: ${error.message}</div>`;
+                    }
+                },
+                
+                // Add color
+                addColor: async function() {
+                    const productId = document.getElementById('colorProductSelect').value;
+                    const colorName = document.getElementById('colorName').value.trim();
+                    const colorHex = document.getElementById('colorHex').value;
+                    
+                    if (!productId || !colorName) {
+                        this.showMessage('Please select a product and enter color name', 'error');
+                        return;
+                    }
+                    
+                    const newColor = {
+                        product_id: parseInt(productId),
+                        color_name: colorName,
+                        color_code: colorHex,
+                        is_default: false,
+                        sort_order: 0
+                    };
+                    
+                    try {
+                        const { error } = await this.supabase
+                            .from('product_colors')
+                            .insert([newColor]);
+                        
+                        if (error) throw error;
+                        
+                        this.showMessage('✅ Color added successfully!');
+                        document.getElementById('colorName').value = '';
+                        await this.loadColorsForProduct();
+                    } catch (error) {
+                        this.showMessage('❌ Error adding color: ' + error.message, 'error');
+                    }
+                },
+                
+                // Delete color
+                deleteColor: async function(colorId) {
+                    if (!confirm('Are you sure you want to delete this color? All associated sizes will also be deleted.')) {
+                        return;
+                    }
+                    
+                    try {
+                        const { error } = await this.supabase
+                            .from('product_colors')
+                            .delete()
+                            .eq('id', colorId);
+                        
+                        if (error) throw error;
+                        
+                        this.showMessage('✅ Color deleted!');
+                        await this.loadColorsForProduct();
+                    } catch (error) {
+                        this.showMessage('❌ Error deleting color: ' + error.message, 'error');
+                    }
+                },
+                
+                // Load colors for size product
+                loadColorsForSizeProduct: async function() {
+                    const productId = document.getElementById('sizeProductSelect').value;
+                    if (!productId) return;
+                    
+                    try {
+                        const { data: colors, error } = await this.supabase
+                            .from('product_colors')
+                            .select('id, color_name')
+                            .eq('product_id', productId)
+                            .order('color_name');
+                        
+                        if (error) throw error;
+                        
+                        const select = document.getElementById('sizeColorSelect');
+                        select.innerHTML = '<option value="">Select color...</option>' +
+                            colors.map(c => `<option value="${c.id}">${c.color_name}</option>`).join('');
+                    } catch (error) {
+                        console.error('Error loading colors:', error);
+                    }
+                },
+                
+                // Load sizes for color
+                loadSizesForColor: async function() {
+                    const colorId = document.getElementById('sizeColorSelect').value;
+                    const productId = document.getElementById('sizeProductSelect').value;
+                    
+                    if (!colorId || !productId) {
+                        document.getElementById('sizesList').innerHTML = '<div class="loading">Select product and color to view sizes</div>';
+                        return;
+                    }
+                    
+                    try {
+                        document.getElementById('sizesList').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><br>Loading sizes...</div>';
+                        
+                        const { data: sizes, error } = await this.supabase
+                            .from('product_sizes')
+                            .select('*')
+                            .eq('product_id', productId)
+                            .eq('color_id', colorId)
+                            .order('size_value');
+                        
+                        if (error) throw error;
+                        
+                        let html = '';
+                        if (sizes.length > 0) {
+                            html = sizes.map(s => {
+                                const stockClass = s.stock_quantity === 0 ? 'stock-out' : 
+                                                 s.stock_quantity < 5 ? 'stock-low' : 'stock-in';
+                                const stockText = s.stock_quantity === 0 ? 'Out of stock' : 
+                                                 s.stock_quantity < 5 ? `${s.stock_quantity} left` : 'In stock';
+                                
+                                return `
+                                    <div class="data-item">
+                                        <div class="data-info">
+                                            <h4>Size ${s.size_value}</h4>
+                                            <p>ID: ${s.id} | <span class="stock-badge ${stockClass}">${stockText}</span></p>
+                                        </div>
+                                        <div class="data-actions">
+                                            <button class="btn btn-sm" onclick="JMPOTTERS_ADMIN.editSizeStock(${s.id}, ${s.stock_quantity})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" onclick="JMPOTTERS_ADMIN.deleteSize(${s.id})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                        } else {
+                            html = '<div class="loading">No sizes defined for this color</div>';
+                        }
+                        
+                        document.getElementById('sizesList').innerHTML = html;
+                    } catch (error) {
+                        document.getElementById('sizesList').innerHTML = `<div class="error">Failed to load sizes: ${error.message}</div>`;
+                    }
+                },
+                
+                // Add/update size
+                addSize: async function() {
+                    const productId = document.getElementById('sizeProductSelect').value;
+                    const colorId = document.getElementById('sizeColorSelect').value;
+                    const sizeValue = document.getElementById('sizeValue').value;
+                    const stock = parseInt(document.getElementById('sizeStock').value);
+                    
+                    if (!productId || !colorId || !sizeValue) {
+                        this.showMessage('Please select product, color, and size', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        // Check if size exists
+                        const { data: existing, error: checkError } = await this.supabase
+                            .from('product_sizes')
+                            .select('id')
+                            .eq('product_id', productId)
+                            .eq('color_id', colorId)
+                            .eq('size_value', sizeValue)
+                            .maybeSingle();
+                        
+                        if (checkError) throw checkError;
+                        
+                        let result;
+                        if (existing) {
+                            // Update existing
+                            result = await this.supabase
+                                .from('product_sizes')
+                                .update({ 
+                                    stock_quantity: stock, 
+                                    updated_at: new Date().toISOString() 
+                                })
+                                .eq('id', existing.id);
+                        } else {
+                            // Insert new
+                            result = await this.supabase
+                                .from('product_sizes')
+                                .insert([{
+                                    product_id: productId,
+                                    color_id: colorId,
+                                    size_value: sizeValue,
+                                    stock_quantity: stock,
+                                    is_available: true
+                                }]);
+                        }
+                        
+                        if (result.error) throw result.error;
+                        
+                        this.showMessage('✅ Size stock updated successfully!');
+                        document.getElementById('sizeStock').value = 0;
+                        await this.loadSizesForColor();
+                    } catch (error) {
+                        this.showMessage('❌ Error updating size: ' + error.message, 'error');
+                    }
+                },
+                
+                // Edit size stock
+                editSizeStock: async function(sizeId, currentStock) {
+                    const newStock = prompt('Enter new stock quantity:', currentStock);
+                    if (newStock === null || isNaN(newStock)) return;
+                    
+                    try {
+                        const { error } = await this.supabase
+                            .from('product_sizes')
+                            .update({ 
+                                stock_quantity: parseInt(newStock), 
+                                updated_at: new Date().toISOString() 
+                            })
+                            .eq('id', sizeId);
+                        
+                        if (error) throw error;
+                        
+                        this.showMessage('✅ Stock updated!');
+                        await this.loadSizesForColor();
+                    } catch (error) {
+                        this.showMessage('❌ Error updating stock: ' + error.message, 'error');
+                    }
+                },
+                
+                // Delete size
+                deleteSize: async function(sizeId) {
+                    if (!confirm('Delete this size variant?')) return;
+                    
+                    try {
+                        const { error } = await this.supabase
+                            .from('product_sizes')
+                            .delete()
+                            .eq('id', sizeId);
+                        
+                        if (error) throw error;
+                        
+                        this.showMessage('✅ Size deleted!');
+                        await this.loadSizesForColor();
+                    } catch (error) {
+                        this.showMessage('❌ Error deleting size: ' + error.message, 'error');
+                    }
+                },
+                
+                // Initialize dashboard
+                initializeDashboard: async function() {
+                    console.log('🚀 Starting admin dashboard...');
+                    
+                    if (!this.supabase) {
+                        this.showMessage('❌ Supabase client not initialized', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        // Test connection
+                        const { data, error } = await this.supabase
+                            .from('products')
+                            .select('count', { count: 'exact', head: true });
+                        
+                        if (error) {
+                            throw new Error('Failed to connect to Supabase: ' + error.message);
+                        }
+                        
+                        console.log('✅ Connected to Supabase');
+                        
+                        // Load data
+                        await this.loadProductsDropdown();
+                        
+                        // Set up event listeners
+                        this.setupEventListeners();
+                        
+                    } catch (error) {
+                        console.error('❌ Initialization error:', error);
+                        this.showMessage('Failed to initialize: ' + error.message, 'error');
+                    }
+                },
+                
+                // Setup event listeners
+                setupEventListeners: function() {
+                    // Add any additional event listeners here
+                    console.log('✅ Event listeners setup');
                 }
-                
-                document.getElementById('colorsList').innerHTML = html;
-                debug(`Loaded ${colors?.length || 0} colors for product ${productId}`, 'success');
-                
-            } catch (error) {
-                debug(`Error loading colors: ${error.message}`, 'error');
-                document.getElementById('colorsList').innerHTML = `<div style="color: #f44336;">Error: ${error.message}</div>`;
-            }
+            };
         }
         
-        async function addColor() {
-            const productId = document.getElementById('colorProductSelect').value;
-            const colorName = document.getElementById('colorName').value.trim();
-            const colorHex = document.getElementById('colorHex').value;
-            
-            if (!productId || !colorName) {
-                alert('Please select a product and enter color name');
-                return;
-            }
-            
-            try {
-                const newColor = {
-                    product_id: parseInt(productId),
-                    color_name: colorName,
-                    color_code: colorHex,
-                    is_default: false,
-                    sort_order: 0
-                };
-                
-                const { error } = await supabase
-                    .from('product_colors')
-                    .insert([newColor]);
-                
-                if (error) throw error;
-                
-                debug(`Added color "${colorName}" to product ${productId}`, 'success');
-                document.getElementById('colorName').value = '';
-                await loadColorsForProduct();
-                
-            } catch (error) {
-                debug(`Error adding color: ${error.message}`, 'error');
-                alert(`Error: ${error.message}`);
-            }
-        }
-        
-        async function deleteColor(colorId) {
-            if (!confirm('Delete this color? All associated sizes will also be deleted.')) {
-                return;
-            }
-            
-            try {
-                await supabase.from('product_sizes').delete().eq('color_id', colorId);
-                
-                const { error } = await supabase
-                    .from('product_colors')
-                    .delete()
-                    .eq('id', colorId);
-                
-                if (error) throw error;
-                
-                debug(`Deleted color ID ${colorId}`, 'success');
-                await loadColorsForProduct();
-                
-            } catch (error) {
-                debug(`Error deleting color: ${error.message}`, 'error');
-                alert(`Error: ${error.message}`);
-            }
-        }
-        
-        // ============================================
-        // INITIALIZE
-        // ============================================
-        
+        // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            debug('Admin dashboard loaded', 'info');
-            // Start connection test automatically
-            setTimeout(testDirectConnection, 1000);
+            console.log('📄 DOM loaded, initializing admin...');
+            if (window.JMPOTTERS_ADMIN) {
+                window.JMPOTTERS_ADMIN.init();
+            } else {
+                console.error('❌ JMPOTTERS_ADMIN not defined');
+            }
         });
         
-        // Make functions global
-        window.testDirectConnection = testDirectConnection;
-        window.toggleDebug = toggleDebug;
-        window.clearLocalStorage = clearLocalStorage;
-        window.loadProductDetails = loadProductDetails;
-        window.updateProduct = updateProduct;
-        window.deleteProduct = deleteProduct;
-        window.loadColorsForProduct = loadColorsForProduct;
-        window.addColor = addColor;
-        window.deleteColor = deleteColor;
+        // Global error handler
+        window.addEventListener('error', function(event) {
+            console.error('🚨 Global error:', event.error);
+            const container = document.getElementById('messageContainer');
+            if (container) {
+                container.innerHTML = `<div class="error">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    JavaScript Error: ${event.message}
+                </div>`;
+            }
+        });
     </script>
 </body>
 </html>
