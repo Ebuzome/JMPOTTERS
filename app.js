@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE IMPROVED VERSION WITH PERMANENT PRODUCT URLs
+// JMPOTTERS APP - COMPLETE FIXED VERSION WITH PERMANENT PRODUCT URLs
 // ====================
 (function() {
     'use strict';
@@ -9,7 +9,7 @@
         return;
     }
     
-    console.log('🚀 JMPOTTERS app starting (Improved v2 with Permanent URLs)...');
+    console.log('🚀 JMPOTTERS app starting (Fixed v3)...');
     window.JMPOTTERS_APP_INITIALIZED = true;
     
     // ====================
@@ -34,7 +34,8 @@
             'bags': '',
             'household': 'household2/',
             'kids': 'kids/',
-            'accessories': 'accessories/'
+            'accessories': 'accessories/',
+            'healthcare': ''
         }
     };
     
@@ -56,14 +57,18 @@
     function getCurrentCategory() {
         const path = window.location.pathname;
         const page = path.split('/').pop().replace('.html', '');
+        
+        // Map your actual category slugs from database
         const pageToCategory = {
             'mensfootwear': 'mensfootwear',
             'womensfootwear': 'womensfootwear',
             'bags': 'bags',
             'household': 'household',
             'kids': 'kids',
-            'accessories': 'accessories'
+            'accessories': 'accessories',
+            'healthcare': 'healthcare'
         };
+        
         return pageToCategory[page] || 'mensfootwear';
     }
     
@@ -75,7 +80,10 @@
         if (!isProductPage()) return null;
         
         const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('slug');
+        const slug = urlParams.get('slug');
+        
+        // Decode the slug to handle spaces and special characters
+        return slug ? decodeURIComponent(slug) : null;
     }
     
     function getImageUrl(categorySlug, imageFilename) {
@@ -146,7 +154,7 @@
     }
     
     // ====================
-    // NEW: LOAD SINGLE PRODUCT BY SLUG (FOR PERMANENT URLS)
+    // LOAD SINGLE PRODUCT BY SLUG (FOR PERMANENT URLS)
     // ====================
     async function loadSingleProductBySlug(slug) {
         console.log(`📦 Loading single product by slug: ${slug}`);
@@ -178,55 +186,63 @@
         }
         
         try {
-            // Fetch product with all related data
-            const { data: product, error } = await supabase
+            // Get product first
+            const { data: product, error: productError } = await supabase
                 .from('products')
-                .select(`
-                    *,
-                    categories!inner(slug, name),
-                    product_colors(
-                        id,
-                        color_name,
-                        color_code,
-                        sort_order
-                    ),
-                    product_sizes(
-                        id,
-                        size_value,
-                        stock_quantity,
-                        color_id
-                    )
-                `)
+                .select('*')
                 .eq('slug', slug)
                 .eq('is_active', true)
                 .single();
             
-            if (error) {
-                console.error('❌ Product fetch error:', error);
-                throw new Error('Product not found in database');
-            }
-            
-            if (!product) {
+            if (productError || !product) {
+                console.error('❌ Product not found:', slug);
                 throw new Error('Product not found');
             }
             
             console.log('✅ Loaded product:', product.name);
-            console.log('✅ Category:', product.categories);
+            
+            // Get category separately
+            const { data: category, error: catError } = await supabase
+                .from('categories')
+                .select('id, name, slug')
+                .eq('id', product.category_id)
+                .single();
+            
+            if (catError) {
+                console.warn('⚠️ Category not found for product:', product.id);
+            }
+            
+            // Get colors separately
+            const { data: colors, error: colorsError } = await supabase
+                .from('product_colors')
+                .select('*')
+                .eq('product_id', product.id)
+                .order('sort_order');
+            
+            if (colorsError) {
+                console.warn('⚠️ Could not load colors:', colorsError);
+            }
+            
+            // Get sizes separately
+            const { data: sizes, error: sizesError } = await supabase
+                .from('product_sizes')
+                .select('*')
+                .eq('product_id', product.id)
+                .order('size_value');
+            
+            if (sizesError) {
+                console.warn('⚠️ Could not load sizes:', sizesError);
+            }
             
             // Update document title
             document.title = `${product.name} - JMPOTTERS`;
             
-            // Update URL if slug is different (for legacy URLs)
-            const currentSlug = getSlugFromURL();
-            if (currentSlug !== product.slug) {
-                const newUrl = `${window.location.pathname}?slug=${encodeURIComponent(product.slug)}`;
-                window.history.replaceState(null, '', newUrl);
-            }
-            
             // Set current product state
             currentProduct = product;
-            currentProductColors = product.product_colors || [];
-            currentProductSizes = product.product_sizes || [];
+            currentProduct.category_slug = category?.slug || getCurrentCategory();
+            currentProduct.category_name = category?.name || 'Category';
+            currentProductColors = colors || [];
+            currentProductSizes = sizes || [];
             currentSelectedQuantity = 1;
             currentSelectedColor = null;
             currentSelectedSize = null;
@@ -235,10 +251,10 @@
             buildColorSizeMappings(currentProductColors, currentProductSizes);
             
             // Render product on standalone page
-            renderProductPage(product);
+            renderProductPage(currentProduct);
             
             // Update breadcrumb
-            updateBreadcrumb(product);
+            updateBreadcrumb(currentProduct);
             
             // Setup product page interactions
             setupProductPageInteractions();
@@ -248,7 +264,7 @@
             productViewer.innerHTML = `
                 <div class="error-message">
                     <h3>⚠️ Product Not Found</h3>
-                    <p>${error.message}</p>
+                    <p>The product "${slug}" was not found or is no longer available.</p>
                     <a href="index.html" class="btn">Return to Home</a>
                 </div>
             `;
@@ -259,8 +275,7 @@
         const productViewer = document.getElementById('productViewer');
         if (!productViewer) return;
         
-        const category = product.categories;
-        const categorySlug = category?.slug || getCurrentCategory();
+        const categorySlug = product.category_slug || getCurrentCategory();
         const imageUrl = getImageUrl(categorySlug, product.image_url);
         
         // Calculate fake price for discount display
@@ -278,7 +293,7 @@
             <div class="breadcrumb">
                 <a href="index.html">Home</a>
                 <i class="fas fa-chevron-right"></i>
-                <a href="${categorySlug}.html">${category?.name || categorySlug}</a>
+                <a href="${categorySlug}.html">${product.category_name || categorySlug}</a>
                 <i class="fas fa-chevron-right"></i>
                 <span>${product.name}</span>
             </div>
@@ -318,7 +333,7 @@
                     </div>
                     
                     <!-- Variant Selectors (for footwear) -->
-                    ${isFootwear ? `
+                    ${isFootwear && currentProductColors.length > 0 ? `
                     <div class="variant-selectors" id="variantSelectors">
                         <div class="variant-section">
                             <h4>Select Color</h4>
@@ -362,7 +377,7 @@
                         <h4>Quantity</h4>
                         <div class="quantity-controls">
                             <button class="quantity-btn minus">-</button>
-                            <input type="number" id="productQuantity" value="1" min="1" max="100">
+                            <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}">
                             <button class="quantity-btn plus">+</button>
                         </div>
                         <div class="bulk-options">
@@ -833,9 +848,9 @@
     
     function updateBreadcrumb(product) {
         const breadcrumb = document.querySelector('.breadcrumb');
-        if (breadcrumb && product.categories) {
-            const categoryName = product.categories.name || product.categories.slug;
-            const categorySlug = product.categories.slug;
+        if (breadcrumb && product) {
+            const categoryName = product.category_name || 'Category';
+            const categorySlug = product.category_slug || getCurrentCategory();
             
             breadcrumb.innerHTML = `
                 <a href="index.html">Home</a>
@@ -845,6 +860,33 @@
                 <span>${product.name}</span>
             `;
         }
+    }
+    
+    function buildColorSizeMappings(colors, sizes) {
+        // Reset mappings
+        colorSizeMap = {};
+        sizeColorMap = {};
+        
+        // Build color -> sizes map
+        colors.forEach(color => {
+            colorSizeMap[color.id] = sizes.filter(size => size.color_id === color.id);
+        });
+        
+        // Build size -> colors map
+        const uniqueSizes = [...new Set(sizes.map(s => s.size_value))];
+        uniqueSizes.forEach(sizeValue => {
+            const sizeVariants = sizes.filter(s => s.size_value === sizeValue);
+            sizeColorMap[sizeValue] = colors.filter(color => 
+                sizeVariants.some(s => s.color_id === color.id)
+            );
+        });
+        
+        console.log('🗺️ Built color-size mappings:', {
+            colors: colors.length,
+            sizes: sizes.length,
+            colorSizeMapEntries: Object.keys(colorSizeMap).length,
+            sizeColorMapEntries: Object.keys(sizeColorMap).length
+        });
     }
     
     function setupProductPageInteractions() {
@@ -873,8 +915,6 @@
                 updateSizeOptionsForColor(currentSelectedColor.id);
             });
         }
-        
-        // Size selection (dynamic - added in updateSizeOptionsForColor)
         
         // Quantity controls
         const quantityInput = document.getElementById('productQuantity');
@@ -916,8 +956,10 @@
                 this.classList.add('active');
                 
                 const qty = parseInt(this.dataset.qty);
-                quantityInput.value = qty;
-                currentSelectedQuantity = qty;
+                if (quantityInput) {
+                    quantityInput.value = qty;
+                    currentSelectedQuantity = qty;
+                }
             });
         });
         
@@ -927,10 +969,10 @@
             pageAddToCart.addEventListener('click', () => {
                 // For footwear, validate selection
                 const isFootwear = ['mensfootwear', 'womensfootwear'].includes(
-                    currentProduct.categories?.slug || getCurrentCategory()
+                    currentProduct.category_slug || getCurrentCategory()
                 );
                 
-                if (isFootwear) {
+                if (isFootwear && currentProductColors.length > 0) {
                     if (!currentSelectedColor) {
                         showNotification('Please select a color', 'warning');
                         return;
@@ -1076,7 +1118,7 @@
     }
     
     // ====================
-    // PRODUCT FUNCTIONS (ORIGINAL)
+    // PRODUCT FUNCTIONS
     // ====================
     async function loadProductsByCategory(categorySlug) {
         console.log(`📦 Loading products for: ${categorySlug}`);
@@ -1107,26 +1149,28 @@
         }
         
         try {
-            // Get category ID
+            // Get category by slug first
             const { data: category, error: catError } = await supabase
                 .from('categories')
-                .select('id, name')
+                .select('id, name, slug')
                 .eq('slug', categorySlug)
                 .single();
             
-            if (catError) {
-                console.error('❌ Category error:', catError);
-                showNotification('Category not found', 'error');
+            if (catError || !category) {
+                console.error('❌ Category not found:', categorySlug);
+                productsGrid.innerHTML = `
+                    <div class="error-message">
+                        <h3>⚠️ Category Not Found</h3>
+                        <p>The category "${categorySlug}" was not found.</p>
+                        <a href="index.html" class="btn">Return to Home</a>
+                    </div>
+                `;
                 return;
-            }
-            
-            if (!category) {
-                throw new Error(`Category "${categorySlug}" not found`);
             }
             
             console.log(`✅ Found category: ${category.name} (ID: ${category.id})`);
             
-            // Get basic product data WITH SLUGS
+            // Get products for this category
             const { data: products, error: prodError } = await supabase
                 .from('products')
                 .select('id, name, price, image_url, stock, slug')
@@ -1139,10 +1183,16 @@
                 throw prodError;
             }
             
-            console.log(`✅ Loaded ${products?.length || 0} basic products`);
+            console.log(`✅ Loaded ${products?.length || 0} products`);
             
             if (!products || products.length === 0) {
-                showNoProducts();
+                productsGrid.innerHTML = `
+                    <div class="no-products">
+                        <i class="fas fa-box-open"></i>
+                        <h3>No Products Found</h3>
+                        <p>No products available in this category yet.</p>
+                    </div>
+                `;
                 return;
             }
             
@@ -1215,7 +1265,7 @@
                         <button class="btn-add-cart" data-id="${product.id}">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
-                        <a href="product.html?slug=${product.slug || encodeURIComponent(product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'))}" 
+                        <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
                            class="btn-view-details">
                             <i class="fas fa-eye"></i> View Details
                         </a>
@@ -1231,7 +1281,7 @@
     }
     
     // ====================
-    // MODAL FUNCTIONS - WITH IMPROVED DROPDOWNS
+    // MODAL FUNCTIONS (FOR BACKWARD COMPATIBILITY)
     // ====================
     async function openProductModal(productId) {
         console.log(`📊 Opening modal for product ID: ${productId}`);
@@ -1243,25 +1293,18 @@
         }
         
         try {
-            // 1. Get basic product data
+            // Get product
             const { data: product, error: productError } = await supabase
                 .from('products')
                 .select('*')
                 .eq('id', productId)
                 .single();
             
-            if (productError) {
-                console.error('❌ Product fetch error:', productError);
+            if (productError || !product) {
                 throw new Error('Product not found in database');
             }
             
-            if (!product) {
-                throw new Error('Product data is empty');
-            }
-            
-            console.log('✅ Loaded basic product:', product.name);
-            
-            // 2. Get colors for this product
+            // Get colors
             const { data: colors, error: colorsError } = await supabase
                 .from('product_colors')
                 .select('*')
@@ -1269,13 +1312,10 @@
                 .order('sort_order');
             
             if (colorsError) {
-                console.error('❌ Colors fetch error:', colorsError);
-                throw new Error('Failed to load colors');
+                console.warn('⚠️ Colors fetch error:', colorsError);
             }
             
-            console.log(`✅ Loaded ${colors?.length || 0} colors`);
-            
-            // 3. Get sizes with stock for this product
+            // Get sizes
             const { data: sizes, error: sizesError } = await supabase
                 .from('product_sizes')
                 .select('*')
@@ -1283,85 +1323,32 @@
                 .order('size_value');
             
             if (sizesError) {
-                console.error('❌ Sizes fetch error:', sizesError);
-                throw new Error('Failed to load sizes');
+                console.warn('⚠️ Sizes fetch error:', sizesError);
             }
             
-            console.log(`✅ Loaded ${sizes?.length || 0} size variants`);
-            
-            // 4. Get modal configuration
-            let modalConfig = null;
-            try {
-                const { data: modalData } = await supabase
-                    .from('product_modals')
-                    .select('*')
-                    .eq('product_id', productId)
-                    .maybeSingle();
-                
-                modalConfig = modalData;
-                console.log('✅ Modal config:', modalConfig ? 'found' : 'not found');
-            } catch (modalError) {
-                console.log('⚠️ No modal config:', modalError.message);
-            }
-            
-            // 5. Build mappings
+            // Set current state
             currentProduct = product;
-            currentModalConfig = modalConfig;
             currentProductColors = colors || [];
             currentProductSizes = sizes || [];
             currentSelectedColor = null;
             currentSelectedSize = null;
             currentSelectedVariant = null;
             
-            buildColorSizeMappings(colors || [], sizes || []);
+            buildColorSizeMappings(currentProductColors, currentProductSizes);
             
-            // 6. Render modal with new dropdown interface
-            renderModalWithDropdowns(product, colors || [], sizes || [], modalConfig);
-            
-            // 7. Open modal
-            const modalOverlay = document.getElementById('modalOverlay');
-            if (modalOverlay) {
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                console.log('✅ Modal opened successfully');
+            // Redirect to product page instead of opening modal
+            if (product.slug) {
+                window.location.href = `product.html?slug=${encodeURIComponent(product.slug)}`;
+            } else {
+                // Fallback to ID if no slug
+                window.location.href = `product.html?slug=${product.id}`;
             }
             
         } catch (error) {
-            console.error('❌ Detailed modal error:', error);
-            showNotification(`Failed to load product details: ${error.message}`, 'error');
+            console.error('❌ Modal error:', error);
+            showNotification(`Failed to load product: ${error.message}`, 'error');
         }
     }
-    
-    function buildColorSizeMappings(colors, sizes) {
-        // Reset mappings
-        colorSizeMap = {};
-        sizeColorMap = {};
-        
-        // Build color -> sizes map
-        colors.forEach(color => {
-            colorSizeMap[color.id] = sizes.filter(size => size.color_id === color.id);
-        });
-        
-        // Build size -> colors map
-        const uniqueSizes = [...new Set(sizes.map(s => s.size_value))];
-        uniqueSizes.forEach(sizeValue => {
-            const sizeVariants = sizes.filter(s => s.size_value === sizeValue);
-            sizeColorMap[sizeValue] = colors.filter(color => 
-                sizeVariants.some(s => s.color_id === color.id)
-            );
-        });
-        
-        console.log('🗺️ Built color-size mappings:', {
-            colors: colors.length,
-            sizes: sizes.length,
-            colorSizeMapEntries: Object.keys(colorSizeMap).length,
-            sizeColorMapEntries: Object.keys(sizeColorMap).length
-        });
-    }
-    
-    // ... [Rest of the modal functions remain the same as in original file]
-    // Including: renderModalWithDropdowns, addDropdownStyles, setupDropdownInteractions,
-    // updateSizeDropdownForColor, updateStockDisplay, updateAddToCartButton
     
     // ====================
     // PRODUCT INTERACTIONS
@@ -1425,7 +1412,7 @@
     }
     
     // ====================
-    // CART FUNCTIONS (UNCHANGED)
+    // CART FUNCTIONS
     // ====================
     function addToCart(product, quantity = 1, options = {}) {
         let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
@@ -1437,7 +1424,7 @@
             name: product.name,
             price: product.price || 0,
             image_url: product.image_url,
-            category_slug: getCurrentCategory(),
+            category_slug: options.category_slug || getCurrentCategory(),
             color_id: options.color_id || null,
             color_name: options.color_name || null,
             size_id: options.size_id || null,
@@ -1484,14 +1471,170 @@
         updateCartPanel();
     }
     
-    // ... [Rest of cart functions remain the same]
-    // Including: updateCartPanel, setupCartInteractions, toggleWishlist, updateWishlistUI
+    function updateCartPanel() {
+        const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        const whatsappCheckout = document.getElementById('whatsappCheckout');
+        
+        if (!cartItems || !cartTotal) return;
+        
+        if (cart.length === 0) {
+            cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+            cartTotal.textContent = '₦0';
+            if (whatsappCheckout) whatsappCheckout.href = '#';
+            return;
+        }
+        
+        let html = '';
+        let total = 0;
+        
+        cart.forEach((item, index) => {
+            const itemTotal = (item.price || 0) * item.quantity;
+            total += itemTotal;
+            
+            // Build item description
+            let itemDescription = item.name;
+            if (item.color_name) itemDescription += ` (${item.color_name})`;
+            if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
+            
+            html += `
+                <div class="cart-item">
+                    <div class="cart-item-image">
+                        <img src="${getImageUrl(item.category_slug, item.image_url)}" alt="${item.name}">
+                    </div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${itemDescription}</div>
+                        <div class="cart-item-price">${formatPrice(item.price)}</div>
+                        <div class="cart-item-quantity">
+                            <button class="decrease-quantity" data-index="${index}">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="increase-quantity" data-index="${index}">+</button>
+                        </div>
+                    </div>
+                    <button class="cart-item-remove" data-index="${index}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+        });
+        
+        cartItems.innerHTML = html;
+        cartTotal.textContent = formatPrice(total);
+        
+        setupCartInteractions();
+        
+        // Update WhatsApp checkout link
+        if (whatsappCheckout) {
+            let text = "I would like to purchase:\n";
+            cart.forEach(item => {
+                let itemDescription = item.name;
+                if (item.color_name) itemDescription += ` (${item.color_name})`;
+                if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
+                
+                const itemTotal = (item.price || 0) * item.quantity;
+                text += `- ${itemDescription} (${item.quantity} × ${formatPrice(item.price)}) = ${formatPrice(itemTotal)}\n`;
+            });
+            text += `\n*Total: ${formatPrice(total)}*\n\nPlease confirm order & shipping details.`;
+            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
+        }
+    }
+    
+    function setupCartInteractions() {
+        // Decrease quantity
+        document.querySelectorAll('.decrease-quantity').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity--;
+                } else {
+                    cart.splice(index, 1);
+                }
+                
+                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
+                updateCartUI();
+                showNotification('Cart updated', 'info');
+            });
+        });
+        
+        // Increase quantity
+        document.querySelectorAll('.increase-quantity').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                
+                cart[index].quantity++;
+                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
+                updateCartUI();
+                showNotification('Cart updated', 'info');
+            });
+        });
+        
+        // Remove item
+        document.querySelectorAll('.cart-item-remove').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                const removedItem = cart[index];
+                
+                cart.splice(index, 1);
+                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
+                updateCartUI();
+                
+                showNotification(`${removedItem.name} removed from cart`, 'info');
+            });
+        });
+    }
+    
+    function toggleWishlist(product) {
+        let wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        const existingIndex = wishlist.findIndex(item => item.id === product.id);
+        
+        if (existingIndex !== -1) {
+            wishlist.splice(existingIndex, 1);
+            showNotification(`${product.name} removed from wishlist`, 'info');
+        } else {
+            wishlist.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image_url: product.image_url,
+                slug: product.slug
+            });
+            showNotification(`${product.name} added to wishlist!`, 'success');
+        }
+        
+        localStorage.setItem('jmpotters_wishlist', JSON.stringify(wishlist));
+        updateWishlistUI();
+    }
+    
+    function updateWishlistUI() {
+        const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        const wishlistCount = document.getElementById('wishlistCount');
+        
+        if (wishlistCount) {
+            wishlistCount.textContent = wishlist.length;
+            wishlistCount.style.display = wishlist.length > 0 ? 'flex' : 'none';
+        }
+    }
     
     // ====================
     // INITIALIZATION
     // ====================
     async function initializePage() {
         console.log('🚀 Initializing JMPOTTERS page...');
+        console.log('Current page:', window.location.pathname);
+        console.log('Current category:', getCurrentCategory());
+        
+        // Check Supabase connection
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            console.error('❌ Supabase client not initialized');
+        } else {
+            console.log('✅ Supabase client ready');
+        }
         
         // Initialize UI
         updateCartUI();
@@ -1514,52 +1657,7 @@
             }
         }
         
-        // Setup modal add to cart button (for backward compatibility)
-        const modalAddCart = document.getElementById('modalAddCart');
-        if (modalAddCart) {
-            modalAddCart.addEventListener('click', () => {
-                if (!currentProduct) return;
-                
-                // Validate selection
-                if (!currentSelectedColor) {
-                    showNotification('Please select a color', 'warning');
-                    return;
-                }
-                
-                if (!currentSelectedSize) {
-                    showNotification('Please select a size', 'warning');
-                    return;
-                }
-                
-                if (currentSelectedSize.stock === 0) {
-                    showNotification('This size is out of stock', 'error');
-                    return;
-                }
-                
-                if (currentSelectedQuantity > currentSelectedSize.stock) {
-                    showNotification(`Only ${currentSelectedSize.stock} units available`, 'error');
-                    return;
-                }
-                
-                // Add to cart with all details
-                addToCart(currentProduct, currentSelectedQuantity, {
-                    color_id: currentSelectedColor.id,
-                    color_name: currentSelectedColor.name,
-                    size_id: currentSelectedSize.id,
-                    size_value: currentSelectedSize.value,
-                    variant_id: currentSelectedVariant?.id
-                });
-                
-                // Close modal
-                const modalOverlay = document.getElementById('modalOverlay');
-                if (modalOverlay) {
-                    modalOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        }
-        
-        // Setup modal close button
+        // Setup modal close button (for backward compatibility)
         const modalClose = document.getElementById('modalClose');
         if (modalClose) {
             modalClose.addEventListener('click', () => {
@@ -1571,7 +1669,7 @@
             });
         }
         
-        console.log('✅ JMPOTTERS initialized');
+        console.log('✅ JMPOTTERS initialized successfully');
     }
     
     // ====================
@@ -1584,8 +1682,9 @@
             toggleWishlist,
             initializePage,
             formatPrice,
-            loadSingleProductBySlug, // NEW: Exposed function for product pages
-            getImageUrl // NEW: Exposed for product pages
+            loadSingleProductBySlug,
+            getImageUrl,
+            loadProductsByCategory
         };
     }
     
@@ -1598,5 +1697,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with Permanent Product URLs');
+    console.log('✅ JMPOTTERS app loaded with Permanent Product URLs and all fixes');
 })();
