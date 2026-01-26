@@ -433,9 +433,16 @@
 
     <!-- Supabase & Your App -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="app.js"></script>
     
     <script>
+        // ========== SUPABASE CONFIGURATION ========== //
+        // Replace these with your actual Supabase credentials
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+        
+        // Initialize Supabase client
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         // ========== PRODUCT VIEWER LOGIC ========== //
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Minimal product viewer loaded');
@@ -446,7 +453,7 @@
             
             // Set up close button
             document.getElementById('closeBtn').addEventListener('click', function() {
-                if (document.referrer && document.referrer.includes('jmpotters')) {
+                if (document.referrer && document.referrer.includes(window.location.hostname)) {
                     window.history.back();
                 } else {
                     window.location.href = 'index.html';
@@ -466,11 +473,10 @@
             const container = document.getElementById('productContainer');
             
             try {
-                // Use your existing JMPOTTERS app
-                const app = JMPOTTERS.getInstance();
+                console.log('Loading product with slug:', slug);
                 
                 // Fetch product from Supabase
-                const { data: product, error } = await app.supabase
+                const { data: product, error } = await supabaseClient
                     .from('products')
                     .select(`
                         *,
@@ -490,24 +496,60 @@
                     .eq('slug', slug)
                     .single();
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase error:', error);
+                    
+                    // If product not found, try alternative query
+                    if (error.code === 'PGRST116') {
+                        // Try without joins first
+                        const { data: simpleProduct, error: simpleError } = await supabaseClient
+                            .from('products')
+                            .select('*')
+                            .eq('slug', slug)
+                            .single();
+                            
+                        if (simpleError) {
+                            throw new Error('Product not found');
+                        }
+                        
+                        // Get additional data separately
+                        const [categories, product_colors, bulk_pricing_tiers] = await Promise.all([
+                            supabaseClient.from('categories').select('slug, name').eq('id', simpleProduct.category_id).single(),
+                            supabaseClient.from('product_colors').select('*').eq('product_id', simpleProduct.id),
+                            supabaseClient.from('bulk_pricing_tiers').select('*').eq('product_id', simpleProduct.id)
+                        ]);
+                        
+                        product = {
+                            ...simpleProduct,
+                            categories: categories.data,
+                            product_colors: product_colors.data,
+                            bulk_pricing_tiers: bulk_pricing_tiers.data
+                        };
+                    } else {
+                        throw error;
+                    }
+                }
+                
+                if (!product) {
+                    throw new Error('Product not found');
+                }
                 
                 // Update page title
                 document.title = `${product.name} | JMPOTTERS`;
                 
                 // Render product
-                renderProduct(product, app);
+                renderProduct(product);
                 
             } catch (error) {
                 console.error('Error loading product:', error);
-                showError('Product not found or error loading details');
+                showError(`Product not found or error loading details: ${error.message}`);
             }
         }
         
-        function renderProduct(product, app) {
+        function renderProduct(product) {
             const container = document.getElementById('productContainer');
-            const isFootwear = product.categories.slug === 'mensfootwear' || 
-                              product.categories.slug === 'womensfootwear';
+            const categorySlug = product.categories?.slug || '';
+            const isFootwear = categorySlug === 'mensfootwear' || categorySlug === 'womensfootwear';
             
             // Determine stock status
             let stockStatus = '';
@@ -526,15 +568,23 @@
                 stockClass = 'stock-out';
             }
             
+            // Build image URL
+            let imageUrl = product.image_url;
+            if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+                // If it's a relative path, assume it's in the images folder
+                imageUrl = `images/${categorySlug}/${imageUrl}`;
+            }
+            
             // Build HTML
             let html = `
                 <div class="product-container">
                     <!-- Left: Image -->
                     <div class="product-image-section">
-                        <img src="${app.getImageUrl(product.categories.slug, product.image_url)}" 
+                        <img src="${imageUrl}" 
                              alt="${product.name}" 
                              class="product-image"
-                             id="productImage">
+                             id="productImage"
+                             onerror="this.src='https://via.placeholder.com/500x500?text=No+Image+Available'">
                     </div>
                     
                     <!-- Right: Details -->
@@ -549,7 +599,7 @@
                         </div>
                         
                         <div class="product-price-container">
-                            <span class="price-real">₦${product.price.toLocaleString()}</span>
+                            <span class="price-real">₦${product.price ? product.price.toLocaleString() : '0'}</span>
                             ${product.compare_price > 0 ? 
                                 `<span class="price-compare">₦${product.compare_price.toLocaleString()}</span>` : ''}
                         </div>
@@ -568,13 +618,21 @@
                 `;
                 
                 product.product_colors.forEach((color, index) => {
+                    // Find default color
+                    const isDefault = color.is_default || index === 0;
+                    let colorImage = color.color_image_url || product.image_url;
+                    if (colorImage && !colorImage.startsWith('http')) {
+                        colorImage = `images/${categorySlug}/${colorImage}`;
+                    }
+                    
                     html += `
-                        <div class="color-option ${index === 0 ? 'selected' : ''}"
+                        <div class="color-option ${isDefault ? 'selected' : ''}"
                              style="background-color: ${color.color_code || '#000'};"
                              data-color-id="${color.id}"
                              data-color-name="${color.color_name}"
-                             data-image="${color.color_image_url || product.image_url}"
-                             onclick="selectColor(this)">
+                             data-image="${colorImage}"
+                             onclick="selectColor(this, ${product.id})"
+                             title="${color.color_name}">
                         </div>
                     `;
                 });
@@ -591,20 +649,23 @@
                     <div class="size-section">
                         <label class="size-label">Size</label>
                         <div class="size-grid" id="sizeGrid">
-                            <div class="loading">Loading sizes...</div>
+                            <div class="loading" style="padding: 10px; grid-column: span 4;">
+                                <i class="fas fa-spinner fa-spin"></i> Loading sizes...
+                            </div>
                         </div>
                     </div>
                 `;
             }
             
             // Quantity selector
+            const maxQuantity = !isFootwear && product.stock ? product.stock : 999;
             html += `
                 <div class="quantity-section">
                     <label class="quantity-label">Quantity</label>
                     <div class="quantity-controls">
                         <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
                         <input type="number" id="quantityInput" class="qty-input" 
-                               value="1" min="1" ${!isFootwear ? `max="${product.stock}"` : ''}>
+                               value="1" min="1" max="${maxQuantity}">
                         <button class="qty-btn" onclick="changeQuantity(1)">+</button>
                     </div>
                 </div>
@@ -666,7 +727,11 @@
             
             // Load sizes if footwear
             if (isFootwear) {
-                loadSizes(product.id);
+                // Get selected color
+                const selectedColor = document.querySelector('.color-option.selected');
+                if (selectedColor) {
+                    loadSizes(product.id, selectedColor.dataset.colorId);
+                }
             }
             
             // Check wishlist status
@@ -674,7 +739,7 @@
         }
         
         // ========== GLOBAL FUNCTIONS ========== //
-        window.selectColor = function(element) {
+        window.selectColor = async function(element, productId) {
             // Update color selection
             document.querySelectorAll('.color-option').forEach(opt => {
                 opt.classList.remove('selected');
@@ -684,16 +749,13 @@
             // Update product image if color has specific image
             const imageUrl = element.dataset.image;
             const mainImage = document.getElementById('productImage');
-            const app = JMPOTTERS.getInstance();
-            
-            // We need the category to build proper image URL
-            // For now, we'll keep it simple
-            console.log('Selected color:', element.dataset.colorName);
+            if (imageUrl && mainImage) {
+                mainImage.src = imageUrl;
+            }
             
             // Reload sizes for this color
-            const productId = getProductIdFromURL();
             if (productId) {
-                loadSizes(productId, element.dataset.colorId);
+                await loadSizes(productId, element.dataset.colorId);
             }
         };
         
@@ -708,29 +770,37 @@
             }
             
             if (!colorId) {
-                sizeGrid.innerHTML = '<div>No color selected</div>';
+                sizeGrid.innerHTML = '<div class="size-option" style="grid-column: span 4;">No color selected</div>';
                 return;
             }
             
             try {
-                const app = JMPOTTERS.getInstance();
-                const { data: sizes, error } = await app.supabase
+                const { data: sizes, error } = await supabaseClient
                     .from('product_sizes')
                     .select('*')
                     .eq('product_id', productId)
-                    .eq('color_id', colorId);
+                    .eq('color_id', colorId)
+                    .order('size_value');
                 
                 if (error) throw error;
                 
+                if (!sizes || sizes.length === 0) {
+                    sizeGrid.innerHTML = '<div class="size-option" style="grid-column: span 4;">No sizes available for this color</div>';
+                    return;
+                }
+                
                 let sizesHtml = '';
                 sizes.forEach(size => {
+                    const isOutOfStock = size.stock_quantity <= 0;
                     sizesHtml += `
-                        <button class="size-option" 
+                        <button class="size-option ${isOutOfStock ? 'stock-out' : ''}" 
                                 data-size-id="${size.id}"
                                 data-size="${size.size_value}"
                                 data-stock="${size.stock_quantity}"
-                                onclick="selectSize(this)">
+                                onclick="selectSize(this)"
+                                ${isOutOfStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                             ${size.size_value}
+                            ${isOutOfStock ? '<br><small style="font-size: 0.7em;">(Out of stock)</small>' : ''}
                         </button>
                     `;
                 });
@@ -739,7 +809,7 @@
                 
             } catch (error) {
                 console.error('Error loading sizes:', error);
-                sizeGrid.innerHTML = '<div>Error loading sizes</div>';
+                sizeGrid.innerHTML = '<div class="size-option" style="grid-column: span 4;">Error loading sizes</div>';
             }
         }
         
@@ -769,6 +839,8 @@
         
         window.changeQuantity = function(change) {
             const input = document.getElementById('quantityInput');
+            if (!input) return;
+            
             let value = parseInt(input.value) || 1;
             const max = parseInt(input.max) || 999;
             const min = parseInt(input.min) || 1;
@@ -781,31 +853,74 @@
         };
         
         window.addToCart = function(productId) {
-            alert('Add to cart functionality would be implemented here');
-            // You can integrate with your existing cart system
-            console.log('Add to cart clicked for product:', productId);
+            const quantity = document.getElementById('quantityInput')?.value || 1;
+            const selectedSize = document.querySelector('.size-option.selected');
+            const selectedColor = document.querySelector('.color-option.selected');
+            
+            const cartItem = {
+                productId,
+                quantity: parseInt(quantity),
+                colorId: selectedColor ? selectedColor.dataset.colorId : null,
+                colorName: selectedColor ? selectedColor.dataset.colorName : null,
+                sizeId: selectedSize ? selectedSize.dataset.sizeId : null,
+                size: selectedSize ? selectedSize.dataset.size : null
+            };
+            
+            // Get existing cart
+            let cart = JSON.parse(localStorage.getItem('jmp_cart') || '[]');
+            
+            // Check if item already exists in cart
+            const existingIndex = cart.findIndex(item => 
+                item.productId === cartItem.productId && 
+                item.colorId === cartItem.colorId && 
+                item.sizeId === cartItem.sizeId
+            );
+            
+            if (existingIndex > -1) {
+                // Update quantity
+                cart[existingIndex].quantity += cartItem.quantity;
+            } else {
+                // Add new item
+                cart.push(cartItem);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('jmp_cart', JSON.stringify(cart));
+            
+            // Show success message
+            alert(`Added to cart! ${quantity} item(s) added.`);
+            
+            // Optional: Update cart count in the header if it exists
+            updateCartCount();
         };
         
         window.toggleWishlist = function(productId) {
             const btn = document.getElementById('wishlistBtn');
+            if (!btn) return;
+            
             const isActive = btn.classList.contains('active');
             
-            if (isActive) {
-                btn.classList.remove('active');
-            } else {
-                btn.classList.add('active');
-            }
-            
-            // Update localStorage
+            // Get existing wishlist
             let wishlist = JSON.parse(localStorage.getItem('jmp_wishlist') || '[]');
+            
             if (isActive) {
+                // Remove from wishlist
+                btn.classList.remove('active');
                 wishlist = wishlist.filter(id => id !== productId);
             } else {
+                // Add to wishlist
+                btn.classList.add('active');
                 if (!wishlist.includes(productId)) {
                     wishlist.push(productId);
                 }
             }
+            
+            // Save to localStorage
             localStorage.setItem('jmp_wishlist', JSON.stringify(wishlist));
+            
+            // Show feedback
+            const message = isActive ? 'Removed from wishlist' : 'Added to wishlist';
+            console.log(message);
         };
         
         function updateWishlistButton(productId) {
@@ -818,12 +933,17 @@
             }
         }
         
-        function getProductIdFromURL() {
-            // Extract from current URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const slug = urlParams.get('slug');
-            // In real implementation, you'd need to fetch or store product ID
-            return null;
+        function updateCartCount() {
+            // This function would update a cart counter in your header
+            // Implement based on your existing cart system
+            const cart = JSON.parse(localStorage.getItem('jmp_cart') || '[]');
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            
+            // If you have a cart count element, update it
+            const cartCountElement = document.querySelector('.cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = totalItems;
+            }
         }
         
         function showError(message) {
@@ -832,9 +952,9 @@
                 <div class="error-message">
                     <div class="error-title"><i class="fas fa-exclamation-triangle"></i> Error</div>
                     <p>${message}</p>
-                    <button onclick="window.history.back()" 
+                    <button onclick="window.location.href='index.html'" 
                             style="margin-top: 20px; padding: 10px 20px; background: var(--black); color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        Go Back
+                        Go to Homepage
                     </button>
                 </div>
             `;
