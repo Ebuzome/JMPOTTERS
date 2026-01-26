@@ -8,6 +8,12 @@
     <!-- Essential FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Supabase JS -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- Your App.js - This is CRITICAL -->
+    <script src="app.js" defer></script>
+    
     <style>
         /* === MINIMAL PRODUCT VIEWER STYLES === */
         :root {
@@ -40,6 +46,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
         }
 
         /* Close/Back Button */
@@ -65,6 +72,32 @@
 
         .close-btn:hover {
             background: var(--gold);
+            transform: scale(1.1);
+        }
+
+        /* WhatsApp Button */
+        .whatsapp-btn {
+            position: fixed;
+            top: 20px;
+            right: 80px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #25d366;
+            color: var(--white);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            text-decoration: none;
+        }
+
+        .whatsapp-btn:hover {
             transform: scale(1.1);
         }
 
@@ -129,16 +162,25 @@
             border-bottom: 1px solid var(--gray-light);
         }
 
-        .price-real {
+        .current-price {
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--black);
         }
 
-        .price-compare {
+        .original-price {
             font-size: 1.4rem;
             color: #999;
             text-decoration: line-through;
+        }
+
+        .discount-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
 
         .product-description {
@@ -174,88 +216,159 @@
             color: var(--danger);
         }
 
-        /* Size Selection (Footwear Only) */
-        .size-section {
-            margin-bottom: 25px;
+        /* Variant Selectors */
+        .variant-selectors {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
         }
 
-        .size-label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 600;
+        .variant-section {
+            margin-bottom: 20px;
+        }
+
+        .variant-section h4 {
+            margin-bottom: 10px;
+            color: var(--black);
+            font-size: 1.1rem;
+        }
+
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .color-option {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--black);
+            font-size: 0.9rem;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .color-option:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .color-option.selected {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: var(--gold);
             color: var(--black);
         }
 
-        .size-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
+        .size-options {
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
         }
 
         .size-option {
-            padding: 12px 5px;
-            border: 2px solid var(--gray-light);
-            background: var(--white);
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
             border-radius: 6px;
-            text-align: center;
             cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--black);
+            font-weight: bold;
+            text-align: center;
+            min-width: 60px;
         }
 
         .size-option:hover {
-            border-color: var(--gold);
-            transform: translateY(-2px);
+            background: rgba(212, 175, 55, 0.2);
+            border-color: rgba(212, 175, 55, 0.5);
         }
 
         .size-option.selected {
-            background: var(--gold);
-            color: var(--white);
+            background: rgba(212, 175, 55, 0.3);
             border-color: var(--gold);
-        }
-
-        /* Color Selection (Footwear Only) */
-        .color-section {
-            margin-bottom: 25px;
-        }
-
-        .color-label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 600;
             color: var(--black);
         }
 
-        .color-grid {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+        .size-option.out-of-stock {
+            opacity: 0.5;
+            cursor: not-allowed;
+            text-decoration: line-through;
         }
 
-        .color-option {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: var(--transition);
+        .size-option.low-stock {
             position: relative;
         }
 
-        .color-option.selected {
-            border-color: var(--gold);
-            transform: scale(1.1);
+        .size-option.low-stock::after {
+            content: 'Low';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #f39c12;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .no-selection {
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            width: 100%;
+        }
+
+        /* Selection Summary */
+        .selection-summary {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 3px solid var(--gold);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .selected-variant {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .selected-variant .separator {
+            opacity: 0.5;
+        }
+
+        .stock-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+
+        .stock-info i {
+            color: var(--gold);
         }
 
         /* Quantity Selector */
         .quantity-section {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
-        .quantity-label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 600;
+        .quantity-section h4 {
+            margin-bottom: 10px;
             color: var(--black);
         }
 
@@ -263,116 +376,184 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            max-width: 200px;
+            margin-bottom: 15px;
         }
 
-        .qty-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 8px;
-            border: 2px solid var(--gray-light);
-            background: var(--white);
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--gold);
+            color: black;
+            border: none;
+            border-radius: 6px;
             font-size: 1.2rem;
             cursor: pointer;
-            transition: var(--transition);
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .qty-btn:hover {
-            border-color: var(--gold);
-            color: var(--gold);
+        .quantity-btn:hover {
+            background: #e0c04c;
         }
 
-        .qty-input {
-            width: 70px;
-            height: 45px;
-            border: 2px solid var(--gray-light);
-            border-radius: 8px;
+        #productQuantity {
+            width: 80px;
+            height: 40px;
             text-align: center;
-            font-size: 1.2rem;
-            font-weight: 600;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--gray-light);
+            color: var(--black);
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+
+        .bulk-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .bulk-option {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--gray-light);
+            color: var(--black);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .bulk-option:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--gold);
+        }
+
+        .bulk-option.active {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: var(--gold);
+            color: var(--black);
         }
 
         /* Action Buttons */
         .action-buttons {
             display: flex;
             gap: 15px;
-            margin-top: 30px;
+            margin-bottom: 30px;
         }
 
-        .btn-add-cart {
+        .action-buttons .btn {
             flex: 1;
-            padding: 16px;
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
+            padding: 15px;
             font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
         }
 
-        .btn-add-cart:hover {
+        .btn-primary {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
             background: var(--gold);
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
         }
 
-        .btn-wishlist {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 2px solid var(--gray-light);
-            background: var(--white);
-            color: var(--gray);
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: var(--transition);
+        .btn-secondary {
+            background: #f8f9fa;
+            color: var(--black);
+            border: 2px solid #dee2e6 !important;
         }
 
-        .btn-wishlist:hover,
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
         .btn-wishlist.active {
-            background: #ff4757;
-            color: var(--white);
-            border-color: #ff4757;
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c !important;
         }
 
         /* Bulk Pricing Table */
-        .bulk-pricing {
+        .bulk-pricing-table {
             margin-top: 30px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            padding: 20px;
-            border-left: 3px solid var(--gold);
         }
 
-        .bulk-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+        .bulk-pricing-table h3 {
             margin-bottom: 15px;
             color: var(--black);
         }
 
-        .bulk-table {
+        .bulk-pricing-table table {
             width: 100%;
             border-collapse: collapse;
+            background: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        .bulk-table th {
+        .bulk-pricing-table th {
+            background: rgba(212, 175, 55, 0.3);
+            color: var(--black);
+            padding: 12px;
             text-align: left;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            color: var(--gray);
             font-weight: 600;
         }
 
-        .bulk-table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+        .bulk-pricing-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            color: #666;
+        }
+
+        .bulk-pricing-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .bulk-pricing-table tr:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--black);
+            text-decoration: underline;
+        }
+
+        .breadcrumb i {
+            margin: 0 10px;
+            opacity: 0.5;
         }
 
         /* Loading & Error States */
@@ -396,6 +577,7 @@
             margin: 0 auto;
             background: #ffebee;
             border-radius: 10px;
+            border: 2px solid #ffcdd2;
         }
 
         .error-title {
@@ -404,561 +586,164 @@
             font-size: 1.5rem;
         }
 
+        .error-message .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: var(--black);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .error-message .btn:hover {
+            background: var(--gold);
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb" id="breadcrumb">
+        <a href="index.html">Home</a>
+        <i class="fas fa-chevron-right"></i>
+        <span id="categoryLink">Loading...</span>
+        <i class="fas fa-chevron-right"></i>
+        <span id="productName">Product</span>
+    </div>
+
     <!-- Simple Back Button -->
     <button class="close-btn" id="closeBtn" title="Go back">
         <i class="fas fa-times"></i>
     </button>
 
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/2348139583320" class="whatsapp-btn" title="Chat on WhatsApp" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <!-- Product Container -->
-    <div id="productContainer">
+    <div id="productViewer">
         <div class="loading">
             <i class="fas fa-spinner loading-spinner"></i>
             <p>Loading product details...</p>
         </div>
     </div>
 
-    <!-- WhatsApp Floating Button (Optional) -->
-    <a href="https://wa.me/2348139583320" class="close-btn" 
-       style="right: 80px; background: #25d366;" 
-       title="Chat on WhatsApp" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <!-- Supabase & Your App -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    
     <script>
-        // ========== SUPABASE CONFIGURATION ========== //
-        // Replace these with your actual Supabase credentials
-        const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
+        // This script will be executed AFTER app.js loads
         
-        // Initialize Supabase client
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // ========== PRODUCT VIEWER LOGIC ========== //
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Minimal product viewer loaded');
+        // Wait for the JMPOTTERS app to initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Product page initialized');
             
-            // Get product slug from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const productSlug = urlParams.get('slug');
+            // Setup close button
+            const closeBtn = document.getElementById('closeBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    // Try to go back, otherwise go to homepage
+                    if (document.referrer && document.referrer.includes(window.location.hostname)) {
+                        window.history.back();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
             
-            // Set up close button
-            document.getElementById('closeBtn').addEventListener('click', function() {
-                if (document.referrer && document.referrer.includes(window.location.hostname)) {
-                    window.history.back();
-                } else {
-                    window.location.href = 'index.html';
-                }
-            });
-            
-            // Load product
-            if (!productSlug) {
-                showError('No product specified');
+            // Check if JMPOTTERS app is loaded
+            if (!window.JMPOTTERS) {
+                console.error('❌ JMPOTTERS app not loaded!');
+                showError('Application failed to load. Please refresh the page.');
                 return;
             }
             
-            await loadProduct(productSlug);
+            console.log('✅ JMPOTTERS app found:', window.JMPOTTERS);
+            
+            // Get slug from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('slug');
+            
+            if (!slug) {
+                showError('No product specified in URL.');
+                return;
+            }
+            
+            // Use the JMPOTTERS app to load the product
+            loadProductBySlug(slug);
         });
         
-        async function loadProduct(slug) {
-            const container = document.getElementById('productContainer');
+        async function loadProductBySlug(slug) {
+            const productViewer = document.getElementById('productViewer');
             
             try {
                 console.log('Loading product with slug:', slug);
                 
-                // Fetch product from Supabase
-                const { data: product, error } = await supabaseClient
-                    .from('products')
-                    .select(`
-                        *,
-                        categories(slug, name),
-                        product_colors(
-                            id,
-                            color_name,
-                            color_code,
-                            color_image_url,
-                            is_default
-                        ),
-                        bulk_pricing_tiers(
-                            min_quantity,
-                            discount_percent
-                        )
-                    `)
-                    .eq('slug', slug)
-                    .single();
-                
-                if (error) {
-                    console.error('Supabase error:', error);
-                    
-                    // If product not found, try alternative query
-                    if (error.code === 'PGRST116') {
-                        // Try without joins first
-                        const { data: simpleProduct, error: simpleError } = await supabaseClient
-                            .from('products')
-                            .select('*')
-                            .eq('slug', slug)
-                            .single();
-                            
-                        if (simpleError) {
-                            throw new Error('Product not found');
+                // Use the JMPOTTERS app function
+                if (window.JMPOTTERS && window.JMPOTTERS.loadSingleProductBySlug) {
+                    await window.JMPOTTERS.loadSingleProductBySlug(slug);
+                } else {
+                    // Fallback: Try to initialize the page first
+                    if (window.JMPOTTERS && window.JMPOTTERS.initializePage) {
+                        await window.JMPOTTERS.initializePage();
+                        
+                        // Try again after initialization
+                        if (window.JMPOTTERS.loadSingleProductBySlug) {
+                            await window.JMPOTTERS.loadSingleProductBySlug(slug);
+                        } else {
+                            throw new Error('Product loading function not available');
                         }
-                        
-                        // Get additional data separately
-                        const [categories, product_colors, bulk_pricing_tiers] = await Promise.all([
-                            supabaseClient.from('categories').select('slug, name').eq('id', simpleProduct.category_id).single(),
-                            supabaseClient.from('product_colors').select('*').eq('product_id', simpleProduct.id),
-                            supabaseClient.from('bulk_pricing_tiers').select('*').eq('product_id', simpleProduct.id)
-                        ]);
-                        
-                        product = {
-                            ...simpleProduct,
-                            categories: categories.data,
-                            product_colors: product_colors.data,
-                            bulk_pricing_tiers: bulk_pricing_tiers.data
-                        };
                     } else {
-                        throw error;
+                        throw new Error('JMPOTTERS app not properly initialized');
                     }
                 }
-                
-                if (!product) {
-                    throw new Error('Product not found');
-                }
-                
-                // Update page title
-                document.title = `${product.name} | JMPOTTERS`;
-                
-                // Render product
-                renderProduct(product);
                 
             } catch (error) {
                 console.error('Error loading product:', error);
-                showError(`Product not found or error loading details: ${error.message}`);
-            }
-        }
-        
-        function renderProduct(product) {
-            const container = document.getElementById('productContainer');
-            const categorySlug = product.categories?.slug || '';
-            const isFootwear = categorySlug === 'mensfootwear' || categorySlug === 'womensfootwear';
-            
-            // Determine stock status
-            let stockStatus = '';
-            let stockClass = '';
-            if (isFootwear) {
-                stockStatus = 'Select size to check stock';
-                stockClass = 'stock-low';
-            } else if (product.stock > 10) {
-                stockStatus = `In Stock (${product.stock} available)`;
-                stockClass = 'stock-in';
-            } else if (product.stock > 0) {
-                stockStatus = `Low Stock (${product.stock} left)`;
-                stockClass = 'stock-low';
-            } else {
-                stockStatus = 'Out of Stock';
-                stockClass = 'stock-out';
-            }
-            
-            // Build image URL
-            let imageUrl = product.image_url;
-            if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
-                // If it's a relative path, assume it's in the images folder
-                imageUrl = `images/${categorySlug}/${imageUrl}`;
-            }
-            
-            // Build HTML
-            let html = `
-                <div class="product-container">
-                    <!-- Left: Image -->
-                    <div class="product-image-section">
-                        <img src="${imageUrl}" 
-                             alt="${product.name}" 
-                             class="product-image"
-                             id="productImage"
-                             onerror="this.src='https://via.placeholder.com/500x500?text=No+Image+Available'">
-                    </div>
-                    
-                    <!-- Right: Details -->
-                    <div class="product-details-section">
-                        <h1 class="product-title">${product.name}</h1>
-                        
-                        <div class="stock-status ${stockClass}">
-                            <i class="fas fa-${stockClass === 'stock-out' ? 'times-circle' : 
-                                            stockClass === 'stock-low' ? 'exclamation-triangle' : 
-                                            'check-circle'}"></i>
-                            ${stockStatus}
-                        </div>
-                        
-                        <div class="product-price-container">
-                            <span class="price-real">₦${product.price ? product.price.toLocaleString() : '0'}</span>
-                            ${product.compare_price > 0 ? 
-                                `<span class="price-compare">₦${product.compare_price.toLocaleString()}</span>` : ''}
-                        </div>
-                        
-                        <div class="product-description">
-                            ${product.description || 'No description available.'}
-                        </div>
-            `;
-            
-            // Color selection for footwear
-            if (isFootwear && product.product_colors && product.product_colors.length > 0) {
-                html += `
-                    <div class="color-section">
-                        <label class="color-label">Color</label>
-                        <div class="color-grid" id="colorGrid">
-                `;
-                
-                product.product_colors.forEach((color, index) => {
-                    // Find default color
-                    const isDefault = color.is_default || index === 0;
-                    let colorImage = color.color_image_url || product.image_url;
-                    if (colorImage && !colorImage.startsWith('http')) {
-                        colorImage = `images/${categorySlug}/${colorImage}`;
-                    }
-                    
-                    html += `
-                        <div class="color-option ${isDefault ? 'selected' : ''}"
-                             style="background-color: ${color.color_code || '#000'};"
-                             data-color-id="${color.id}"
-                             data-color-name="${color.color_name}"
-                             data-image="${colorImage}"
-                             onclick="selectColor(this, ${product.id})"
-                             title="${color.color_name}">
-                        </div>
-                    `;
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Size selection for footwear
-            if (isFootwear) {
-                html += `
-                    <div class="size-section">
-                        <label class="size-label">Size</label>
-                        <div class="size-grid" id="sizeGrid">
-                            <div class="loading" style="padding: 10px; grid-column: span 4;">
-                                <i class="fas fa-spinner fa-spin"></i> Loading sizes...
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Quantity selector
-            const maxQuantity = !isFootwear && product.stock ? product.stock : 999;
-            html += `
-                <div class="quantity-section">
-                    <label class="quantity-label">Quantity</label>
-                    <div class="quantity-controls">
-                        <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
-                        <input type="number" id="quantityInput" class="qty-input" 
-                               value="1" min="1" max="${maxQuantity}">
-                        <button class="qty-btn" onclick="changeQuantity(1)">+</button>
-                    </div>
-                </div>
-            `;
-            
-            // Bulk pricing
-            if (product.bulk_pricing_tiers && product.bulk_pricing_tiers.length > 0) {
-                html += `
-                    <div class="bulk-pricing">
-                        <div class="bulk-title">Bulk Discounts</div>
-                        <table class="bulk-table">
-                            <tr>
-                                <th>Quantity</th>
-                                <th>Discount</th>
-                                <th>Price Each</th>
-                            </tr>
-                `;
-                
-                product.bulk_pricing_tiers.forEach(tier => {
-                    const discountedPrice = product.price * (1 - tier.discount_percent / 100);
-                    html += `
-                        <tr>
-                            <td>${tier.min_quantity}+</td>
-                            <td>${tier.discount_percent}% OFF</td>
-                            <td>₦${discountedPrice.toLocaleString()}</td>
-                        </tr>
-                    `;
-                });
-                
-                html += `
-                        </table>
-                    </div>
-                `;
-            }
-            
-            // Action buttons
-            const isOutOfStock = !isFootwear && product.stock <= 0;
-            
-            html += `
-                <div class="action-buttons">
-                    <button class="btn-add-cart" id="addToCartBtn" 
-                            ${isOutOfStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}
-                            onclick="addToCart(${product.id})">
-                        <i class="fas fa-shopping-cart"></i>
-                        ${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-                    </button>
-                    <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlist(${product.id})">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                </div>
-            `;
-            
-            html += `
-                    </div>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-            
-            // Load sizes if footwear
-            if (isFootwear) {
-                // Get selected color
-                const selectedColor = document.querySelector('.color-option.selected');
-                if (selectedColor) {
-                    loadSizes(product.id, selectedColor.dataset.colorId);
-                }
-            }
-            
-            // Check wishlist status
-            updateWishlistButton(product.id);
-        }
-        
-        // ========== GLOBAL FUNCTIONS ========== //
-        window.selectColor = async function(element, productId) {
-            // Update color selection
-            document.querySelectorAll('.color-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            
-            // Update product image if color has specific image
-            const imageUrl = element.dataset.image;
-            const mainImage = document.getElementById('productImage');
-            if (imageUrl && mainImage) {
-                mainImage.src = imageUrl;
-            }
-            
-            // Reload sizes for this color
-            if (productId) {
-                await loadSizes(productId, element.dataset.colorId);
-            }
-        };
-        
-        async function loadSizes(productId, colorId = null) {
-            const sizeGrid = document.getElementById('sizeGrid');
-            if (!sizeGrid) return;
-            
-            // Get selected color
-            if (!colorId) {
-                const selectedColor = document.querySelector('.color-option.selected');
-                colorId = selectedColor ? selectedColor.dataset.colorId : null;
-            }
-            
-            if (!colorId) {
-                sizeGrid.innerHTML = '<div class="size-option" style="grid-column: span 4;">No color selected</div>';
-                return;
-            }
-            
-            try {
-                const { data: sizes, error } = await supabaseClient
-                    .from('product_sizes')
-                    .select('*')
-                    .eq('product_id', productId)
-                    .eq('color_id', colorId)
-                    .order('size_value');
-                
-                if (error) throw error;
-                
-                if (!sizes || sizes.length === 0) {
-                    sizeGrid.innerHTML = '<div class="size-option" style="grid-column: span 4;">No sizes available for this color</div>';
-                    return;
-                }
-                
-                let sizesHtml = '';
-                sizes.forEach(size => {
-                    const isOutOfStock = size.stock_quantity <= 0;
-                    sizesHtml += `
-                        <button class="size-option ${isOutOfStock ? 'stock-out' : ''}" 
-                                data-size-id="${size.id}"
-                                data-size="${size.size_value}"
-                                data-stock="${size.stock_quantity}"
-                                onclick="selectSize(this)"
-                                ${isOutOfStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                            ${size.size_value}
-                            ${isOutOfStock ? '<br><small style="font-size: 0.7em;">(Out of stock)</small>' : ''}
-                        </button>
-                    `;
-                });
-                
-                sizeGrid.innerHTML = sizesHtml;
-                
-            } catch (error) {
-                console.error('Error loading sizes:', error);
-                sizeGrid.innerHTML = '<div class="size-option" style="grid-column: span 4;">Error loading sizes</div>';
-            }
-        }
-        
-        window.selectSize = function(element) {
-            // Update size selection
-            document.querySelectorAll('.size-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            
-            // Update stock status
-            const stock = parseInt(element.dataset.stock);
-            const stockElement = document.querySelector('.stock-status');
-            if (stockElement) {
-                if (stock > 10) {
-                    stockElement.className = 'stock-status stock-in';
-                    stockElement.innerHTML = `<i class="fas fa-check-circle"></i> In Stock (${stock} available)`;
-                } else if (stock > 0) {
-                    stockElement.className = 'stock-status stock-low';
-                    stockElement.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Low Stock (${stock} left)`;
-                } else {
-                    stockElement.className = 'stock-status stock-out';
-                    stockElement.innerHTML = `<i class="fas fa-times-circle"></i> Out of Stock`;
-                }
-            }
-        };
-        
-        window.changeQuantity = function(change) {
-            const input = document.getElementById('quantityInput');
-            if (!input) return;
-            
-            let value = parseInt(input.value) || 1;
-            const max = parseInt(input.max) || 999;
-            const min = parseInt(input.min) || 1;
-            
-            value += change;
-            if (value < min) value = min;
-            if (value > max) value = max;
-            
-            input.value = value;
-        };
-        
-        window.addToCart = function(productId) {
-            const quantity = document.getElementById('quantityInput')?.value || 1;
-            const selectedSize = document.querySelector('.size-option.selected');
-            const selectedColor = document.querySelector('.color-option.selected');
-            
-            const cartItem = {
-                productId,
-                quantity: parseInt(quantity),
-                colorId: selectedColor ? selectedColor.dataset.colorId : null,
-                colorName: selectedColor ? selectedColor.dataset.colorName : null,
-                sizeId: selectedSize ? selectedSize.dataset.sizeId : null,
-                size: selectedSize ? selectedSize.dataset.size : null
-            };
-            
-            // Get existing cart
-            let cart = JSON.parse(localStorage.getItem('jmp_cart') || '[]');
-            
-            // Check if item already exists in cart
-            const existingIndex = cart.findIndex(item => 
-                item.productId === cartItem.productId && 
-                item.colorId === cartItem.colorId && 
-                item.sizeId === cartItem.sizeId
-            );
-            
-            if (existingIndex > -1) {
-                // Update quantity
-                cart[existingIndex].quantity += cartItem.quantity;
-            } else {
-                // Add new item
-                cart.push(cartItem);
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('jmp_cart', JSON.stringify(cart));
-            
-            // Show success message
-            alert(`Added to cart! ${quantity} item(s) added.`);
-            
-            // Optional: Update cart count in the header if it exists
-            updateCartCount();
-        };
-        
-        window.toggleWishlist = function(productId) {
-            const btn = document.getElementById('wishlistBtn');
-            if (!btn) return;
-            
-            const isActive = btn.classList.contains('active');
-            
-            // Get existing wishlist
-            let wishlist = JSON.parse(localStorage.getItem('jmp_wishlist') || '[]');
-            
-            if (isActive) {
-                // Remove from wishlist
-                btn.classList.remove('active');
-                wishlist = wishlist.filter(id => id !== productId);
-            } else {
-                // Add to wishlist
-                btn.classList.add('active');
-                if (!wishlist.includes(productId)) {
-                    wishlist.push(productId);
-                }
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('jmp_wishlist', JSON.stringify(wishlist));
-            
-            // Show feedback
-            const message = isActive ? 'Removed from wishlist' : 'Added to wishlist';
-            console.log(message);
-        };
-        
-        function updateWishlistButton(productId) {
-            const btn = document.getElementById('wishlistBtn');
-            if (!btn) return;
-            
-            const wishlist = JSON.parse(localStorage.getItem('jmp_wishlist') || '[]');
-            if (wishlist.includes(productId)) {
-                btn.classList.add('active');
-            }
-        }
-        
-        function updateCartCount() {
-            // This function would update a cart counter in your header
-            // Implement based on your existing cart system
-            const cart = JSON.parse(localStorage.getItem('jmp_cart') || '[]');
-            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-            
-            // If you have a cart count element, update it
-            const cartCountElement = document.querySelector('.cart-count');
-            if (cartCountElement) {
-                cartCountElement.textContent = totalItems;
+                showError(`Failed to load product: ${error.message}`);
             }
         }
         
         function showError(message) {
-            const container = document.getElementById('productContainer');
-            container.innerHTML = `
+            const productViewer = document.getElementById('productViewer');
+            productViewer.innerHTML = `
                 <div class="error-message">
                     <div class="error-title"><i class="fas fa-exclamation-triangle"></i> Error</div>
                     <p>${message}</p>
-                    <button onclick="window.location.href='index.html'" 
-                            style="margin-top: 20px; padding: 10px 20px; background: var(--black); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <button onclick="window.location.href='index.html'" class="btn">
                         Go to Homepage
                     </button>
                 </div>
             `;
         }
+        
+        // Update breadcrumb dynamically
+        function updateBreadcrumb(product) {
+            const breadcrumb = document.getElementById('breadcrumb');
+            const categoryLink = document.getElementById('categoryLink');
+            const productName = document.getElementById('productName');
+            
+            if (breadcrumb && product) {
+                const categoryName = product.category_name || 'Category';
+                const categorySlug = product.category_slug || 'mensfootwear';
+                
+                categoryLink.innerHTML = `<a href="${categorySlug}.html">${categoryName}</a>`;
+                productName.textContent = product.name;
+            }
+        }
+        
+        // Make updateBreadcrumb available globally for the app.js to call
+        window.updateProductBreadcrumb = updateBreadcrumb;
     </script>
 </body>
 </html>
