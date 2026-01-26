@@ -3,19 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details | JMPOTTERS</title>
+    <title>Loading Product... | JMPOTTERS</title>
     
-    <!-- Stylesheets -->
+    <!-- Essential FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- Swiper JS -->
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* === GLOBAL STYLES === */
+        /* === MINIMAL PRODUCT VIEWER STYLES === */
         :root {
             --black: #000;
             --white: #fff;
@@ -24,9 +18,8 @@
             --gray-dark: #222;
             --gray: #444;
             --gray-light: #e0e0e0;
-            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            --shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.4);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             --shadow-dark: 0 5px 15px rgba(0, 0, 0, 0.2);
             --success: #27ae60;
             --warning: #f39c12;
@@ -40,545 +33,94 @@
         }
 
         body {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--gray);
-            background-color: var(--white);
-            overflow-x: hidden;
-            line-height: 1.6;
-            cursor: default;
-        }
-
-        h1, h2, h3, h4 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            color: var(--black);
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        section {
-            padding: 100px 0;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-            font-size: 2.8rem;
-            position: relative;
-        }
-
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 3px;
-            background: var(--gold);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background: transparent;
-            color: var(--black);
-            text-decoration: none;
-            font-weight: 600;
-            letter-spacing: 1px;
-            border-radius: 0;
-            transition: var(--transition);
-            text-transform: uppercase;
-            font-size: 0.95rem;
-            border: 2px solid var(--black);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: var(--black);
-            transition: var(--transition);
-            z-index: -1;
-        }
-
-        .btn:hover {
-            color: var(--white);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-gold);
-        }
-
-        .btn:hover:before {
-            left: 0;
-        }
-
-        .btn-gold {
-            background: var(--gold);
-            color: var(--white);
-            border: 2px solid var(--gold);
-        }
-
-        .btn-gold:hover {
-            background: transparent;
-            color: var(--black);
-        }
-
-        /* === PRELOADER === */
-        .preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--black);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f8f8f8;
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
+            padding: 20px;
         }
 
-        .preloader-text {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--white);
-            font-family: 'Playfair Display', serif;
-            overflow: hidden;
-            height: 60px;
-        }
-
-        .preloader-text span {
-            display: inline-block;
-            transform: translateY(100%);
-            opacity: 0;
-            animation: letterAppear 0.3s forwards;
-        }
-
-        .preloader-line {
-            width: 0;
-            height: 3px;
-            background: var(--gold);
-            margin-top: 20px;
-            animation: lineGrow 2s forwards;
-        }
-
-        .sparkle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--gold);
-            border-radius: 50%;
-            animation: sparkle 2s ease-out forwards;
-            opacity: 0;
-        }
-
-        @keyframes letterAppear {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes lineGrow {
-            to {
-                width: 300px;
-            }
-        }
-
-        @keyframes sparkle {
-            0% {
-                transform: translate(0, 0) scale(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--tx), var(--ty)) scale(1);
-                opacity: 0;
-            }
-        }
-
-        /* === HEADER === */
-        header {
+        /* Close/Back Button */
+        .close-btn {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
             z-index: 1000;
-            padding: 20px 0;
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
-            backdrop-filter: blur(10px);
-        }
-
-        header.scrolled {
-            background: rgba(0, 0, 0, 0.9);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        header.scrolled .logo,
-        header.scrolled .nav-links a,
-        header.scrolled .header-icon {
-            color: var(--white);
-        }
-
-        header.scrolled .nav-links a:hover {
-            color: var(--gold);
-        }
-
-        header.scrolled .mobile-toggle {
-            color: var(--white);
-        }
-
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--black);
-            text-decoration: none;
-            letter-spacing: 1px;
-            transition: var(--transition);
-        }
-
-        .logo:hover {
-            color: var(--gold);
-        }
-
-        /* Navigation */
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-left: 25px;
-            position: relative;
-        }
-
-        .nav-links a {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--black);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-            position: relative;
-            transition: var(--transition);
-            padding: 8px 0;
-        }
-
-        .nav-links a i {
-            transition: var(--transition);
-            font-size: 1.1rem;
-        }
-
-        .nav-links a:hover {
-            color: var(--gold);
-        }
-
-        .nav-links a:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gold);
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover:after {
-            width: 100%;
-        }
-
-        .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .header-icon {
-            position: relative;
-            font-size: 1.4rem;
-            color: var(--black);
-            transition: var(--transition);
-        }
-
-        .header-icon:hover {
-            color: var(--gold);
-            transform: translateY(-3px);
-        }
-
-        .icon-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--gold);
-            color: var(--white);
-            font-size: 0.7rem;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            transition: var(--transition);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
 
-        .mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--black);
-            transition: var(--transition);
+        .close-btn:hover {
+            background: var(--gold);
+            transform: scale(1.1);
         }
 
-        .mobile-toggle:hover {
-            color: var(--gold);
-            transform: rotate(90deg);
-        }
-
-        /* Dropdown styles */
-        .dropdown-content {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            min-width: 220px;
-            background: var(--white);
-            box-shadow: var(--shadow-dark);
-            border-top: 2px solid var(--gold);
-            z-index: 100;
-            display: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: var(--transition);
-        }
-
-        .dropdown.active .dropdown-content {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .dropdown-content a {
-            padding: 12px 20px;
-            display: block;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            color: var(--gray);
-            transition: var(--transition);
-        }
-
-        .dropdown-content a:hover {
-            background: var(--gold-light);
-            color: var(--black);
-            padding-left: 25px;
-        }
-
-        .dropdown-content a i {
-            width: 20px;
-            text-align: center;
-        }
-
-        .dropdown > a .fa-chevron-down {
-            transition: transform 0.3s ease;
-        }
-
-        .dropdown.active > a .fa-chevron-down {
-            transform: rotate(180deg);
-        }
-
-        /* Mobile Navigation */
-        .mobile-nav {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 85%;
-            max-width: 320px;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1100;
-            transition: var(--transition);
-            overflow-y: auto;
-            padding: 30px;
-            border-left: 2px solid var(--gold);
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .mobile-nav.active {
-            right: 0;
-        }
-
-        .mobile-nav-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .mobile-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            color: var(--white);
-        }
-
-        .close-nav {
-            background: none;
-            border: none;
-            color: var(--white);
-            font-size: 1.5rem;
-            transition: var(--transition);
-        }
-
-        .close-nav:hover {
-            color: var(--gold);
-            transform: rotate(90deg);
-        }
-
-        .mobile-nav-links {
-            list-style: none;
-        }
-
-        .mobile-nav-links li {
-            margin-bottom: 15px;
-        }
-
-        .mobile-nav-links a {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: var(--white);
-            text-decoration: none;
-            font-size: 1.1rem;
-            padding: 12px 15px;
-            border-radius: 8px;
-            transition: var(--transition);
-        }
-
-        .mobile-nav-links a i {
-            color: var(--gold);
-            font-size: 1.3rem;
-            width: 30px;
-            text-align: center;
-            transition: var(--transition);
-        }
-
-        .mobile-nav-links a:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--gold);
-            padding-left: 20px;
-        }
-
-        .mobile-nav-links a:hover i {
-            transform: scale(1.2);
-        }
-
-        .mobile-dropdown-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out;
-            padding-left: 20px;
-        }
-
-        .mobile-dropdown.active .mobile-dropdown-content {
-            max-height: 300px;
-        }
-
-        .mobile-dropdown > a .fa-chevron-down {
-            transition: transform 0.3s ease;
-        }
-
-        .mobile-dropdown.active > a .fa-chevron-down {
-            transform: rotate(180deg);
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Product Container */
+        .product-container {
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1050;
-            display: none;
-            backdrop-filter: blur(5px);
-        }
-
-        .overlay.active {
-            display: block;
-        }
-
-        /* === PRODUCT DETAIL GRID === */
-        .product-detail-grid {
+            max-width: 1000px;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            margin-top: 40px;
-            align-items: start;
+            min-height: 600px;
         }
 
-        @media (max-width: 992px) {
-            .product-detail-grid {
+        @media (max-width: 900px) {
+            .product-container {
                 grid-template-columns: 1fr;
-                gap: 40px;
+                max-width: 500px;
             }
         }
 
-        .product-detail-image {
-            position: sticky;
-            top: 120px;
+        /* Product Image */
+        .product-image-section {
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            border-right: 1px solid #eee;
         }
 
-        .product-detail-image img {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
+        .product-image {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
             border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
         }
 
-        .product-detail-image img:hover {
-            transform: scale(1.02);
+        /* Product Details */
+        .product-details-section {
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 600px;
         }
 
-        .product-detail-info {
-            padding: 30px;
-            background: var(--white);
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-        }
-
-        .product-title-large {
-            font-size: 2.8rem;
-            margin-bottom: 20px;
+        .product-title {
+            font-size: 2rem;
+            font-weight: 700;
             color: var(--black);
-            line-height: 1.2;
+            margin-bottom: 15px;
+            line-height: 1.3;
         }
 
-        .product-price-large {
+        .product-price-container {
             display: flex;
             align-items: center;
             gap: 20px;
@@ -587,1820 +129,716 @@
             border-bottom: 1px solid var(--gray-light);
         }
 
-        .price-real-large {
-            font-size: 2.2rem;
+        .price-real {
+            font-size: 1.8rem;
             font-weight: 700;
             color: var(--black);
         }
 
-        .price-fake-large {
-            font-size: 1.6rem;
+        .price-compare {
+            font-size: 1.4rem;
             color: #999;
             text-decoration: line-through;
         }
 
-        .product-description-full {
-            font-size: 1.1rem;
-            line-height: 1.8;
+        .product-description {
             color: var(--gray);
+            line-height: 1.6;
             margin-bottom: 30px;
+            font-size: 1.05rem;
         }
 
-        /* === SIZE SELECTION === */
-        .size-selection-detail {
-            margin-bottom: 30px;
-        }
-
-        .size-selection-detail h4 {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: var(--black);
-            display: flex;
+        /* Stock Status */
+        .stock-status {
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .size-grid-detail {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
             margin-bottom: 20px;
         }
 
-        @media (max-width: 576px) {
-            .size-grid-detail {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        .stock-in {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success);
         }
 
-        .size-option-detail {
-            padding: 15px 10px;
+        .stock-low {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning);
+        }
+
+        .stock-out {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+
+        /* Size Selection (Footwear Only) */
+        .size-section {
+            margin-bottom: 25px;
+        }
+
+        .size-label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--black);
+        }
+
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .size-option {
+            padding: 12px 5px;
             border: 2px solid var(--gray-light);
             background: var(--white);
-            color: var(--black);
+            border-radius: 6px;
+            text-align: center;
             cursor: pointer;
             transition: var(--transition);
-            text-align: center;
-            border-radius: 4px;
             font-weight: 600;
-            font-size: 1.1rem;
         }
 
-        .size-option-detail:hover {
+        .size-option:hover {
             border-color: var(--gold);
-            color: var(--gold);
             transform: translateY(-2px);
         }
 
-        .size-option-detail.selected {
+        .size-option.selected {
             background: var(--gold);
-            color: var(--black);
-            border-color: var(--gold);
-            font-weight: 700;
-        }
-
-        .size-option-detail.out-of-stock {
-            opacity: 0.5;
-            cursor: not-allowed;
-            position: relative;
-        }
-
-        .size-option-detail.out-of-stock:after {
-            content: '×';
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--danger);
             color: var(--white);
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: 700;
+            border-color: var(--gold);
         }
 
-        /* === COLOR SELECTION === */
-        .color-selection {
-            margin-bottom: 30px;
+        /* Color Selection (Footwear Only) */
+        .color-section {
+            margin-bottom: 25px;
         }
 
-        .color-selection h4 {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
+        .color-label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
             color: var(--black);
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .color-grid {
             display: flex;
+            gap: 12px;
             flex-wrap: wrap;
-            gap: 15px;
         }
 
         .color-option {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
-            transition: var(--transition);
             border: 3px solid transparent;
+            transition: var(--transition);
             position: relative;
-        }
-
-        .color-option:hover {
-            transform: scale(1.1);
         }
 
         .color-option.selected {
             border-color: var(--gold);
-            box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--gold);
+            transform: scale(1.1);
         }
 
-        .color-name {
-            position: absolute;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            font-size: 0.8rem;
-            color: var(--gray);
+        /* Quantity Selector */
+        .quantity-section {
+            margin-bottom: 25px;
         }
 
-        /* === QUANTITY SELECTOR === */
-        .quantity-selector-detail {
-            margin-bottom: 30px;
-        }
-
-        .quantity-selector-detail label {
+        .quantity-label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: 600;
             color: var(--black);
-            font-size: 1.1rem;
         }
 
-        .quantity-input-group {
+        .quantity-controls {
             display: flex;
             align-items: center;
+            gap: 10px;
             max-width: 200px;
         }
 
-        .quantity-btn {
-            width: 50px;
-            height: 50px;
+        .qty-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            border: 2px solid var(--gray-light);
+            background: var(--white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .qty-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .qty-input {
+            width: 70px;
+            height: 45px;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-add-cart {
+            flex: 1;
+            padding: 16px;
             background: var(--black);
             color: var(--white);
             border: none;
-            font-size: 1.2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 10px;
         }
 
-        .quantity-btn:hover {
+        .btn-add-cart:hover {
             background: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
         }
 
-        .quantity-input {
-            width: 80px;
-            height: 50px;
-            text-align: center;
+        .btn-wishlist {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
             border: 2px solid var(--gray-light);
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--black);
             background: var(--white);
+            color: var(--gray);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: var(--transition);
         }
 
-        .quantity-input:focus {
-            outline: none;
-            border-color: var(--gold);
+        .btn-wishlist:hover,
+        .btn-wishlist.active {
+            background: #ff4757;
+            color: var(--white);
+            border-color: #ff4757;
         }
 
-        /* === BULK PRICING === */
-        .bulk-pricing-detail {
-            margin-bottom: 30px;
+        /* Bulk Pricing Table */
+        .bulk-pricing {
+            margin-top: 30px;
             background: #f9f9f9;
-            padding: 20px;
             border-radius: 8px;
+            padding: 20px;
             border-left: 3px solid var(--gold);
         }
 
-        .bulk-pricing-detail h4 {
-            font-size: 1.3rem;
+        .bulk-title {
+            font-size: 1.1rem;
+            font-weight: 600;
             margin-bottom: 15px;
             color: var(--black);
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .bulk-table {
             width: 100%;
             border-collapse: collapse;
-            background: var(--white);
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
         .bulk-table th {
-            background: var(--gold-light);
-            padding: 12px 15px;
             text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            color: var(--gray);
             font-weight: 600;
-            color: var(--black);
         }
 
         .bulk-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--gray-light);
+            padding: 10px;
+            border-bottom: 1px solid #eee;
         }
 
-        .bulk-table tr:hover {
-            background: #f5f5f5;
-        }
-
-        /* === ACTION BUTTONS === */
-        .action-buttons-detail {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .btn-add-cart-detail {
-            flex: 1;
-            padding: 18px 30px;
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            min-width: 200px;
-        }
-
-        .btn-add-cart-detail:hover {
-            background: var(--gold);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-gold);
-        }
-
-        .btn-wishlist-detail {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--white);
-            color: var(--black);
-            border: 2px solid var(--gray-light);
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-wishlist-detail:hover,
-        .btn-wishlist-detail.active {
-            background: #ff4757;
-            color: var(--white);
-            border-color: #ff4757;
-            transform: scale(1.1);
-        }
-
-        /* === STOCK STATUS === */
-        .stock-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 10px 15px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-
-        .stock-status.in-stock {
-            background: rgba(39, 174, 96, 0.1);
-            color: var(--success);
-        }
-
-        .stock-status.low-stock {
-            background: rgba(243, 156, 18, 0.1);
-            color: var(--warning);
-        }
-
-        .stock-status.out-of-stock {
-            background: rgba(231, 76, 60, 0.1);
-            color: var(--danger);
-        }
-
-        .stock-icon {
-            font-size: 1.2rem;
-        }
-
-        /* === SPECIFICATIONS === */
-        .specifications {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid var(--gray-light);
-        }
-
-        .specifications h3 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--black);
-        }
-
-        .spec-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        @media (max-width: 576px) {
-            .spec-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .spec-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px dashed var(--gray-light);
-        }
-
-        .spec-label {
-            font-weight: 600;
+        /* Loading & Error States */
+        .loading {
+            text-align: center;
+            padding: 60px;
             color: var(--gray);
         }
 
-        .spec-value {
-            color: var(--black);
-        }
-
-        /* === TOAST MESSAGES === */
-        .toast-container {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            z-index: 1100;
-        }
-
-        .toast {
-            padding: 15px 20px;
-            background: var(--black);
-            color: var(--white);
-            border-radius: 4px;
-            box-shadow: var(--shadow-dark);
-            margin-bottom: 15px;
-            transform: translateX(-100px);
-            opacity: 0;
-            transition: all 0.5s ease;
-            display: flex;
-            align-items: center;
-            max-width: 350px;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
-        .toast-icon {
-            font-size: 1.2rem;
-            margin-right: 10px;
-            color: var(--gold);
-        }
-
-        /* === CART PANEL === */
-        .cart-panel {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 85%;
-            max-width: 400px;
-            height: 100vh;
-            background: var(--white);
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-            z-index: 1100;
-            transition: var(--transition);
-            overflow-y: auto;
-            padding: 30px;
-            border-left: 3px solid var(--black);
-        }
-
-        .cart-panel.active {
-            right: 0;
-        }
-
-        .cart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .cart-title {
-            font-size: 1.5rem;
-            color: var(--black);
-        }
-
-        .close-cart {
-            background: none;
-            border: none;
-            color: var(--black);
-            font-size: 1.5rem;
-            transition: var(--transition);
-        }
-
-        .close-cart:hover {
-            color: var(--gold);
-            transform: rotate(90deg);
-        }
-
-        .cart-items {
-            min-height: 300px;
-        }
-
-        .cart-empty {
-            text-align: center;
-            padding: 40px 0;
-            color: var(--gray);
-        }
-
-        .cart-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .cart-item-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-right: 15px;
-        }
-
-        .cart-item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .cart-item-details {
-            flex-grow: 1;
-        }
-
-        .cart-item-name {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .cart-item-price {
-            color: var(--black);
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .cart-item-quantity {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .cart-item-quantity button {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 1px solid var(--gray-light);
-            background: var(--white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .cart-item-quantity span {
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .cart-item-remove {
-            color: var(--gray);
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-left: 15px;
-            font-size: 1.2rem;
-            transition: var(--transition);
-        }
-
-        .cart-item-remove:hover {
-            color: #e74c3c;
-            transform: scale(1.2);
-        }
-
-        .cart-total {
-            padding: 20px 0;
-            border-top: 1px solid var(--gray-light);
-            font-size: 1.2rem;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .cart-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .checkout-btn {
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            padding: 12px;
-            border-radius: 0;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            display: block;
-            text-decoration: none;
-        }
-
-        .checkout-btn:hover {
-            background: var(--gold);
-            transform: translateY(-3px);
-        }
-
-        /* === FOOTER === */
-        footer {
-            background: var(--black);
-            padding: 80px 0 40px;
-            color: var(--white);
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-            margin-bottom: 50px;
-        }
-
-        .footer-column h3 {
-            font-size: 1.2rem;
-            margin-bottom: 25px;
-            position: relative;
-            padding-bottom: 10px;
-            color: var(--white);
-        }
-
-        .footer-column h3:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 40px;
-            height: 2px;
-            background: var(--gold);
-        }
-
-        .footer-logo {
-            width: 100px;
-            margin-bottom: 20px;
-        }
-
-        .footer-logo .logo {
-            font-size: 1.8rem;
-            color: var(--white);
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-
-        .footer-links a {
-            color: #aaa;
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 0.95rem;
-        }
-
-        .footer-links a:hover {
-            color: var(--gold);
-            padding-left: 5px;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--white);
-            transition: var(--transition);
-            font-size: 1.1rem;
-        }
-
-        .social-links a:hover {
-            background: var(--gold);
-            color: var(--black);
-            transform: translateY(-5px);
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-
-        /* === WHATSAPP FLOATING BUTTON === */
-        .whatsapp-float {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #25d366;
-            color: var(--white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-            animation: float 3s ease-in-out infinite;
-            transition: var(--transition);
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .whatsapp-float:hover {
-            transform: scale(1.1) translateY(-5px);
-            animation: none;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        /* === LOADING STATES === */
         .loading-spinner {
-            text-align: center;
-            padding: 100px 0;
-            color: #666;
-        }
-        
-        .loading-spinner i {
-            font-size: 3rem;
+            font-size: 2.5rem;
             color: var(--gold);
             margin-bottom: 20px;
             animation: spin 1s linear infinite;
         }
-        
+
+        .error-message {
+            text-align: center;
+            padding: 60px;
+            max-width: 500px;
+            margin: 0 auto;
+            background: #ffebee;
+            border-radius: 10px;
+        }
+
+        .error-title {
+            color: #d32f2f;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        .error-message {
-            text-align: center;
-            padding: 100px 0;
-            background: #ffebee;
-            border-radius: 10px;
-            margin: 50px 0;
-        }
-        
-        .error-message h3 {
-            color: #d32f2f;
-            margin-bottom: 15px;
-        }
-
-        /* === RESPONSIVE DESIGN === */
-        @media (max-width: 1200px) {
-            .footer-content {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .mobile-toggle {
-                display: block;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .product-title-large {
-                font-size: 2.2rem;
-            }
-            
-            .price-real-large {
-                font-size: 1.8rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            section {
-                padding: 80px 0;
-            }
-            
-            .product-detail-info {
-                padding: 20px;
-            }
-            
-            .action-buttons-detail {
-                flex-direction: column;
-            }
-            
-            .btn-add-cart-detail {
-                width: 100%;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .cart-panel {
-                width: 90%;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .product-title-large {
-                font-size: 1.8rem;
-            }
-            
-            .product-detail-grid {
-                gap: 30px;
-            }
-            
-            .toast-container {
-                bottom: auto;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 90%;
-            }
-            
-            .toast {
-                max-width: 100%;
-            }
-
-            .header-container {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .logo {
-                order: 1;
-                width: 100%;
-                text-align: center;
-                margin-bottom: 10px;
-            }
-            
-            .header-icons {
-                order: 2;
-                margin: 0 15px;
-            }
-            
-            .mobile-toggle {
-                order: 3;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- Preloader -->
-    <div class="preloader" id="preloader">
-        <div class="preloader-text">
-            <span>J</span>
-            <span>M</span>
-            <span>P</span>
-            <span>O</span>
-            <span>T</span>
-            <span>T</span>
-            <span>E</span>
-            <span>R</span>
-            <span>S</span>
-        </div>
-        <div class="preloader-line"></div>
-    </div>
+    <!-- Simple Back Button -->
+    <button class="close-btn" id="closeBtn" title="Go back">
+        <i class="fas fa-times"></i>
+    </button>
 
-    <!-- Header -->
-    <header id="header">
-        <div class="container header-container">
-            <a href="index.html" class="logo">JMPOTTERS</a>
-            
-            <!-- Desktop Navigation -->
-            <ul class="nav-links">
-                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-                
-                <!-- Footwear dropdown -->
-                <li class="dropdown">
-                    <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
-                    <div class="dropdown-content">
-                        <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
-                        <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
-                    </div>
-                </li>
-                
-                <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
-                <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
-                <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-                <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
-                <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
-            </ul>
-            
-            <button class="mobile-toggle" id="mobileToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <div class="header-icons">
-                <div class="header-icon" id="wishlistIcon">
-                    <i class="fas fa-heart"></i>
-                    <span class="icon-badge" id="wishlistCount">0</span>
-                </div>
-                <div class="header-icon" id="cartIcon">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span class="icon-badge" id="cartCount">0</span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Mobile Navigation -->
-    <div class="overlay" id="navOverlay"></div>
-    <div class="mobile-nav" id="mobileNav">
-        <div class="mobile-nav-header">
-            <a href="index.html" class="mobile-logo">JMPOTTERS</a>
-            <button class="close-nav">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <ul class="mobile-nav-links">
-            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-    
-            <!-- Mobile Footwear dropdown -->
-            <li class="mobile-dropdown" id="mobileFootwearDropdown">
-                <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
-                <div class="mobile-dropdown-content">
-                    <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
-                    <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
-                </div>
-            </li>
-            
-            <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
-            <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
-            <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-            <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
-            <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
-        </ul>
-    </div>
-
-    <!-- Main Product Content -->
-    <section class="product-detail-section">
-        <div class="container">
-            <div id="productContainer">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading product details...</p>
-                </div>
-            </div>
-            
-            <!-- Back to category button -->
-            <div style="text-align: center; margin-top: 50px;">
-                <a href="#" id="backToCategory" class="btn">
-                    <i class="fas fa-arrow-left"></i> Back to Collection
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Cart Panel -->
-    <div class="overlay" id="cartOverlay"></div>
-    <div class="cart-panel" id="cartPanel">
-        <div class="cart-header">
-            <h3 class="cart-title">Your Shopping Cart</h3>
-            <button class="close-cart">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <div class="cart-empty">Your cart is empty</div>
-        </div>
-        <div class="cart-total">
-            <span>Total:</span>
-            <span id="cartTotal">₦0</span>
-        </div>
-        <div class="cart-actions">
-            <a href="#" class="checkout-btn" id="whatsappCheckout">Proceed to Checkout</a>
+    <!-- Product Container -->
+    <div id="productContainer">
+        <div class="loading">
+            <i class="fas fa-spinner loading-spinner"></i>
+            <p>Loading product details...</p>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <div class="footer-logo">
-                        <a href="index.html" class="logo">JMPOTTERS</a>
-                    </div>
-                    <p>Premium men's footwear designed for the modern gentleman who values quality and style.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Shop</h3>
-                    <ul class="footer-links">
-                        <li><a href="mensfootwear.html">Men's Footwear</a></li>
-                        <li><a href="womensfootwear.html">Women's Footwear</a></li>
-                        <li><a href="bags.html">Bags</a></li>
-                        <li><a href="accessories.html">Accessories</a></li>
-                        <li><a href="household.html">Household</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Information</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                        <li><a href="#">Shipping Policy</a></li>
-                        <li><a href="#">Returns & Exchanges</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Customer Service</h3>
-                    <ul class="footer-links">
-                        <li><a href="https://wa.me/2348139583320"><i class="fab fa-whatsapp"></i> WhatsApp Support</a></li>
-                        <li><a href="tel:+2348139583320"><i class="fas fa-phone"></i> Call Us</a></li>
-                        <li><a href="#"><i class="fas fa-shipping-fast"></i> Track Order</a></li>
-                        <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                &copy; 2023 JMPOTTERS. All rights reserved.
-            </div>
-        </div>
-    </footer>
-
-    <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
+    <!-- WhatsApp Floating Button (Optional) -->
+    <a href="https://wa.me/2348139583320" class="close-btn" 
+       style="right: 80px; background: #25d366;" 
+       title="Chat on WhatsApp" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer">
-        <!-- Toast messages will appear here -->
-    </div>
-
-    <!-- Libraries -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-    
-    <!-- ========= SUPABASE INTEGRATION ========= -->
+    <!-- Supabase & Your App -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    
-    <!-- Main app.js (Supabase logic) -->
     <script src="app.js"></script>
     
-    <!-- Page-specific JavaScript -->
     <script>
+        // ========== PRODUCT VIEWER LOGIC ========== //
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Product detail page initialized');
+            console.log('🚀 Minimal product viewer loaded');
             
-            // Initialize AOS
-            AOS.init({
-                duration: 800,
-                once: true
+            // Get product slug from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const productSlug = urlParams.get('slug');
+            
+            // Set up close button
+            document.getElementById('closeBtn').addEventListener('click', function() {
+                if (document.referrer && document.referrer.includes('jmpotters')) {
+                    window.history.back();
+                } else {
+                    window.location.href = 'index.html';
+                }
             });
-
-            // ========== INITIALIZE PRELOADER ========== //
-            function initializePreloader() {
-                const letters = document.querySelectorAll('.preloader-text span');
-                letters.forEach((letter, index) => {
-                    setTimeout(() => {
-                        letter.style.transform = 'translateY(0)';
-                        letter.style.opacity = '1';
-                    }, index * 150);
-                });
-                
-                // Hide preloader after 3 seconds
-                setTimeout(() => {
-                    const preloader = document.getElementById('preloader');
-                    preloader.style.opacity = '0';
-                    preloader.style.visibility = 'hidden';
-                }, 3000);
+            
+            // Load product
+            if (!productSlug) {
+                showError('No product specified');
+                return;
             }
-
-            // ========== HEADER FUNCTIONS ========== //
-            function initializeHeader() {
-                const header = document.getElementById('header');
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 50) {
-                        header.classList.add('scrolled');
-                    } else {
-                        header.classList.remove('scrolled');
-                    }
-                });
-            }
-
-            // ========== TOAST MESSAGES ========== //
-            function showToast(message, type = 'info') {
-                const toastContainer = document.getElementById('toastContainer');
-                if (!toastContainer) return;
-                
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                
-                const icons = {
-                    success: 'fas fa-check-circle',
-                    error: 'fas fa-exclamation-circle',
-                    warning: 'fas fa-exclamation-triangle',
-                    info: 'fas fa-info-circle'
-                };
-                
-                toast.innerHTML = `
-                    <i class="${icons[type] || icons.info} toast-icon"></i>
-                    <span>${message}</span>
-                `;
-                
-                toastContainer.appendChild(toast);
-                
-                // Show toast
-                setTimeout(() => {
-                    toast.classList.add('show');
-                }, 100);
-                
-                // Hide and remove toast after 5 seconds
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 500);
-                }, 5000);
-            }
-
-            // ========== LOAD PRODUCT DATA ========== //
-            async function loadProduct() {
-                const productContainer = document.getElementById('productContainer');
-                const urlParams = new URLSearchParams(window.location.search);
-                const productSlug = urlParams.get('slug');
-                
-                if (!productSlug) {
-                    productContainer.innerHTML = `
-                        <div class="error-message">
-                            <h3><i class="fas fa-exclamation-triangle"></i> Product Not Found</h3>
-                            <p>No product specified. Please go back and select a product.</p>
-                            <a href="index.html" class="btn">Go to Homepage</a>
-                        </div>
-                    `;
-                    return null;
-                }
-                
-                try {
-                    // Get JMPOTTERS instance
-                    const app = JMPOTTERS.getInstance();
-                    
-                    // Fetch product from Supabase
-                    const { data: product, error } = await app.supabase
-                        .from('products')
-                        .select(`
-                            *,
-                            categories(slug, name),
-                            product_colors(
-                                id,
-                                color_name,
-                                color_code,
-                                color_image_url,
-                                is_default
-                            ),
-                            bulk_pricing_tiers(
-                                min_quantity,
-                                discount_percent
-                            )
-                        `)
-                        .eq('slug', productSlug)
-                        .single();
-                    
-                    if (error) throw error;
-                    
-                    console.log('✅ Product loaded:', product);
-                    return product;
-                    
-                } catch (error) {
-                    console.error('Error loading product:', error);
-                    productContainer.innerHTML = `
-                        <div class="error-message">
-                            <h3><i class="fas fa-exclamation-triangle"></i> Product Not Found</h3>
-                            <p>Sorry, we couldn't find this product. It may have been removed.</p>
-                            <a href="index.html" class="btn">Browse Other Products</a>
-                        </div>
-                    `;
-                    return null;
-                }
-            }
-
-            // ========== RENDER PRODUCT ========== //
-            async function renderProduct(product) {
-                const productContainer = document.getElementById('productContainer');
+            
+            await loadProduct(productSlug);
+        });
+        
+        async function loadProduct(slug) {
+            const container = document.getElementById('productContainer');
+            
+            try {
+                // Use your existing JMPOTTERS app
                 const app = JMPOTTERS.getInstance();
                 
-                // Determine if it's footwear
-                const isFootwear = product.categories.slug === 'mensfootwear' || 
-                                  product.categories.slug === 'womensfootwear';
+                // Fetch product from Supabase
+                const { data: product, error } = await app.supabase
+                    .from('products')
+                    .select(`
+                        *,
+                        categories(slug, name),
+                        product_colors(
+                            id,
+                            color_name,
+                            color_code,
+                            color_image_url,
+                            is_default
+                        ),
+                        bulk_pricing_tiers(
+                            min_quantity,
+                            discount_percent
+                        )
+                    `)
+                    .eq('slug', slug)
+                    .single();
                 
-                // Get stock status
-                let stockStatus = '';
-                let stockClass = '';
-                let stockIcon = '';
+                if (error) throw error;
                 
-                if (isFootwear) {
-                    // For footwear, we'll show dynamic stock based on selected color/size
-                    stockStatus = 'Select size to check stock';
-                    stockClass = 'low-stock';
-                    stockIcon = 'fas fa-shoe-prints';
-                } else {
-                    // For non-footwear
-                    if (product.stock > 20) {
-                        stockStatus = `In Stock (${product.stock} available)`;
-                        stockClass = 'in-stock';
-                        stockIcon = 'fas fa-check-circle';
-                    } else if (product.stock > 0) {
-                        stockStatus = `Low Stock (${product.stock} left)`;
-                        stockClass = 'low-stock';
-                        stockIcon = 'fas fa-exclamation-triangle';
-                    } else {
-                        stockStatus = 'Out of Stock';
-                        stockClass = 'out-of-stock';
-                        stockIcon = 'fas fa-times-circle';
-                    }
-                }
+                // Update page title
+                document.title = `${product.name} | JMPOTTERS`;
                 
-                // Build HTML
-                let html = `
-                    <div class="product-detail-grid">
-                        <!-- Left Column: Image -->
-                        <div class="product-detail-image">
-                            <img src="${app.getImageUrl(product.categories.slug, product.image_url)}" 
-                                 alt="${product.name}"
-                                 id="productMainImage">
+                // Render product
+                renderProduct(product, app);
+                
+            } catch (error) {
+                console.error('Error loading product:', error);
+                showError('Product not found or error loading details');
+            }
+        }
+        
+        function renderProduct(product, app) {
+            const container = document.getElementById('productContainer');
+            const isFootwear = product.categories.slug === 'mensfootwear' || 
+                              product.categories.slug === 'womensfootwear';
+            
+            // Determine stock status
+            let stockStatus = '';
+            let stockClass = '';
+            if (isFootwear) {
+                stockStatus = 'Select size to check stock';
+                stockClass = 'stock-low';
+            } else if (product.stock > 10) {
+                stockStatus = `In Stock (${product.stock} available)`;
+                stockClass = 'stock-in';
+            } else if (product.stock > 0) {
+                stockStatus = `Low Stock (${product.stock} left)`;
+                stockClass = 'stock-low';
+            } else {
+                stockStatus = 'Out of Stock';
+                stockClass = 'stock-out';
+            }
+            
+            // Build HTML
+            let html = `
+                <div class="product-container">
+                    <!-- Left: Image -->
+                    <div class="product-image-section">
+                        <img src="${app.getImageUrl(product.categories.slug, product.image_url)}" 
+                             alt="${product.name}" 
+                             class="product-image"
+                             id="productImage">
+                    </div>
+                    
+                    <!-- Right: Details -->
+                    <div class="product-details-section">
+                        <h1 class="product-title">${product.name}</h1>
+                        
+                        <div class="stock-status ${stockClass}">
+                            <i class="fas fa-${stockClass === 'stock-out' ? 'times-circle' : 
+                                            stockClass === 'stock-low' ? 'exclamation-triangle' : 
+                                            'check-circle'}"></i>
+                            ${stockStatus}
                         </div>
                         
-                        <!-- Right Column: Details -->
-                        <div class="product-detail-info">
-                            <h1 class="product-title-large">${product.name}</h1>
-                            
-                            <!-- Stock Status -->
-                            <div class="stock-status ${stockClass}">
-                                <i class="${stockIcon} stock-icon"></i>
-                                ${stockStatus}
-                            </div>
-                            
-                            <!-- Price -->
-                            <div class="product-price-large">
-                                <span class="price-real-large">₦${product.price.toLocaleString()}</span>
-                                ${product.compare_price > 0 ? 
-                                    `<span class="price-fake-large">₦${product.compare_price.toLocaleString()}</span>` 
-                                    : ''}
-                            </div>
-                            
-                            <!-- Description -->
-                            <div class="product-description-full">
-                                ${product.description || 'No description available.'}
-                            </div>
+                        <div class="product-price-container">
+                            <span class="price-real">₦${product.price.toLocaleString()}</span>
+                            ${product.compare_price > 0 ? 
+                                `<span class="price-compare">₦${product.compare_price.toLocaleString()}</span>` : ''}
+                        </div>
+                        
+                        <div class="product-description">
+                            ${product.description || 'No description available.'}
+                        </div>
+            `;
+            
+            // Color selection for footwear
+            if (isFootwear && product.product_colors && product.product_colors.length > 0) {
+                html += `
+                    <div class="color-section">
+                        <label class="color-label">Color</label>
+                        <div class="color-grid" id="colorGrid">
                 `;
                 
-                // Color selection (for footwear)
-                if (isFootwear && product.product_colors && product.product_colors.length > 0) {
+                product.product_colors.forEach((color, index) => {
                     html += `
-                        <div class="color-selection">
-                            <h4><i class="fas fa-palette"></i> Select Color</h4>
-                            <div class="color-grid" id="colorGrid">
-                    `;
-                    
-                    product.product_colors.forEach((color, index) => {
-                        const isSelected = index === 0;
-                        html += `
-                            <div class="color-option ${isSelected ? 'selected' : ''}" 
-                                 data-color-id="${color.id}"
-                                 data-color-name="${color.color_name}"
-                                 style="background-color: ${color.color_code || '#000'};"
-                                 onclick="selectColor(this, '${color.color_image_url || product.image_url}')">
-                                <span class="color-name">${color.color_name}</span>
-                            </div>
-                        `;
-                    });
-                    
-                    html += `
-                            </div>
+                        <div class="color-option ${index === 0 ? 'selected' : ''}"
+                             style="background-color: ${color.color_code || '#000'};"
+                             data-color-id="${color.id}"
+                             data-color-name="${color.color_name}"
+                             data-image="${color.color_image_url || product.image_url}"
+                             onclick="selectColor(this)">
                         </div>
                     `;
-                }
+                });
                 
-                // Size selection (for footwear)
-                if (isFootwear) {
-                    html += `
-                        <div class="size-selection-detail">
-                            <h4><i class="fas fa-ruler"></i> Select Size</h4>
-                            <div class="size-grid-detail" id="sizeGridDetail">
-                                <!-- Sizes will be loaded dynamically -->
-                                <div class="loading-spinner" style="padding: 20px; grid-column: 1 / -1;">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <p>Loading sizes...</p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // Quantity selector
                 html += `
-                    <div class="quantity-selector-detail">
-                        <label><i class="fas fa-box"></i> Quantity</label>
-                        <div class="quantity-input-group">
-                            <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
-                            <input type="number" id="productQuantity" class="quantity-input" 
-                                   value="1" min="1" max="${!isFootwear ? product.stock : 100}">
-                            <button class="quantity-btn" onclick="increaseQuantity()">+</button>
                         </div>
                     </div>
                 `;
-                
-                // Bulk pricing (if available)
-                if (product.bulk_pricing_tiers && product.bulk_pricing_tiers.length > 0) {
-                    html += `
-                        <div class="bulk-pricing-detail">
-                            <h4><i class="fas fa-tags"></i> Bulk Pricing</h4>
-                            <table class="bulk-table">
-                                <thead>
-                                    <tr>
-                                        <th>Quantity</th>
-                                        <th>Discount</th>
-                                        <th>Price per Unit</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bulkPricingBody">
-                    `;
-                    
-                    product.bulk_pricing_tiers.forEach(tier => {
-                        const discountPrice = product.price * (1 - tier.discount_percent / 100);
-                        html += `
+            }
+            
+            // Size selection for footwear
+            if (isFootwear) {
+                html += `
+                    <div class="size-section">
+                        <label class="size-label">Size</label>
+                        <div class="size-grid" id="sizeGrid">
+                            <div class="loading">Loading sizes...</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Quantity selector
+            html += `
+                <div class="quantity-section">
+                    <label class="quantity-label">Quantity</label>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" id="quantityInput" class="qty-input" 
+                               value="1" min="1" ${!isFootwear ? `max="${product.stock}"` : ''}>
+                        <button class="qty-btn" onclick="changeQuantity(1)">+</button>
+                    </div>
+                </div>
+            `;
+            
+            // Bulk pricing
+            if (product.bulk_pricing_tiers && product.bulk_pricing_tiers.length > 0) {
+                html += `
+                    <div class="bulk-pricing">
+                        <div class="bulk-title">Bulk Discounts</div>
+                        <table class="bulk-table">
                             <tr>
-                                <td>${tier.min_quantity}+</td>
-                                <td>${tier.discount_percent}% OFF</td>
-                                <td>₦${discountPrice.toLocaleString()}</td>
-                                <td>₦${(discountPrice * tier.min_quantity).toLocaleString()}</td>
+                                <th>Quantity</th>
+                                <th>Discount</th>
+                                <th>Price Each</th>
                             </tr>
-                        `;
-                    });
-                    
+                `;
+                
+                product.bulk_pricing_tiers.forEach(tier => {
+                    const discountedPrice = product.price * (1 - tier.discount_percent / 100);
                     html += `
-                                </tbody>
-                            </table>
-                        </div>
+                        <tr>
+                            <td>${tier.min_quantity}+</td>
+                            <td>${tier.discount_percent}% OFF</td>
+                            <td>₦${discountedPrice.toLocaleString()}</td>
+                        </tr>
                     `;
-                }
-                
-                // Action buttons
-                const isOutOfStock = !isFootwear && product.stock <= 0;
-                
-                html += `
-                    <div class="action-buttons-detail">
-                        <button class="btn-add-cart-detail" id="addToCartBtn" 
-                                ${isOutOfStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}
-                                onclick="addToCart(${product.id})">
-                            <i class="fas fa-shopping-cart"></i>
-                            ${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-                        </button>
-                        <button class="btn-wishlist-detail" id="wishlistBtn" onclick="toggleWishlist(${product.id})">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                    </div>
-                `;
-                
-                // Specifications
-                html += `
-                    <div class="specifications">
-                        <h3><i class="fas fa-info-circle"></i> Product Specifications</h3>
-                        <div class="spec-grid">
-                            <div class="spec-item">
-                                <span class="spec-label">Product ID:</span>
-                                <span class="spec-value">${product.id}</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Category:</span>
-                                <span class="spec-value">${product.categories.name}</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Added:</span>
-                                <span class="spec-value">${new Date(product.created_at).toLocaleDateString()}</span>
-                            </div>
-                            ${!isFootwear ? `
-                                <div class="spec-item">
-                                    <span class="spec-label">Stock:</span>
-                                    <span class="spec-value">${product.stock} units</span>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-                
-                productContainer.innerHTML = html;
-                
-                // Set back button
-                const backBtn = document.getElementById('backToCategory');
-                if (backBtn && product.categories) {
-                    backBtn.href = `${product.categories.slug}.html`;
-                }
-                
-                // Load sizes if footwear
-                if (isFootwear) {
-                    await loadSizes(product.id);
-                }
-                
-                // Update total price
-                updateTotalPrice();
-            }
-
-            // ========== LOAD SIZES (FOOTWEAR ONLY) ========== //
-            async function loadSizes(productId) {
-                const sizeGrid = document.getElementById('sizeGridDetail');
-                if (!sizeGrid) return;
-                
-                try {
-                    const app = JMPOTTERS.getInstance();
-                    
-                    // Get sizes for the first color (default)
-                    const colorOptions = document.querySelectorAll('.color-option');
-                    const selectedColor = document.querySelector('.color-option.selected');
-                    const colorId = selectedColor ? selectedColor.dataset.colorId : null;
-                    
-                    if (!colorId) {
-                        sizeGrid.innerHTML = '<div class="error-message" style="padding: 20px;">No sizes available</div>';
-                        return;
-                    }
-                    
-                    const { data: sizes, error } = await app.supabase
-                        .from('product_sizes')
-                        .select('*')
-                        .eq('product_id', productId)
-                        .eq('color_id', colorId);
-                    
-                    if (error) throw error;
-                    
-                    if (!sizes || sizes.length === 0) {
-                        sizeGrid.innerHTML = '<div class="error-message" style="padding: 20px;">No sizes available for this color</div>';
-                        return;
-                    }
-                    
-                    let sizesHtml = '';
-                    sizes.forEach(size => {
-                        const isAvailable = size.stock_quantity > 0;
-                        sizesHtml += `
-                            <button class="size-option-detail ${!isAvailable ? 'out-of-stock' : ''}" 
-                                    data-size-id="${size.id}"
-                                    data-size-value="${size.size_value}"
-                                    data-stock="${size.stock_quantity}"
-                                    ${!isAvailable ? 'disabled' : 'onclick="selectSize(this)"'}>
-                                ${size.size_value}
-                            </button>
-                        `;
-                    });
-                    
-                    sizeGrid.innerHTML = sizesHtml;
-                    
-                } catch (error) {
-                    console.error('Error loading sizes:', error);
-                    sizeGrid.innerHTML = '<div class="error-message" style="padding: 20px;">Error loading sizes</div>';
-                }
-            }
-
-            // ========== GLOBAL FUNCTIONS FOR BUTTONS ========== //
-            window.selectColor = function(element, imageUrl) {
-                // Remove selected class from all color options
-                document.querySelectorAll('.color-option').forEach(opt => {
-                    opt.classList.remove('selected');
                 });
                 
-                // Add selected class to clicked option
-                element.classList.add('selected');
-                
-                // Update main image if color has specific image
-                const mainImage = document.getElementById('productMainImage');
-                const app = JMPOTTERS.getInstance();
-                
-                if (imageUrl && imageUrl !== 'null') {
-                    // Get current product slug from URL
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const productSlug = urlParams.get('slug');
-                    
-                    // We need to get the category slug to build proper image URL
-                    // This is a bit complex, so for now, we'll keep the original image
-                    // You can enhance this later
-                    console.log('Color image URL available:', imageUrl);
-                }
-                
-                // Load sizes for this color
-                const productId = getProductIdFromPage();
-                if (productId) {
-                    loadSizes(productId);
-                }
-            };
-
-            window.selectSize = function(element) {
-                // Remove selected class from all size options
-                document.querySelectorAll('.size-option-detail').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                
-                // Add selected class to clicked option
-                element.classList.add('selected');
-                
-                // Update stock status
-                const stock = parseInt(element.dataset.stock);
-                const stockStatus = document.querySelector('.stock-status');
-                if (stockStatus) {
-                    if (stock > 10) {
-                        stockStatus.className = 'stock-status in-stock';
-                        stockStatus.innerHTML = `<i class="fas fa-check-circle stock-icon"></i> In Stock (${stock} available)`;
-                    } else if (stock > 0) {
-                        stockStatus.className = 'stock-status low-stock';
-                        stockStatus.innerHTML = `<i class="fas fa-exclamation-triangle stock-icon"></i> Low Stock (${stock} left)`;
-                    } else {
-                        stockStatus.className = 'stock-status out-of-stock';
-                        stockStatus.innerHTML = `<i class="fas fa-times-circle stock-icon"></i> Out of Stock`;
-                    }
-                }
-                
-                // Update quantity max
-                const quantityInput = document.getElementById('productQuantity');
-                if (quantityInput) {
-                    quantityInput.max = stock;
-                    if (parseInt(quantityInput.value) > stock) {
-                        quantityInput.value = stock;
-                        updateTotalPrice();
-                    }
-                }
-            };
-
-            window.decreaseQuantity = function() {
-                const input = document.getElementById('productQuantity');
-                let value = parseInt(input.value);
-                if (value > 1) {
-                    input.value = value - 1;
-                    updateTotalPrice();
-                }
-            };
-
-            window.increaseQuantity = function() {
-                const input = document.getElementById('productQuantity');
-                const max = parseInt(input.max) || 100;
-                let value = parseInt(input.value);
-                if (value < max) {
-                    input.value = value + 1;
-                    updateTotalPrice();
-                }
-            };
-
-            window.updateTotalPrice = function() {
-                const quantityInput = document.getElementById('productQuantity');
-                if (!quantityInput) return;
-                
-                const quantity = parseInt(quantityInput.value) || 1;
-                
-                // Get product price from the page
-                const priceElement = document.querySelector('.price-real-large');
-                if (!priceElement) return;
-                
-                // Extract price number (remove ₦ and commas)
-                const priceText = priceElement.textContent.replace('₦', '').replace(/,/g, '');
-                const price = parseFloat(priceText);
-                
-                // Calculate total
-                const total = price * quantity;
-                
-                // Update add to cart button text
-                const addToCartBtn = document.getElementById('addToCartBtn');
-                if (addToCartBtn) {
-                    addToCartBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Add to Cart - ₦${total.toLocaleString()}`;
-                }
-            };
-
-            window.addToCart = async function(productId) {
-                try {
-                    const app = JMPOTTERS.getInstance();
-                    
-                    // Get product details from the page
-                    const productName = document.querySelector('.product-title-large').textContent;
-                    const priceElement = document.querySelector('.price-real-large');
-                    const priceText = priceElement.textContent.replace('₦', '').replace(/,/g, '');
-                    const price = parseFloat(priceText);
-                    
-                    // Get quantity
-                    const quantityInput = document.getElementById('productQuantity');
-                    const quantity = parseInt(quantityInput.value) || 1;
-                    
-                    // Get selected color and size (for footwear)
-                    let colorId = null;
-                    let colorName = null;
-                    let sizeId = null;
-                    let sizeValue = null;
-                    let variantId = null;
-                    
-                    const selectedColor = document.querySelector('.color-option.selected');
-                    if (selectedColor) {
-                        colorId = selectedColor.dataset.colorId;
-                        colorName = selectedColor.dataset.colorName;
-                    }
-                    
-                    const selectedSize = document.querySelector('.size-option-detail.selected');
-                    if (selectedSize) {
-                        sizeId = selectedSize.dataset.sizeId;
-                        sizeValue = selectedSize.dataset.sizeValue;
-                        variantId = selectedSize.dataset.sizeId; // Use size ID as variant ID
-                    }
-                    
-                    // Get category from URL or page
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const productSlug = urlParams.get('slug');
-                    
-                    // Fetch product to get full details
-                    const { data: product } = await app.supabase
-                        .from('products')
-                        .select('categories(slug)')
-                        .eq('id', productId)
-                        .single();
-                    
-                    const cartItem = {
-                        product_id: productId,
-                        quantity: quantity,
-                        name: productName,
-                        price: price,
-                        image_url: '', // We'll get this from the main image
-                        category_slug: product.categories.slug,
-                        color_id: colorId,
-                        color_name: colorName,
-                        size_id: sizeId,
-                        size_value: sizeValue,
-                        variant_id: variantId,
-                        added_at: new Date().toISOString()
-                    };
-                    
-                    // Get image URL from main image
-                    const mainImage = document.getElementById('productMainImage');
-                    if (mainImage && mainImage.src) {
-                        // Extract just the filename from the full URL
-                        const imageUrl = mainImage.src.split('/').pop();
-                        cartItem.image_url = imageUrl;
-                    }
-                    
-                    // Add to cart using your existing app function
-                    app.addToCart(cartItem);
-                    
-                    // Show success message
-                    showToast(`Added ${quantity} × ${productName} to cart`, 'success');
-                    
-                    // Update cart count
-                    app.updateCartUI();
-                    
-                } catch (error) {
-                    console.error('Error adding to cart:', error);
-                    showToast('Error adding to cart', 'error');
-                }
-            };
-
-            window.toggleWishlist = function(productId) {
-                const wishlistBtn = document.getElementById('wishlistBtn');
-                const isActive = wishlistBtn.classList.contains('active');
-                
-                if (isActive) {
-                    wishlistBtn.classList.remove('active');
-                    showToast('Removed from wishlist', 'info');
-                } else {
-                    wishlistBtn.classList.add('active');
-                    showToast('Added to wishlist', 'success');
-                }
-                
-                // You can implement localStorage wishlist here
-                let wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist') || '[]');
-                
-                if (isActive) {
-                    wishlist = wishlist.filter(id => id !== productId);
-                } else {
-                    if (!wishlist.includes(productId)) {
-                        wishlist.push(productId);
-                    }
-                }
-                
-                localStorage.setItem('jmpotters_wishlist', JSON.stringify(wishlist));
-                
-                // Update wishlist count
-                const wishlistCount = document.getElementById('wishlistCount');
-                if (wishlistCount) {
-                    wishlistCount.textContent = wishlist.length;
-                }
-            };
-
-            function getProductIdFromPage() {
-                // Try to get product ID from the specifications
-                const specItems = document.querySelectorAll('.spec-item');
-                for (const item of specItems) {
-                    if (item.querySelector('.spec-label').textContent === 'Product ID:') {
-                        return parseInt(item.querySelector('.spec-value').textContent);
-                    }
-                }
-                return null;
-            }
-
-            // ========== SETUP CART PANEL ========== //
-            function setupCartPanel() {
-                const cartIcon = document.getElementById('cartIcon');
-                const cartPanel = document.getElementById('cartPanel');
-                const cartOverlay = document.getElementById('cartOverlay');
-                const closeCart = document.querySelector('.close-cart');
-                
-                if (cartIcon) {
-                    cartIcon.addEventListener('click', () => {
-                        cartPanel.classList.add('active');
-                        cartOverlay.classList.add('active');
-                        document.body.style.overflow = 'hidden';
-                    });
-                }
-                
-                if (closeCart) {
-                    closeCart.addEventListener('click', () => {
-                        cartPanel.classList.remove('active');
-                        cartOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                }
-                
-                if (cartOverlay) {
-                    cartOverlay.addEventListener('click', () => {
-                        cartPanel.classList.remove('active');
-                        cartOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                }
-                
-                // Setup WhatsApp checkout
-                const whatsappCheckout = document.getElementById('whatsappCheckout');
-                if (whatsappCheckout) {
-                    whatsappCheckout.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const app = JMPOTTERS.getInstance();
-                        app.checkoutViaWhatsApp();
-                    });
-                }
-            }
-
-            // ========== SETUP MOBILE NAVIGATION ========== //
-            function setupMobileNavigation() {
-                const mobileToggle = document.getElementById('mobileToggle');
-                const mobileNav = document.getElementById('mobileNav');
-                const navOverlay = document.getElementById('navOverlay');
-                const closeNav = document.querySelector('.close-nav');
-                
-                if (mobileToggle) {
-                    mobileToggle.addEventListener('click', () => {
-                        mobileNav.classList.add('active');
-                        navOverlay.classList.add('active');
-                        document.body.style.overflow = 'hidden';
-                    });
-                }
-                
-                if (closeNav) {
-                    closeNav.addEventListener('click', () => {
-                        mobileNav.classList.remove('active');
-                        navOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                }
-                
-                if (navOverlay) {
-                    navOverlay.addEventListener('click', () => {
-                        mobileNav.classList.remove('active');
-                        navOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                }
-                
-                // Setup mobile dropdown
-                const mobileDropdown = document.getElementById('mobileFootwearDropdown');
-                if (mobileDropdown) {
-                    const mobileDropdownLink = mobileDropdown.querySelector('a');
-                    mobileDropdownLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        mobileDropdown.classList.toggle('active');
-                    });
-                }
-            }
-
-            // ========== SETUP DROPDOWN TOGGLE ========== //
-            function setupDropdownToggle() {
-                const desktopDropdown = document.querySelector('.nav-links .dropdown');
-                if (desktopDropdown) {
-                    const dropdownLink = desktopDropdown.querySelector('a');
-                    dropdownLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        desktopDropdown.classList.toggle('active');
-                    });
-                }
-            }
-
-            // ========== INITIALIZE EVERYTHING ========== //
-            initializePreloader();
-            initializeHeader();
-            setupCartPanel();
-            setupMobileNavigation();
-            setupDropdownToggle();
-            
-            // Load and render the product
-            const product = await loadProduct();
-            if (product) {
-                await renderProduct(product);
-                
-                // Update quantity input to trigger price update
-                const quantityInput = document.getElementById('productQuantity');
-                if (quantityInput) {
-                    quantityInput.addEventListener('input', updateTotalPrice);
-                    quantityInput.addEventListener('change', updateTotalPrice);
-                }
-                
-                // Check if product is in wishlist
-                const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist') || '[]');
-                const wishlistBtn = document.getElementById('wishlistBtn');
-                if (wishlistBtn && wishlist.includes(product.id)) {
-                    wishlistBtn.classList.add('active');
-                }
-                
-                // Update wishlist count
-                const wishlistCount = document.getElementById('wishlistCount');
-                if (wishlistCount) {
-                    wishlistCount.textContent = wishlist.length;
-                }
-                
-                console.log('✅ Product page fully loaded');
+                html += `
+                        </table>
+                    </div>
+                `;
             }
             
-            // Listen for quantity changes
-            document.addEventListener('input', function(e) {
-                if (e.target.id === 'productQuantity') {
-                    updateTotalPrice();
-                }
+            // Action buttons
+            const isOutOfStock = !isFootwear && product.stock <= 0;
+            
+            html += `
+                <div class="action-buttons">
+                    <button class="btn-add-cart" id="addToCartBtn" 
+                            ${isOutOfStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}
+                            onclick="addToCart(${product.id})">
+                        <i class="fas fa-shopping-cart"></i>
+                        ${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+                    </button>
+                    <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlist(${product.id})">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            `;
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Load sizes if footwear
+            if (isFootwear) {
+                loadSizes(product.id);
+            }
+            
+            // Check wishlist status
+            updateWishlistButton(product.id);
+        }
+        
+        // ========== GLOBAL FUNCTIONS ========== //
+        window.selectColor = function(element) {
+            // Update color selection
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('selected');
             });
-        });
+            element.classList.add('selected');
+            
+            // Update product image if color has specific image
+            const imageUrl = element.dataset.image;
+            const mainImage = document.getElementById('productImage');
+            const app = JMPOTTERS.getInstance();
+            
+            // We need the category to build proper image URL
+            // For now, we'll keep it simple
+            console.log('Selected color:', element.dataset.colorName);
+            
+            // Reload sizes for this color
+            const productId = getProductIdFromURL();
+            if (productId) {
+                loadSizes(productId, element.dataset.colorId);
+            }
+        };
+        
+        async function loadSizes(productId, colorId = null) {
+            const sizeGrid = document.getElementById('sizeGrid');
+            if (!sizeGrid) return;
+            
+            // Get selected color
+            if (!colorId) {
+                const selectedColor = document.querySelector('.color-option.selected');
+                colorId = selectedColor ? selectedColor.dataset.colorId : null;
+            }
+            
+            if (!colorId) {
+                sizeGrid.innerHTML = '<div>No color selected</div>';
+                return;
+            }
+            
+            try {
+                const app = JMPOTTERS.getInstance();
+                const { data: sizes, error } = await app.supabase
+                    .from('product_sizes')
+                    .select('*')
+                    .eq('product_id', productId)
+                    .eq('color_id', colorId);
+                
+                if (error) throw error;
+                
+                let sizesHtml = '';
+                sizes.forEach(size => {
+                    sizesHtml += `
+                        <button class="size-option" 
+                                data-size-id="${size.id}"
+                                data-size="${size.size_value}"
+                                data-stock="${size.stock_quantity}"
+                                onclick="selectSize(this)">
+                            ${size.size_value}
+                        </button>
+                    `;
+                });
+                
+                sizeGrid.innerHTML = sizesHtml;
+                
+            } catch (error) {
+                console.error('Error loading sizes:', error);
+                sizeGrid.innerHTML = '<div>Error loading sizes</div>';
+            }
+        }
+        
+        window.selectSize = function(element) {
+            // Update size selection
+            document.querySelectorAll('.size-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            // Update stock status
+            const stock = parseInt(element.dataset.stock);
+            const stockElement = document.querySelector('.stock-status');
+            if (stockElement) {
+                if (stock > 10) {
+                    stockElement.className = 'stock-status stock-in';
+                    stockElement.innerHTML = `<i class="fas fa-check-circle"></i> In Stock (${stock} available)`;
+                } else if (stock > 0) {
+                    stockElement.className = 'stock-status stock-low';
+                    stockElement.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Low Stock (${stock} left)`;
+                } else {
+                    stockElement.className = 'stock-status stock-out';
+                    stockElement.innerHTML = `<i class="fas fa-times-circle"></i> Out of Stock`;
+                }
+            }
+        };
+        
+        window.changeQuantity = function(change) {
+            const input = document.getElementById('quantityInput');
+            let value = parseInt(input.value) || 1;
+            const max = parseInt(input.max) || 999;
+            const min = parseInt(input.min) || 1;
+            
+            value += change;
+            if (value < min) value = min;
+            if (value > max) value = max;
+            
+            input.value = value;
+        };
+        
+        window.addToCart = function(productId) {
+            alert('Add to cart functionality would be implemented here');
+            // You can integrate with your existing cart system
+            console.log('Add to cart clicked for product:', productId);
+        };
+        
+        window.toggleWishlist = function(productId) {
+            const btn = document.getElementById('wishlistBtn');
+            const isActive = btn.classList.contains('active');
+            
+            if (isActive) {
+                btn.classList.remove('active');
+            } else {
+                btn.classList.add('active');
+            }
+            
+            // Update localStorage
+            let wishlist = JSON.parse(localStorage.getItem('jmp_wishlist') || '[]');
+            if (isActive) {
+                wishlist = wishlist.filter(id => id !== productId);
+            } else {
+                if (!wishlist.includes(productId)) {
+                    wishlist.push(productId);
+                }
+            }
+            localStorage.setItem('jmp_wishlist', JSON.stringify(wishlist));
+        };
+        
+        function updateWishlistButton(productId) {
+            const btn = document.getElementById('wishlistBtn');
+            if (!btn) return;
+            
+            const wishlist = JSON.parse(localStorage.getItem('jmp_wishlist') || '[]');
+            if (wishlist.includes(productId)) {
+                btn.classList.add('active');
+            }
+        }
+        
+        function getProductIdFromURL() {
+            // Extract from current URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('slug');
+            // In real implementation, you'd need to fetch or store product ID
+            return null;
+        }
+        
+        function showError(message) {
+            const container = document.getElementById('productContainer');
+            container.innerHTML = `
+                <div class="error-message">
+                    <div class="error-title"><i class="fas fa-exclamation-triangle"></i> Error</div>
+                    <p>${message}</p>
+                    <button onclick="window.history.back()" 
+                            style="margin-top: 20px; padding: 10px 20px; background: var(--black); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Go Back
+                    </button>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
