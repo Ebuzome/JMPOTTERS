@@ -14,9 +14,6 @@
     <!-- Custom Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Image Zoom Library -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
-    
     <style>
         /* Ultra-precise custom styles */
         :root {
@@ -31,10 +28,8 @@
             --success: #10b981;
             --error: #ef4444;
             --border: #475569;
-            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
         }
 
-        /* Base reset */
         * {
             margin: 0;
             padding: 0;
@@ -42,31 +37,13 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html {
-            font-size: 16px;
-        }
-
-        @media (max-width: 768px) {
-            html {
-                font-size: 14px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            html {
-                font-size: 13px;
-            }
-        }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-dark);
             color: var(--text-primary);
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* Mobile-first container */
         .container-tight {
             width: 100%;
             max-width: 1280px;
@@ -74,302 +51,25 @@
             padding: 0 1rem;
         }
 
-        @media (min-width: 640px) {
-            .container-tight {
-                padding: 0 1.5rem;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .container-tight {
-                padding: 0 2rem;
-            }
-        }
-
-        /* Custom utility classes */
-        .glass-effect {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .text-balance {
-            text-wrap: balance;
-        }
-
-        .touch-target {
-            min-height: 44px;
-            min-width: 44px;
-        }
-
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-surface);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 3px;
-        }
-
-        /* Image zoom container */
-        .zoom-container {
-            position: relative;
-            overflow: hidden;
-            cursor: zoom-in;
-            border-radius: 12px;
-            background: var(--bg-card);
-        }
-
-        .zoom-container:hover img {
-            transform: scale(1.03);
-        }
-
-        .zoom-container.zoomed {
-            cursor: zoom-out;
-            overflow: visible;
-            z-index: 100;
-        }
-
-        .zoom-container.zoomed img {
-            transform: scale(2);
-            position: relative;
-            z-index: 101;
-        }
-
-        /* Professional variant dropdowns */
-        .variant-dropdown {
-            position: relative;
-            width: 100%;
-        }
-
-        .variant-dropdown-btn {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            background: var(--bg-surface);
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .variant-dropdown-btn:hover {
-            border-color: var(--accent);
-        }
-
-        .variant-dropdown-btn.open {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.1);
-        }
-
-        .variant-dropdown-content {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: var(--bg-card);
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
-            box-shadow: var(--shadow);
-        }
-
-        .variant-dropdown-content.open {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .variant-option {
-            padding: 0.75rem 1rem;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .variant-option:last-child {
-            border-bottom: none;
-        }
-
-        .variant-option:hover {
-            background: var(--bg-surface);
-        }
-
-        .variant-option.selected {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--accent);
-        }
-
-        .color-swatch {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            margin-right: 12px;
-            border: 2px solid var(--border);
-        }
-
-        .size-option {
-            padding: 0.75rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .size-badge {
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-
-        .size-badge.in-stock {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-        }
-
-        .size-badge.low-stock {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--accent);
-        }
-
-        .size-badge.out-of-stock {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--error);
-        }
-
-        /* Quantity selector */
-        .quantity-selector {
-            display: flex;
-            align-items: center;
-            background: var(--bg-surface);
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            width: fit-content;
-        }
-
-        .quantity-btn {
-            width: 48px;
-            height: 48px;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: 1.25rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s ease;
-        }
-
-        .quantity-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .quantity-btn:active {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .quantity-input {
-            width: 60px;
-            height: 48px;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 600;
-            -moz-appearance: textfield;
-        }
-
-        .quantity-input::-webkit-outer-spin-button,
-        .quantity-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+        @media (min-width: 640px) { .container-tight { padding: 0 1.5rem; } }
+        @media (min-width: 1024px) { .container-tight { padding: 0 2rem; } }
 
         /* Mobile optimizations */
         @media (max-width: 768px) {
-            .mobile-stack {
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
-            .mobile-padding-tight {
-                padding: 0.75rem;
-            }
-
-            .mobile-margin-compact {
-                margin: 0.5rem;
-            }
-
-            .mobile-text-sm {
-                font-size: 0.875rem;
-            }
-
-            .mobile-touch-lg {
-                min-height: 48px;
-                min-width: 48px;
-            }
+            html { font-size: 14px; }
+            .mobile-stack { flex-direction: column; gap: 1rem; }
+            .mobile-padding-tight { padding: 0.5rem; }
         }
 
         @media (max-width: 480px) {
-            .mobile-padding-tighter {
-                padding: 0.5rem;
-            }
-
-            .mobile-space-micro {
-                gap: 0.5rem;
-            }
-
-            .mobile-text-xs {
-                font-size: 0.75rem;
-            }
+            html { font-size: 13px; }
+            .mobile-padding-tighter { padding: 0.25rem; }
         }
 
-        /* Loading skeleton */
-        .skeleton {
-            background: linear-gradient(90deg, 
-                var(--bg-surface) 25%, 
-                var(--bg-card) 50%, 
-                var(--bg-surface) 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 8px;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* Cart panel */
-        .cart-panel {
-            transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .cart-panel.open {
-            transform: translateX(0);
-        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-surface); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
         /* Notification */
         .notification {
@@ -386,17 +86,14 @@
 </head>
 <body class="antialiased">
     <!-- Header -->
-    <header class="sticky top-0 z-40 glass-effect border-b border-gray-800">
+    <header class="sticky top-0 z-40 bg-gray-900 border-b border-gray-800">
         <div class="container-tight">
             <div class="flex items-center justify-between h-16">
-                <!-- Back button -->
-                <button onclick="history.back()" 
-                        class="touch-target flex items-center gap-2 text-gray-300 hover:text-white transition-colors mobile-text-sm">
-                    <i class="fas fa-arrow-left text-lg"></i>
+                <button onclick="history.back()" class="flex items-center gap-2 text-gray-300 hover:text-white">
+                    <i class="fas fa-arrow-left"></i>
                     <span class="hidden sm:inline">Back</span>
                 </button>
 
-                <!-- Logo -->
                 <a href="index.html" class="flex items-center gap-2">
                     <div class="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-700 rounded-lg flex items-center justify-center">
                         <i class="fas fa-gem text-white text-sm"></i>
@@ -404,22 +101,15 @@
                     <span class="text-xl font-bold text-white">JMPOTTERS</span>
                 </a>
 
-                <!-- Actions -->
                 <div class="flex items-center gap-3">
-                    <!-- Wishlist -->
-                    <button id="wishlistBtn" 
-                            class="touch-target relative p-2 text-gray-300 hover:text-red-400 transition-colors">
+                    <button id="wishlistBtn" class="relative p-2 text-gray-300 hover:text-red-400">
                         <i class="far fa-heart text-xl"></i>
-                        <span id="wishlistCount" 
-                              class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                        <span id="wishlistCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
                     </button>
 
-                    <!-- Cart -->
-                    <button id="cartBtn" 
-                            class="touch-target relative p-2 text-gray-300 hover:text-amber-400 transition-colors">
+                    <button id="cartBtn" class="relative p-2 text-gray-300 hover:text-amber-400">
                         <i class="fas fa-shopping-bag text-xl"></i>
-                        <span id="cartCount" 
-                              class="absolute -top-1 -right-1 bg-amber-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-amber-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
                     </button>
                 </div>
             </div>
@@ -427,185 +117,129 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container-tight py-6 md:py-8">
+    <main class="container-tight py-4 md:py-6">
         <!-- Loading State -->
-        <div id="loadingState" class="min-h-[70vh] flex flex-col items-center justify-center">
-            <div class="skeleton w-64 h-64 rounded-xl mb-6"></div>
-            <div class="skeleton w-80 h-8 rounded mb-4"></div>
-            <div class="skeleton w-56 h-6 rounded mb-6"></div>
-            <div class="flex gap-4">
-                <div class="skeleton w-36 h-12 rounded-lg"></div>
-                <div class="skeleton w-36 h-12 rounded-lg"></div>
-            </div>
+        <div id="loadingState" class="min-h-[60vh] flex flex-col items-center justify-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mb-4"></div>
+            <p class="text-gray-400">Loading product details...</p>
         </div>
 
         <!-- Product Content -->
         <div id="productContent" class="hidden">
-            <!-- Breadcrumb -->
-            <nav class="mb-6 md:mb-8 text-sm text-gray-400">
-                <div class="flex items-center gap-2 mobile-text-sm">
-                    <a href="index.html" class="hover:text-amber-400 transition-colors">Home</a>
+            <nav class="mb-4 text-sm text-gray-400">
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="hover:text-amber-400">Home</a>
                     <i class="fas fa-chevron-right text-xs"></i>
-                    <a href="mensfootwear.html" id="categoryLink" class="hover:text-amber-400 transition-colors">Category</a>
+                    <span id="categoryBreadcrumb" class="hover:text-amber-400 cursor-pointer">Category</span>
                     <i class="fas fa-chevron-right text-xs"></i>
-                    <span class="text-gray-300" id="productBreadcrumb">Loading...</span>
+                    <span id="productBreadcrumb" class="text-gray-300">Product</span>
                 </div>
             </nav>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                 <!-- Left Column - Image -->
-                <div>
-                    <!-- Main Image -->
-                    <div id="zoomContainer" class="zoom-container aspect-square">
+                <div class="space-y-4">
+                    <div class="bg-gray-800 rounded-xl p-4">
                         <img id="mainImage" 
                              src="" 
                              alt="Product Image"
-                             class="w-full h-full object-contain p-4 transition-transform duration-300">
+                             class="w-full h-auto object-contain rounded-lg"
+                             onerror="this.src='https://via.placeholder.com/600x600/1e293b/94a3b8?text=JMPOTTERS'">
                     </div>
-
-                    <!-- Image Zoom Hint -->
-                    <div class="mt-4 text-center">
-                        <p class="text-sm text-gray-400">
-                            <i class="fas fa-search-plus mr-2"></i>
-                            Click to zoom • Pinch to zoom on mobile
-                        </p>
-                    </div>
+                    <p class="text-center text-sm text-gray-500">
+                        <i class="fas fa-search-plus mr-2"></i>Click image to view larger
+                    </p>
                 </div>
 
                 <!-- Right Column - Details -->
-                <div class="flex flex-col gap-6 md:gap-8">
-                    <!-- Product Title -->
-                    <h1 id="productTitle" class="text-2xl md:text-3xl lg:text-4xl font-bold text-white text-balance"></h1>
+                <div class="space-y-6">
+                    <h1 id="productTitle" class="text-2xl md:text-3xl font-bold text-white"></h1>
 
-                    <!-- Price Section -->
-                    <div class="flex items-baseline gap-4">
-                        <span id="currentPrice" class="text-3xl md:text-4xl font-bold text-white"></span>
+                    <div class="flex items-baseline gap-3">
+                        <span id="currentPrice" class="text-3xl font-bold text-white"></span>
                         <span id="originalPrice" class="text-xl text-gray-400 line-through"></span>
-                        <span class="px-3 py-1 bg-gradient-to-r from-red-900 to-red-700 text-white text-sm font-semibold rounded-full">
+                        <span class="px-2 py-1 bg-red-900/30 text-red-300 text-sm font-semibold rounded">
                             35% OFF
                         </span>
                     </div>
 
-                    <!-- Stock Status -->
-                    <div id="stockStatus" class="flex items-center gap-3 p-4 bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-800/30 rounded-xl">
-                        <i class="fas fa-check-circle text-2xl text-green-400"></i>
-                        <div>
-                            <p class="font-semibold text-green-300">In Stock</p>
-                            <p id="stockCount" class="text-sm text-green-400/80">Ready to ship</p>
+                    <div class="p-3 bg-green-900/20 border border-green-800/30 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span class="text-green-300 font-medium">In Stock</span>
+                            <span id="stockCount" class="text-green-400/80 text-sm ml-auto">Ready to ship</span>
                         </div>
                     </div>
 
                     <!-- Variant Selectors -->
-                    <div id="variantSelectors" class="space-y-6">
+                    <div id="variantSelectors" class="space-y-4">
                         <!-- Color Selector -->
-                        <div class="variant-dropdown">
-                            <label class="block text-sm font-semibold text-gray-300 mb-3">
-                                <i class="fas fa-palette mr-2"></i>COLOR
-                            </label>
-                            <div id="colorDropdownBtn" class="variant-dropdown-btn">
-                                <span id="selectedColorText">Select Color</span>
-                                <i class="fas fa-chevron-down transition-transform duration-200"></i>
-                            </div>
-                            <div id="colorDropdownContent" class="variant-dropdown-content">
-                                <!-- Color options will be added here -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">COLOR</label>
+                            <div class="flex flex-wrap gap-2">
+                                <div id="colorOptions">
+                                    <!-- Color options will be added here -->
+                                </div>
                             </div>
                         </div>
 
                         <!-- Size Selector -->
-                        <div class="variant-dropdown">
-                            <label class="block text-sm font-semibold text-gray-300 mb-3">
-                                <i class="fas fa-ruler-combined mr-2"></i>SIZE
-                            </label>
-                            <div id="sizeDropdownBtn" class="variant-dropdown-btn">
-                                <span id="selectedSizeText">Select Size</span>
-                                <i class="fas fa-chevron-down transition-transform duration-200"></i>
-                            </div>
-                            <div id="sizeDropdownContent" class="variant-dropdown-content">
-                                <!-- Size options will be added here -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">SIZE</label>
+                            <div class="flex flex-wrap gap-2">
+                                <div id="sizeOptions">
+                                    <!-- Size options will be added here -->
+                                </div>
                             </div>
                         </div>
 
                         <!-- Selection Summary -->
-                        <div id="selectionSummary" class="hidden p-4 bg-gradient-to-r from-amber-900/10 to-amber-800/10 border border-amber-800/30 rounded-xl">
-                            <div class="flex items-center justify-between">
+                        <div id="selectionSummary" class="hidden p-3 bg-amber-900/10 border border-amber-800/20 rounded-lg">
+                            <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="text-sm font-semibold text-amber-300">SELECTED:</p>
-                                    <p id="selectedVariantText" class="text-white font-medium"></p>
+                                    <p class="text-sm text-amber-300">Selected:</p>
+                                    <p id="selectedVariantText" class="font-medium text-white"></p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-sm text-amber-300">STOCK:</p>
-                                    <p id="availableStockText" class="text-xl font-bold text-white">0</p>
+                                    <p class="text-sm text-amber-300">Stock:</p>
+                                    <p id="availableStockText" class="text-lg font-bold text-white">0</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Quantity Selector -->
+                    <!-- Quantity -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-300 mb-3">
-                            <i class="fas fa-layer-group mr-2"></i>QUANTITY
-                        </label>
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-                            <div class="quantity-selector">
-                                <button id="decreaseQty" class="quantity-btn">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">QUANTITY</label>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center border border-gray-700 rounded-lg overflow-hidden">
+                                <button id="decreaseQty" class="px-4 py-2 bg-gray-800 hover:bg-gray-700">
                                     <i class="fas fa-minus"></i>
                                 </button>
-                                <input id="quantityInput" 
-                                       type="number" 
-                                       value="1" 
-                                       min="1" 
-                                       max="100"
-                                       class="quantity-input">
-                                <button id="increaseQty" class="quantity-btn">
+                                <input id="quantityInput" type="number" value="1" min="1" max="100" 
+                                       class="w-16 text-center bg-transparent border-0 focus:ring-0">
+                                <button id="increaseQty" class="px-4 py-2 bg-gray-800 hover:bg-gray-700">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
-                            
-                            <div class="flex flex-wrap gap-2">
-                                <button data-qty="1" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg text-sm transition-colors">
-                                    1 Unit
-                                </button>
-                                <button data-qty="5" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg text-sm transition-colors">
-                                    5 Units
-                                </button>
-                                <button data-qty="10" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg text-sm transition-colors">
-                                    10 Units
-                                </button>
+                            <div class="flex gap-2">
+                                <button data-qty="1" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded text-sm">1</button>
+                                <button data-qty="5" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded text-sm">5</button>
+                                <button data-qty="10" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded text-sm">10</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button id="addToCartBtn" 
-                                class="touch-target w-full py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3">
-                            <i class="fas fa-shopping-cart text-lg"></i>
-                            <span>ADD TO CART</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button id="addToCartBtn" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2">
+                            <i class="fas fa-shopping-cart"></i>
+                            ADD TO CART
                         </button>
                         
-                        <button id="buyNowBtn"
-                                class="touch-target w-full py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3">
-                            <i class="fab fa-whatsapp text-xl"></i>
-                            <span>BUY NOW</span>
-                        </button>
-                    </div>
-
-                    <!-- WhatsApp Quick Actions -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <a id="whatsappInquiry" 
-                           href="#" 
-                           target="_blank"
-                           class="touch-target py-3 px-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-center text-gray-300 hover:text-white transition-colors text-sm font-medium">
-                            <i class="fab fa-whatsapp mr-2 text-green-400"></i>
-                            Ask Questions
-                        </a>
-                        
-                        <a id="whatsappBulk" 
-                           href="#" 
-                           target="_blank"
-                           class="touch-target py-3 px-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-center text-gray-300 hover:text-white transition-colors text-sm font-medium">
-                            <i class="fab fa-whatsapp mr-2 text-green-400"></i>
-                            Bulk Order
+                        <a id="whatsappBtn" href="#" target="_blank" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2">
+                            <i class="fab fa-whatsapp"></i>
+                            BUY NOW
                         </a>
                     </div>
                 </div>
@@ -613,68 +247,50 @@
         </div>
 
         <!-- Error State -->
-        <div id="errorState" class="hidden min-h-[70vh] flex flex-col items-center justify-center text-center">
-            <div class="w-24 h-24 bg-red-900/20 rounded-full flex items-center justify-center mb-6">
-                <i class="fas fa-exclamation-triangle text-red-400 text-4xl"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-white mb-3">Product Not Found</h2>
-            <p class="text-gray-400 mb-8 max-w-md" id="errorMessage">The product you're looking for is not available.</p>
-            <a href="index.html" 
-               class="px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+        <div id="errorState" class="hidden min-h-[60vh] flex flex-col items-center justify-center text-center">
+            <i class="fas fa-exclamation-triangle text-red-400 text-4xl mb-4"></i>
+            <h2 class="text-xl font-bold text-white mb-2">Product Not Found</h2>
+            <p class="text-gray-400 mb-6 max-w-md" id="errorMessage"></p>
+            <a href="index.html" class="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg">
                 RETURN TO HOMEPAGE
             </a>
         </div>
     </main>
 
     <!-- Cart Panel -->
-    <div id="cartPanel" class="cart-panel fixed inset-y-0 right-0 w-full sm:w-96 bg-gray-900 border-l border-gray-800 z-50 overflow-y-auto">
+    <div id="cartPanel" class="fixed inset-y-0 right-0 w-full md:w-96 bg-gray-900 border-l border-gray-800 transform translate-x-full transition-transform duration-300 z-50">
         <div class="flex flex-col h-full">
-            <!-- Cart Header -->
-            <div class="flex items-center justify-between p-6 border-b border-gray-800">
-                <h3 class="text-xl font-bold text-white">SHOPPING CART</h3>
-                <button id="closeCartBtn" class="touch-target p-2 text-gray-400 hover:text-white">
-                    <i class="fas fa-times text-xl"></i>
+            <div class="flex items-center justify-between p-4 border-b border-gray-800">
+                <h3 class="text-lg font-bold text-white">CART</h3>
+                <button id="closeCartBtn" class="p-2 text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-
-            <!-- Cart Items -->
+            
             <div id="cartItems" class="flex-1 overflow-y-auto p-4">
                 <div id="emptyCart" class="text-center py-12">
-                    <div class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-shopping-bag text-gray-400 text-3xl"></i>
-                    </div>
-                    <p class="text-gray-300 font-medium mb-2">Your cart is empty</p>
-                    <p class="text-gray-500 text-sm">Add items to get started</p>
+                    <i class="fas fa-shopping-bag text-gray-600 text-3xl mb-4"></i>
+                    <p class="text-gray-400">Your cart is empty</p>
                 </div>
             </div>
-
-            <!-- Cart Footer -->
-            <div class="border-t border-gray-800 p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <span class="text-gray-300">SUBTOTAL</span>
-                    <span id="cartTotal" class="text-2xl font-bold text-white">₦0</span>
+            
+            <div class="border-t border-gray-800 p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-300">Total:</span>
+                    <span id="cartTotal" class="text-xl font-bold text-white">₦0</span>
                 </div>
-                <a id="whatsappCheckout" 
-                   href="#" 
-                   target="_blank"
-                   class="touch-target block w-full py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3 mb-4">
-                    <i class="fab fa-whatsapp text-xl"></i>
-                    <span>CHECKOUT ON WHATSAPP</span>
+                <a id="whatsappCheckout" href="#" target="_blank" class="block w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg text-center">
+                    CHECKOUT ON WHATSAPP
                 </a>
-                <button onclick="closeCart()" class="touch-target w-full py-3 text-gray-400 hover:text-white text-sm">
-                    CONTINUE SHOPPING
-                </button>
             </div>
         </div>
     </div>
 
     <!-- Overlay -->
-    <div id="overlay" class="fixed inset-0 bg-black/70 z-40 hidden"></div>
+    <div id="overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
 
     <!-- Notification -->
-    <div id="notification" class="notification fixed top-4 right-4 z-50">
-        <!-- Notification content will be added here -->
-    </div>
+    <div id="notification" class="fixed top-4 right-4 z-50 max-w-sm"></div>
 
     <script>
         // Global state
@@ -682,19 +298,26 @@
             product: null,
             colors: [],
             sizes: [],
-            colorSizeMap: {},
             selectedColor: null,
             selectedSize: null,
             quantity: 1,
             cart: JSON.parse(localStorage.getItem('jmpotters_cart')) || [],
-            wishlist: JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [],
-            openDropdown: null
+            wishlist: JSON.parse(localStorage.getItem('jmpotters_wishlist')) || []
         };
 
-        // Supabase config
-        const SUPABASE_CONFIG = {
-            url: 'https://tmpggeeuwdvlngvfncaa.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+        // Supabase configuration
+        const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
+
+        // Category slug mapping
+        const CATEGORY_MAP = {
+            1: 'mensfootwear',
+            2: 'womensfootwear',
+            3: 'bags',
+            4: 'household',
+            5: 'healthcare',
+            6: 'accessories',
+            10: 'kids'
         };
 
         // Initialize app
@@ -703,18 +326,18 @@
         });
 
         async function initApp() {
-            // Initialize UI components
-            initUI();
+            // Initialize UI
+            setupUI();
             
-            // Load product from URL
+            // Load product
             await loadProduct();
             
-            // Update cart/wishlist counts
+            // Update counts
             updateHeaderCounts();
         }
 
-        function initUI() {
-            // Setup cart panel
+        function setupUI() {
+            // Cart panel
             const cartBtn = document.getElementById('cartBtn');
             const closeCartBtn = document.getElementById('closeCartBtn');
             const overlay = document.getElementById('overlay');
@@ -723,294 +346,16 @@
             closeCartBtn.addEventListener('click', closeCart);
             overlay.addEventListener('click', closeCart);
 
-            // Setup wishlist button
+            // Wishlist button
             document.getElementById('wishlistBtn').addEventListener('click', () => {
                 if (state.product) toggleWishlist(state.product);
             });
 
-            // Setup dropdown toggle
-            document.addEventListener('click', (e) => {
-                // Close dropdowns when clicking outside
-                if (!e.target.closest('.variant-dropdown')) {
-                    closeAllDropdowns();
-                }
-            });
-        }
-
-        async function loadProduct() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const slug = urlParams.get('slug');
-
-            if (!slug) {
-                showError('No product specified');
-                return;
-            }
-
-            try {
-                // Create Supabase client
-                const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
-
-                // Fetch product
-                const { data: product, error } = await supabase
-                    .from('products')
-                    .select('*')
-                    .eq('slug', slug)
-                    .eq('is_active', true)
-                    .single();
-
-                if (error || !product) throw new Error('Product not found');
-
-                state.product = product;
-
-                // Fetch colors and sizes
-                const [colorsRes, sizesRes] = await Promise.all([
-                    supabase.from('product_colors').select('*').eq('product_id', product.id),
-                    supabase.from('product_sizes').select('*').eq('product_id', product.id)
-                ]);
-
-                state.colors = colorsRes.data || [];
-                state.sizes = sizesRes.data || [];
-
-                // Build color-size mapping
-                buildColorSizeMapping();
-
-                // Render product
-                renderProduct();
-
-                // Show content
-                document.getElementById('loadingState').classList.add('hidden');
-                document.getElementById('productContent').classList.remove('hidden');
-
-            } catch (error) {
-                console.error('Error:', error);
-                showError('Failed to load product');
-            }
-        }
-
-        function buildColorSizeMapping() {
-            state.colorSizeMap = {};
-            state.colors.forEach(color => {
-                state.colorSizeMap[color.id] = state.sizes.filter(size => size.color_id === color.id);
-            });
-        }
-
-        function renderProduct() {
-            if (!state.product) return;
-
-            const product = state.product;
-            const imageUrl = `https://ebuzome.github.io/JMPOTTERS/assets/images/mensfootwear/${product.image_url}`;
-            const fakePrice = Math.round(product.price * 1.35);
-            const isFootwear = ['mensfootwear', 'womensfootwear'].includes(product.category_slug || 'mensfootwear');
-
-            // Set basic info
-            document.title = `${product.name} | JMPOTTERS`;
-            document.getElementById('productBreadcrumb').textContent = product.name;
-            document.getElementById('productTitle').textContent = product.name;
-            document.getElementById('categoryLink').href = `${product.category_slug || 'mensfootwear'}.html`;
-
-            // Set image
-            const mainImage = document.getElementById('mainImage');
-            mainImage.src = imageUrl;
-            mainImage.onerror = () => mainImage.src = 'https://ebuzome.github.io/JMPOTTERS/assets/images/placeholder.jpg';
-
-            // Setup image zoom
-            setupImageZoom();
-
-            // Set prices
-            document.getElementById('currentPrice').textContent = formatPrice(product.price);
-            document.getElementById('originalPrice').textContent = formatPrice(fakePrice);
-
-            // Set stock
-            document.getElementById('stockCount').textContent = `${product.stock || 100} units available`;
-
-            // Render variant selectors if footwear
-            if (isFootwear && state.colors.length > 0) {
-                renderColorOptions();
-                renderSizeOptions();
-                document.getElementById('variantSelectors').classList.remove('hidden');
-            } else {
-                document.getElementById('variantSelectors').classList.add('hidden');
-            }
-
-            // Setup quantity controls
-            setupQuantityControls();
-
-            // Setup action buttons
-            setupActionButtons();
-
-            // Update WhatsApp links
-            updateWhatsAppLinks();
-        }
-
-        function renderColorOptions() {
-            const container = document.getElementById('colorDropdownContent');
-            const btn = document.getElementById('colorDropdownBtn');
-            const text = document.getElementById('selectedColorText');
-
-            container.innerHTML = '';
-
-            if (state.colors.length === 0) {
-                container.innerHTML = '<div class="variant-option text-gray-400">No colors available</div>';
-                return;
-            }
-
-            state.colors.forEach(color => {
-                const option = document.createElement('div');
-                option.className = 'variant-option';
-                option.dataset.colorId = color.id;
-                option.innerHTML = `
-                    <div class="color-swatch" style="background-color: ${color.color_code || '#666'}"></div>
-                    <span>${color.color_name}</span>
-                `;
-                
-                option.addEventListener('click', () => {
-                    selectColor(color.id, color.color_name);
-                    closeDropdown('color');
-                });
-                
-                container.appendChild(option);
-            });
-
-            // Select first color
-            if (state.colors.length > 0) {
-                const firstColor = state.colors[0];
-                selectColor(firstColor.id, firstColor.color_name);
-            }
-
-            // Setup dropdown toggle
-            btn.addEventListener('click', () => toggleDropdown('color'));
-        }
-
-        function renderSizeOptions() {
-            const container = document.getElementById('sizeDropdownContent');
-            const btn = document.getElementById('sizeDropdownBtn');
-            const text = document.getElementById('selectedSizeText');
-
-            container.innerHTML = '<div class="variant-option text-gray-400">Select a color first</div>';
-
-            btn.addEventListener('click', () => {
-                if (!state.selectedColor) {
-                    showNotification('Please select a color first', 'error');
-                    return;
-                }
-                toggleDropdown('size');
-            });
-        }
-
-        function updateSizeOptions() {
-            if (!state.selectedColor) return;
-
-            const container = document.getElementById('sizeDropdownContent');
-            const availableSizes = state.colorSizeMap[state.selectedColor.id] || [];
-
-            container.innerHTML = '';
-
-            if (availableSizes.length === 0) {
-                container.innerHTML = '<div class="variant-option text-gray-400">No sizes available</div>';
-                return;
-            }
-
-            availableSizes.forEach(size => {
-                const stock = size.stock_quantity || 0;
-                let stockClass = 'in-stock';
-                let stockText = 'In stock';
-                
-                if (stock === 0) {
-                    stockClass = 'out-of-stock';
-                    stockText = 'Out of stock';
-                } else if (stock < 5) {
-                    stockClass = 'low-stock';
-                    stockText = `${stock} left`;
-                }
-
-                const option = document.createElement('div');
-                option.className = `variant-option size-option ${stock === 0 ? 'opacity-50' : ''}`;
-                option.dataset.sizeId = size.id;
-                option.dataset.sizeValue = size.size_value;
-                option.dataset.stock = stock;
-                
-                option.innerHTML = `
-                    <span>Size ${size.size_value}</span>
-                    <span class="size-badge ${stockClass}">${stockText}</span>
-                `;
-                
-                if (stock > 0) {
-                    option.addEventListener('click', () => {
-                        selectSize(size.id, size.size_value, stock);
-                        closeDropdown('size');
-                    });
-                }
-                
-                container.appendChild(option);
-            });
-
-            // Select first available size
-            const firstAvailableSize = availableSizes.find(size => size.stock_quantity > 0);
-            if (firstAvailableSize) {
-                selectSize(firstAvailableSize.id, firstAvailableSize.size_value, firstAvailableSize.stock_quantity);
-            }
-        }
-
-        function selectColor(colorId, colorName) {
-            state.selectedColor = { id: colorId, name: colorName };
-            
-            // Update UI
-            document.getElementById('selectedColorText').textContent = colorName;
-            document.querySelectorAll('#colorDropdownContent .variant-option').forEach(opt => {
-                opt.classList.remove('selected');
-                if (parseInt(opt.dataset.colorId) === colorId) {
-                    opt.classList.add('selected');
-                }
-            });
-            
-            // Update size options
-            updateSizeOptions();
-            updateSelectionSummary();
-        }
-
-        function selectSize(sizeId, sizeValue, stock) {
-            state.selectedSize = { id: sizeId, value: sizeValue, stock: stock };
-            
-            // Update UI
-            document.getElementById('selectedSizeText').textContent = `Size ${sizeValue}`;
-            document.querySelectorAll('#sizeDropdownContent .variant-option').forEach(opt => {
-                opt.classList.remove('selected');
-                if (parseInt(opt.dataset.sizeId) === sizeId) {
-                    opt.classList.add('selected');
-                }
-            });
-            
-            // Update selection summary
-            updateSelectionSummary();
-            
-            // Update quantity max
-            const quantityInput = document.getElementById('quantityInput');
-            quantityInput.max = stock;
-            if (state.quantity > stock) {
-                state.quantity = stock;
-                quantityInput.value = stock;
-            }
-        }
-
-        function updateSelectionSummary() {
-            const summary = document.getElementById('selectionSummary');
-            if (state.selectedColor && state.selectedSize) {
-                summary.classList.remove('hidden');
-                document.getElementById('selectedVariantText').textContent = 
-                    `${state.selectedColor.name} • Size ${state.selectedSize.value}`;
-                document.getElementById('availableStockText').textContent = state.selectedSize.stock;
-            } else {
-                summary.classList.add('hidden');
-            }
-        }
-
-        function setupQuantityControls() {
+            // Quantity controls
             const quantityInput = document.getElementById('quantityInput');
             const decreaseBtn = document.getElementById('decreaseQty');
             const increaseBtn = document.getElementById('increaseQty');
             const bulkBtns = document.querySelectorAll('[data-qty]');
-
-            quantityInput.value = state.quantity;
 
             decreaseBtn.addEventListener('click', () => {
                 if (state.quantity > 1) {
@@ -1040,180 +385,289 @@
                     const maxStock = state.selectedSize?.stock || state.product?.stock || 100;
                     state.quantity = Math.min(qty, maxStock);
                     quantityInput.value = state.quantity;
-                    
-                    // Update active state
-                    bulkBtns.forEach(b => b.classList.remove('bg-amber-600', 'text-white'));
-                    this.classList.add('bg-amber-600', 'text-white');
                 });
             });
-        }
 
-        function setupActionButtons() {
-            // Add to cart
+            // Add to cart button
             document.getElementById('addToCartBtn').addEventListener('click', addToCart);
-            
-            // Buy now
-            document.getElementById('buyNowBtn').addEventListener('click', buyNow);
-            
-            // Wishlist
-            const wishlistBtn = document.getElementById('wishlistBtn');
-            const isInWishlist = state.wishlist.some(item => item.id === state.product?.id);
-            if (isInWishlist) {
-                wishlistBtn.innerHTML = '<i class="fas fa-heart text-red-400 text-xl"></i>';
-            }
-            
-            wishlistBtn.addEventListener('click', () => {
-                if (state.product) toggleWishlist(state.product);
+
+            // Category breadcrumb click
+            document.getElementById('categoryBreadcrumb').addEventListener('click', function() {
+                if (state.product?.category_slug) {
+                    window.location.href = `${state.product.category_slug}.html`;
+                }
             });
         }
 
-        function updateWhatsAppLinks() {
+        async function loadProduct() {
+            try {
+                // Get slug from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const slug = urlParams.get('slug');
+                
+                if (!slug) {
+                    throw new Error('No product specified in URL');
+                }
+
+                console.log('Loading product with slug:', slug);
+
+                // Create Supabase client
+                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+                // Fetch product by slug
+                const { data: product, error: productError } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('slug', slug)
+                    .eq('is_active', true)
+                    .single();
+
+                if (productError) {
+                    console.error('Product fetch error:', productError);
+                    throw new Error('Product not found in database');
+                }
+
+                if (!product) {
+                    throw new Error('Product not found');
+                }
+
+                console.log('Product found:', product);
+
+                // Get category info
+                let categorySlug = 'mensfootwear';
+                let categoryName = 'Category';
+                
+                if (product.category_id && CATEGORY_MAP[product.category_id]) {
+                    categorySlug = CATEGORY_MAP[product.category_id];
+                    categoryName = categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1);
+                }
+
+                // Fetch colors
+                const { data: colors, error: colorsError } = await supabase
+                    .from('product_colors')
+                    .select('*')
+                    .eq('product_id', product.id);
+
+                if (colorsError) {
+                    console.warn('Colors fetch error:', colorsError);
+                }
+
+                // Fetch sizes
+                const { data: sizes, error: sizesError } = await supabase
+                    .from('product_sizes')
+                    .select('*')
+                    .eq('product_id', product.id);
+
+                if (sizesError) {
+                    console.warn('Sizes fetch error:', sizesError);
+                }
+
+                // Update state
+                state.product = {
+                    ...product,
+                    category_slug: categorySlug,
+                    category_name: categoryName
+                };
+                state.colors = colors || [];
+                state.sizes = sizes || [];
+
+                // Render product
+                renderProduct();
+
+                // Hide loading, show content
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('productContent').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading product:', error);
+                showError(error.message || 'Failed to load product. Please check the URL and try again.');
+            }
+        }
+
+        function renderProduct() {
+            if (!state.product) return;
+
+            const product = state.product;
+            const categorySlug = product.category_slug || 'mensfootwear';
+            const imageUrl = `https://ebuzome.github.io/JMPOTTERS/assets/images/${categorySlug}/${product.image_url}`;
+            const fakePrice = product.price ? Math.round(product.price * 1.35) : 0;
+            const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
+
+            // Set basic info
+            document.title = `${product.name} | JMPOTTERS`;
+            document.getElementById('productTitle').textContent = product.name;
+            document.getElementById('productBreadcrumb').textContent = product.name;
+            document.getElementById('categoryBreadcrumb').textContent = product.category_name;
+
+            // Set image
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = imageUrl;
+            mainImage.alt = product.name;
+
+            // Set prices
+            document.getElementById('currentPrice').textContent = formatPrice(product.price);
+            document.getElementById('originalPrice').textContent = formatPrice(fakePrice);
+
+            // Set stock
+            document.getElementById('stockCount').textContent = `${product.stock || 100} units available`;
+
+            // Render variant selectors if footwear
+            if (isFootwear && state.colors.length > 0) {
+                renderColorOptions();
+                renderSizeOptions();
+                document.getElementById('variantSelectors').classList.remove('hidden');
+            } else {
+                document.getElementById('variantSelectors').classList.add('hidden');
+            }
+
+            // Update WhatsApp button
+            updateWhatsAppButton();
+        }
+
+        function renderColorOptions() {
+            const container = document.getElementById('colorOptions');
+            container.innerHTML = '';
+
+            state.colors.forEach(color => {
+                const colorBtn = document.createElement('button');
+                colorBtn.className = 'px-3 py-2 rounded-lg border border-gray-700 hover:border-amber-500 text-sm flex items-center gap-2';
+                colorBtn.innerHTML = `
+                    <div class="w-4 h-4 rounded border" style="background-color: ${color.color_code || '#666'}"></div>
+                    <span>${color.color_name}</span>
+                `;
+                
+                colorBtn.addEventListener('click', () => selectColor(color.id, color.color_name));
+                
+                container.appendChild(colorBtn);
+            });
+
+            // Select first color by default
+            if (state.colors.length > 0) {
+                const firstColor = state.colors[0];
+                selectColor(firstColor.id, firstColor.color_name);
+            }
+        }
+
+        function renderSizeOptions() {
+            const container = document.getElementById('sizeOptions');
+            container.innerHTML = '';
+
+            if (!state.selectedColor) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">Select a color first</p>';
+                return;
+            }
+
+            // Get sizes for selected color
+            const availableSizes = state.sizes.filter(size => size.color_id === state.selectedColor.id);
+
+            if (availableSizes.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">No sizes available</p>';
+                return;
+            }
+
+            availableSizes.forEach(size => {
+                const stock = size.stock_quantity || 0;
+                const sizeBtn = document.createElement('button');
+                sizeBtn.className = `px-4 py-2 rounded-lg border text-sm font-medium ${
+                    stock === 0 ? 
+                    'border-gray-800 text-gray-600 bg-gray-900 cursor-not-allowed' : 
+                    'border-gray-700 hover:border-amber-500 hover:bg-amber-900/20'
+                }`;
+                sizeBtn.textContent = `Size ${size.size_value}`;
+                sizeBtn.dataset.sizeId = size.id;
+                sizeBtn.dataset.sizeValue = size.size_value;
+                sizeBtn.dataset.stock = stock;
+                
+                if (stock > 0) {
+                    sizeBtn.addEventListener('click', () => selectSize(size.id, size.size_value, stock));
+                }
+                
+                container.appendChild(sizeBtn);
+            });
+
+            // Select first available size
+            const firstAvailableSize = availableSizes.find(size => size.stock_quantity > 0);
+            if (firstAvailableSize) {
+                selectSize(firstAvailableSize.id, firstAvailableSize.size_value, firstAvailableSize.stock_quantity);
+            }
+        }
+
+        function selectColor(colorId, colorName) {
+            state.selectedColor = { id: colorId, name: colorName };
+            
+            // Update UI - add selected class to color button
+            document.querySelectorAll('#colorOptions button').forEach(btn => {
+                btn.classList.remove('bg-amber-900', 'border-amber-500', 'text-white');
+            });
+            
+            // Find and highlight selected color
+            document.querySelectorAll('#colorOptions button').forEach(btn => {
+                if (btn.textContent.includes(colorName)) {
+                    btn.classList.add('bg-amber-900', 'border-amber-500', 'text-white');
+                }
+            });
+            
+            // Update size options
+            renderSizeOptions();
+            updateSelectionSummary();
+        }
+
+        function selectSize(sizeId, sizeValue, stock) {
+            state.selectedSize = { id: sizeId, value: sizeValue, stock: stock };
+            
+            // Update UI - add selected class to size button
+            document.querySelectorAll('#sizeOptions button').forEach(btn => {
+                btn.classList.remove('bg-amber-600', 'border-amber-500', 'text-white');
+                if (parseInt(btn.dataset.sizeId) === sizeId) {
+                    btn.classList.add('bg-amber-600', 'border-amber-500', 'text-white');
+                }
+            });
+            
+            // Update selection summary
+            updateSelectionSummary();
+            
+            // Update quantity max
+            const quantityInput = document.getElementById('quantityInput');
+            quantityInput.max = stock;
+            if (state.quantity > stock) {
+                state.quantity = stock;
+                quantityInput.value = stock;
+            }
+        }
+
+        function updateSelectionSummary() {
+            const summary = document.getElementById('selectionSummary');
+            if (state.selectedColor && state.selectedSize) {
+                summary.classList.remove('hidden');
+                document.getElementById('selectedVariantText').textContent = 
+                    `${state.selectedColor.name} • Size ${state.selectedSize.value}`;
+                document.getElementById('availableStockText').textContent = state.selectedSize.stock;
+            } else {
+                summary.classList.add('hidden');
+            }
+        }
+
+        function updateWhatsAppButton() {
             if (!state.product) return;
             
-            const productName = state.product.name;
-            const price = formatPrice(state.product.price);
-            
-            // Inquiry link
-            document.getElementById('whatsappInquiry').href = 
-                `https://wa.me/2348139583320?text=${encodeURIComponent(`Hi, I have questions about: ${productName}`)}`;
-            
-            // Bulk order link
-            document.getElementById('whatsappBulk').href = 
-                `https://wa.me/2348139583320?text=${encodeURIComponent(`Hi, I'm interested in bulk order for: ${productName} - ${price}`)}`;
-        }
-
-        function setupImageZoom() {
-            const container = document.getElementById('zoomContainer');
-            const image = document.getElementById('mainImage');
-            
-            let isZoomed = false;
-            let scale = 1;
-            
-            // Click to zoom
-            container.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                if (!isZoomed) {
-                    // Zoom in
-                    isZoomed = true;
-                    container.classList.add('zoomed');
-                    scale = 2;
-                    
-                    // Calculate position
-                    const rect = container.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const xPercent = x / rect.width * 100;
-                    const yPercent = y / rect.height * 100;
-                    
-                    image.style.transformOrigin = `${xPercent}% ${yPercent}%`;
-                    image.style.transform = `scale(${scale})`;
-                    
-                    // Prevent body scroll
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    // Zoom out
-                    isZoomed = false;
-                    container.classList.remove('zoomed');
-                    scale = 1;
-                    image.style.transform = `scale(${scale})`;
-                    document.body.style.overflow = '';
-                }
-            });
-            
-            // Close zoom on escape
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && isZoomed) {
-                    isZoomed = false;
-                    container.classList.remove('zoomed');
-                    scale = 1;
-                    image.style.transform = `scale(${scale})`;
-                    document.body.style.overflow = '';
-                }
-            });
-            
-            // Close zoom on click outside (mobile)
-            document.addEventListener('click', (e) => {
-                if (isZoomed && !container.contains(e.target)) {
-                    isZoomed = false;
-                    container.classList.remove('zoomed');
-                    scale = 1;
-                    image.style.transform = `scale(${scale})`;
-                    document.body.style.overflow = '';
-                }
-            });
-            
-            // Pinch zoom for mobile
-            let initialDistance = null;
-            
-            container.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 2) {
-                    initialDistance = getDistance(e.touches[0], e.touches[1]);
-                }
-            });
-            
-            container.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 2 && isZoomed) {
-                    e.preventDefault();
-                    const currentDistance = getDistance(e.touches[0], e.touches[1]);
-                    const newScale = Math.min(Math.max(scale * (currentDistance / initialDistance), 1), 4);
-                    image.style.transform = `scale(${newScale})`;
-                }
-            });
-            
-            function getDistance(touch1, touch2) {
-                return Math.hypot(
-                    touch2.clientX - touch1.clientX,
-                    touch2.clientY - touch1.clientY
-                );
+            let message = `I'm interested in: ${state.product.name}`;
+            if (state.selectedColor) {
+                message += ` (Color: ${state.selectedColor.name})`;
             }
-        }
-
-        function toggleDropdown(type) {
-            const btn = document.getElementById(`${type}DropdownBtn`);
-            const content = document.getElementById(`${type}DropdownContent`);
-            const icon = btn.querySelector('i');
-            
-            if (state.openDropdown === type) {
-                // Close dropdown
-                btn.classList.remove('open');
-                content.classList.remove('open');
-                icon.style.transform = 'rotate(0deg)';
-                state.openDropdown = null;
-            } else {
-                // Close other dropdowns
-                closeAllDropdowns();
-                
-                // Open this dropdown
-                btn.classList.add('open');
-                content.classList.add('open');
-                icon.style.transform = 'rotate(180deg)';
-                state.openDropdown = type;
+            if (state.selectedSize) {
+                message += `, Size: ${state.selectedSize.value}`;
             }
-        }
-
-        function closeDropdown(type) {
-            const btn = document.getElementById(`${type}DropdownBtn`);
-            const content = document.getElementById(`${type}DropdownContent`);
-            const icon = btn.querySelector('i');
+            message += ` - ${formatPrice(state.product.price)}`;
             
-            btn.classList.remove('open');
-            content.classList.remove('open');
-            icon.style.transform = 'rotate(0deg)';
-            state.openDropdown = null;
-        }
-
-        function closeAllDropdowns() {
-            ['color', 'size'].forEach(type => {
-                closeDropdown(type);
-            });
+            document.getElementById('whatsappBtn').href = 
+                `https://wa.me/2348139583320?text=${encodeURIComponent(message)}`;
         }
 
         function addToCart() {
             if (!state.product) return;
             
             // Validate selection for footwear
-            const isFootwear = ['mensfootwear', 'womensfootwear'].includes(state.product.category_slug || 'mensfootwear');
+            const isFootwear = ['mensfootwear', 'womensfootwear'].includes(state.product.category_slug);
             
             if (isFootwear && state.colors.length > 0) {
                 if (!state.selectedColor) {
@@ -1245,7 +699,7 @@
                 color_name: state.selectedColor?.name,
                 size_id: state.selectedSize?.id,
                 size_value: state.selectedSize?.value,
-                added_at: new Date().toISOString()
+                category_slug: state.product.category_slug
             };
             
             // Check if item exists
@@ -1266,49 +720,10 @@
             
             // Update UI
             updateHeaderCounts();
-            showNotification('Added to cart successfully', 'success');
+            showNotification('Added to cart', 'success');
             
-            // Open cart panel
+            // Open cart
             openCart();
-        }
-
-        function buyNow() {
-            if (!state.product) return;
-            
-            // Validate selection
-            const isFootwear = ['mensfootwear', 'womensfootwear'].includes(state.product.category_slug || 'mensfootwear');
-            
-            if (isFootwear && state.colors.length > 0) {
-                if (!state.selectedColor) {
-                    showNotification('Please select a color', 'error');
-                    return;
-                }
-                if (!state.selectedSize) {
-                    showNotification('Please select a size', 'error');
-                    return;
-                }
-                if (state.selectedSize.stock === 0) {
-                    showNotification('This size is out of stock', 'error');
-                    return;
-                }
-                if (state.quantity > state.selectedSize.stock) {
-                    showNotification(`Only ${state.selectedSize.stock} units available`, 'error');
-                    return;
-                }
-            }
-            
-            // Create WhatsApp message
-            let message = `I want to buy:\n`;
-            message += `• ${state.product.name}\n`;
-            if (state.selectedColor) message += `• Color: ${state.selectedColor.name}\n`;
-            if (state.selectedSize) message += `• Size: ${state.selectedSize.value}\n`;
-            message += `• Quantity: ${state.quantity}\n`;
-            message += `• Price: ${formatPrice(state.product.price)} each\n`;
-            message += `• Total: ${formatPrice(state.product.price * state.quantity)}\n`;
-            message += `\nPlease confirm availability and shipping details.`;
-            
-            // Open WhatsApp
-            window.open(`https://wa.me/2348139583320?text=${encodeURIComponent(message)}`, '_blank');
         }
 
         function toggleWishlist(product) {
@@ -1340,7 +755,6 @@
             const cartCount = document.getElementById('cartCount');
             const wishlistCount = document.getElementById('wishlistCount');
             
-            // Calculate total cart items
             const totalCartItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
             
             if (cartCount) {
@@ -1355,14 +769,14 @@
         }
 
         function openCart() {
-            document.getElementById('cartPanel').classList.add('open');
+            document.getElementById('cartPanel').classList.remove('translate-x-full');
             document.getElementById('overlay').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             updateCartPanel();
         }
 
         function closeCart() {
-            document.getElementById('cartPanel').classList.remove('open');
+            document.getElementById('cartPanel').classList.add('translate-x-full');
             document.getElementById('overlay').classList.add('hidden');
             document.body.style.overflow = '';
         }
@@ -1382,7 +796,6 @@
             
             emptyCart.classList.add('hidden');
             
-            // Calculate total
             let total = 0;
             let itemsHTML = '';
             
@@ -1391,35 +804,25 @@
                 total += itemTotal;
                 
                 itemsHTML += `
-                    <div class="flex gap-4 p-3 mb-3 bg-gray-800 rounded-xl">
-                        <img src="https://ebuzome.github.io/JMPOTTERS/assets/images/mensfootwear/${item.image_url}" 
-                             alt="${item.name}" 
-                             class="w-16 h-16 object-cover rounded-lg"
-                             onerror="this.src='https://ebuzome.github.io/JMPOTTERS/assets/images/placeholder.jpg'">
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-medium text-white truncate">${item.name}</h4>
-                            <p class="text-sm text-gray-400">
+                    <div class="flex gap-3 p-3 mb-3 bg-gray-800 rounded-lg">
+                        <img src="https://ebuzome.github.io/JMPOTTERS/assets/images/${item.category_slug || 'mensfootwear'}/${item.image_url}" 
+                             class="w-16 h-16 object-cover rounded"
+                             onerror="this.src='https://via.placeholder.com/100/1e293b/94a3b8?text=Product'">
+                        <div class="flex-1">
+                            <p class="font-medium text-white text-sm">${item.name}</p>
+                            <p class="text-xs text-gray-400">
                                 ${item.color_name ? `${item.color_name} • ` : ''}
                                 ${item.size_value ? `Size ${item.size_value}` : ''}
                             </p>
                             <div class="flex items-center justify-between mt-2">
                                 <div class="flex items-center gap-2">
-                                    <button onclick="updateCartItem(${index}, -1)" 
-                                            class="w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 rounded-lg">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="font-semibold text-white">${item.quantity}</span>
-                                    <button onclick="updateCartItem(${index}, 1)" 
-                                            class="w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 rounded-lg">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
+                                    <button onclick="updateCartItem(${index}, -1)" class="w-6 h-6 bg-gray-700 rounded text-xs">-</button>
+                                    <span class="font-semibold">${item.quantity}</span>
+                                    <button onclick="updateCartItem(${index}, 1)" class="w-6 h-6 bg-gray-700 rounded text-xs">+</button>
                                 </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-white">${formatPrice(itemTotal)}</p>
-                                    <button onclick="removeCartItem(${index})" 
-                                            class="text-sm text-red-400 hover:text-red-300 mt-1">
-                                        Remove
-                                    </button>
+                                <div>
+                                    <p class="font-bold text-white text-sm">${formatPrice(itemTotal)}</p>
+                                    <button onclick="removeCartItem(${index})" class="text-xs text-red-400 hover:text-red-300">Remove</button>
                                 </div>
                             </div>
                         </div>
@@ -1430,7 +833,7 @@
             cartItems.innerHTML = itemsHTML;
             cartTotal.textContent = formatPrice(total);
             
-            // Update WhatsApp checkout link
+            // Update WhatsApp checkout
             let message = "I want to purchase:\n\n";
             state.cart.forEach(item => {
                 let itemDesc = item.name;
@@ -1461,7 +864,7 @@
             localStorage.setItem('jmpotters_cart', JSON.stringify(state.cart));
             updateCartPanel();
             updateHeaderCounts();
-            showNotification('Item removed from cart', 'info');
+            showNotification('Item removed', 'info');
         };
 
         function showNotification(message, type = 'success') {
@@ -1474,9 +877,9 @@
             };
             
             notification.innerHTML = `
-                <div class="${colors[type]} px-6 py-4 rounded-xl border shadow-lg max-w-sm">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} text-lg"></i>
+                <div class="${colors[type]} px-4 py-3 rounded-lg border shadow-lg">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
                         <span>${message}</span>
                     </div>
                 </div>
