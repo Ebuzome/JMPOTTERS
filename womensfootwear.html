@@ -765,7 +765,6 @@
             display: flex;
             flex-direction: column;
             border: 1px solid rgba(236, 72, 153, 0.1);
-            cursor: pointer;
         }
 
         .product-card:hover {
@@ -779,35 +778,29 @@
         }
 
         .product-image {
-            height: 320px;
+            height: 250px;
             overflow: hidden;
             position: relative;
             background: #2d3748;
             transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
         }
 
         @media (max-width: 768px) {
             .product-image {
-                height: 280px;
-                padding: 15px;
+                height: 220px;
             }
         }
 
         @media (max-width: 480px) {
             .product-image {
-                height: 260px;
-                padding: 12px;
+                height: 200px;
             }
         }
 
         .product-image img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
             transition: var(--transition);
         }
 
@@ -868,14 +861,9 @@
         }
 
         .price-real {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--accent-light);
-        }
-
-        /* Remove old price and discount styles */
-        .price-old, .discount-percent {
-            display: none;
         }
 
         .availability {
@@ -887,9 +875,36 @@
             color: var(--success);
         }
 
-        /* Remove sizes and action buttons from product card */
-        .sizes, .product-actions, .btn-view-details, .add-to-cart-btn, .bulk-action-btn {
-            display: none !important;
+        .sizes {
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        .sizes span {
+            font-weight: 600;
+            color: var(--gray-dark);
+        }
+
+        .btn-view-details {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-view-details:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: var(--glow);
         }
 
         .wishlist-btn {
@@ -1487,8 +1502,7 @@
                 }
                 
                 .product-image {
-                    height: 240px;
-                    padding: 10px;
+                    height: 180px;
                 }
                 
                 .product-info {
@@ -1605,10 +1619,12 @@
     <section class="promo-strip">
         <div class="promo-container">
             <div class="promo-item">New Arrivals</div>
+            <div class="promo-item">30% Off Heels</div>
             <div class="promo-item">Premium Collection</div>
             <div class="promo-item">Limited Edition</div>
             <div class="promo-item">Free Shipping</div>
             <div class="promo-item">New Arrivals</div>
+            <div class="promo-item">30% Off Heels</div>
             <div class="promo-item">Premium Collection</div>
             <div class="promo-item">Limited Edition</div>
             <div class="promo-item">Free Shipping</div>
@@ -1838,7 +1854,7 @@
                 });
                 
                 // Add hover effects to interactive elements
-                const interactiveElements = document.querySelectorAll('a, button, .product-card');
+                const interactiveElements = document.querySelectorAll('a, button, .btn-view-details, .wishlist-btn');
                 interactiveElements.forEach(el => {
                     el.addEventListener('mouseenter', () => {
                         cursor.classList.add('active');
@@ -1901,42 +1917,6 @@
                 }
             });
             
-            // Make product cards clickable to open modal
-            function setupProductCardClicks() {
-                const productsGrid = document.getElementById('productsGrid');
-                if (!productsGrid) return;
-                
-                // Use event delegation for dynamically loaded product cards
-                productsGrid.addEventListener('click', function(e) {
-                    const productCard = e.target.closest('.product-card');
-                    if (productCard && !e.target.closest('.wishlist-btn')) {
-                        // Get product ID from data attribute
-                        const productId = productCard.getAttribute('data-product-id');
-                        if (productId) {
-                            // Open modal with product details
-                            if (typeof window.openProductModal === 'function') {
-                                window.openProductModal(productId);
-                            } else {
-                                // Fallback: trigger modal open
-                                modalOverlay.classList.add('active');
-                                document.body.style.overflow = 'hidden';
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Initialize product card clicks
-            setupProductCardClicks();
-            
-            // Also check for product cards periodically (for dynamic loading)
-            const checkProductCardsInterval = setInterval(() => {
-                if (document.querySelector('.product-card')) {
-                    setupProductCardClicks();
-                    clearInterval(checkProductCardsInterval);
-                }
-            }, 500);
-            
             console.log('✅ All UI components initialized');
         });
         
@@ -1953,4 +1933,3 @@
     </script>
 </body>
 </html>
-                       
