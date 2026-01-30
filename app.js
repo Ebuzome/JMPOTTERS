@@ -1225,21 +1225,7 @@
                         <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                     </div>
                     
-                    <div class="quantity-selector">
-                        <button class="toggle-bulk-options">
-                            Bulk Options <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="quantity-options" style="display: none;">
-                            ${[1, 10, 25, 50, 100].map(qty => `
-                                <div class="quantity-option ${qty === 1 ? 'selected' : ''}" data-qty="${qty}">${qty} Unit${qty > 1 ? 's' : ''}</div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    
                     <div class="action-buttons">
-                        <button class="btn-add-cart" data-id="${product.id}">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
                         <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
                            class="btn-view-details">
                             <i class="fas fa-eye"></i> View Details
@@ -1331,24 +1317,6 @@
     function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // Add to Cart buttons (from product cards)
-        document.addEventListener('click', function(event) {
-            const addCartBtn = event.target.closest('.btn-add-cart');
-            if (addCartBtn) {
-                event.preventDefault();
-                const productId = parseInt(addCartBtn.getAttribute('data-id'));
-                const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
-                
-                if (!product) {
-                    showNotification('Product not found', 'error');
-                    return;
-                }
-                
-                addToCart(product, 1);
-                showNotification(`${product.name} added to cart!`, 'success');
-            }
-        });
-        
         // Wishlist buttons
         document.addEventListener('click', function(event) {
             const wishlistBtn = event.target.closest('.wishlist-btn');
@@ -1361,26 +1329,6 @@
                     toggleWishlist(product);
                 }
             }
-        });
-        
-        // Quantity toggles
-        document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const options = this.nextElementSibling;
-                options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
-            });
-        });
-        
-        document.querySelectorAll('.quantity-option').forEach(option => {
-            option.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const container = this.closest('.quantity-options');
-                container.querySelectorAll('.quantity-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                this.classList.add('selected');
-            });
         });
         
         console.log('✅ Product interactions setup complete');
@@ -1482,10 +1430,8 @@
                     <div class="cart-item-details">
                         <div class="cart-item-name">${itemDescription}</div>
                         <div class="cart-item-price">${formatPrice(item.price)}</div>
-                        <div class="cart-item-quantity">
-                            <button class="decrease-quantity" data-index="${index}">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="increase-quantity" data-index="${index}">+</button>
+                        <div class="cart-item-quantity-display">
+                            Quantity: <strong>${item.quantity}</strong>
                         </div>
                     </div>
                     <button class="cart-item-remove" data-index="${index}">
@@ -1544,37 +1490,6 @@
     }
     
     function setupCartInteractions() {
-        // Decrease quantity
-        document.querySelectorAll('.decrease-quantity').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                
-                if (cart[index].quantity > 1) {
-                    cart[index].quantity--;
-                } else {
-                    cart.splice(index, 1);
-                }
-                
-                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
-                updateCartUI();
-                showNotification('Cart updated', 'info');
-            });
-        });
-        
-        // Increase quantity
-        document.querySelectorAll('.increase-quantity').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                
-                cart[index].quantity++;
-                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
-                updateCartUI();
-                showNotification('Cart updated', 'info');
-            });
-        });
-        
         // Remove item
         document.querySelectorAll('.cart-item-remove').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1663,6 +1578,142 @@
     }
     
     // ====================
+    // CART STYLES INJECTION
+    // ====================
+    function injectCartStyles() {
+        if (document.getElementById('cart-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'cart-styles';
+        style.textContent = `
+            .cart-item {
+                display: flex;
+                align-items: center;
+                padding: 15px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                gap: 15px;
+            }
+            
+            .cart-item-image {
+                width: 60px;
+                height: 60px;
+                border-radius: 6px;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+            
+            .cart-item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+            
+            .cart-item-details {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .cart-item-name {
+                font-weight: 500;
+                color: white;
+                margin-bottom: 5px;
+                font-size: 0.95rem;
+            }
+            
+            .cart-item-price {
+                color: var(--gold);
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            
+            .cart-item-quantity-display {
+                color: #ddd;
+                font-size: 0.9rem;
+            }
+            
+            .cart-item-remove {
+                background: rgba(231, 76, 60, 0.2);
+                border: none;
+                color: #e74c3c;
+                width: 35px;
+                height: 35px;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: background 0.3s;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .cart-item-remove:hover {
+                background: rgba(231, 76, 60, 0.3);
+            }
+            
+            .cart-empty {
+                text-align: center;
+                padding: 40px 20px;
+                color: #888;
+                font-style: italic;
+            }
+            
+            .cart-checkout-section {
+                padding: 20px;
+                background: rgba(0, 0, 0, 0.2);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .cart-total-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: white;
+            }
+            
+            .cart-total-amount {
+                color: var(--gold);
+                font-size: 1.3rem;
+            }
+            
+            .btn-checkout {
+                width: 100%;
+                padding: 15px;
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            
+            .btn-whatsapp {
+                width: 100%;
+                padding: 15px;
+                background: #25D366;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                text-decoration: none;
+                transition: background 0.3s;
+            }
+            
+            .btn-whatsapp:hover {
+                background: #1da851;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // ====================
     // INITIALIZATION
     // ====================
     async function initializePage() {
@@ -1680,6 +1731,9 @@
         
         // Ensure header icons exist and work
         ensureHeaderIconsExist();
+        
+        // Inject cart styles
+        injectCartStyles();
         
         // Initialize UI
         updateCartUI();
@@ -1742,5 +1796,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with Simplified Pricing and Checkout');
+    console.log('✅ JMPOTTERS app loaded with Simplified Product Display and Fixed Cart');
 })();
