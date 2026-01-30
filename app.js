@@ -278,9 +278,6 @@
         const categorySlug = product.category_slug || getCurrentCategory();
         const imageUrl = getImageUrl(categorySlug, product.image_url);
         
-        // Calculate fake price for discount display
-        const fakePrice = product.price ? Math.round(product.price * 1.35) : 0;
-        
         // Determine if it's footwear (needs size/color selectors)
         const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
         
@@ -312,11 +309,9 @@
                 <div class="product-details">
                     <h1 class="product-title">${product.name}</h1>
                     
-                    <!-- Price -->
+                    <!-- Price - SIMPLIFIED (No fake prices or discounts) -->
                     <div class="product-price-container">
                         <div class="current-price">${formatPrice(product.price)}</div>
-                        <div class="original-price">${formatPrice(fakePrice)}</div>
-                        <div class="discount-badge">35% OFF</div>
                     </div>
                     
                     <!-- Availability -->
@@ -498,7 +493,6 @@
             .product-price-container {
                 display: flex;
                 align-items: center;
-                gap: 20px;
                 margin-bottom: 20px;
                 padding: 15px;
                 background: rgba(0, 0, 0, 0.2);
@@ -509,21 +503,6 @@
                 font-size: 2rem;
                 font-weight: bold;
                 color: var(--gold);
-            }
-            
-            .original-price {
-                font-size: 1.2rem;
-                color: #888;
-                text-decoration: line-through;
-            }
-            
-            .discount-badge {
-                background: #e74c3c;
-                color: white;
-                padding: 5px 10px;
-                border-radius: 4px;
-                font-weight: bold;
-                font-size: 0.9rem;
             }
             
             .availability {
@@ -1220,10 +1199,8 @@
         
         productsGrid.innerHTML = '';
         
-        products.forEach((product, index) => {
+        products.forEach((product) => {
             const imageUrl = getImageUrl(categorySlug, product.image_url);
-            const displayDiscount = [10, 20, 35][index % 3];
-            const fakePrice = product.price ? Math.round(product.price * (1 + displayDiscount/100)) : 0;
             const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
             const isInWishlist = wishlist.some(item => item.id === product.id);
             
@@ -1232,7 +1209,6 @@
             productCard.setAttribute('data-aos', 'fade-up');
             productCard.innerHTML = `
                 <div class="product-image">
-                    <div class="product-badge">-${displayDiscount}%</div>
                     <img src="${imageUrl}" alt="${product.name}" 
                          onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
                     <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
@@ -1243,7 +1219,6 @@
                 <div class="product-info">
                     <h3 class="product-title">${product.name}</h3>
                     <div class="product-price">
-                        <del class="price-fake">${formatPrice(fakePrice)}</del>
                         <span class="price-real">${formatPrice(product.price)}</span>
                     </div>
                     <div class="availability">
@@ -1475,14 +1450,15 @@
         const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
         const cartItems = document.getElementById('cartItems');
         const cartTotal = document.getElementById('cartTotal');
-        const whatsappCheckout = document.getElementById('whatsappCheckout');
         
         if (!cartItems || !cartTotal) return;
         
         if (cart.length === 0) {
             cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
             cartTotal.textContent = '₦0';
-            if (whatsappCheckout) whatsappCheckout.href = '#';
+            // Disable checkout button if it exists
+            const checkoutBtn = document.getElementById('checkoutButton');
+            if (checkoutBtn) checkoutBtn.disabled = true;
             return;
         }
         
@@ -1519,12 +1495,37 @@
             `;
         });
         
+        // Add checkout section
+        html += `
+            <div class="cart-checkout-section">
+                <div class="cart-total-row">
+                    <span>Total:</span>
+                    <span class="cart-total-amount">${formatPrice(total)}</span>
+                </div>
+                <button class="btn btn-primary btn-checkout" id="checkoutButton">
+                    <i class="fas fa-shopping-bag"></i> Proceed to Checkout
+                </button>
+                <a href="#" class="btn btn-secondary btn-whatsapp" id="whatsappCheckout">
+                    <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
+                </a>
+            </div>
+        `;
+        
         cartItems.innerHTML = html;
         cartTotal.textContent = formatPrice(total);
         
-        setupCartInteractions();
+        // Setup checkout button
+        const checkoutBtn = document.getElementById('checkoutButton');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                // You can redirect to a checkout page or show a checkout modal
+                // For now, we'll use WhatsApp as the checkout method
+                document.getElementById('whatsappCheckout')?.click();
+            });
+        }
         
         // Update WhatsApp checkout link
+        const whatsappCheckout = document.getElementById('whatsappCheckout');
         if (whatsappCheckout) {
             let text = "I would like to purchase:\n";
             cart.forEach(item => {
@@ -1538,6 +1539,8 @@
             text += `\n*Total: ${formatPrice(total)}*\n\nPlease confirm order & shipping details.`;
             whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
         }
+        
+        setupCartInteractions();
     }
     
     function setupCartInteractions() {
@@ -1621,6 +1624,45 @@
     }
     
     // ====================
+    // HEADER CART/WISHLIST UNIVERSAL SETUP
+    // ====================
+    function ensureHeaderIconsExist() {
+        // This function helps ensure cart/wishlist icons are present on all pages
+        // You should have these in your HTML header:
+        // <button id="cartIcon"><i class="fas fa-shopping-cart"></i><span id="cartCount">0</span></button>
+        // <button id="wishlistIcon"><i class="fas fa-heart"></i><span id="wishlistCount">0</span></button>
+        
+        // If icons don't exist, you might need to add them to your HTML template
+        if (!document.getElementById('cartIcon')) {
+            console.warn('⚠️ Cart icon not found in HTML. Please add: <button id="cartIcon"><i class="fas fa-shopping-cart"></i><span id="cartCount">0</span></button>');
+        }
+        
+        if (!document.getElementById('wishlistIcon')) {
+            console.warn('⚠️ Wishlist icon not found in HTML. Please add: <button id="wishlistIcon"><i class="fas fa-heart"></i><span id="wishlistCount">0</span></button>');
+        }
+        
+        // Setup cart toggle
+        const cartIcon = document.getElementById('cartIcon');
+        if (cartIcon) {
+            cartIcon.addEventListener('click', function() {
+                const cartPanel = document.getElementById('cartPanel');
+                if (cartPanel) {
+                    cartPanel.classList.toggle('active');
+                }
+            });
+        }
+        
+        // Setup wishlist toggle (if you have a wishlist panel)
+        const wishlistIcon = document.getElementById('wishlistIcon');
+        if (wishlistIcon) {
+            wishlistIcon.addEventListener('click', function() {
+                // Redirect to wishlist page or open wishlist panel
+                window.location.href = 'wishlist.html'; // You'll need to create this page
+            });
+        }
+    }
+    
+    // ====================
     // INITIALIZATION
     // ====================
     async function initializePage() {
@@ -1635,6 +1677,9 @@
         } else {
             console.log('✅ Supabase client ready');
         }
+        
+        // Ensure header icons exist and work
+        ensureHeaderIconsExist();
         
         // Initialize UI
         updateCartUI();
@@ -1697,5 +1742,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with Permanent Product URLs and all fixes');
+    console.log('✅ JMPOTTERS app loaded with Simplified Pricing and Checkout');
 })();
