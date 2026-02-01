@@ -1204,17 +1204,24 @@
             const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
             const isInWishlist = wishlist.some(item => item.id === product.id);
             
-            const productCard = document.createElement('div');
-            productCard.className = 'product-card';
+            const productCard = document.createElement('a');
+            productCard.className = 'product-card product-card-clickable';
+            productCard.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
             productCard.setAttribute('data-aos', 'fade-up');
+            productCard.setAttribute('role', 'article');
+            productCard.setAttribute('aria-label', `View details for ${product.name}`);
             productCard.innerHTML = `
                 <div class="product-image">
                     <img src="${imageUrl}" alt="${product.name}" 
                          onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
                     <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
-                            data-id="${product.id}">
+                            data-id="${product.id}"
+                            aria-label="${isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}">
                         <i class="fas fa-heart"></i>
                     </button>
+                    <span class="card-hover-indicator">
+                        <i class="fas fa-arrow-right"></i> View Details
+                    </span>
                 </div>
                 <div class="product-info">
                     <h3 class="product-title">${product.name}</h3>
@@ -1224,13 +1231,6 @@
                     <div class="availability">
                         <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                     </div>
-                    
-                    <div class="action-buttons">
-                        <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
-                           class="btn-view-details">
-                            <i class="fas fa-eye"></i> View Details
-                        </a>
-                    </div>
                 </div>
             `;
             
@@ -1238,7 +1238,220 @@
         });
         
         setupProductInteractions();
+        injectProductCardStyles();
         console.log(`✅ Rendered ${products.length} products`);
+    }
+    
+    // ====================
+    // CLICKABLE PRODUCT CARD STYLES
+    // ====================
+    function injectProductCardStyles() {
+        if (document.getElementById('product-card-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'product-card-styles';
+        style.textContent = `
+            /* Clickable Product Card Styles */
+            .product-card-clickable {
+                display: flex;
+                flex-direction: column;
+                text-decoration: none;
+                color: inherit;
+                cursor: pointer;
+                position: relative;
+                background: white;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+                transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                            box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            }
+            
+            .product-card-clickable:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            }
+            
+            .product-card-clickable:focus {
+                outline: 3px solid var(--gold, #d4af37);
+                outline-offset: 2px;
+            }
+            
+            .product-card-clickable:focus:not(:focus-visible) {
+                outline: none;
+            }
+            
+            .product-card-clickable:focus-visible {
+                outline: 3px solid var(--gold, #d4af37);
+                outline-offset: 2px;
+            }
+            
+            .product-card-clickable .product-image {
+                position: relative;
+                height: 250px;
+                overflow: hidden;
+            }
+            
+            .product-card-clickable .product-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            }
+            
+            .product-card-clickable:hover .product-image img {
+                transform: scale(1.08);
+            }
+            
+            /* Hover indicator */
+            .card-hover-indicator {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 15px 20px;
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+                color: white;
+                font-weight: 600;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                opacity: 0;
+                transform: translateY(10px);
+                transition: opacity 0.3s ease, transform 0.3s ease;
+            }
+            
+            .product-card-clickable:hover .card-hover-indicator,
+            .product-card-clickable:focus .card-hover-indicator {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            
+            .card-hover-indicator i {
+                transition: transform 0.3s ease;
+            }
+            
+            .product-card-clickable:hover .card-hover-indicator i {
+                transform: translateX(5px);
+            }
+            
+            /* Wishlist button - prevent card navigation */
+            .product-card-clickable .wishlist-btn {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                z-index: 10;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.95);
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 1.1rem;
+                color: #888;
+            }
+            
+            .product-card-clickable .wishlist-btn:hover {
+                background: white;
+                transform: scale(1.1);
+                color: #e74c3c;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+            
+            .product-card-clickable .wishlist-btn.active {
+                background: #e74c3c;
+                color: white;
+            }
+            
+            .product-card-clickable .wishlist-btn.active:hover {
+                background: #c0392b;
+                color: white;
+            }
+            
+            /* Product info section */
+            .product-card-clickable .product-info {
+                padding: 20px;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .product-card-clickable .product-title {
+                font-size: 1.05rem;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 10px;
+                line-height: 1.4;
+                min-height: 45px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            
+            .product-card-clickable .product-price {
+                margin-top: auto;
+                margin-bottom: 8px;
+            }
+            
+            .product-card-clickable .price-real {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--gold, #d4af37);
+            }
+            
+            .product-card-clickable .availability {
+                font-size: 0.85rem;
+                color: #27ae60;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            
+            .product-card-clickable .availability i {
+                font-size: 0.8rem;
+            }
+            
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .product-card-clickable .product-image {
+                    height: 200px;
+                }
+                
+                .product-card-clickable .product-info {
+                    padding: 15px;
+                }
+                
+                .product-card-clickable .product-title {
+                    font-size: 0.95rem;
+                    min-height: 40px;
+                }
+                
+                .card-hover-indicator {
+                    padding: 12px 15px;
+                    font-size: 0.85rem;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .product-card-clickable .product-image {
+                    height: 180px;
+                }
+                
+                .product-card-clickable .wishlist-btn {
+                    width: 35px;
+                    height: 35px;
+                    font-size: 1rem;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     }
     
     // ====================
@@ -1317,16 +1530,24 @@
     function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // Wishlist buttons
+        // Wishlist buttons - prevent navigation when clicking inside clickable cards
         document.addEventListener('click', function(event) {
             const wishlistBtn = event.target.closest('.wishlist-btn');
             if (wishlistBtn) {
                 event.preventDefault();
+                event.stopPropagation(); // Prevent card navigation
+                
                 const productId = parseInt(wishlistBtn.getAttribute('data-id'));
                 const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
                 
                 if (product) {
                     toggleWishlist(product);
+                    
+                    // Update wishlist button state
+                    const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+                    const isInWishlist = wishlist.some(item => item.id === productId);
+                    wishlistBtn.classList.toggle('active', isInWishlist);
+                    wishlistBtn.setAttribute('aria-label', isInWishlist ? 'Remove from wishlist' : 'Add to wishlist');
                 }
             }
         });

@@ -787,9 +787,70 @@
             color: var(--plum-burgundy);
         }
 
-        .btn-view-details:hover {
-            background: var(--plum-burgundy);
+        /* Clickable Card Styles */
+        .masonry-item-clickable {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+        
+        .masonry-item-clickable:focus {
+            outline: 3px solid var(--gold-ochre);
+            outline-offset: 2px;
+        }
+        
+        .masonry-item-clickable:focus:not(:focus-visible) {
+            outline: none;
+        }
+        
+        .arrival-card-clickable {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            height: 100%;
+        }
+        
+        .arrival-card-clickable:focus {
+            outline: 3px solid var(--gold-ochre);
+            outline-offset: 2px;
+        }
+        
+        .card-click-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
             color: var(--soft-blush);
+            transition: var(--transition);
+        }
+        
+        .masonry-item-clickable:hover .card-click-hint,
+        .arrival-card-clickable:hover .card-click-hint {
+            background: var(--gold-ochre);
+            color: var(--plum-burgundy);
+        }
+        
+        .card-click-hint i {
+            transition: transform 0.3s ease;
+        }
+        
+        .masonry-item-clickable:hover .card-click-hint i,
+        .arrival-card-clickable:hover .card-click-hint i {
+            transform: translateX(5px);
+        }
+        
+        /* Wishlist button positioning for clickable cards */
+        .masonry-item-clickable .wishlist-btn,
+        .arrival-card-clickable .arrival-wishlist {
+            z-index: 10;
         }
 
         /* === NEW ARRIVALS SECTION === */
@@ -2496,13 +2557,16 @@
             // Clear the grid
             productsGrid.innerHTML = '';
             
-            // Add products to the grid
+            // Add products to the grid - now with clickable cards
             products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'masonry-item';
+                const productCard = document.createElement('a');
+                productCard.className = 'masonry-item masonry-item-clickable';
+                productCard.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
                 productCard.setAttribute('data-aos', 'fade-up');
+                productCard.setAttribute('role', 'article');
+                productCard.setAttribute('aria-label', `View details for ${product.name}`);
                 productCard.innerHTML = `
-                    <button class="wishlist-btn ${product.inWishlist ? 'active' : ''}" data-id="${product.id}">
+                    <button class="wishlist-btn ${product.inWishlist ? 'active' : ''}" data-id="${product.id}" aria-label="${product.inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}">
                         <i class="fas fa-heart"></i>
                     </button>
                     <img src="assets/images/${product.image}" alt="${product.name}" class="masonry-image">
@@ -2510,28 +2574,8 @@
                         <h3 class="masonry-title">${product.name}</h3>
                         <div class="masonry-price">₦${product.price.toLocaleString()}</div>
                         <p class="masonry-desc">Premium handcrafted bag with elegant design and durable materials.</p>
-                        
-                        <!-- Quantity selector -->
-                        <div class="quantity-selector">
-                            <button class="toggle-bulk-options">
-                                Bulk Options <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="quantity-options">
-                                <div class="quantity-option selected" data-qty="1">1 Unit</div>
-                                <div class="quantity-option" data-qty="10">10 Units</div>
-                                <div class="quantity-option" data-qty="25">25 Units</div>
-                                <div class="quantity-option" data-qty="50">50 Units</div>
-                                <div class="quantity-option" data-qty="100">100 Units</div>
-                            </div>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button class="btn-add-cart" data-id="${product.id}">
-                                <i class="fas fa-shopping-bag"></i> Add to Cart
-                            </button>
-                            <button class="btn-view-details" data-id="${product.id}">
-                                <i class="fas fa-eye"></i> View Details
-                            </button>
+                        <div class="card-click-hint">
+                            <i class="fas fa-arrow-right"></i> Tap to View Details
                         </div>
                     </div>
                 `;
@@ -2549,44 +2593,27 @@
             // Get 8 random products for arrivals
             const arrivals = [...products].sort(() => 0.5 - Math.random()).slice(0, 8);
             
-            // Add products to arrivals
+            // Add products to arrivals - now with clickable cards
             arrivals.forEach(product => {
                 const arrivalCard = document.createElement('div');
                 arrivalCard.className = 'swiper-slide';
                 arrivalCard.innerHTML = `
-                    <div class="arrival-card">
-                        <button class="arrival-wishlist ${product.inWishlist ? 'active' : ''}" data-id="${product.id}">
+                    <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
+                       class="arrival-card arrival-card-clickable"
+                       role="article"
+                       aria-label="View details for ${product.name}">
+                        <button class="arrival-wishlist ${product.inWishlist ? 'active' : ''}" data-id="${product.id}" aria-label="${product.inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}">
                             <i class="fas fa-heart"></i>
                         </button>
                         <img src="assets/images/${product.image}" alt="${product.name}" class="arrival-image">
                         <div class="arrival-details">
                             <h3 class="arrival-title">${product.name}</h3>
                             <div class="arrival-price">₦${product.price.toLocaleString()}</div>
-                            
-                            <!-- Quantity selector -->
-                            <div class="quantity-selector">
-                                <button class="toggle-bulk-options">
-                                    Bulk Options <i class="fas fa-chevron-down"></i>
-                                </button>
-                                <div class="quantity-options">
-                                    <div class="quantity-option selected" data-qty="1">1 Unit</div>
-                                    <div class="quantity-option" data-qty="10">10 Units</div>
-                                    <div class="quantity-option" data-qty="25">25 Units</div>
-                                    <div class="quantity-option" data-qty="50">50 Units</div>
-                                    <div class="quantity-option" data-qty="100">100 Units</div>
-                                </div>
-                            </div>
-                            
-                            <div class="arrival-actions">
-                                <button class="arrival-btn arrival-cart" data-id="${product.id}">
-                                    <i class="fas fa-shopping-bag"></i> Add to Cart
-                                </button>
-                                <button class="arrival-btn arrival-view" data-id="${product.id}">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
+                            <div class="card-click-hint">
+                                <i class="fas fa-arrow-right"></i> Tap to View
                             </div>
                         </div>
-                    </div>
+                    </a>
                 `;
                 arrivalsGrid.appendChild(arrivalCard);
             });
@@ -2601,106 +2628,47 @@
         }
 
         function setupProductInteractions() {
-            // Add to Cart buttons
-            document.querySelectorAll('.btn-add-cart').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    // Get selected quantity
-                    const card = this.closest('.masonry-item');
-                    const selectedQty = card.querySelector('.quantity-option.selected');
-                    const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
-                    
-                    addToCart(product, quantity);
-                });
-            });
-            
-            // View Details buttons
-            document.querySelectorAll('.btn-view-details').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    currentProduct = products.find(p => p.id === productId);
-                    openProductModal(currentProduct);
-                });
-            });
-            
-            // Wishlist buttons
+            // Wishlist buttons - prevent card navigation when clicked
             document.querySelectorAll('.wishlist-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevent card navigation
+                    
                     const productId = parseInt(this.getAttribute('data-id'));
                     const product = products.find(p => p.id === productId);
                     
                     if (this.classList.contains('active')) {
                         removeFromWishlist(productId);
                         this.classList.remove('active');
+                        this.setAttribute('aria-label', 'Add to wishlist');
                     } else {
                         addToWishlist(product);
                         this.classList.add('active');
+                        this.setAttribute('aria-label', 'Remove from wishlist');
                         createHeartExplosion(this);
                     }
-                });
-            });
-            
-            // Quantity option selection
-            document.querySelectorAll('.quantity-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options
-                    this.parentElement.querySelectorAll('.quantity-option').forEach(el => {
-                        el.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                });
-            });
-            
-            // Toggle bulk options
-            document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const options = this.nextElementSibling;
-                    options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
                 });
             });
         }
 
         function setupArrivalsInteractions() {
-            // Add to Cart buttons
-            document.querySelectorAll('.arrival-cart').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    const product = products.find(p => p.id === productId);
-                    
-                    // Get selected quantity
-                    const card = this.closest('.arrival-details');
-                    const selectedQty = card.querySelector('.quantity-option.selected');
-                    const quantity = selectedQty ? parseInt(selectedQty.dataset.qty) : 1;
-                    
-                    addToCart(product, quantity);
-                });
-            });
-            
-            // View Details buttons
-            document.querySelectorAll('.arrival-view').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    currentProduct = products.find(p => p.id === productId);
-                    openProductModal(currentProduct);
-                });
-            });
-            
-            // Wishlist buttons
+            // Wishlist buttons - prevent card navigation when clicked
             document.querySelectorAll('.arrival-wishlist').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevent card navigation
+                    
                     const productId = parseInt(this.getAttribute('data-id'));
                     const product = products.find(p => p.id === productId);
                     
                     if (this.classList.contains('active')) {
                         removeFromWishlist(productId);
                         this.classList.remove('active');
+                        this.setAttribute('aria-label', 'Add to wishlist');
                     } else {
                         addToWishlist(product);
                         this.classList.add('active');
+                        this.setAttribute('aria-label', 'Remove from wishlist');
                         createHeartExplosion(this);
                     }
                 });
