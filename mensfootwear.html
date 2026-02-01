@@ -881,9 +881,55 @@
             background: var(--gold);
         }
 
-        .btn-view-details:hover {
-            background: var(--black);
-            color: var(--white);
+        /* Clickable Card Styles - for app.js rendered cards */
+        .product-card-clickable {
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+        
+        .product-card-clickable:focus {
+            outline: 3px solid var(--gold);
+            outline-offset: 2px;
+        }
+        
+        .product-card-clickable:focus:not(:focus-visible) {
+            outline: none;
+        }
+        
+        .card-hover-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .product-card-clickable:hover .card-hover-indicator,
+        .product-card-clickable:focus .card-hover-indicator {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .card-hover-indicator i {
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card-clickable:hover .card-hover-indicator i {
+            transform: translateX(5px);
         }
 
         .wishlist-btn {
