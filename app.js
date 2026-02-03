@@ -1204,324 +1204,39 @@
             const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
             const isInWishlist = wishlist.some(item => item.id === product.id);
             
-            const productCard = document.createElement('a');
-            productCard.className = 'product-card product-card-clickable';
-            productCard.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
             productCard.setAttribute('data-aos', 'fade-up');
             productCard.setAttribute('role', 'article');
             productCard.setAttribute('aria-label', `View details for ${product.name}`);
             productCard.innerHTML = `
-                <div class="product-image">
-                    <img src="${imageUrl}" alt="${product.name}" 
-                         onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
-                    <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
-                            data-id="${product.id}"
-                            aria-label="${isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                    <span class="card-hover-indicator">
-                        <i class="fas fa-arrow-right"></i> View Details
-                    </span>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">${product.name}</h3>
-                    <div class="product-price">
-                        <span class="price-real">${formatPrice(product.price)}</span>
+                <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" class="product-card-clickable">
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.name}" 
+                             onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
+                                data-id="${product.id}"
+                                aria-label="${isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}">
+                            <i class="fas fa-heart"></i>
+                        </button>
                     </div>
-                    <div class="availability">
-                        <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                    <div class="product-info">
+                        <h3 class="product-title">${product.name}</h3>
+                        <div class="product-price">
+                            <span class="price-real">${formatPrice(product.price)}</span>
+                        </div>
+                        <div class="availability">
+                            <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                        </div>
                     </div>
-                </div>
+                </a>
             `;
             
             productsGrid.appendChild(productCard);
         });
         
         setupProductInteractions();
-        injectProductCardStyles();
         console.log(`✅ Rendered ${products.length} products`);
-    }
-    
-    // ====================
-    // CLICKABLE PRODUCT CARD STYLES
-    // ====================
-    function injectProductCardStyles() {
-        if (document.getElementById('product-card-styles')) return;
-        
-        const style = document.createElement('style');
-        style.id = 'product-card-styles';
-        style.textContent = `
-            /* Clickable Product Card Styles */
-            .product-card-clickable {
-                display: flex;
-                flex-direction: column;
-                text-decoration: none;
-                color: inherit;
-                cursor: pointer;
-                position: relative;
-                background: white;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-                transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
-                            box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            }
-            
-            .product-card-clickable:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            }
-            
-            .product-card-clickable:focus {
-                outline: 3px solid var(--gold, #d4af37);
-                outline-offset: 2px;
-            }
-            
-            .product-card-clickable:focus:not(:focus-visible) {
-                outline: none;
-            }
-            
-            .product-card-clickable:focus-visible {
-                outline: 3px solid var(--gold, #d4af37);
-                outline-offset: 2px;
-            }
-            
-            .product-card-clickable .product-image {
-                position: relative;
-                height: 250px;
-                overflow: hidden;
-            }
-            
-            .product-card-clickable .product-image img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-            }
-            
-            .product-card-clickable:hover .product-image img {
-                transform: scale(1.08);
-            }
-            
-            /* Hover indicator */
-            .card-hover-indicator {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                padding: 15px 20px;
-                background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-                color: white;
-                font-weight: 600;
-                font-size: 0.9rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                opacity: 0;
-                transform: translateY(10px);
-                transition: opacity 0.3s ease, transform 0.3s ease;
-            }
-            
-            .product-card-clickable:hover .card-hover-indicator,
-            .product-card-clickable:focus .card-hover-indicator {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            
-            .card-hover-indicator i {
-                transition: transform 0.3s ease;
-            }
-            
-            .product-card-clickable:hover .card-hover-indicator i {
-                transform: translateX(5px);
-            }
-            
-            /* Wishlist button - prevent card navigation */
-            .product-card-clickable .wishlist-btn {
-                position: absolute;
-                top: 15px;
-                right: 15px;
-                z-index: 10;
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.95);
-                border: none;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                font-size: 1.1rem;
-                color: #888;
-            }
-            
-            .product-card-clickable .wishlist-btn:hover {
-                background: white;
-                transform: scale(1.1);
-                color: #e74c3c;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            }
-            
-            .product-card-clickable .wishlist-btn.active {
-                background: #e74c3c;
-                color: white;
-            }
-            
-            .product-card-clickable .wishlist-btn.active:hover {
-                background: #c0392b;
-                color: white;
-            }
-            
-            /* Product info section */
-            .product-card-clickable .product-info {
-                padding: 20px;
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-            }
-            
-            .product-card-clickable .product-title {
-                font-size: 1.05rem;
-                font-weight: 600;
-                color: #333;
-                margin-bottom: 10px;
-                line-height: 1.4;
-                min-height: 45px;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-            }
-            
-            .product-card-clickable .product-price {
-                margin-top: auto;
-                margin-bottom: 8px;
-            }
-            
-            .product-card-clickable .price-real {
-                font-size: 1.25rem;
-                font-weight: 700;
-                color: var(--gold, #d4af37);
-            }
-            
-            .product-card-clickable .availability {
-                font-size: 0.85rem;
-                color: #27ae60;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-            }
-            
-            .product-card-clickable .availability i {
-                font-size: 0.8rem;
-            }
-            
-            /* Responsive adjustments */
-            @media (max-width: 768px) {
-                .product-card-clickable .product-image {
-                    height: 200px;
-                }
-                
-                .product-card-clickable .product-info {
-                    padding: 15px;
-                }
-                
-                .product-card-clickable .product-title {
-                    font-size: 0.95rem;
-                    min-height: 40px;
-                }
-                
-                .card-hover-indicator {
-                    padding: 12px 15px;
-                    font-size: 0.85rem;
-                }
-            }
-            
-            @media (max-width: 480px) {
-                .product-card-clickable .product-image {
-                    height: 180px;
-                }
-                
-                .product-card-clickable .wishlist-btn {
-                    width: 35px;
-                    height: 35px;
-                    font-size: 1rem;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    // ====================
-    // MODAL FUNCTIONS (FOR BACKWARD COMPATIBILITY)
-    // ====================
-    async function openProductModal(productId) {
-        console.log(`📊 Opening modal for product ID: ${productId}`);
-        
-        const supabase = getSupabaseClient();
-        if (!supabase) {
-            showNotification('Database connection error', 'error');
-            return;
-        }
-        
-        try {
-            // Get product
-            const { data: product, error: productError } = await supabase
-                .from('products')
-                .select('*')
-                .eq('id', productId)
-                .single();
-            
-            if (productError || !product) {
-                throw new Error('Product not found in database');
-            }
-            
-            // Get colors
-            const { data: colors, error: colorsError } = await supabase
-                .from('product_colors')
-                .select('*')
-                .eq('product_id', productId)
-                .order('sort_order');
-            
-            if (colorsError) {
-                console.warn('⚠️ Colors fetch error:', colorsError);
-            }
-            
-            // Get sizes
-            const { data: sizes, error: sizesError } = await supabase
-                .from('product_sizes')
-                .select('*')
-                .eq('product_id', productId)
-                .order('size_value');
-            
-            if (sizesError) {
-                console.warn('⚠️ Sizes fetch error:', sizesError);
-            }
-            
-            // Set current state
-            currentProduct = product;
-            currentProductColors = colors || [];
-            currentProductSizes = sizes || [];
-            currentSelectedColor = null;
-            currentSelectedSize = null;
-            currentSelectedVariant = null;
-            
-            buildColorSizeMappings(currentProductColors, currentProductSizes);
-            
-            // Redirect to product page instead of opening modal
-            if (product.slug) {
-                window.location.href = `product.html?slug=${encodeURIComponent(product.slug)}`;
-            } else {
-                // Fallback to ID if no slug
-                window.location.href = `product.html?slug=${product.id}`;
-            }
-            
-        } catch (error) {
-            console.error('❌ Modal error:', error);
-            showNotification(`Failed to load product: ${error.message}`, 'error');
-        }
     }
     
     // ====================
@@ -1799,142 +1514,6 @@
     }
     
     // ====================
-    // CART STYLES INJECTION
-    // ====================
-    function injectCartStyles() {
-        if (document.getElementById('cart-styles')) return;
-        
-        const style = document.createElement('style');
-        style.id = 'cart-styles';
-        style.textContent = `
-            .cart-item {
-                display: flex;
-                align-items: center;
-                padding: 15px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                gap: 15px;
-            }
-            
-            .cart-item-image {
-                width: 60px;
-                height: 60px;
-                border-radius: 6px;
-                overflow: hidden;
-                flex-shrink: 0;
-            }
-            
-            .cart-item-image img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                display: block;
-            }
-            
-            .cart-item-details {
-                flex: 1;
-                min-width: 0;
-            }
-            
-            .cart-item-name {
-                font-weight: 500;
-                color: white;
-                margin-bottom: 5px;
-                font-size: 0.95rem;
-            }
-            
-            .cart-item-price {
-                color: var(--gold);
-                font-weight: bold;
-                margin-bottom: 5px;
-            }
-            
-            .cart-item-quantity-display {
-                color: #ddd;
-                font-size: 0.9rem;
-            }
-            
-            .cart-item-remove {
-                background: rgba(231, 76, 60, 0.2);
-                border: none;
-                color: #e74c3c;
-                width: 35px;
-                height: 35px;
-                border-radius: 6px;
-                cursor: pointer;
-                transition: background 0.3s;
-                flex-shrink: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            
-            .cart-item-remove:hover {
-                background: rgba(231, 76, 60, 0.3);
-            }
-            
-            .cart-empty {
-                text-align: center;
-                padding: 40px 20px;
-                color: #888;
-                font-style: italic;
-            }
-            
-            .cart-checkout-section {
-                padding: 20px;
-                background: rgba(0, 0, 0, 0.2);
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            
-            .cart-total-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 15px;
-                font-size: 1.2rem;
-                font-weight: bold;
-                color: white;
-            }
-            
-            .cart-total-amount {
-                color: var(--gold);
-                font-size: 1.3rem;
-            }
-            
-            .btn-checkout {
-                width: 100%;
-                padding: 15px;
-                margin-bottom: 10px;
-                font-size: 1.1rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-            }
-            
-            .btn-whatsapp {
-                width: 100%;
-                padding: 15px;
-                background: #25D366;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: 1.1rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                text-decoration: none;
-                transition: background 0.3s;
-            }
-            
-            .btn-whatsapp:hover {
-                background: #1da851;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    // ====================
     // INITIALIZATION
     // ====================
     async function initializePage() {
@@ -1952,9 +1531,6 @@
         
         // Ensure header icons exist and work
         ensureHeaderIconsExist();
-        
-        // Inject cart styles
-        injectCartStyles();
         
         // Initialize UI
         updateCartUI();
@@ -1975,18 +1551,6 @@
             if (document.getElementById('productsGrid')) {
                 await loadProductsByCategory(currentCategory);
             }
-        }
-        
-        // Setup modal close button (for backward compatibility)
-        const modalClose = document.getElementById('modalClose');
-        if (modalClose) {
-            modalClose.addEventListener('click', () => {
-                const modalOverlay = document.getElementById('modalOverlay');
-                if (modalOverlay) {
-                    modalOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
         }
         
         console.log('✅ JMPOTTERS initialized successfully');
