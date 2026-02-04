@@ -1,533 +1,362 @@
+<!-- admin-dashboard.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JMPOTTERS Admin | Professional Dashboard</title>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>JMPOTTERS Admin Dashboard | Professional Stock Management</title>
     <style>
         :root {
-            --primary: #4F46E5;
-            --primary-dark: #4338CA;
-            --primary-light: #E0E7FF;
-            --success: #10B981;
-            --success-light: #D1FAE5;
-            --warning: #F59E0B;
-            --warning-light: #FEF3C7;
-            --danger: #EF4444;
-            --danger-light: #FEE2E2;
-            --info: #06B6D4;
-            --info-light: #CFFAFE;
-            --dark: #1F2937;
-            --dark-2: #374151;
-            --light: #F9FAFB;
-            --light-2: #E5E7EB;
-            --white: #FFFFFF;
-            --border: #D1D5DB;
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --primary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #1abc9c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --border: #bdc3c7;
         }
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: var(--dark);
+            color: #333;
         }
-
-        .admin-app {
-            display: flex;
+        
+        .admin-wrapper {
             min-height: 100vh;
+            padding: 20px;
         }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: 280px;
-            background: rgba(255, 255, 255, 0.98);
+        
+        .admin-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
             backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, var(--dark), #34495e);
+            color: white;
+            padding: 25px 40px;
             display: flex;
-            flex-direction: column;
-            z-index: 100;
-            box-shadow: var(--shadow-xl);
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--primary);
         }
-
-        .logo {
-            padding: 24px;
-            border-bottom: 1px solid var(--light-2);
+        
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-left h1 i {
+            color: var(--success);
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 12px;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 25px;
+            font-size: 0.9rem;
+        }
+        
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            border-radius: 10px;
             text-align: center;
+            min-width: 120px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
         }
-
-        .logo h1 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-value {
             font-size: 24px;
             font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            justify-content: center;
+            margin-bottom: 5px;
         }
-
-        .logo h1 i {
-            background: var(--primary);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
+        
+        .admin-body {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 800px;
+        }
+        
+        .sidebar {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding: 30px 0;
+        }
+        
         .nav-menu {
-            padding: 20px;
-            flex: 1;
+            list-style: none;
         }
-
+        
         .nav-item {
+            padding: 15px 30px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 16px 20px;
-            margin-bottom: 8px;
-            border-radius: var(--radius);
-            color: var(--dark-2);
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 15px;
             cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+            color: #ecf0f1;
+            text-decoration: none;
         }
-
+        
         .nav-item:hover {
-            background: var(--light);
-            color: var(--primary);
-            transform: translateX(4px);
+            background: rgba(255,255,255,0.1);
+            border-left-color: var(--primary);
         }
-
+        
         .nav-item.active {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(90deg, rgba(52, 152, 219, 0.2), transparent);
             color: white;
-            box-shadow: var(--shadow);
+            border-left-color: var(--success);
         }
-
+        
         .nav-item i {
             width: 20px;
             text-align: center;
-            font-size: 18px;
         }
-
-        .nav-item span {
-            font-weight: 500;
-            font-size: 15px;
-        }
-
-        .badge {
-            background: var(--danger);
-            color: white;
-            font-size: 12px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            margin-left: auto;
-            font-weight: 600;
-        }
-
-        .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid var(--light-2);
-            text-align: center;
-            color: var(--dark-2);
-            font-size: 14px;
-        }
-
-        /* ===== MAIN CONTENT ===== */
+        
         .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            padding: 40px;
+            background: #fff;
         }
-
-        /* ===== HEADER ===== */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px 30px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
+        
+        .content-header {
+            margin-bottom: 40px;
         }
-
-        .header-left h2 {
+        
+        .content-header h2 {
             font-size: 28px;
-            font-weight: 700;
             color: var(--dark);
-            margin-bottom: 6px;
+            margin-bottom: 10px;
+            font-weight: 700;
         }
-
-        .header-left p {
-            color: var(--dark-2);
-            font-size: 14px;
+        
+        .content-header p {
+            color: #7f8c8d;
+            font-size: 16px;
         }
-
-        .header-actions {
+        
+        /* Category Filter */
+        .category-filter {
             display: flex;
-            gap: 15px;
-            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
-
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 14px 20px 14px 50px;
-            border: 2px solid var(--light-2);
-            border-radius: var(--radius);
-            font-size: 15px;
-            transition: all 0.3s;
-            background: white;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--dark-2);
-        }
-
-        .quick-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn {
+        
+        .cat-btn {
             padding: 12px 24px;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 14px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
+            transition: all 0.3s ease;
+            display: flex;
             align-items: center;
             gap: 8px;
-            text-decoration: none;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
+        
+        .cat-btn:hover {
+            border-color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
         }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success) 0%, #0CA678 100%);
+        
+        .cat-btn.active {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
             color: white;
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
         }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning) 0%, #E67E22 100%);
-            color: white;
+        
+        .cat-count {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
         }
-
-        .btn-light {
-            background: white;
-            color: var(--dark);
-            border: 1px solid var(--light-2);
-        }
-
-        /* ===== STATS CARDS ===== */
-        .stats-grid {
+        
+        /* Category Cards */
+        .category-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 24px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        .stat-icon.primary { background: var(--primary-light); color: var(--primary); }
-        .stat-icon.success { background: var(--success-light); color: var(--success); }
-        .stat-icon.warning { background: var(--warning-light); color: var(--warning); }
-        .stat-icon.danger { background: var(--danger-light); color: var(--danger); }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 6px;
-        }
-
-        .stat-label {
-            color: var(--dark-2);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* ===== PRODUCTS TABLE ===== */
-        .table-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+        
+        .category-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
             overflow: hidden;
-            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
-
-        .table-header {
-            padding: 24px;
-            border-bottom: 1px solid var(--light-2);
+        
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        .table-header h3 {
+        
+        .category-title {
             font-size: 18px;
             font-weight: 600;
-            color: var(--dark);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: var(--light);
-        }
-
-        th {
-            padding: 18px 20px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--dark-2);
-            font-size: 14px;
-            border-bottom: 1px solid var(--light-2);
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 18px 20px;
-            border-bottom: 1px solid var(--light-2);
-            color: var(--dark);
-        }
-
-        tbody tr {
-            transition: background 0.2s;
-        }
-
-        tbody tr:hover {
-            background: var(--light);
-        }
-
-        .product-cell {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 10px;
         }
-
-        .product-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid var(--light-2);
+        
+        .category-count {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
         }
-
-        .product-info {
+        
+        .category-products {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .product-item {
+            padding: 15px;
+            border-bottom: 1px solid #f1f1f1;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
         }
-
-        .product-name {
+        
+        .product-item:hover {
+            background: linear-gradient(90deg, rgba(52, 152, 219, 0.05), transparent);
+        }
+        
+        .product-info h4 {
+            font-size: 15px;
+            margin-bottom: 5px;
+            color: #2c3e50;
             font-weight: 600;
-            margin-bottom: 4px;
         }
-
-        .product-category {
-            font-size: 12px;
-            color: var(--dark-2);
-            background: var(--light);
-            padding: 2px 8px;
-            border-radius: 4px;
-            width: fit-content;
+        
+        .product-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: #7f8c8d;
         }
-
-        .price {
+        
+        .product-price {
             font-weight: 700;
             color: var(--success);
         }
-
-        .stock-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
+        
+        .product-stock {
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
-            width: fit-content;
         }
-
-        .stock-high { background: var(--success-light); color: var(--success); }
-        .stock-medium { background: var(--warning-light); color: var(--warning); }
-        .stock-low { background: var(--danger-light); color: var(--danger); }
-
-        .action-buttons {
+        
+        .stock-high { background: #d4edda; color: #155724; }
+        .stock-medium { background: #fff3cd; color: #856404; }
+        .stock-low { background: #f8d7da; color: #721c24; }
+        
+        .product-actions {
             display: flex;
             gap: 8px;
         }
-
-        .btn-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            border: none;
-            background: var(--light);
-            color: var(--dark-2);
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-icon:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-icon.edit:hover { background: var(--warning); }
-        .btn-icon.delete:hover { background: var(--danger); }
-
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-state i {
-            font-size: 64px;
-            color: var(--light-2);
-            margin-bottom: 20px;
-        }
-
-        .empty-state h3 {
-            font-size: 20px;
-            color: var(--dark-2);
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            color: var(--dark-2);
-            margin-bottom: 30px;
-        }
-
-        /* ===== MODAL ===== */
+        
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.8);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(5px);
         }
-
+        
         .modal-content {
             background: white;
-            border-radius: var(--radius);
+            border-radius: 20px;
             width: 90%;
-            max-width: 1000px;
+            max-width: 800px;
             max-height: 90vh;
             overflow-y: auto;
             animation: modalSlide 0.3s ease;
-            box-shadow: var(--shadow-xl);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
         }
-
+        
         @keyframes modalSlide {
-            from { transform: translateY(30px) scale(0.95); opacity: 0; }
+            from { transform: translateY(50px) scale(0.95); opacity: 0; }
             to { transform: translateY(0) scale(1); opacity: 1; }
         }
-
+        
         .modal-header {
-            padding: 24px 30px;
-            border-bottom: 1px solid var(--light-2);
+            padding: 25px 30px;
+            border-bottom: 1px solid #e9ecef;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, var(--primary), #2980b9);
             color: white;
         }
-
+        
         .modal-header h3 {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 12px;
         }
-
+        
         .close-modal {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
             border: none;
             width: 40px;
             height: 40px;
@@ -535,598 +364,378 @@
             cursor: pointer;
             color: white;
             font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: background 0.3s;
         }
-
+        
         .close-modal:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255,255,255,0.3);
         }
-
+        
         .modal-body {
             padding: 30px;
         }
-
-        .product-preview {
+        
+        .form-row {
             display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .image-upload {
-            border: 2px dashed var(--light-2);
-            border-radius: var(--radius);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .image-upload:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .image-upload i {
-            font-size: 48px;
-            color: var(--light-2);
-            margin-bottom: 16px;
-        }
-
-        .current-image {
-            width: 100%;
-            height: 250px;
-            object-fit: contain;
-            border-radius: var(--radius);
-            border: 1px solid var(--light-2);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
-
+        
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
+        
+        .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: var(--dark);
             font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-
+        
         .form-control {
             width: 100%;
-            padding: 14px;
-            border: 2px solid var(--light-2);
-            border-radius: var(--radius);
-            font-size: 15px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
             transition: all 0.3s;
-            background: white;
         }
-
+        
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
-
+        
         .form-actions {
             display: flex;
             justify-content: flex-end;
             gap: 15px;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid var(--light-2);
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid #e9ecef;
         }
-
-        /* ===== TOAST ===== */
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #d35400);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        /* Toast Notifications */
         .toast-container {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 2000;
         }
-
+        
         .toast {
             background: white;
-            padding: 18px 24px;
-            border-radius: var(--radius);
+            padding: 15px 20px;
+            border-radius: 10px;
             margin-bottom: 10px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             gap: 15px;
             animation: toastSlide 0.3s ease;
-            min-width: 350px;
-            border-left: 4px solid var(--primary);
+            min-width: 300px;
+            border-left: 5px solid var(--primary);
         }
-
+        
         .toast.success { border-color: var(--success); }
         .toast.error { border-color: var(--danger); }
         .toast.warning { border-color: var(--warning); }
-
+        
         @keyframes toastSlide {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-
+        
         .toast-icon {
             font-size: 20px;
-            flex-shrink: 0;
         }
-
+        
         .toast.success .toast-icon { color: var(--success); }
         .toast.error .toast-icon { color: var(--danger); }
         .toast.warning .toast-icon { color: var(--warning); }
-
-        /* ===== LOADING ===== */
+        
+        /* Loading */
         .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            text-align: center;
             padding: 60px;
-            color: var(--dark-2);
+            color: #7f8c8d;
         }
-
+        
         .loading i {
             font-size: 40px;
             margin-bottom: 20px;
             color: var(--primary);
             animation: spin 1s linear infinite;
         }
-
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* ===== CONNECTION STATUS ===== */
+        
+        /* Connection Status */
         .connection-status {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0,0,0,0.8);
             color: white;
-            padding: 12px 18px;
-            border-radius: var(--radius);
+            padding: 10px 15px;
+            border-radius: 10px;
             font-size: 12px;
             display: flex;
             align-items: center;
             gap: 10px;
             backdrop-filter: blur(10px);
-            z-index: 100;
         }
-
+        
         .status-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: var(--danger);
-            animation: pulse 2s infinite;
+            background: #e74c3c;
         }
-
-        .status-dot.connected { 
-            background: var(--success); 
-            animation: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* ===== FOOTWEAR VARIANT EDITOR ===== */
-        .variant-section {
-            margin-top: 30px;
-            padding: 25px;
-            background: var(--light);
-            border-radius: var(--radius);
-            border: 1px solid var(--light-2);
-        }
-
-        .variant-section h4 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .variant-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .color-list, .size-list {
-            background: white;
-            border-radius: var(--radius);
-            padding: 20px;
-            border: 1px solid var(--light-2);
-        }
-
-        .color-item, .size-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-bottom: 1px solid var(--light-2);
-        }
-
-        .color-item:last-child, .size-item:last-child {
-            border-bottom: none;
-        }
-
-        .color-preview {
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-        }
-
-        .size-stock-input {
-            width: 80px;
-            padding: 8px;
-            border: 1px solid var(--light-2);
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .add-variant-btn {
-            margin-top: 15px;
-            width: 100%;
-        }
-
-        .size-matrix {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .size-cell {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--light-2);
-            text-align: center;
-        }
-
-        .size-cell-header {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--dark);
-        }
-
-        .size-cell-stock {
-            font-size: 14px;
-            color: var(--dark-2);
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1200px) {
-            .admin-app {
-                flex-direction: column;
+        
+        .status-dot.connected { background: #2ecc71; }
+        
+        @media (max-width: 768px) {
+            .admin-body {
+                grid-template-columns: 1fr;
             }
             
             .sidebar {
-                width: 100%;
-                height: auto;
-                flex-direction: row;
-                padding: 0 20px;
-            }
-            
-            .logo {
-                border-right: 1px solid var(--light-2);
-                border-bottom: none;
-                padding: 20px;
-                min-width: 200px;
-            }
-            
-            .nav-menu {
-                display: flex;
-                overflow-x: auto;
-                padding: 0;
-                flex: 1;
-            }
-            
-            .nav-item {
-                white-space: nowrap;
-                margin: 20px 4px;
-            }
-            
-            .sidebar-footer {
                 display: none;
             }
-        }
-
-        @media (max-width: 768px) {
-            .header {
+            
+            .admin-header {
                 flex-direction: column;
                 gap: 20px;
                 text-align: center;
             }
             
-            .search-box {
-                width: 100%;
-            }
-            
-            .product-preview {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .variant-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .quick-actions {
+            .header-stats {
                 flex-wrap: wrap;
                 justify-content: center;
             }
             
-            .table-container {
-                overflow-x: auto;
-            }
-            
-            table {
-                min-width: 800px;
+            .category-cards {
+                grid-template-columns: 1fr;
             }
         }
     </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="admin-app">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="logo">
-                <h1><i class="fas fa-store"></i> JMPOTTERS</h1>
-                <p style="font-size: 12px; color: var(--dark-2); margin-top: 8px;">Admin Dashboard</p>
-            </div>
-            
-            <div class="nav-menu">
-                <a class="nav-item active" data-section="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a class="nav-item" data-section="products">
-                    <i class="fas fa-box"></i>
-                    <span>Products</span>
-                    <span class="badge" id="productsBadge">0</span>
-                </a>
-                <a class="nav-item" data-section="categories">
-                    <i class="fas fa-tags"></i>
-                    <span>Categories</span>
-                </a>
-                <a class="nav-item" data-section="inventory">
-                    <i class="fas fa-warehouse"></i>
-                    <span>Inventory</span>
-                    <span class="badge" id="inventoryBadge">0</span>
-                </a>
-                <a class="nav-item" data-section="analytics">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
-                </a>
-                <a class="nav-item" data-section="settings">
-                    <i class="fas fa-cogs"></i>
-                    <span>Settings</span>
-                </a>
-            </div>
-            
-            <div class="sidebar-footer">
-                <p>Connected to Supabase</p>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <div class="header-left">
-                    <h2 id="pageTitle">Dashboard Overview</h2>
-                    <p id="pageDescription">Manage your JMPOTTERS store</p>
-                </div>
-                <div class="header-actions">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="globalSearch" placeholder="Search products...">
-                    </div>
-                    <div class="quick-actions">
-                        <button class="btn btn-primary" id="addProductBtn">
-                            <i class="fas fa-plus"></i> Add Product
-                        </button>
-                        <button class="btn btn-light" id="refreshData">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dashboard Content -->
-            <div id="contentContainer">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading dashboard data...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
     
     <!-- Connection Status -->
     <div class="connection-status">
         <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">Connecting to database...</span>
+        <span id="statusText">Connecting to Supabase...</span>
     </div>
-
-    <!-- Product Modal -->
+    
+    <div class="admin-wrapper">
+        <div class="admin-container">
+            <!-- Header -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <h1><i class="fas fa-store"></i> JMPOTTERS Admin Dashboard</h1>
+                    <button class="btn btn-warning btn-sm" onclick="AdminDashboard.testWrite()" style="margin-top: 10px;">
+                        <i class="fas fa-bug"></i> Test Write Operation
+                    </button>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalProducts">0</div>
+                        <div class="stat-label">Total Products</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCategories">6</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="lowStock">0</div>
+                        <div class="stat-label">Low Stock</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="outOfStock">0</div>
+                        <div class="stat-label">Out of Stock</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Body -->
+            <div class="admin-body">
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <ul class="nav-menu">
+                        <li class="nav-item active" onclick="AdminDashboard.showSection('overview')">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard Overview
+                        </li>
+                        <li class="nav-item" onclick="AdminDashboard.showSection('products')">
+                            <i class="fas fa-box"></i> Product Management
+                        </li>
+                        <li class="nav-item" onclick="AdminDashboard.showSection('categories')">
+                            <i class="fas fa-tags"></i> Category Management
+                        </li>
+                        <li class="nav-item" onclick="AdminDashboard.showSection('orders')">
+                            <i class="fas fa-shopping-cart"></i> Order Management
+                        </li>
+                        <li class="nav-item" onclick="AdminDashboard.showSection('analytics')">
+                            <i class="fas fa-chart-line"></i> Sales Analytics
+                        </li>
+                        <li class="nav-item" onclick="AdminDashboard.showSection('settings')">
+                            <i class="fas fa-cogs"></i> Settings
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="main-content">
+                    <div class="content-header">
+                        <h2>Stock Management Dashboard</h2>
+                        <p>Manage inventory across all product categories. Real-time updates with Supabase backend.</p>
+                    </div>
+                    
+                    <!-- Category Filter -->
+                    <div class="category-filter" id="categoryFilter">
+                        <button class="cat-btn active" data-category="all">
+                            <i class="fas fa-th"></i> All Products
+                            <span class="cat-count" id="countAll">0</span>
+                        </button>
+                        <!-- Categories will be loaded here -->
+                    </div>
+                    
+                    <!-- Products Grid -->
+                    <div class="category-cards" id="productsGrid">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading products from Supabase...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product Edit Modal -->
     <div class="modal-overlay" id="productModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-edit"></i> <span id="modalTitle">Edit Product</span></h3>
-                <button class="close-modal" id="closeModal">
+                <h3 id="modalTitle">Edit Product</h3>
+                <button class="close-modal" onclick="AdminDashboard.closeModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="product-preview">
-                    <div>
-                        <label>Product Image</label>
-                        <div class="image-upload" id="imageUpload">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p>Click to upload or drag & drop</p>
-                            <p style="font-size: 12px; color: var(--dark-2); margin-top: 8px;">PNG, JPG up to 5MB</p>
-                            <img id="currentProductImage" class="current-image" src="" alt="Product Image" style="display: none;">
+                <form id="productForm" onsubmit="return AdminDashboard.saveProduct(event)">
+                    <input type="hidden" id="editProductId">
+                    <input type="hidden" id="editIsFootwear">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Product Name *</label>
+                            <input type="text" id="editName" class="form-control" required>
                         </div>
-                        <input type="file" id="imageFile" accept="image/*" style="display: none;">
-                        <input type="hidden" id="productImageUrl">
-                        
-                        <div style="margin-top: 20px;">
-                            <label>Product Details</label>
-                            <div style="display: grid; gap: 12px; margin-top: 12px;">
-                                <div>
-                                    <span style="font-size: 13px; color: var(--dark-3);">Created:</span>
-                                    <span id="productCreated" style="font-weight: 600; margin-left: 8px;">N/A</span>
-                                </div>
-                                <div>
-                                    <span style="font-size: 13px; color: var(--dark-3);">Last Updated:</span>
-                                    <span id="productUpdated" style="font-weight: 600; margin-left: 8px;">N/A</span>
-                                </div>
-                                <div>
-                                    <span style="font-size: 13px; color: var(--dark-3);">Status:</span>
-                                    <span id="productStatus" style="font-weight: 600; margin-left: 8px;">Active</span>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label>Price (₦) *</label>
+                            <input type="number" id="editPrice" class="form-control" min="0" step="100" required>
                         </div>
                     </div>
-                    <div>
-                        <form id="productForm">
-                            <input type="hidden" id="editProductId">
-                            <input type="hidden" id="editCategorySlug">
-                            
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label>Product Name *</label>
-                                    <input type="text" id="editName" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Price (₦) *</label>
-                                    <input type="number" id="editPrice" class="form-control" min="0" step="100" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Compare Price (₦)</label>
-                                    <input type="number" id="editComparePrice" class="form-control" min="0" step="100">
-                                </div>
-                                <div class="form-group">
-                                    <label>Category *</label>
-                                    <select id="editCategory" class="form-control" required>
-                                        <option value="">Select Category</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" id="stockFieldContainer">
-                                    <label>Stock Quantity</label>
-                                    <input type="number" id="editStock" class="form-control" min="0" value="0">
-                                    <p style="font-size: 12px; color: var(--dark-2); margin-top: 6px;" id="stockNote">
-                                        For non-footwear products only
-                                    </p>
-                                </div>
-                                <div class="form-group full-width">
-                                    <label>Description</label>
-                                    <textarea id="editDescription" class="form-control" rows="4"></textarea>
-                                </div>
-                            </div>
-
-                            <!-- FOOTWEAR VARIANT SECTION (Shown only for footwear) -->
-                            <div class="variant-section" id="variantSection" style="display: none;">
-                                <h4><i class="fas fa-shoe-prints"></i> Color & Size Variants</h4>
-                                <div class="variant-grid">
-                                    <div class="color-list" id="colorListContainer">
-                                        <h5>Colors</h5>
-                                        <div id="colorItems">
-                                            <div class="loading">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                                <p>Loading colors...</p>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-light add-variant-btn" onclick="admin.addColorField()">
-                                            <i class="fas fa-plus"></i> Add New Color
-                                        </button>
-                                    </div>
-                                    <div class="size-list" id="sizeListContainer">
-                                        <h5>Size Variants & Stock</h5>
-                                        <div id="sizeItems">
-                                            <div class="loading">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                                <p>Loading sizes...</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- New Color Form -->
-                                <div id="newColorForm" style="display: none; margin-top: 20px; padding: 20px; background: white; border-radius: var(--radius); border: 1px solid var(--light-2);">
-                                    <h5>Add New Color</h5>
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label>Color Name *</label>
-                                            <input type="text" id="newColorName" class="form-control" placeholder="e.g., Black, Blue, Red">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Color Code</label>
-                                            <input type="color" id="newColorCode" class="form-control" value="#000000">
-                                        </div>
-                                    </div>
-                                    <div style="display: flex; gap: 12px; margin-top: 15px;">
-                                        <button type="button" class="btn btn-light" onclick="admin.cancelAddColor()">
-                                            Cancel
-                                        </button>
-                                        <button type="button" class="btn btn-primary" onclick="admin.saveNewColor()">
-                                            <i class="fas fa-save"></i> Save Color
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-actions">
-                                <div>
-                                    <button type="button" class="btn btn-danger" id="deleteProductBtn" style="display: none;">
-                                        <i class="fas fa-trash"></i> Delete Product
-                                    </button>
-                                </div>
-                                <div style="display: flex; gap: 12px;">
-                                    <button type="button" class="btn btn-light" id="cancelEdit">
-                                        Cancel
-                                    </button>
-                                    <button type="submit" class="btn btn-primary" id="saveProductBtn">
-                                        <i class="fas fa-save"></i> Save Changes
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select id="editCategory" class="form-control" required>
+                                <!-- Categories will be loaded -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock Quantity</label>
+                            <input type="number" id="editStock" class="form-control" min="0" value="0">
+                        </div>
                     </div>
-                </div>
+                    
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="editDescription" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <!-- Conditional Fields (will be shown based on category) -->
+                    <div id="conditionalFields" style="display: none;">
+                        <!-- Color/Size fields will be added here dynamically -->
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-danger" onclick="AdminDashboard.deleteCurrentProduct()">
+                            <i class="fas fa-trash"></i> Delete Product
+                        </button>
+                        <div style="flex: 1;"></div>
+                        <button type="button" class="btn" onclick="AdminDashboard.closeModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -1135,1057 +744,600 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
     <script>
-        // ====================
-        // IMAGE CONFIGURATION
-        // ====================
-        const IMAGE_CONFIG = {
-            baseUrl: 'https://ebuzome.github.io/JMPOTTERS/assets/images/',
-            paths: {
-                'mensfootwear': 'mensfootwear/',
-                'womensfootwear': '',
-                'bags': '',
-                'household': 'household2/',
-                'kids': 'kids/',
-                'accessories': 'accessories/'
-            }
-        };
-
-        function getImageUrl(categorySlug, imageFilename) {
-            if (!imageFilename || imageFilename === 'null') {
-                return 'https://ebuzome.github.io/JMPOTTERS/assets/images/placeholder.jpg';
+        // Enhanced Admin Dashboard with Working Write Operations
+        const AdminDashboard = (function() {
+            let supabase = null;
+            let categories = [];
+            let products = [];
+            let currentCategory = 'all';
+            
+            function init() {
+                console.log('🚀 Initializing Admin Dashboard...');
+                
+                try {
+                    // Initialize Supabase client
+                    supabase = window.supabase.createClient(
+                        'https://tmpggeeuwdvlngvfncaa.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+                    );
+                    
+                    // Update connection status
+                    updateConnectionStatus('Connecting...', 'warning');
+                    
+                    // Setup event listeners
+                    setupEventListeners();
+                    
+                    // Test connection and load data
+                    testConnection();
+                    
+                } catch (error) {
+                    console.error('❌ Initialization error:', error);
+                    showToast('Failed to initialize: ' + error.message, 'error');
+                }
             }
             
-            const folder = IMAGE_CONFIG.paths[categorySlug] || '';
-            return IMAGE_CONFIG.baseUrl + folder + imageFilename;
-        }
-
-        // ====================
-        // JMPOTTERS ADMIN DASHBOARD
-        // ====================
-        class JMPAdminDashboard {
-            constructor() {
-                this.supabase = null;
-                this.currentSection = 'dashboard';
-                this.categories = [];
-                this.products = [];
-                this.currentProduct = null;
-                this.currentProductColors = [];
-                this.currentProductSizes = [];
-                this.isFootwear = false;
-                
-                this.init();
-            }
-
-            async init() {
-                console.log('🚀 Initializing JMPOTTERS Admin Dashboard...');
-                
-                // Initialize Supabase
-                this.supabase = window.supabase.createClient(
-                    'https://tmpggeeuwdvlngvfncaa.supabase.co',
-                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
-                );
-
-                // Setup event listeners
-                this.setupEventListeners();
-
-                // Test connection
-                await this.testConnection();
-
-                // Load initial data
-                await this.loadDashboardData();
-
-                // Show dashboard
-                this.showSection('dashboard');
-            }
-
-            async testConnection() {
+            async function testConnection() {
                 try {
-                    this.updateStatus('Connecting to database...', 'warning');
+                    console.log('🔌 Testing Supabase connection...');
                     
-                    const { data, error } = await this.supabase
+                    const { data, error } = await supabase
                         .from('products')
                         .select('count', { count: 'exact', head: true });
                     
-                    if (error) throw error;
+                    if (error) {
+                        console.error('❌ Connection test failed:', error);
+                        
+                        if (error.code === '42501') {
+                            showToast('RLS Policy Error: Please disable RLS in Supabase', 'error');
+                            updateConnectionStatus('RLS Error', 'error');
+                            
+                            // Show detailed instructions
+                            setTimeout(() => {
+                                alert('🚨 ROW LEVEL SECURITY ERROR\n\nTo fix this:\n\n1. Go to Supabase Dashboard\n2. Open SQL Editor\n3. Run: ALTER TABLE products DISABLE ROW LEVEL SECURITY;\n4. Run: ALTER TABLE product_colors DISABLE ROW LEVEL SECURITY;\n5. Run: ALTER TABLE product_sizes DISABLE ROW LEVEL SECURITY;\n\nThen refresh this page.');
+                            }, 1000);
+                            
+                            return;
+                        }
+                        
+                        throw error;
+                    }
                     
-                    this.updateStatus('Connected to Supabase', 'success');
-                    this.showToast('Database connection established!', 'success');
+                    console.log('✅ Connection successful!');
+                    updateConnectionStatus('Connected', 'success');
+                    showToast('Successfully connected to Supabase!', 'success');
+                    
+                    // Load data
+                    await loadDashboard();
                     
                 } catch (error) {
                     console.error('❌ Connection error:', error);
-                    this.updateStatus('Connection failed', 'error');
-                    this.showToast('Database connection failed: ' + error.message, 'error');
+                    updateConnectionStatus('Connection Failed', 'error');
+                    showToast('Database connection failed: ' + error.message, 'error');
                 }
             }
-
-            async loadDashboardData() {
+            
+            async function loadDashboard() {
+                showToast('Loading dashboard data...', 'info');
+                
                 try {
                     // Load categories
-                    const { data: cats, error: catError } = await this.supabase
+                    const { data: cats, error: catError } = await supabase
                         .from('categories')
                         .select('*')
                         .order('name');
                     
                     if (catError) throw catError;
-                    this.categories = cats;
-
-                    // Load products with category info
-                    const { data: prods, error: prodError } = await this.supabase
+                    categories = cats;
+                    
+                    // Load products
+                    const { data: prods, error: prodError } = await supabase
                         .from('products')
                         .select(`
                             *,
                             category:categories(name, slug)
                         `)
-                        .order('created_at', { ascending: false });
+                        .order('name');
                     
                     if (prodError) throw prodError;
-                    this.products = prods;
-
-                    // Update badges
-                    this.updateBadges();
-
+                    products = prods;
+                    
+                    // Update UI
+                    updateStats();
+                    renderCategoryFilter();
+                    renderProducts();
+                    
+                    showToast('Dashboard loaded successfully!', 'success');
+                    
                 } catch (error) {
-                    console.error('❌ Error loading data:', error);
-                    this.showToast('Failed to load data: ' + error.message, 'error');
+                    console.error('❌ Load error:', error);
+                    showToast('Failed to load data: ' + error.message, 'error');
                 }
             }
-
-            updateBadges() {
-                const totalProducts = this.products.length;
-                const lowStock = this.products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= 10).length;
-                const outOfStock = this.products.filter(p => (p.stock || 0) === 0).length;
+            
+            function updateStats() {
+                const totalProducts = products.length;
+                const totalCategories = categories.length;
+                const lowStock = products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) < 10).length;
+                const outOfStock = products.filter(p => (p.stock || 0) === 0).length;
                 
-                document.getElementById('productsBadge').textContent = totalProducts;
-                document.getElementById('inventoryBadge').textContent = lowStock + outOfStock;
+                document.getElementById('totalProducts').textContent = totalProducts;
+                document.getElementById('totalCategories').textContent = totalCategories;
+                document.getElementById('lowStock').textContent = lowStock;
+                document.getElementById('outOfStock').textContent = outOfStock;
             }
-
-            async showSection(section) {
-                this.currentSection = section;
+            
+            function renderCategoryFilter() {
+                const container = document.getElementById('categoryFilter');
+                if (!container) return;
                 
-                // Update active nav item
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.remove('active');
-                    if (item.dataset.section === section) {
-                        item.classList.add('active');
-                    }
+                // Count products per category
+                const counts = {};
+                products.forEach(product => {
+                    const catId = product.category_id || 'uncategorized';
+                    counts[catId] = (counts[catId] || 0) + 1;
                 });
-
-                // Update page title
-                const titles = {
-                    'dashboard': 'Dashboard Overview',
-                    'products': 'Product Management',
-                    'categories': 'Category Management',
-                    'inventory': 'Inventory Management',
-                    'analytics': 'Sales Analytics',
-                    'settings': 'Store Settings'
-                };
-
-                const descriptions = {
-                    'dashboard': 'Welcome back! Monitor your store performance.',
-                    'products': 'Manage all products in your store.',
-                    'categories': 'Organize products into categories.',
-                    'inventory': 'Monitor stock levels and manage inventory.',
-                    'analytics': 'Track sales performance and store analytics.',
-                    'settings': 'Configure store settings and preferences.'
-                };
-
-                document.getElementById('pageTitle').textContent = titles[section] || section;
-                document.getElementById('pageDescription').textContent = descriptions[section] || '';
-
-                // Load section content
-                switch(section) {
-                    case 'dashboard':
-                        await this.renderDashboard();
-                        break;
-                    case 'products':
-                        await this.renderProducts();
-                        break;
-                    case 'categories':
-                        await this.renderCategories();
-                        break;
-                    case 'inventory':
-                        await this.renderInventory();
-                        break;
-                    case 'analytics':
-                        await this.renderAnalytics();
-                        break;
-                    case 'settings':
-                        await this.renderSettings();
-                        break;
-                }
-            }
-
-            calculateStats() {
-                const totalProducts = this.products.length;
-                const lowStock = this.products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= 10).length;
-                const outOfStock = this.products.filter(p => (p.stock || 0) === 0).length;
-                const inStock = this.products.filter(p => (p.stock || 0) > 10).length;
                 
-                return {
-                    totalProducts,
-                    lowStock,
-                    outOfStock,
-                    inStock
-                };
-            }
-
-            async renderDashboard() {
-                const stats = this.calculateStats();
-                
-                const html = `
-                    <div class="stats-grid">
-                        <div class="stat-card" onclick="admin.showSection('products')">
-                            <div class="stat-header">
-                                <div class="stat-icon primary">
-                                    <i class="fas fa-box"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value">${stats.totalProducts}</div>
-                            <div class="stat-label">Total Products</div>
-                        </div>
-
-                        <div class="stat-card" onclick="admin.showSection('inventory')">
-                            <div class="stat-header">
-                                <div class="stat-icon success">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value">${stats.inStock}</div>
-                            <div class="stat-label">In Stock</div>
-                        </div>
-
-                        <div class="stat-card" onclick="admin.showSection('inventory')">
-                            <div class="stat-header">
-                                <div class="stat-icon warning">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value">${stats.lowStock}</div>
-                            <div class="stat-label">Low Stock</div>
-                        </div>
-
-                        <div class="stat-card" onclick="admin.showSection('inventory')">
-                            <div class="stat-header">
-                                <div class="stat-icon danger">
-                                    <i class="fas fa-ban"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value">${stats.outOfStock}</div>
-                            <div class="stat-label">Out of Stock</div>
-                        </div>
-                    </div>
-
-                    <div class="table-container" style="margin-top: 30px;">
-                        <div class="table-header">
-                            <h3>Recent Products</h3>
-                            <button class="btn btn-light" onclick="admin.showSection('products')">
-                                View All Products <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Category</th>
-                                    <th>Price</th>
-                                    <th>Stock</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${this.products.slice(0, 8).map(product => {
-                                    const stock = product.stock || 0;
-                                    const stockClass = stock > 10 ? 'stock-high' : stock > 0 ? 'stock-medium' : 'stock-low';
-                                    const stockText = stock > 10 ? 'In Stock' : stock > 0 ? 'Low Stock' : 'Out of Stock';
-                                    const status = product.is_active ? 'Active' : 'Inactive';
-                                    const statusClass = product.is_active ? 'stock-high' : 'stock-low';
-                                    
-                                    return `
-                                        <tr>
-                                            <td>
-                                                <div class="product-cell">
-                                                    <img src="${getImageUrl(product.category?.slug || 'accessories', product.image_url)}" 
-                                                         class="product-image" 
-                                                         alt="${product.name}">
-                                                    <div class="product-info">
-                                                        <div class="product-name">${product.name}</div>
-                                                        <div class="product-category">${product.category?.name || 'Uncategorized'}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>${product.category?.name || '-'}</td>
-                                            <td class="price">₦${(product.price || 0).toLocaleString()}</td>
-                                            <td><span class="stock-badge ${stockClass}">${stockText} (${stock})</span></td>
-                                            <td><span class="stock-badge ${statusClass}">${status}</span></td>
-                                            <td>
-                                                <div class="action-buttons">
-                                                    <button class="btn-icon edit" onclick="admin.editProduct(${product.id})">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn-icon delete" onclick="admin.confirmDelete(${product.id})">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                
-                document.getElementById('contentContainer').innerHTML = html;
-            }
-
-            async renderProducts() {
                 let html = `
-                    <div class="table-container">
-                        <div class="table-header">
-                            <div>
-                                <h3>All Products (${this.products.length})</h3>
-                                <p style="font-size: 14px; color: var(--dark-2); margin-top: 4px;">Manage your product catalog</p>
-                            </div>
-                            <div style="display: flex; gap: 12px;">
-                                <select id="categoryFilter" class="form-control" style="width: 200px;">
-                                    <option value="all">All Categories</option>
-                                    ${this.categories.map(cat => `
-                                        <option value="${cat.id}">${cat.name}</option>
-                                    `).join('')}
-                                </select>
-                                <button class="btn btn-primary" onclick="admin.openProductModal(null)">
-                                    <i class="fas fa-plus"></i> Add Product
-                                </button>
-                            </div>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Category</th>
-                                    <th>Price</th>
-                                    <th>Stock</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productsTableBody">
+                    <button class="cat-btn active" data-category="all">
+                        <i class="fas fa-th"></i> All Products
+                        <span class="cat-count" id="countAll">${products.length}</span>
+                    </button>
                 `;
-
-                this.products.forEach(product => {
-                    const stock = product.stock || 0;
-                    const stockClass = stock > 10 ? 'stock-high' : stock > 0 ? 'stock-medium' : 'stock-low';
-                    const stockText = stock > 10 ? 'In Stock' : stock > 0 ? 'Low Stock' : 'Out of Stock';
-                    const status = product.is_active ? 'Active' : 'Inactive';
-                    const statusClass = product.is_active ? 'stock-high' : 'stock-low';
+                
+                categories.forEach(category => {
+                    const count = counts[category.id] || 0;
+                    const icon = category.slug.includes('footwear') ? 'shoe-prints' : 'tag';
                     
                     html += `
-                        <tr data-product-id="${product.id}" data-category-id="${product.category_id}">
-                            <td>
-                                <div class="product-cell">
-                                    <img src="${getImageUrl(product.category?.slug || 'accessories', product.image_url)}" 
-                                         class="product-image" 
-                                         alt="${product.name}">
-                                    <div class="product-info">
-                                        <div class="product-name">${product.name}</div>
-                                        <div style="font-size: 12px; color: var(--dark-2);">${(product.description || '').substring(0, 50)}...</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="product-category">${product.category?.name || 'Uncategorized'}</div>
-                            </td>
-                            <td class="price">₦${(product.price || 0).toLocaleString()}</td>
-                            <td><span class="stock-badge ${stockClass}">${stockText} (${stock})</span></td>
-                            <td><span class="stock-badge ${statusClass}">${status}</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon edit" onclick="admin.editProduct(${product.id})">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn-icon delete" onclick="admin.confirmDelete(${product.id})">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                        <button class="cat-btn" data-category="${category.id}">
+                            <i class="fas fa-${icon}"></i> ${category.name}
+                            <span class="cat-count">${count}</span>
+                        </button>
                     `;
                 });
-
-                html += `
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-
-                document.getElementById('contentContainer').innerHTML = html;
-
-                // Setup category filter
-                document.getElementById('categoryFilter').addEventListener('change', (e) => {
-                    const categoryId = e.target.value;
-                    const rows = document.querySelectorAll('#productsTableBody tr');
-                    
-                    rows.forEach(row => {
-                        if (categoryId === 'all' || row.dataset.categoryId === categoryId) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
+                
+                container.innerHTML = html;
+                
+                // Add event listeners
+                container.querySelectorAll('.cat-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Update active state
+                        container.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Filter products
+                        currentCategory = this.dataset.category;
+                        renderProducts();
                     });
                 });
             }
-
-            async renderCategories() {
-                const html = `
-                    <div class="table-container">
-                        <div class="table-header">
-                            <div>
-                                <h3>Categories (${this.categories.length})</h3>
-                                <p style="font-size: 14px; color: var(--dark-2); margin-top: 4px;">Organize products into categories</p>
-                            </div>
-                            <button class="btn btn-primary" onclick="admin.showToast('Add category feature coming soon!', 'info')">
-                                <i class="fas fa-plus"></i> Add Category
-                            </button>
+            
+            function renderProducts() {
+                const container = document.getElementById('productsGrid');
+                if (!container) return;
+                
+                // Filter products
+                let filteredProducts = products;
+                if (currentCategory !== 'all') {
+                    filteredProducts = products.filter(p => p.category_id == currentCategory);
+                }
+                
+                if (filteredProducts.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+                            <i class="fas fa-box-open" style="font-size: 48px; color: #bdc3c7; margin-bottom: 20px;"></i>
+                            <h3>No products found</h3>
+                            <p>No products in this category. Try selecting a different category.</p>
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Slug</th>
-                                    <th>Product Count</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${this.categories.map(category => {
-                                    const productCount = this.products.filter(p => p.category_id === category.id).length;
-                                    return `
-                                        <tr>
-                                            <td>
-                                                <div class="product-cell">
-                                                    <div style="width: 40px; height: 40px; background: var(--primary-light); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                                                        <i class="fas fa-${category.slug.includes('footwear') ? 'shoe-prints' : 'tag'}" style="color: var(--primary);"></i>
-                                                    </div>
-                                                    <div class="product-info">
-                                                        <div class="product-name">${category.name}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><code>${category.slug}</code></td>
-                                            <td><strong>${productCount}</strong> products</td>
-                                            <td>${category.description || 'No description'}</td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
+                    `;
+                    return;
+                }
                 
-                document.getElementById('contentContainer').innerHTML = html;
-            }
-
-            async renderInventory() {
-                const lowStockProducts = this.products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= 10);
-                const outOfStockProducts = this.products.filter(p => (p.stock || 0) === 0);
+                // Group by category
+                const grouped = {};
+                filteredProducts.forEach(product => {
+                    const catId = product.category_id || 'uncategorized';
+                    if (!grouped[catId]) {
+                        const category = categories.find(c => c.id === catId) || { name: 'Uncategorized', slug: '' };
+                        grouped[catId] = {
+                            category: category,
+                            products: []
+                        };
+                    }
+                    grouped[catId].products.push(product);
+                });
                 
-                const html = `
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-icon warning">
-                                    <i class="fas fa-exclamation-triangle"></i>
+                // Render category cards
+                let html = '';
+                
+                Object.values(grouped).forEach(group => {
+                    const isFootwear = group.category.slug.includes('footwear');
+                    
+                    html += `
+                        <div class="category-card">
+                            <div class="category-header">
+                                <div class="category-title">
+                                    <i class="fas fa-${isFootwear ? 'shoe-prints' : 'tag'}"></i>
+                                    ${group.category.name}
+                                </div>
+                                <div class="category-count">${group.products.length} products</div>
+                            </div>
+                            <div class="category-products">
+                    `;
+                    
+                    group.products.forEach(product => {
+                        const stock = product.stock || 0;
+                        const stockClass = stock > 10 ? 'stock-high' : stock > 0 ? 'stock-medium' : 'stock-low';
+                        const stockText = stock > 10 ? 'In Stock' : stock > 0 ? 'Low Stock' : 'Out of Stock';
+                        
+                        html += `
+                            <div class="product-item" data-product-id="${product.id}">
+                                <div class="product-info">
+                                    <h4>${product.name}</h4>
+                                    <div class="product-meta">
+                                        <span class="product-price">₦${product.price?.toLocaleString() || '0'}</span>
+                                        <span class="product-stock ${stockClass}">${stockText} (${stock})</span>
+                                        ${isFootwear ? '<span><i class="fas fa-palette"></i> Color/Size Variants</span>' : ''}
+                                    </div>
+                                </div>
+                                <div class="product-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="AdminDashboard.editProduct(${product.id})">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="AdminDashboard.confirmDelete(${product.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="stat-value">${lowStockProducts.length}</div>
-                            <div class="stat-label">Low Stock Items</div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-icon danger">
-                                    <i class="fas fa-ban"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value">${outOfStockProducts.length}</div>
-                            <div class="stat-label">Out of Stock</div>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
-                        <div class="table-container">
-                            <div class="table-header">
-                                <h3>Low Stock Items (≤ 10)</h3>
-                            </div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Current Stock</th>
-                                        <th>Reorder Level</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${lowStockProducts.slice(0, 5).map(product => {
-                                        return `
-                                            <tr>
-                                                <td>
-                                                    <div class="product-cell">
-                                                        <img src="${getImageUrl(product.category?.slug || 'accessories', product.image_url)}" 
-                                                             class="product-image" 
-                                                             alt="${product.name}">
-                                                        <div class="product-info">
-                                                            <div class="product-name">${product.name}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td><span class="stock-badge stock-medium">${product.stock} left</span></td>
-                                                <td>10 units</td>
-                                                <td>
-                                                    <button class="btn-icon edit" onclick="admin.editProduct(${product.id})">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="table-container">
-                            <div class="table-header">
-                                <h3>Out of Stock</h3>
-                            </div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Last Stock</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${outOfStockProducts.slice(0, 5).map(product => {
-                                        return `
-                                            <tr>
-                                                <td>
-                                                    <div class="product-cell">
-                                                        <img src="${getImageUrl(product.category?.slug || 'accessories', product.image_url)}" 
-                                                             class="product-image" 
-                                                             alt="${product.name}">
-                                                        <div class="product-info">
-                                                            <div class="product-name">${product.name}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td><span class="stock-badge stock-low">0</span></td>
-                                                <td><span class="stock-badge danger">Restock Needed</span></td>
-                                                <td>
-                                                    <button class="btn-icon edit" onclick="admin.editProduct(${product.id})">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
+                        `;
+                    });
+                    
+                    html += `</div></div>`;
+                });
                 
-                document.getElementById('contentContainer').innerHTML = html;
+                container.innerHTML = html;
             }
-
-            async renderAnalytics() {
-                const html = `
-                    <div class="empty-state">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Analytics Coming Soon</h3>
-                        <p>Track your store performance with detailed analytics and reports.</p>
-                    </div>
-                `;
-                
-                document.getElementById('contentContainer').innerHTML = html;
-            }
-
-            async renderSettings() {
-                const html = `
-                    <div class="empty-state">
-                        <i class="fas fa-cogs"></i>
-                        <h3>Settings Panel</h3>
-                        <p>Configure your store settings and preferences.</p>
-                    </div>
-                `;
-                
-                document.getElementById('contentContainer').innerHTML = html;
-            }
-
-            // ====================
-            // PRODUCT EDITING - CORRECTED FOR YOUR SCHEMA
-            // ====================
-            async editProduct(productId) {
-                console.log('Editing product ID:', productId);
-                
+            
+            async function editProduct(productId) {
                 try {
-                    const product = this.products.find(p => p.id === productId);
+                    const product = products.find(p => p.id === productId);
                     if (!product) {
-                        this.showToast('Product not found!', 'error');
+                        showToast('Product not found!', 'error');
                         return;
                     }
                     
-                    this.currentProduct = product;
+                    // Get full product data with colors/sizes if footwear
+                    const isFootwear = product.category?.slug?.includes('footwear');
                     
-                    // Get category info
-                    const category = this.categories.find(c => c.id === product.category_id);
-                    this.isFootwear = category?.slug?.includes('footwear') || false;
-                    
-                    // Populate modal with EXACT columns from your schema
+                    // Populate modal
                     document.getElementById('editProductId').value = product.id;
+                    document.getElementById('editIsFootwear').value = isFootwear;
                     document.getElementById('editName').value = product.name || '';
                     document.getElementById('editPrice').value = product.price || 0;
-                    document.getElementById('editComparePrice').value = product.compare_price || 0;
+                    document.getElementById('editStock').value = product.stock || 0;
                     document.getElementById('editDescription').value = product.description || '';
-                    document.getElementById('editCategorySlug').value = category?.slug || 'accessories';
-                    
-                    // Handle stock field based on product type
-                    const stockFieldContainer = document.getElementById('stockFieldContainer');
-                    const stockNote = document.getElementById('stockNote');
-                    
-                    if (this.isFootwear) {
-                        // For footwear: Hide general stock field, show variant section
-                        stockFieldContainer.style.display = 'none';
-                        document.getElementById('variantSection').style.display = 'block';
-                        document.getElementById('editStock').value = 0; // Not used for footwear
-                        
-                        // Load colors and sizes for footwear
-                        await this.loadProductColors(productId);
-                        await this.loadProductSizes(productId);
-                    } else {
-                        // For non-footwear: Show general stock field, hide variant section
-                        stockFieldContainer.style.display = 'block';
-                        document.getElementById('variantSection').style.display = 'none';
-                        document.getElementById('editStock').value = product.stock || 0;
-                        stockNote.textContent = 'For non-footwear products only';
-                    }
                     
                     // Populate category dropdown
                     const categorySelect = document.getElementById('editCategory');
-                    categorySelect.innerHTML = `
-                        <option value="">Select Category</option>
-                        ${this.categories.map(cat => `
-                            <option value="${cat.id}" ${cat.id === product.category_id ? 'selected' : ''}>
-                                ${cat.name}
-                            </option>
-                        `).join('')}
-                    `;
-                    
-                    // Display current image
-                    const imagePreview = document.getElementById('currentProductImage');
-                    const imageUrl = getImageUrl(category?.slug || 'accessories', product.image_url);
-                    imagePreview.src = imageUrl;
-                    imagePreview.style.display = 'block';
-                    document.getElementById('productImageUrl').value = product.image_url || '';
-                    
-                    // Update product details
-                    document.getElementById('productCreated').textContent = product.created_at ? 
-                        new Date(product.created_at).toLocaleDateString() : 'N/A';
-                    document.getElementById('productUpdated').textContent = product.updated_at ? 
-                        new Date(product.updated_at).toLocaleDateString() : 'N/A';
-                    document.getElementById('productStatus').textContent = product.is_active ? 'Active' : 'Inactive';
+                    categorySelect.innerHTML = categories.map(cat => 
+                        `<option value="${cat.id}" ${cat.id === product.category_id ? 'selected' : ''}>${cat.name}</option>`
+                    ).join('');
                     
                     // Set modal title
                     document.getElementById('modalTitle').textContent = `Edit: ${product.name}`;
-                    document.getElementById('deleteProductBtn').style.display = 'block';
+                    
+                    // Show conditional fields for footwear
+                    const conditionalFields = document.getElementById('conditionalFields');
+                    if (isFootwear) {
+                        conditionalFields.style.display = 'block';
+                        conditionalFields.innerHTML = `
+                            <h4 style="margin: 20px 0 15px; color: var(--dark); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                                <i class="fas fa-shoe-prints"></i> Footwear Variants
+                            </h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Colors</label>
+                                    <div id="colorList">
+                                        <div class="loading">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading colors...
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm" onclick="AdminDashboard.addColorField()" style="margin-top: 10px;">
+                                        <i class="fas fa-plus"></i> Add Color
+                                    </button>
+                                </div>
+                                <div class="form-group">
+                                    <label>Sizes & Stock</label>
+                                    <div id="sizeList">
+                                        <div class="loading">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading sizes...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Load colors and sizes
+                        await loadProductColors(productId);
+                        await loadProductSizes(productId);
+                    } else {
+                        conditionalFields.style.display = 'none';
+                    }
                     
                     // Show modal
                     document.getElementById('productModal').style.display = 'flex';
                     
                 } catch (error) {
                     console.error('Error editing product:', error);
-                    this.showToast('Failed to load product: ' + error.message, 'error');
+                    showToast('Failed to load product: ' + error.message, 'error');
                 }
             }
-
-            async loadProductColors(productId) {
+            
+            async function loadProductColors(productId) {
                 try {
-                    const { data: colors, error } = await this.supabase
+                    const { data: colors, error } = await supabase
                         .from('product_colors')
                         .select('*')
                         .eq('product_id', productId)
                         .order('color_name');
                     
                     if (error) throw error;
-                    this.currentProductColors = colors || [];
                     
-                    const container = document.getElementById('colorItems');
+                    const container = document.getElementById('colorList');
                     if (!container) return;
                     
-                    if (this.currentProductColors.length === 0) {
-                        container.innerHTML = '<p style="color: var(--dark-2); text-align: center; padding: 20px;">No colors defined for this product</p>';
-                        return;
-                    }
-                    
                     let html = '';
-                    this.currentProductColors.forEach(color => {
-                        html += `
-                            <div class="color-item" data-color-id="${color.id}">
-                                <div class="color-preview" style="background-color: ${color.color_code || '#666'}"></div>
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600;">${color.color_name}</div>
-                                    <div style="font-size: 12px; color: var(--dark-2);">Code: ${color.color_code || 'N/A'}</div>
-                                </div>
-                                <div style="display: flex; gap: 8px;">
-                                    <button class="btn-icon" onclick="admin.editColor(${color.id})" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn-icon delete" onclick="admin.deleteColor(${color.id})" title="Delete">
+                    if (colors && colors.length > 0) {
+                        colors.forEach(color => {
+                            html += `
+                                <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                                    <input type="color" value="${color.color_code || '#000000'}" 
+                                           onchange="AdminDashboard.updateColor(${color.id}, 'color_code', this.value)"
+                                           style="width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;">
+                                    <input type="text" value="${color.color_name}" 
+                                           onchange="AdminDashboard.updateColor(${color.id}, 'color_name', this.value)"
+                                           class="form-control" style="flex: 1;">
+                                    <button class="btn btn-danger btn-sm" onclick="AdminDashboard.deleteColor(${color.id})">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
-                            </div>
-                        `;
-                    });
+                            `;
+                        });
+                    } else {
+                        html = '<p style="color: #7f8c8d; text-align: center; padding: 20px;">No colors defined for this product</p>';
+                    }
                     
                     container.innerHTML = html;
                     
                 } catch (error) {
                     console.error('Error loading colors:', error);
-                    document.getElementById('colorItems').innerHTML = 
-                        `<p class="error" style="color: var(--danger);">Failed to load colors: ${error.message}</p>`;
+                    document.getElementById('colorList').innerHTML = 
+                        `<p class="error">Failed to load colors: ${error.message}</p>`;
                 }
             }
-
-            async loadProductSizes(productId) {
+            
+            async function loadProductSizes(productId) {
                 try {
-                    const { data: sizes, error } = await this.supabase
+                    const { data: sizes, error } = await supabase
                         .from('product_sizes')
                         .select('*')
                         .eq('product_id', productId)
                         .order('size_value');
                     
                     if (error) throw error;
-                    this.currentProductSizes = sizes || [];
                     
-                    const container = document.getElementById('sizeItems');
+                    const container = document.getElementById('sizeList');
                     if (!container) return;
                     
-                    if (this.currentProductSizes.length === 0) {
-                        container.innerHTML = '<p style="color: var(--dark-2); text-align: center; padding: 20px;">No sizes defined for this product</p>';
-                        return;
+                    // Group sizes by color for better display
+                    const grouped = {};
+                    if (sizes && sizes.length > 0) {
+                        sizes.forEach(size => {
+                            if (!grouped[size.color_id]) grouped[size.color_id] = [];
+                            grouped[size.color_id].push(size);
+                        });
                     }
                     
-                    // Group sizes by color for display
-                    const grouped = {};
-                    this.currentProductSizes.forEach(size => {
-                        if (!grouped[size.color_id]) grouped[size.color_id] = [];
-                        grouped[size.color_id].push(size);
-                    });
-                    
                     let html = '';
-                    
-                    // Get color names for display
-                    const colorMap = {};
-                    this.currentProductColors.forEach(color => {
-                        colorMap[color.id] = color.color_name;
-                    });
-                    
-                    for (const [colorId, sizeList] of Object.entries(grouped)) {
-                        const colorName = colorMap[colorId] || `Color ${colorId}`;
-                        
-                        html += `
-                            <div style="margin-bottom: 20px;">
-                                <div style="font-weight: 600; margin-bottom: 10px; color: var(--dark);">
-                                    ${colorName} Variants:
-                                </div>
-                                <div class="size-matrix">
-                        `;
-                        
-                        sizeList.forEach(size => {
-                            html += `
-                                <div class="size-cell">
-                                    <div class="size-cell-header">Size ${size.size_value}</div>
-                                    <div class="size-cell-stock">
-                                        <input type="number" 
-                                               class="size-stock-input" 
-                                               value="${size.stock_quantity}"
-                                               data-size-id="${size.id}"
-                                               onchange="admin.updateSizeStock(${size.id}, this.value)"
-                                               min="0">
+                    if (Object.keys(grouped).length > 0) {
+                        for (const [colorId, sizeList] of Object.entries(grouped)) {
+                            html += `<div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e9ecef;">`;
+                            html += `<h5 style="margin-bottom: 10px; color: #2c3e50;">Color ID: ${colorId}</h5>`;
+                            html += `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px;">`;
+                            
+                            sizeList.forEach(size => {
+                                html += `
+                                    <div style="text-align: center;">
+                                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Size ${size.size_value}</label>
+                                        <input type="number" value="${size.stock_quantity}" 
+                                               onchange="AdminDashboard.updateSizeStock(${size.id}, this.value)"
+                                               class="form-control" min="0" placeholder="Stock">
                                     </div>
-                                </div>
-                            `;
-                        });
-                        
-                        html += `</div></div>`;
+                                `;
+                            });
+                            
+                            html += `</div></div>`;
+                        }
+                    } else {
+                        html = '<p style="color: #7f8c8d; text-align: center; padding: 20px;">No sizes defined for this product</p>';
                     }
                     
                     container.innerHTML = html;
                     
                 } catch (error) {
                     console.error('Error loading sizes:', error);
-                    document.getElementById('sizeItems').innerHTML = 
-                        `<p class="error" style="color: var(--danger);">Failed to load sizes: ${error.message}</p>`;
+                    document.getElementById('sizeList').innerHTML = 
+                        `<p class="error">Failed to load sizes: ${error.message}</p>`;
                 }
             }
-
-            async updateSizeStock(sizeId, newStock) {
-                try {
-                    const stock = parseInt(newStock);
-                    if (isNaN(stock) || stock < 0) {
-                        this.showToast('Invalid stock quantity', 'error');
-                        return;
-                    }
-                    
-                    const { error } = await this.supabase
-                        .from('product_sizes')
-                        .update({ 
-                            stock_quantity: stock,
-                            updated_at: new Date().toISOString()
-                        })
-                        .eq('id', sizeId);
-                    
-                    if (error) throw error;
-                    
-                    // Update local array
-                    const sizeIndex = this.currentProductSizes.findIndex(s => s.id === sizeId);
-                    if (sizeIndex !== -1) {
-                        this.currentProductSizes[sizeIndex].stock_quantity = stock;
-                    }
-                    
-                    this.showToast('Stock updated successfully', 'success');
-                    
-                } catch (error) {
-                    console.error('Error updating stock:', error);
-                    this.showToast('Failed to update stock: ' + error.message, 'error');
-                }
-            }
-
-            async saveProduct(event) {
-                if (event) event.preventDefault();
+            
+            async function saveProduct(event) {
+                event.preventDefault();
                 
                 const productId = document.getElementById('editProductId').value;
-                const isNew = !productId;
+                const isFootwear = document.getElementById('editIsFootwear').value === 'true';
                 
-                // Build product data with ONLY existing columns
-                const productData = {
+                const updates = {
                     name: document.getElementById('editName').value.trim(),
                     price: parseFloat(document.getElementById('editPrice').value),
-                    compare_price: parseFloat(document.getElementById('editComparePrice').value) || 0,
                     category_id: parseInt(document.getElementById('editCategory').value),
                     description: document.getElementById('editDescription').value.trim(),
-                    image_url: document.getElementById('productImageUrl').value.trim(),
                     updated_at: new Date().toISOString()
                 };
                 
-                // Add stock only for non-footwear products
-                if (!this.isFootwear) {
-                    productData.stock = parseInt(document.getElementById('editStock').value) || 0;
+                // For non-footwear, update stock in products table
+                if (!isFootwear) {
+                    updates.stock = parseInt(document.getElementById('editStock').value) || 0;
                 }
                 
-                // Validate required fields
-                if (!productData.name || !productData.price || !productData.category_id) {
-                    this.showToast('Please fill in all required fields', 'warning');
+                // Validate
+                if (!updates.name || updates.price <= 0) {
+                    showToast('Please fill all required fields correctly', 'warning');
                     return;
                 }
-
+                
                 try {
-                    let result;
+                    console.log('💾 Saving product:', updates);
                     
-                    if (isNew) {
-                        productData.created_at = new Date().toISOString();
-                        productData.is_active = true;
+                    const { data, error } = await supabase
+                        .from('products')
+                        .update(updates)
+                        .eq('id', productId)
+                        .select();
+                    
+                    if (error) {
+                        console.error('❌ Save error:', error);
                         
-                        const { data, error } = await this.supabase
-                            .from('products')
-                            .insert([productData])
-                            .select();
-                        
-                        if (error) throw error;
-                        result = data[0];
-                        this.products.push(result);
-                        
-                        this.showToast('Product created successfully!', 'success');
-                    } else {
-                        const { data, error } = await this.supabase
-                            .from('products')
-                            .update(productData)
-                            .eq('id', productId)
-                            .select();
-                        
-                        if (error) throw error;
-                        result = data[0];
-                        
-                        // Update local array
-                        const index = this.products.findIndex(p => p.id === parseInt(productId));
-                        if (index !== -1) {
-                            this.products[index] = { ...this.products[index], ...productData };
+                        if (error.code === '42501') {
+                            showToast('Permission Denied: Please disable RLS in Supabase', 'error');
+                            alert('🚨 RLS POLICY ERROR\n\nTo fix write operations:\n\n1. Go to Supabase Dashboard → SQL Editor\n2. Run: ALTER TABLE products DISABLE ROW LEVEL SECURITY;\n3. Run: ALTER TABLE product_colors DISABLE ROW LEVEL SECURITY;\n4. Run: ALTER TABLE product_sizes DISABLE ROW LEVEL SECURITY;\n\nThen refresh this page.');
+                            return;
                         }
                         
-                        this.showToast('Product updated successfully!', 'success');
+                        throw error;
                     }
-
-                    // Update badges and reload current section
-                    this.updateBadges();
-                    await this.showSection(this.currentSection);
                     
-                    // Close modal after delay
+                    console.log('✅ Save successful:', data);
+                    
+                    // Update local data
+                    const index = products.findIndex(p => p.id === productId);
+                    if (index !== -1) {
+                        products[index] = { ...products[index], ...updates };
+                    }
+                    
+                    // Update UI
+                    updateStats();
+                    renderProducts();
+                    
+                    // Show success
+                    showToast('✅ Product updated successfully!', 'success');
+                    
+                    // Close modal after a delay
                     setTimeout(() => {
-                        this.closeModal();
+                        closeModal();
                     }, 1500);
-
+                    
                 } catch (error) {
-                    console.error('Save error:', error);
-                    this.showToast('Failed to save product: ' + error.message, 'error');
+                    console.error('❌ Save failed:', error);
+                    showToast('❌ Failed to save: ' + error.message, 'error');
                 }
             }
-
-            async confirmDelete(productId) {
-                const product = this.products.find(p => p.id === productId);
-                if (!product) return;
+            
+            async function testWrite() {
+                // This function tests write operations to debug RLS issues
+                showToast('Testing write operation...', 'info');
                 
-                if (!confirm(`Are you sure you want to delete "${product.name}"? This action cannot be undone.`)) {
+                const testData = {
+                    name: 'Test Product ' + Date.now(),
+                    price: 1000,
+                    stock: 10,
+                    category_id: 1,
+                    description: 'Test product for debugging',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                
+                try {
+                    console.log('🧪 Testing write with data:', testData);
+                    
+                    const { data, error } = await supabase
+                        .from('products')
+                        .insert([testData])
+                        .select();
+                    
+                    if (error) {
+                        console.error('❌ Write test failed:', error);
+                        
+                        if (error.code === '42501') {
+                            showToast('RLS Error: Cannot write to database', 'error');
+                            alert('🚨 CRITICAL: RLS is blocking writes\n\nFix this in Supabase SQL Editor:\n\nALTER TABLE products DISABLE ROW LEVEL SECURITY;');
+                            return;
+                        }
+                        
+                        showToast('Write test failed: ' + error.message, 'error');
+                        return;
+                    }
+                    
+                    console.log('✅ Write test successful!', data);
+                    showToast('✅ Write test successful! Product created.', 'success');
+                    
+                    // Reload data
+                    await loadDashboard();
+                    
+                } catch (error) {
+                    console.error('❌ Unexpected error:', error);
+                    showToast('Unexpected error: ' + error.message, 'error');
+                }
+            }
+            
+            async function confirmDelete(productId) {
+                if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
                     return;
                 }
                 
-                await this.deleteProduct(productId);
+                await deleteProduct(productId);
             }
-
-            async deleteProduct(productId) {
+            
+            async function deleteProduct(productId) {
                 try {
-                    this.showToast('Deleting product...', 'info');
+                    showToast('Deleting product...', 'info');
                     
-                    const { error } = await this.supabase
+                    const { error } = await supabase
                         .from('products')
                         .delete()
                         .eq('id', productId);
                     
-                    if (error) throw error;
+                    if (error) {
+                        if (error.code === '42501') {
+                            showToast('Permission denied: RLS prevents deletion', 'error');
+                            return;
+                        }
+                        throw error;
+                    }
                     
                     // Remove from local array
-                    this.products = this.products.filter(p => p.id !== productId);
+                    products = products.filter(p => p.id !== productId);
                     
                     // Update UI
-                    this.updateBadges();
-                    await this.showSection(this.currentSection);
+                    updateStats();
+                    renderProducts();
                     
-                    this.showToast('✅ Product deleted successfully!', 'success');
+                    showToast('✅ Product deleted successfully!', 'success');
                     
                 } catch (error) {
-                    this.showToast('❌ Failed to delete: ' + error.message, 'error');
+                    showToast('❌ Failed to delete: ' + error.message, 'error');
                 }
             }
-
-            // ====================
-            // COLOR MANAGEMENT (FOOTWEAR)
-            // ====================
-            addColorField() {
-                document.getElementById('newColorForm').style.display = 'block';
-                document.getElementById('newColorName').value = '';
-                document.getElementById('newColorCode').value = '#000000';
-            }
-
-            cancelAddColor() {
-                document.getElementById('newColorForm').style.display = 'none';
-            }
-
-            async saveNewColor() {
+            
+            function deleteCurrentProduct() {
                 const productId = document.getElementById('editProductId').value;
-                const colorName = document.getElementById('newColorName').value.trim();
-                const colorCode = document.getElementById('newColorCode').value;
-                
-                if (!colorName) {
-                    this.showToast('Please enter a color name', 'warning');
-                    return;
-                }
-                
-                try {
-                    const { data, error } = await this.supabase
-                        .from('product_colors')
-                        .insert([{
-                            product_id: productId,
-                            color_name: colorName,
-                            color_code: colorCode,
-                            created_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString()
-                        }])
-                        .select();
-                    
-                    if (error) throw error;
-                    
-                    // Add to local array
-                    this.currentProductColors.push(data[0]);
-                    
-                    // Reload colors and sizes
-                    await this.loadProductColors(productId);
-                    await this.loadProductSizes(productId);
-                    
-                    // Hide form
-                    document.getElementById('newColorForm').style.display = 'none';
-                    
-                    this.showToast('Color added successfully!', 'success');
-                    
-                } catch (error) {
-                    console.error('Error adding color:', error);
-                    this.showToast('Failed to add color: ' + error.message, 'error');
+                if (productId) {
+                    closeModal();
+                    setTimeout(() => confirmDelete(productId), 300);
                 }
             }
-
-            async deleteColor(colorId) {
-                if (!confirm('Are you sure you want to delete this color? This will also delete all size variants for this color.')) {
-                    return;
-                }
-                
-                try {
-                    // First delete all sizes for this color
-                    const { error: sizeError } = await this.supabase
-                        .from('product_sizes')
-                        .delete()
-                        .eq('color_id', colorId);
-                    
-                    if (sizeError) throw sizeError;
-                    
-                    // Then delete the color
-                    const { error: colorError } = await this.supabase
-                        .from('product_colors')
-                        .delete()
-                        .eq('id', colorId);
-                    
-                    if (colorError) throw colorError;
-                    
-                    // Update local arrays
-                    this.currentProductColors = this.currentProductColors.filter(c => c.id !== colorId);
-                    this.currentProductSizes = this.currentProductSizes.filter(s => s.color_id !== colorId);
-                    
-                    // Reload displays
-                    const productId = document.getElementById('editProductId').value;
-                    await this.loadProductColors(productId);
-                    await this.loadProductSizes(productId);
-                    
-                    this.showToast('Color deleted successfully', 'success');
-                    
-                } catch (error) {
-                    console.error('Error deleting color:', error);
-                    this.showToast('Failed to delete color: ' + error.message, 'error');
-                }
-            }
-
-            closeModal() {
-                document.getElementById('productModal').style.display = 'none';
-                document.getElementById('productForm').reset();
-                document.getElementById('currentProductImage').style.display = 'none';
-                document.getElementById('variantSection').style.display = 'none';
-                document.getElementById('newColorForm').style.display = 'none';
-                this.currentProductColors = [];
-                this.currentProductSizes = [];
-                this.isFootwear = false;
-            }
-
-            showToast(message, type = 'info') {
+            
+            function showToast(message, type = 'info') {
                 const container = document.getElementById('toastContainer');
                 if (!container) return;
                 
@@ -2207,169 +1359,64 @@
                 
                 // Auto-remove after 5 seconds
                 setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateX(100%)';
+                    toast.style.animation = 'toastSlide 0.3s ease reverse';
                     setTimeout(() => toast.remove(), 300);
                 }, 5000);
             }
-
-            updateStatus(text, status) {
+            
+            function updateConnectionStatus(text, status) {
                 const dot = document.getElementById('statusDot');
                 const textEl = document.getElementById('statusText');
                 
                 if (dot) {
                     dot.className = 'status-dot';
-                    if (status === 'success') {
-                        dot.classList.add('connected');
-                    }
+                    if (status === 'success') dot.classList.add('connected');
+                    if (status === 'error') dot.style.background = '#e74c3c';
+                    if (status === 'warning') dot.style.background = '#f39c12';
                 }
                 
                 if (textEl) {
                     textEl.textContent = text;
                 }
             }
-
-            setupEventListeners() {
+            
+            function closeModal() {
+                document.getElementById('productModal').style.display = 'none';
+                document.getElementById('productForm').reset();
+            }
+            
+            function setupEventListeners() {
                 // Navigation
                 document.querySelectorAll('.nav-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const section = item.dataset.section;
-                        this.showSection(section);
+                    item.addEventListener('click', function() {
+                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        const section = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+                        showToast(`Switching to ${section} section`, 'info');
                     });
                 });
-
-                // Add Product Button
-                document.getElementById('addProductBtn').addEventListener('click', () => {
-                    this.openProductModal(null);
-                });
-
-                // Refresh Button
-                document.getElementById('refreshData').addEventListener('click', async () => {
-                    await this.loadDashboardData();
-                    await this.showSection(this.currentSection);
-                    this.showToast('Data refreshed successfully!', 'success');
-                });
-
-                // Modal events
-                document.getElementById('closeModal').addEventListener('click', () => {
-                    this.closeModal();
-                });
-
-                document.getElementById('cancelEdit').addEventListener('click', () => {
-                    this.closeModal();
-                });
-
-                document.getElementById('saveProductBtn').addEventListener('click', (e) => {
-                    this.saveProduct(e);
-                });
-
-                document.getElementById('deleteProductBtn').addEventListener('click', () => {
-                    const productId = document.getElementById('editProductId').value;
-                    if (productId) {
-                        this.closeModal();
-                        setTimeout(() => this.confirmDelete(parseInt(productId)), 300);
-                    }
-                });
-
-                // Image upload
-                document.getElementById('imageUpload').addEventListener('click', () => {
-                    document.getElementById('imageFile').click();
-                });
-
-                document.getElementById('imageFile').addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            const imagePreview = document.getElementById('currentProductImage');
-                            imagePreview.src = event.target.result;
-                            imagePreview.style.display = 'block';
-                            
-                            // Store filename
-                            document.getElementById('productImageUrl').value = `uploaded_${Date.now()}_${file.name}`;
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-
-                // Category change - update variant section visibility
-                document.getElementById('editCategory').addEventListener('change', (e) => {
-                    const categoryId = e.target.value;
-                    const category = this.categories.find(c => c.id == categoryId);
-                    const isFootwear = category?.slug?.includes('footwear') || false;
-                    
-                    const variantSection = document.getElementById('variantSection');
-                    const stockFieldContainer = document.getElementById('stockFieldContainer');
-                    const stockNote = document.getElementById('stockNote');
-                    
-                    if (isFootwear) {
-                        variantSection.style.display = 'block';
-                        stockFieldContainer.style.display = 'none';
-                    } else {
-                        variantSection.style.display = 'none';
-                        stockFieldContainer.style.display = 'block';
-                        stockNote.textContent = 'For non-footwear products only';
-                    }
-                });
-
-                // Close modal on overlay click
-                document.getElementById('productModal').addEventListener('click', (e) => {
-                    if (e.target === document.getElementById('productModal')) {
-                        this.closeModal();
-                    }
-                });
-
-                // Keyboard shortcuts
-                document.addEventListener('keydown', (e) => {
-                    // Escape to close modal
-                    if (e.key === 'Escape') {
-                        if (document.getElementById('productModal').style.display === 'flex') {
-                            this.closeModal();
-                        }
-                    }
-                });
             }
-
-            openProductModal(productId = null) {
-                if (productId === null) {
-                    // Add new product
-                    document.getElementById('modalTitle').textContent = 'Add New Product';
-                    document.getElementById('deleteProductBtn').style.display = 'none';
-                    
-                    // Reset form
-                    document.getElementById('productForm').reset();
-                    document.getElementById('editProductId').value = '';
-                    document.getElementById('currentProductImage').style.display = 'none';
-                    document.getElementById('productImageUrl').value = '';
-                    document.getElementById('variantSection').style.display = 'none';
-                    document.getElementById('newColorForm').style.display = 'none';
-                    
-                    // Populate category dropdown
-                    const categorySelect = document.getElementById('editCategory');
-                    categorySelect.innerHTML = `
-                        <option value="">Select Category</option>
-                        ${this.categories.map(cat => `
-                            <option value="${cat.id}">${cat.name}</option>
-                        `).join('')}
-                    `;
-                    
-                    // Show stock field by default
-                    document.getElementById('stockFieldContainer').style.display = 'block';
-                    document.getElementById('stockNote').textContent = 'For non-footwear products only';
-                }
-                
-                // Show modal
-                document.getElementById('productModal').style.display = 'flex';
-            }
-        }
-
-        // Initialize dashboard
-        let admin;
-        document.addEventListener('DOMContentLoaded', () => {
-            admin = new JMPAdminDashboard();
-            window.admin = admin; // Make available globally
+            
+            // Public API
+            return {
+                init,
+                editProduct,
+                saveProduct,
+                testWrite,
+                confirmDelete,
+                deleteCurrentProduct,
+                closeModal,
+                showToast
+            };
+        })();
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            AdminDashboard.init();
         });
+        
+        // Make AdminDashboard available globally for onclick handlers
+        window.AdminDashboard = AdminDashboard;
     </script>
 </body>
 </html>
