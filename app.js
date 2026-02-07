@@ -386,8 +386,8 @@
                     
                     <!-- Action Buttons -->
                     <div class="action-buttons">
-                        <button class="btn btn-primary btn-add-cart" id="pageAddToCart">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        <button class="btn btn-primary btn-place-order" id="pagePlaceOrder">
+                            <i class="fas fa-shopping-bag"></i> Place Order
                         </button>
                         <button class="btn btn-secondary btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist">
                             <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
@@ -774,6 +774,17 @@
                 gap: 10px;
             }
             
+            .btn-place-order {
+                background: var(--gold);
+                color: #000;
+                font-weight: bold;
+            }
+            
+            .btn-place-order:hover {
+                background: #e0c04c;
+                color: #000;
+            }
+            
             .btn-wishlist.active {
                 background: #e74c3c;
             }
@@ -942,10 +953,10 @@
             });
         });
         
-        // Add to Cart button
-        const pageAddToCart = document.getElementById('pageAddToCart');
-        if (pageAddToCart && currentProduct) {
-            pageAddToCart.addEventListener('click', () => {
+        // Place Order button
+        const pagePlaceOrder = document.getElementById('pagePlaceOrder');
+        if (pagePlaceOrder && currentProduct) {
+            pagePlaceOrder.addEventListener('click', () => {
                 // For footwear, validate selection
                 const isFootwear = ['mensfootwear', 'womensfootwear'].includes(
                     currentProduct.category_slug || getCurrentCategory()
@@ -972,7 +983,7 @@
                         return;
                     }
                     
-                    // Add to cart with variant details
+                    // Add to cart with variant details and proceed to checkout
                     addToCart(currentProduct, currentSelectedQuantity, {
                         color_id: currentSelectedColor.id,
                         color_name: currentSelectedColor.name,
@@ -980,14 +991,20 @@
                         size_value: currentSelectedSize.value,
                         variant_id: currentSelectedVariant?.id
                     });
+                    
+                    // Redirect to WhatsApp checkout
+                    triggerWhatsAppCheckout();
                 } else {
-                    // For non-footwear, simple add to cart
+                    // For non-footwear
                     if (currentSelectedQuantity > currentProduct.stock) {
                         showNotification(`Only ${currentProduct.stock} units available`, 'error');
                         return;
                     }
                     
                     addToCart(currentProduct, currentSelectedQuantity);
+                    
+                    // Redirect to WhatsApp checkout
+                    triggerWhatsAppCheckout();
                 }
             });
         }
@@ -1149,10 +1166,10 @@
             
             console.log(`✅ Found category: ${category.name} (ID: ${category.id})`);
             
-            // Get products for this category
+            // Get products for this category - FIXED: Added slug to select
             const { data: products, error: prodError } = await supabase
                 .from('products')
-                .select('id, name, price, image_url, stock, slug')
+                .select('id, name, price, image_url, stock, slug, description')
                 .eq('category_id', category.id)
                 .eq('is_active', true)
                 .order('created_at', { ascending: false });
@@ -1210,7 +1227,7 @@
             productCard.setAttribute('role', 'article');
             productCard.setAttribute('aria-label', `View details for ${product.name}`);
             productCard.innerHTML = `
-                <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" class="product-card-clickable">
+                <div class="product-card-content">
                     <div class="product-image">
                         <img src="${imageUrl}" alt="${product.name}" 
                              onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
@@ -1228,8 +1245,11 @@
                         <div class="availability">
                             <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                         </div>
+                        <button class="btn-place-order-card" data-slug="${product.slug || product.id}">
+                            <i class="fas fa-shopping-bag"></i> Place Order
+                        </button>
                     </div>
-                </a>
+                </div>
             `;
             
             productsGrid.appendChild(productCard);
@@ -1245,12 +1265,12 @@
     function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // Wishlist buttons - prevent navigation when clicking inside clickable cards
+        // Wishlist buttons
         document.addEventListener('click', function(event) {
             const wishlistBtn = event.target.closest('.wishlist-btn');
             if (wishlistBtn) {
                 event.preventDefault();
-                event.stopPropagation(); // Prevent card navigation
+                event.stopPropagation();
                 
                 const productId = parseInt(wishlistBtn.getAttribute('data-id'));
                 const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
@@ -1263,6 +1283,20 @@
                     const isInWishlist = wishlist.some(item => item.id === productId);
                     wishlistBtn.classList.toggle('active', isInWishlist);
                     wishlistBtn.setAttribute('aria-label', isInWishlist ? 'Remove from wishlist' : 'Add to wishlist');
+                }
+            }
+            
+            // Place Order buttons on product cards
+            const placeOrderBtn = event.target.closest('.btn-place-order-card');
+            if (placeOrderBtn) {
+                event.preventDefault();
+                const slug = placeOrderBtn.getAttribute('data-slug');
+                if (slug) {
+                    // Direct WhatsApp order - no cart addition
+                    const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.slug === slug || p.id == slug);
+                    if (product) {
+                        triggerWhatsAppOrder(product, 1);
+                    }
                 }
             }
         });
@@ -1315,6 +1349,62 @@
         notificationText += ' added to cart!';
         
         showNotification(notificationText, 'success');
+    }
+    
+    function triggerWhatsAppOrder(product, quantity = 1, options = {}) {
+        // Build WhatsApp message for direct order
+        let text = `I would like to place an order:\n\n`;
+        text += `*Product:* ${product.name}\n`;
+        
+        if (options.color_name) {
+            text += `*Color:* ${options.color_name}\n`;
+        }
+        
+        if (options.size_value) {
+            text += `*Size:* ${options.size_value}\n`;
+        }
+        
+        text += `*Quantity:* ${quantity}\n`;
+        text += `*Price per unit:* ${formatPrice(product.price)}\n`;
+        text += `*Total:* ${formatPrice(product.price * quantity)}\n\n`;
+        text += `Please confirm availability and provide payment/shipping details.`;
+        
+        const phone = "2348139583320"; // Your WhatsApp number
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+        
+        window.open(url, '_blank');
+    }
+    
+    function triggerWhatsAppCheckout() {
+        const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+        
+        if (cart.length === 0) {
+            showNotification('Cart is empty', 'warning');
+            return;
+        }
+        
+        let text = "I would like to purchase:\n\n";
+        let total = 0;
+        
+        cart.forEach((item, index) => {
+            const itemTotal = (item.price || 0) * item.quantity;
+            total += itemTotal;
+            
+            let itemDescription = item.name;
+            if (item.color_name) itemDescription += ` (${item.color_name})`;
+            if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
+            
+            text += `${index + 1}. ${itemDescription}\n`;
+            text += `   Quantity: ${item.quantity} × ${formatPrice(item.price)} = ${formatPrice(itemTotal)}\n\n`;
+        });
+        
+        text += `*Total: ${formatPrice(total)}*\n\n`;
+        text += `Please confirm order & shipping details.`;
+        
+        const phone = "2348139583320"; // Your WhatsApp number
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+        
+        window.open(url, '_blank');
     }
     
     function updateCartUI() {
@@ -1387,9 +1477,9 @@
                 <button class="btn btn-primary btn-checkout" id="checkoutButton">
                     <i class="fas fa-shopping-bag"></i> Proceed to Checkout
                 </button>
-                <a href="#" class="btn btn-secondary btn-whatsapp" id="whatsappCheckout">
+                <button class="btn btn-success btn-whatsapp" id="whatsappCheckout">
                     <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
-                </a>
+                </button>
             </div>
         `;
         
@@ -1400,26 +1490,16 @@
         const checkoutBtn = document.getElementById('checkoutButton');
         if (checkoutBtn) {
             checkoutBtn.addEventListener('click', function() {
-                // You can redirect to a checkout page or show a checkout modal
-                // For now, we'll use WhatsApp as the checkout method
-                document.getElementById('whatsappCheckout')?.click();
+                triggerWhatsAppCheckout();
             });
         }
         
-        // Update WhatsApp checkout link
+        // Setup WhatsApp checkout button
         const whatsappCheckout = document.getElementById('whatsappCheckout');
         if (whatsappCheckout) {
-            let text = "I would like to purchase:\n";
-            cart.forEach(item => {
-                let itemDescription = item.name;
-                if (item.color_name) itemDescription += ` (${item.color_name})`;
-                if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
-                
-                const itemTotal = (item.price || 0) * item.quantity;
-                text += `- ${itemDescription} (${item.quantity} × ${formatPrice(item.price)}) = ${formatPrice(itemTotal)}\n`;
+            whatsappCheckout.addEventListener('click', function() {
+                triggerWhatsAppCheckout();
             });
-            text += `\n*Total: ${formatPrice(total)}*\n\nPlease confirm order & shipping details.`;
-            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
         }
         
         setupCartInteractions();
@@ -1561,14 +1641,15 @@
     // ====================
     if (!window.JMPOTTERS) {
         window.JMPOTTERS = {
-            openProductModal,
             addToCart,
             toggleWishlist,
             initializePage,
             formatPrice,
             loadSingleProductBySlug,
             getImageUrl,
-            loadProductsByCategory
+            loadProductsByCategory,
+            triggerWhatsAppOrder,
+            triggerWhatsAppCheckout
         };
     }
     
