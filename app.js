@@ -1228,7 +1228,7 @@
                     <div class="action-buttons">
                         <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
                            class="btn-view-details">
-                            <i class="fas fa-eye"></i> PLACE ORDER
+                            <i class="fas fa-eye"></i> Place Order
                         </a>
                     </div>
                 </div>
