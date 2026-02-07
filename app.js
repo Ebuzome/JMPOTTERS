@@ -51,6 +51,9 @@
     let colorSizeMap = {};
     let sizeColorMap = {};
     
+    // Cart panel state
+    let isCartOpen = false;
+    
     // ====================
     // UTILITY FUNCTIONS
     // ====================
@@ -107,11 +110,45 @@
     function showNotification(message, type = 'success') {
         console.log(`${type.toUpperCase()}: ${message}`);
         
-        const toastContainer = document.getElementById('toastContainer');
-        if (!toastContainer) return;
+        // Create or get notification container
+        let notificationContainer = document.getElementById('notificationContainer');
+        if (!notificationContainer) {
+            notificationContainer = document.createElement('div');
+            notificationContainer.id = 'notificationContainer';
+            notificationContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+            `;
+            document.body.appendChild(notificationContainer);
+        }
         
         const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
+        toast.className = `notification ${type}`;
+        toast.style.cssText = `
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 200px;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        `;
+        
+        if (type === 'success') {
+            toast.style.background = '#38a169';
+        } else if (type === 'error') {
+            toast.style.background = '#e53e3e';
+        } else if (type === 'warning') {
+            toast.style.background = '#d69e2e';
+        } else {
+            toast.style.background = '#4a5568';
+        }
         
         const icons = {
             success: 'fas fa-check-circle',
@@ -121,17 +158,30 @@
         };
         
         toast.innerHTML = `
-            <i class="${icons[type] || icons.info} toast-icon"></i>
+            <i class="${icons[type] || icons.info}" style="font-size: 18px;"></i>
             <span>${message}</span>
         `;
         
-        toastContainer.appendChild(toast);
+        notificationContainer.appendChild(toast);
         
-        setTimeout(() => toast.classList.add('show'), 100);
+        // Add slideIn animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
         setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 500);
-        }, 5000);
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
     
     // ====================
@@ -1204,41 +1254,69 @@
             const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
             const isInWishlist = wishlist.some(item => item.id === product.id);
             
+            // Create a wrapper link for the entire product card
+            const productLink = document.createElement('a');
+            productLink.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
+            productLink.className = 'product-card-link';
+            productLink.style.cssText = `
+                display: block;
+                text-decoration: none;
+                color: inherit;
+            `;
+            
+            // Create the product card
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.setAttribute('data-aos', 'fade-up');
+            productCard.style.cssText = `
+                cursor: pointer;
+                transition: transform 0.3s, box-shadow 0.3s;
+                border-radius: 10px;
+                overflow: hidden;
+                background: rgba(0, 0, 0, 0.2);
+                height: 100%;
+            `;
+            
             productCard.innerHTML = `
-                <div class="product-image">
+                <div class="product-image" style="position: relative;">
                     <img src="${imageUrl}" alt="${product.name}" 
+                         style="width: 100%; height: 250px; object-fit: cover;"
                          onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
                     <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
-                            data-id="${product.id}">
+                            data-id="${product.id}"
+                            style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); border: none; width: 36px; height: 36px; border-radius: 50%; color: ${isInWishlist ? '#e74c3c' : 'white'}; cursor: pointer; z-index: 10;">
                         <i class="fas fa-heart"></i>
                     </button>
                 </div>
-                <div class="product-info">
-                    <h3 class="product-title">${product.name}</h3>
-                    <div class="product-price">
-                        <span class="price-real">${formatPrice(product.price)}</span>
+                <div class="product-info" style="padding: 15px;">
+                    <h3 class="product-title" style="margin: 0 0 10px 0; font-size: 1.1rem; color: white;">${product.name}</h3>
+                    <div class="product-price" style="margin-bottom: 8px;">
+                        <span class="price-real" style="font-size: 1.2rem; font-weight: bold; color: #d4af37;">${formatPrice(product.price)}</span>
                     </div>
-                    <div class="availability">
-                        <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
-                           class="btn-view-details">
-                            <i class="fas fa-eye"></i> Place Order
-                        </a>
+                    <div class="availability" style="display: flex; align-items: center; gap: 5px; color: ${product.stock > 0 ? '#2ecc71' : '#e74c3c'}; font-size: 0.9rem;">
+                        <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i> 
+                        ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                     </div>
                 </div>
             `;
             
-            productsGrid.appendChild(productCard);
+            // Add hover effect
+            productCard.addEventListener('mouseenter', () => {
+                productCard.style.transform = 'translateY(-5px)';
+                productCard.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
+            });
+            
+            productCard.addEventListener('mouseleave', () => {
+                productCard.style.transform = 'translateY(0)';
+                productCard.style.boxShadow = 'none';
+            });
+            
+            productLink.appendChild(productCard);
+            productsGrid.appendChild(productLink);
         });
         
         setupProductInteractions();
-        console.log(`✅ Rendered ${products.length} products`);
+        console.log(`✅ Rendered ${products.length} products with clickable cards`);
     }
     
     // ====================
@@ -1317,16 +1395,21 @@
     function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // Wishlist buttons
+        // Wishlist buttons - using event delegation
         document.addEventListener('click', function(event) {
             const wishlistBtn = event.target.closest('.wishlist-btn');
             if (wishlistBtn) {
                 event.preventDefault();
+                event.stopPropagation(); // Prevent card click
                 const productId = parseInt(wishlistBtn.getAttribute('data-id'));
                 const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
                 
                 if (product) {
                     toggleWishlist(product);
+                    // Update button appearance
+                    wishlistBtn.innerHTML = `<i class="fas fa-heart"></i>`;
+                    wishlistBtn.style.color = '#e74c3c';
+                    wishlistBtn.classList.add('active');
                 }
             }
         });
@@ -1379,17 +1462,21 @@
         notificationText += ' added to cart!';
         
         showNotification(notificationText, 'success');
+        
+        // Open cart panel
+        openCart();
     }
     
     function updateCartUI() {
         const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const cartCount = document.getElementById('cartCount');
         
-        if (cartCount) {
+        // Update cart count in multiple possible locations
+        const cartCounts = document.querySelectorAll('#cartCount, .cart-count');
+        cartCounts.forEach(cartCount => {
             cartCount.textContent = totalItems;
             cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
-        }
+        });
         
         updateCartPanel();
     }
@@ -1423,18 +1510,18 @@
             if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
             
             html += `
-                <div class="cart-item">
-                    <div class="cart-item-image">
-                        <img src="${getImageUrl(item.category_slug, item.image_url)}" alt="${item.name}">
+                <div class="cart-item" style="display: flex; align-items: center; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); gap: 12px;">
+                    <div class="cart-item-image" style="width: 60px; height: 60px; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+                        <img src="${getImageUrl(item.category_slug, item.image_url)}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
-                    <div class="cart-item-details">
-                        <div class="cart-item-name">${itemDescription}</div>
-                        <div class="cart-item-price">${formatPrice(item.price)}</div>
-                        <div class="cart-item-quantity-display">
+                    <div class="cart-item-details" style="flex: 1; min-width: 0;">
+                        <div class="cart-item-name" style="font-weight: 500; color: white; margin-bottom: 4px; font-size: 0.95rem;">${itemDescription}</div>
+                        <div class="cart-item-price" style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">${formatPrice(item.price)}</div>
+                        <div class="cart-item-quantity-display" style="color: #ddd; font-size: 0.9rem;">
                             Quantity: <strong>${item.quantity}</strong>
                         </div>
                     </div>
-                    <button class="cart-item-remove" data-index="${index}">
+                    <button class="cart-item-remove" data-index="${index}" style="background: rgba(231, 76, 60, 0.2); border: none; color: #e74c3c; width: 35px; height: 35px; border-radius: 6px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -1443,15 +1530,15 @@
         
         // Add checkout section
         html += `
-            <div class="cart-checkout-section">
-                <div class="cart-total-row">
+            <div class="cart-checkout-section" style="padding: 20px; background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1);">
+                <div class="cart-total-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; color: white;">
                     <span>Total:</span>
-                    <span class="cart-total-amount">${formatPrice(total)}</span>
+                    <span class="cart-total-amount" style="color: #d4af37; font-size: 1.3rem;">${formatPrice(total)}</span>
                 </div>
-                <button class="btn btn-primary btn-checkout" id="checkoutButton">
+                <button class="btn btn-primary btn-checkout" id="checkoutButton" style="width: 100%; padding: 15px; margin-bottom: 10px; background: #d4af37; color: black; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
                     <i class="fas fa-shopping-bag"></i> Proceed to Checkout
                 </button>
-                <a href="#" class="btn btn-secondary btn-whatsapp" id="whatsappCheckout">
+                <a href="#" class="btn btn-secondary btn-whatsapp" id="whatsappCheckout" target="_blank" style="width: 100%; padding: 15px; background: #25D366; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none;">
                     <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
                 </a>
             </div>
@@ -1464,8 +1551,7 @@
         const checkoutBtn = document.getElementById('checkoutButton');
         if (checkoutBtn) {
             checkoutBtn.addEventListener('click', function() {
-                // You can redirect to a checkout page or show a checkout modal
-                // For now, we'll use WhatsApp as the checkout method
+                // Use WhatsApp as the checkout method
                 document.getElementById('whatsappCheckout')?.click();
             });
         }
@@ -1539,178 +1625,127 @@
     }
     
     // ====================
-    // HEADER CART/WISHLIST UNIVERSAL SETUP
+    // CART PANEL FUNCTIONS
     // ====================
-    function ensureHeaderIconsExist() {
-        // This function helps ensure cart/wishlist icons are present on all pages
-        // You should have these in your HTML header:
-        // <button id="cartIcon"><i class="fas fa-shopping-cart"></i><span id="cartCount">0</span></button>
-        // <button id="wishlistIcon"><i class="fas fa-heart"></i><span id="wishlistCount">0</span></button>
+    function openCart() {
+        isCartOpen = true;
+        const cartPanel = document.getElementById('cartPanel');
+        const overlay = document.getElementById('overlay');
         
-        // If icons don't exist, you might need to add them to your HTML template
-        if (!document.getElementById('cartIcon')) {
-            console.warn('⚠️ Cart icon not found in HTML. Please add: <button id="cartIcon"><i class="fas fa-shopping-cart"></i><span id="cartCount">0</span></button>');
+        if (cartPanel) {
+            cartPanel.classList.add('active');
+            // Ensure cart panel is visible
+            cartPanel.style.cssText = `
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 100%;
+                max-width: 400px;
+                height: 100vh;
+                background: #1e293b;
+                z-index: 1000;
+                transform: translateX(0);
+                transition: transform 0.3s ease;
+                overflow-y: auto;
+            `;
         }
         
-        if (!document.getElementById('wishlistIcon')) {
-            console.warn('⚠️ Wishlist icon not found in HTML. Please add: <button id="wishlistIcon"><i class="fas fa-heart"></i><span id="wishlistCount">0</span></button>');
+        if (overlay) {
+            overlay.style.display = 'block';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            `;
         }
         
-        // Setup cart toggle
-        const cartIcon = document.getElementById('cartIcon');
-        if (cartIcon) {
-            cartIcon.addEventListener('click', function() {
-                const cartPanel = document.getElementById('cartPanel');
-                if (cartPanel) {
-                    cartPanel.classList.toggle('active');
-                }
-            });
+        document.body.style.overflow = 'hidden';
+        updateCartPanel();
+    }
+    
+    function closeCart() {
+        isCartOpen = false;
+        const cartPanel = document.getElementById('cartPanel');
+        const overlay = document.getElementById('overlay');
+        
+        if (cartPanel) {
+            cartPanel.classList.remove('active');
+            cartPanel.style.transform = 'translateX(100%)';
         }
         
-        // Setup wishlist toggle (if you have a wishlist panel)
-        const wishlistIcon = document.getElementById('wishlistIcon');
-        if (wishlistIcon) {
-            wishlistIcon.addEventListener('click', function() {
-                // Redirect to wishlist page or open wishlist panel
-                window.location.href = 'wishlist.html'; // You'll need to create this page
-            });
+        if (overlay) {
+            overlay.style.display = 'none';
         }
+        
+        document.body.style.overflow = '';
     }
     
     // ====================
-    // CART STYLES INJECTION
+    // HEADER CART/WISHLIST UNIVERSAL SETUP
     // ====================
-    function injectCartStyles() {
-        if (document.getElementById('cart-styles')) return;
+    function ensureHeaderIconsExist() {
+        console.log('🔧 Setting up header icons...');
         
-        const style = document.createElement('style');
-        style.id = 'cart-styles';
-        style.textContent = `
-            .cart-item {
-                display: flex;
-                align-items: center;
-                padding: 15px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                gap: 15px;
+        // Setup cart button - check for multiple possible IDs
+        const cartButtons = [
+            document.getElementById('cartBtn'),
+            document.getElementById('cartIcon'),
+            document.querySelector('[data-cart-button]')
+        ].filter(btn => btn !== null);
+        
+        if (cartButtons.length > 0) {
+            cartButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🛒 Cart button clicked');
+                    openCart();
+                });
+            });
+        } else {
+            console.warn('⚠️ No cart button found. Please add a cart button with id="cartBtn" or id="cartIcon"');
+        }
+        
+        // Setup wishlist button
+        const wishlistButtons = [
+            document.getElementById('wishlistBtn'),
+            document.getElementById('wishlistIcon'),
+            document.querySelector('[data-wishlist-button]')
+        ].filter(btn => btn !== null);
+        
+        if (wishlistButtons.length > 0) {
+            wishlistButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Redirect to wishlist page or show wishlist
+                    console.log('❤️ Wishlist button clicked');
+                    // For now, just show a notification
+                    showNotification('Wishlist feature coming soon!', 'info');
+                });
+            });
+        }
+        
+        // Setup close cart button
+        const closeCartBtn = document.getElementById('closeCartBtn');
+        if (closeCartBtn) {
+            closeCartBtn.addEventListener('click', closeCart);
+        }
+        
+        // Setup overlay to close cart
+        const overlay = document.getElementById('overlay');
+        if (overlay) {
+            overlay.addEventListener('click', closeCart);
+        }
+        
+        // Close cart with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isCartOpen) {
+                closeCart();
             }
-            
-            .cart-item-image {
-                width: 60px;
-                height: 60px;
-                border-radius: 6px;
-                overflow: hidden;
-                flex-shrink: 0;
-            }
-            
-            .cart-item-image img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                display: block;
-            }
-            
-            .cart-item-details {
-                flex: 1;
-                min-width: 0;
-            }
-            
-            .cart-item-name {
-                font-weight: 500;
-                color: white;
-                margin-bottom: 5px;
-                font-size: 0.95rem;
-            }
-            
-            .cart-item-price {
-                color: var(--gold);
-                font-weight: bold;
-                margin-bottom: 5px;
-            }
-            
-            .cart-item-quantity-display {
-                color: #ddd;
-                font-size: 0.9rem;
-            }
-            
-            .cart-item-remove {
-                background: rgba(231, 76, 60, 0.2);
-                border: none;
-                color: #e74c3c;
-                width: 35px;
-                height: 35px;
-                border-radius: 6px;
-                cursor: pointer;
-                transition: background 0.3s;
-                flex-shrink: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            
-            .cart-item-remove:hover {
-                background: rgba(231, 76, 60, 0.3);
-            }
-            
-            .cart-empty {
-                text-align: center;
-                padding: 40px 20px;
-                color: #888;
-                font-style: italic;
-            }
-            
-            .cart-checkout-section {
-                padding: 20px;
-                background: rgba(0, 0, 0, 0.2);
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            
-            .cart-total-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 15px;
-                font-size: 1.2rem;
-                font-weight: bold;
-                color: white;
-            }
-            
-            .cart-total-amount {
-                color: var(--gold);
-                font-size: 1.3rem;
-            }
-            
-            .btn-checkout {
-                width: 100%;
-                padding: 15px;
-                margin-bottom: 10px;
-                font-size: 1.1rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-            }
-            
-            .btn-whatsapp {
-                width: 100%;
-                padding: 15px;
-                background: #25D366;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: 1.1rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                text-decoration: none;
-                transition: background 0.3s;
-            }
-            
-            .btn-whatsapp:hover {
-                background: #1da851;
-            }
-        `;
-        document.head.appendChild(style);
+        });
     }
     
     // ====================
@@ -1731,9 +1766,6 @@
         
         // Ensure header icons exist and work
         ensureHeaderIconsExist();
-        
-        // Inject cart styles
-        injectCartStyles();
         
         // Initialize UI
         updateCartUI();
@@ -1756,18 +1788,6 @@
             }
         }
         
-        // Setup modal close button (for backward compatibility)
-        const modalClose = document.getElementById('modalClose');
-        if (modalClose) {
-            modalClose.addEventListener('click', () => {
-                const modalOverlay = document.getElementById('modalOverlay');
-                if (modalOverlay) {
-                    modalOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        }
-        
         console.log('✅ JMPOTTERS initialized successfully');
     }
     
@@ -1783,7 +1803,9 @@
             formatPrice,
             loadSingleProductBySlug,
             getImageUrl,
-            loadProductsByCategory
+            loadProductsByCategory,
+            openCart,
+            closeCart
         };
     }
     
@@ -1796,5 +1818,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with Simplified Product Display and Fixed Cart');
+    console.log('✅ JMPOTTERS app loaded with Clickable Product Cards and Fixed Cart');
 })();
