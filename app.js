@@ -1207,29 +1207,45 @@
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.setAttribute('data-aos', 'fade-up');
-            productCard.setAttribute('role', 'article');
-            productCard.setAttribute('aria-label', `View details for ${product.name}`);
             productCard.innerHTML = `
-                <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" class="product-card-clickable">
-                    <div class="product-image">
-                        <img src="${imageUrl}" alt="${product.name}" 
-                             onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
-                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
-                                data-id="${product.id}"
-                                aria-label="${isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}">
-                            <i class="fas fa-heart"></i>
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${product.name}" 
+                         onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                    <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
+                            data-id="${product.id}">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <div class="product-price">
+                        <span class="price-real">${formatPrice(product.price)}</span>
+                    </div>
+                    <div class="availability">
+                        <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                    </div>
+                    
+                    <div class="quantity-selector">
+                        <button class="toggle-bulk-options">
+                            Bulk Options <i class="fas fa-chevron-down"></i>
                         </button>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">${product.name}</h3>
-                        <div class="product-price">
-                            <span class="price-real">${formatPrice(product.price)}</span>
-                        </div>
-                        <div class="availability">
-                            <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                        <div class="quantity-options" style="display: none;">
+                            ${[1, 10, 25, 50, 100].map(qty => `
+                                <div class="quantity-option ${qty === 1 ? 'selected' : ''}" data-qty="${qty}">${qty} Unit${qty > 1 ? 's' : ''}</div>
+                            `).join('')}
                         </div>
                     </div>
-                </a>
+                    
+                    <div class="action-buttons">
+                        <button class="btn-add-cart" data-id="${product.id}">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                        <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
+                           class="btn-view-details">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
             `;
             
             productsGrid.appendChild(productCard);
@@ -1240,31 +1256,131 @@
     }
     
     // ====================
+    // MODAL FUNCTIONS (FOR BACKWARD COMPATIBILITY)
+    // ====================
+    async function openProductModal(productId) {
+        console.log(`📊 Opening modal for product ID: ${productId}`);
+        
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showNotification('Database connection error', 'error');
+            return;
+        }
+        
+        try {
+            // Get product
+            const { data: product, error: productError } = await supabase
+                .from('products')
+                .select('*')
+                .eq('id', productId)
+                .single();
+            
+            if (productError || !product) {
+                throw new Error('Product not found in database');
+            }
+            
+            // Get colors
+            const { data: colors, error: colorsError } = await supabase
+                .from('product_colors')
+                .select('*')
+                .eq('product_id', productId)
+                .order('sort_order');
+            
+            if (colorsError) {
+                console.warn('⚠️ Colors fetch error:', colorsError);
+            }
+            
+            // Get sizes
+            const { data: sizes, error: sizesError } = await supabase
+                .from('product_sizes')
+                .select('*')
+                .eq('product_id', productId)
+                .order('size_value');
+            
+            if (sizesError) {
+                console.warn('⚠️ Sizes fetch error:', sizesError);
+            }
+            
+            // Set current state
+            currentProduct = product;
+            currentProductColors = colors || [];
+            currentProductSizes = sizes || [];
+            currentSelectedColor = null;
+            currentSelectedSize = null;
+            currentSelectedVariant = null;
+            
+            buildColorSizeMappings(currentProductColors, currentProductSizes);
+            
+            // Redirect to product page instead of opening modal
+            if (product.slug) {
+                window.location.href = `product.html?slug=${encodeURIComponent(product.slug)}`;
+            } else {
+                // Fallback to ID if no slug
+                window.location.href = `product.html?slug=${product.id}`;
+            }
+            
+        } catch (error) {
+            console.error('❌ Modal error:', error);
+            showNotification(`Failed to load product: ${error.message}`, 'error');
+        }
+    }
+    
+    // ====================
     // PRODUCT INTERACTIONS
     // ====================
     function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // Wishlist buttons - prevent navigation when clicking inside clickable cards
+        // Add to Cart buttons (from product cards)
+        document.addEventListener('click', function(event) {
+            const addCartBtn = event.target.closest('.btn-add-cart');
+            if (addCartBtn) {
+                event.preventDefault();
+                const productId = parseInt(addCartBtn.getAttribute('data-id'));
+                const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
+                
+                if (!product) {
+                    showNotification('Product not found', 'error');
+                    return;
+                }
+                
+                addToCart(product, 1);
+                showNotification(`${product.name} added to cart!`, 'success');
+            }
+        });
+        
+        // Wishlist buttons
         document.addEventListener('click', function(event) {
             const wishlistBtn = event.target.closest('.wishlist-btn');
             if (wishlistBtn) {
                 event.preventDefault();
-                event.stopPropagation(); // Prevent card navigation
-                
                 const productId = parseInt(wishlistBtn.getAttribute('data-id'));
                 const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
                 
                 if (product) {
                     toggleWishlist(product);
-                    
-                    // Update wishlist button state
-                    const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
-                    const isInWishlist = wishlist.some(item => item.id === productId);
-                    wishlistBtn.classList.toggle('active', isInWishlist);
-                    wishlistBtn.setAttribute('aria-label', isInWishlist ? 'Remove from wishlist' : 'Add to wishlist');
                 }
             }
+        });
+        
+        // Quantity toggles
+        document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const options = this.nextElementSibling;
+                options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
+            });
+        });
+        
+        document.querySelectorAll('.quantity-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const container = this.closest('.quantity-options');
+                container.querySelectorAll('.quantity-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
         });
         
         console.log('✅ Product interactions setup complete');
@@ -1366,8 +1482,10 @@
                     <div class="cart-item-details">
                         <div class="cart-item-name">${itemDescription}</div>
                         <div class="cart-item-price">${formatPrice(item.price)}</div>
-                        <div class="cart-item-quantity-display">
-                            Quantity: <strong>${item.quantity}</strong>
+                        <div class="cart-item-quantity">
+                            <button class="decrease-quantity" data-index="${index}">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="increase-quantity" data-index="${index}">+</button>
                         </div>
                     </div>
                     <button class="cart-item-remove" data-index="${index}">
@@ -1426,6 +1544,37 @@
     }
     
     function setupCartInteractions() {
+        // Decrease quantity
+        document.querySelectorAll('.decrease-quantity').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity--;
+                } else {
+                    cart.splice(index, 1);
+                }
+                
+                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
+                updateCartUI();
+                showNotification('Cart updated', 'info');
+            });
+        });
+        
+        // Increase quantity
+        document.querySelectorAll('.increase-quantity').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                
+                cart[index].quantity++;
+                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
+                updateCartUI();
+                showNotification('Cart updated', 'info');
+            });
+        });
+        
         // Remove item
         document.querySelectorAll('.cart-item-remove').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1553,6 +1702,18 @@
             }
         }
         
+        // Setup modal close button (for backward compatibility)
+        const modalClose = document.getElementById('modalClose');
+        if (modalClose) {
+            modalClose.addEventListener('click', () => {
+                const modalOverlay = document.getElementById('modalOverlay');
+                if (modalOverlay) {
+                    modalOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+        
         console.log('✅ JMPOTTERS initialized successfully');
     }
     
@@ -1581,5 +1742,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with Simplified Product Display and Fixed Cart');
+    console.log('✅ JMPOTTERS app loaded with Simplified Pricing and Checkout');
 })();
