@@ -1207,29 +1207,31 @@
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.setAttribute('data-aos', 'fade-up');
-            productCard.setAttribute('role', 'article');
-            productCard.setAttribute('aria-label', `View details for ${product.name}`);
             productCard.innerHTML = `
-                <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" class="product-card-clickable">
-                    <div class="product-image">
-                        <img src="${imageUrl}" alt="${product.name}" 
-                             onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
-                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
-                                data-id="${product.id}"
-                                aria-label="${isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}">
-                            <i class="fas fa-heart"></i>
-                        </button>
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${product.name}" 
+                         onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                    <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
+                            data-id="${product.id}">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <div class="product-price">
+                        <span class="price-real">${formatPrice(product.price)}</span>
                     </div>
-                    <div class="product-info">
-                        <h3 class="product-title">${product.name}</h3>
-                        <div class="product-price">
-                            <span class="price-real">${formatPrice(product.price)}</span>
-                        </div>
-                        <div class="availability">
-                            <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                        </div>
+                    <div class="availability">
+                        <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                     </div>
-                </a>
+                    
+                    <div class="action-buttons">
+                        <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
+                           class="btn-view-details">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
             `;
             
             productsGrid.appendChild(productCard);
@@ -1240,29 +1242,91 @@
     }
     
     // ====================
+    // MODAL FUNCTIONS (FOR BACKWARD COMPATIBILITY)
+    // ====================
+    async function openProductModal(productId) {
+        console.log(`📊 Opening modal for product ID: ${productId}`);
+        
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showNotification('Database connection error', 'error');
+            return;
+        }
+        
+        try {
+            // Get product
+            const { data: product, error: productError } = await supabase
+                .from('products')
+                .select('*')
+                .eq('id', productId)
+                .single();
+            
+            if (productError || !product) {
+                throw new Error('Product not found in database');
+            }
+            
+            // Get colors
+            const { data: colors, error: colorsError } = await supabase
+                .from('product_colors')
+                .select('*')
+                .eq('product_id', productId)
+                .order('sort_order');
+            
+            if (colorsError) {
+                console.warn('⚠️ Colors fetch error:', colorsError);
+            }
+            
+            // Get sizes
+            const { data: sizes, error: sizesError } = await supabase
+                .from('product_sizes')
+                .select('*')
+                .eq('product_id', productId)
+                .order('size_value');
+            
+            if (sizesError) {
+                console.warn('⚠️ Sizes fetch error:', sizesError);
+            }
+            
+            // Set current state
+            currentProduct = product;
+            currentProductColors = colors || [];
+            currentProductSizes = sizes || [];
+            currentSelectedColor = null;
+            currentSelectedSize = null;
+            currentSelectedVariant = null;
+            
+            buildColorSizeMappings(currentProductColors, currentProductSizes);
+            
+            // Redirect to product page instead of opening modal
+            if (product.slug) {
+                window.location.href = `product.html?slug=${encodeURIComponent(product.slug)}`;
+            } else {
+                // Fallback to ID if no slug
+                window.location.href = `product.html?slug=${product.id}`;
+            }
+            
+        } catch (error) {
+            console.error('❌ Modal error:', error);
+            showNotification(`Failed to load product: ${error.message}`, 'error');
+        }
+    }
+    
+    // ====================
     // PRODUCT INTERACTIONS
     // ====================
     function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // Wishlist buttons - prevent navigation when clicking inside clickable cards
+        // Wishlist buttons
         document.addEventListener('click', function(event) {
             const wishlistBtn = event.target.closest('.wishlist-btn');
             if (wishlistBtn) {
                 event.preventDefault();
-                event.stopPropagation(); // Prevent card navigation
-                
                 const productId = parseInt(wishlistBtn.getAttribute('data-id'));
                 const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
                 
                 if (product) {
                     toggleWishlist(product);
-                    
-                    // Update wishlist button state
-                    const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
-                    const isInWishlist = wishlist.some(item => item.id === productId);
-                    wishlistBtn.classList.toggle('active', isInWishlist);
-                    wishlistBtn.setAttribute('aria-label', isInWishlist ? 'Remove from wishlist' : 'Add to wishlist');
                 }
             }
         });
@@ -1514,6 +1578,142 @@
     }
     
     // ====================
+    // CART STYLES INJECTION
+    // ====================
+    function injectCartStyles() {
+        if (document.getElementById('cart-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'cart-styles';
+        style.textContent = `
+            .cart-item {
+                display: flex;
+                align-items: center;
+                padding: 15px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                gap: 15px;
+            }
+            
+            .cart-item-image {
+                width: 60px;
+                height: 60px;
+                border-radius: 6px;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+            
+            .cart-item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+            
+            .cart-item-details {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .cart-item-name {
+                font-weight: 500;
+                color: white;
+                margin-bottom: 5px;
+                font-size: 0.95rem;
+            }
+            
+            .cart-item-price {
+                color: var(--gold);
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            
+            .cart-item-quantity-display {
+                color: #ddd;
+                font-size: 0.9rem;
+            }
+            
+            .cart-item-remove {
+                background: rgba(231, 76, 60, 0.2);
+                border: none;
+                color: #e74c3c;
+                width: 35px;
+                height: 35px;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: background 0.3s;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .cart-item-remove:hover {
+                background: rgba(231, 76, 60, 0.3);
+            }
+            
+            .cart-empty {
+                text-align: center;
+                padding: 40px 20px;
+                color: #888;
+                font-style: italic;
+            }
+            
+            .cart-checkout-section {
+                padding: 20px;
+                background: rgba(0, 0, 0, 0.2);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .cart-total-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: white;
+            }
+            
+            .cart-total-amount {
+                color: var(--gold);
+                font-size: 1.3rem;
+            }
+            
+            .btn-checkout {
+                width: 100%;
+                padding: 15px;
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            
+            .btn-whatsapp {
+                width: 100%;
+                padding: 15px;
+                background: #25D366;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                text-decoration: none;
+                transition: background 0.3s;
+            }
+            
+            .btn-whatsapp:hover {
+                background: #1da851;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // ====================
     // INITIALIZATION
     // ====================
     async function initializePage() {
@@ -1531,6 +1731,9 @@
         
         // Ensure header icons exist and work
         ensureHeaderIconsExist();
+        
+        // Inject cart styles
+        injectCartStyles();
         
         // Initialize UI
         updateCartUI();
@@ -1551,6 +1754,18 @@
             if (document.getElementById('productsGrid')) {
                 await loadProductsByCategory(currentCategory);
             }
+        }
+        
+        // Setup modal close button (for backward compatibility)
+        const modalClose = document.getElementById('modalClose');
+        if (modalClose) {
+            modalClose.addEventListener('click', () => {
+                const modalOverlay = document.getElementById('modalOverlay');
+                if (modalOverlay) {
+                    modalOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
         }
         
         console.log('✅ JMPOTTERS initialized successfully');
