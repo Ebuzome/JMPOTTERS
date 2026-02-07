@@ -1980,8 +1980,6 @@
                 <form id="productForm" onsubmit="return AdminDashboard.saveProduct(event)">
                     <input type="hidden" id="productId">
                     <input type="hidden" id="isFootwear">
-                    <input type="hidden" id="currentColors" value="[]">
-                    <input type="hidden" id="currentSizes" value="[]">
                     
                     <!-- Basic Information -->
                     <div class="mb-6">
@@ -2003,7 +2001,7 @@
                             <div class="form-group">
                                 <label class="form-label required">Category</label>
                                 <select id="productCategory" class="form-control" required
-                                        onchange="AdminDashboard.updateImagePreview()">
+                                        onchange="AdminDashboard.updateImagePreview(); AdminDashboard.onCategoryChange()">
                                     <option value="">Select Category</option>
                                 </select>
                             </div>
@@ -2074,20 +2072,13 @@
                             <p class="text-sm text-gray-600 mb-3">
                                 Manage color variants for this product. Each color can have different sizes and stock levels.
                             </p>
-                            <button type="button" class="btn btn-secondary" onclick="AdminDashboard.addColor()">
-                                <i class="fas fa-plus"></i> Add Color
+                            <button type="button" class="btn btn-primary" onclick="AdminDashboard.openAddColorModal()">
+                                <i class="fas fa-plus"></i> Add New Color
                             </button>
                         </div>
                         
                         <div class="colors-grid" id="colorsContainer">
                             <!-- Colors will be loaded here -->
-                            <div class="color-item" style="border-style: dashed; cursor: pointer; text-align: center;"
-                                 onclick="AdminDashboard.addColor()">
-                                <div class="color-preview" style="background: var(--gray-200); display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-plus text-gray-400" style="font-size: 1.5rem;"></i>
-                                </div>
-                                <div class="text-sm text-gray-600 mt-2">Add Color</div>
-                            </div>
                         </div>
                     </div>
                     
@@ -2105,6 +2096,9 @@
                                         onchange="AdminDashboard.loadSizesForColor()">
                                     <option value="">Select a color</option>
                                 </select>
+                                <button type="button" class="btn btn-secondary" onclick="AdminDashboard.openAddSizeModal()">
+                                    <i class="fas fa-plus"></i> Add Size
+                                </button>
                             </div>
                             <p class="text-sm text-gray-600">
                                 Select a color above to manage sizes and stock levels for that specific color variant.
@@ -2137,6 +2131,82 @@
             </div>
         </div>
     </div>
+    
+    <!-- Add Color Modal -->
+    <div class="modal-overlay" id="addColorModal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Color Variant</h2>
+                <button class="modal-close" onclick="AdminDashboard.closeAddColorModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label required">Color Name</label>
+                    <input type="text" id="newColorName" class="form-control" placeholder="e.g., Black, Red, Blue">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Color Code</label>
+                    <div class="flex gap-2">
+                        <input type="color" id="newColorPicker" value="#000000" 
+                               style="width: 50px; height: 50px; border: none;">
+                        <input type="text" id="newColorCode" class="form-control" 
+                               value="#000000" placeholder="#000000"
+                               oninput="document.getElementById('newColorPicker').value = this.value">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Set as Default Color</label>
+                    <input type="checkbox" id="isDefaultColor" checked>
+                </div>
+                <div class="flex gap-3 pt-4 border-t border-gray-200">
+                    <button type="button" class="btn btn-secondary flex-1" onclick="AdminDashboard.closeAddColorModal()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary flex-1" onclick="AdminDashboard.saveNewColor()">
+                        <i class="fas fa-save"></i> Save Color
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Size Modal -->
+    <div class="modal-overlay" id="addSizeModal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Size Variant</h2>
+                <button class="modal-close" onclick="AdminDashboard.closeAddSizeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label required">Select Color</label>
+                    <select id="sizeColorSelector" class="form-control">
+                        <option value="">Select a color</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Size Value</label>
+                    <input type="text" id="newSizeValue" class="form-control" placeholder="e.g., 38, 39, 40">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Initial Stock Quantity</label>
+                    <input type="number" id="newSizeStock" class="form-control" value="0" min="0">
+                </div>
+                <div class="flex gap-3 pt-4 border-t border-gray-200">
+                    <button type="button" class="btn btn-secondary flex-1" onclick="AdminDashboard.closeAddSizeModal()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary flex-1" onclick="AdminDashboard.saveNewSize()">
+                        <i class="fas fa-save"></i> Save Size
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Supabase Client -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -2147,15 +2217,18 @@
             let supabase = null;
             let categories = [];
             let products = [];
-            let allProducts = []; // Store all 368+ products
+            let allProducts = [];
             let filteredProducts = [];
             let currentPage = 1;
             let productsPerPage = 20;
             let currentFilter = 'all';
-            let productColors = {}; // Store colors by product ID
-            let productSizes = {}; // Store sizes by product ID
+            let productColors = {};
+            let productSizes = {};
+            let currentProductId = null;
+            let currentEditingColors = [];
+            let currentEditingSizes = [];
             
-            // Image configuration from your architecture
+            // Image configuration
             const imageConfig = {
                 baseUrl: 'https://ebuzome.github.io/JMPOTTERS/assets/images/',
                 paths: {
@@ -2168,6 +2241,9 @@
                     'healthcare': ''
                 }
             };
+            
+            // Common shoe sizes
+            const commonSizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
             
             // Initialize dashboard
             async function init() {
@@ -2214,7 +2290,7 @@
                     if (catError) throw catError;
                     categories = cats;
                     
-                    // Load ALL products (368+)
+                    // Load ALL products
                     console.log('📦 Loading all products from Supabase...');
                     const { data: allProds, error: prodError } = await supabase
                         .from('products')
@@ -2235,11 +2311,14 @@
                     // Update counts
                     updateProductCounts();
                     
-                    // Load colors for all products (batch in smaller chunks)
+                    // Load colors for all products
                     await loadProductColorsBatch();
                     
-                    // Load sizes for all products (batch)
+                    // Load sizes for all products
                     await loadProductSizesBatch();
+                    
+                    // Calculate total stock for each product
+                    calculateProductTotalStock();
                     
                     // Render initial views
                     renderRecentProducts();
@@ -2296,13 +2375,16 @@
                     
                     if (error) throw error;
                     
-                    // Group sizes by product ID
+                    // Group sizes by product ID and color ID
                     productSizes = {};
                     sizes.forEach(size => {
                         if (!productSizes[size.product_id]) {
-                            productSizes[size.product_id] = [];
+                            productSizes[size.product_id] = {};
                         }
-                        productSizes[size.product_id].push(size);
+                        if (!productSizes[size.product_id][size.color_id]) {
+                            productSizes[size.product_id][size.color_id] = [];
+                        }
+                        productSizes[size.product_id][size.color_id].push(size);
                     });
                     
                     console.log(`✅ Loaded sizes for ${Object.keys(productSizes).length} products`);
@@ -2312,11 +2394,40 @@
                 }
             }
             
+            // Calculate total stock for each product
+            function calculateProductTotalStock() {
+                allProducts.forEach(product => {
+                    let totalStock = 0;
+                    const sizes = productSizes[product.id];
+                    
+                    if (sizes) {
+                        Object.values(sizes).forEach(colorSizes => {
+                            colorSizes.forEach(size => {
+                                totalStock += size.stock_quantity || 0;
+                            });
+                        });
+                    }
+                    
+                    // Store calculated total stock
+                    product.total_stock = totalStock;
+                });
+            }
+            
             // Update product counts
             function updateProductCounts() {
                 const totalProducts = allProducts.length;
-                const lowStock = allProducts.filter(p => (p.stock || 0) < 10 && (p.stock || 0) > 0).length;
-                const outOfStock = allProducts.filter(p => (p.stock || 0) === 0).length;
+                const lowStock = allProducts.filter(p => {
+                    if (p.total_stock !== undefined) {
+                        return p.total_stock < 10 && p.total_stock > 0;
+                    }
+                    return (p.stock || 0) < 10 && (p.stock || 0) > 0;
+                }).length;
+                const outOfStock = allProducts.filter(p => {
+                    if (p.total_stock !== undefined) {
+                        return p.total_stock === 0;
+                    }
+                    return (p.stock || 0) === 0;
+                }).length;
                 
                 document.getElementById('productsCount').textContent = totalProducts;
                 document.getElementById('lowStockCount').textContent = lowStock;
@@ -2325,8 +2436,19 @@
                 document.getElementById('totalProductsCount').textContent = totalProducts;
                 
                 // Update inventory stats
-                const totalStock = allProducts.reduce((sum, p) => sum + (p.stock || 0), 0);
-                const inventoryValue = allProducts.reduce((sum, p) => sum + ((p.price || 0) * (p.stock || 0)), 0);
+                const totalStock = allProducts.reduce((sum, p) => {
+                    if (p.total_stock !== undefined) {
+                        return sum + p.total_stock;
+                    }
+                    return sum + (p.stock || 0);
+                }, 0);
+                
+                const inventoryValue = allProducts.reduce((sum, p) => {
+                    if (p.total_stock !== undefined) {
+                        return sum + ((p.price || 0) * p.total_stock);
+                    }
+                    return sum + ((p.price || 0) * (p.stock || 0));
+                }, 0);
                 
                 document.getElementById('inventoryTotalStock').textContent = totalStock.toLocaleString();
                 document.getElementById('inventoryLowStock').textContent = lowStock;
@@ -2334,7 +2456,7 @@
                 document.getElementById('inventoryValue').textContent = '₦' + Math.round(inventoryValue).toLocaleString();
             }
             
-            // Render recent products (for dashboard)
+            // Render recent products
             function renderRecentProducts() {
                 const container = document.getElementById('recentProducts');
                 if (!container) return;
@@ -2370,16 +2492,19 @@
             
             // Render product card
             function renderProductCard(product) {
-                const stock = product.stock || 0;
+                const stock = product.total_stock !== undefined ? product.total_stock : (product.stock || 0);
                 const stockClass = stock > 10 ? 'stock-high' : stock > 0 ? 'stock-medium' : 'stock-low';
                 const stockText = stock > 10 ? `${stock} in stock` : stock > 0 ? `${stock} left` : 'Out of stock';
                 const isFootwear = product.category?.slug?.includes('footwear') || 
                                   product.product_modals?.[0]?.modal_type === 'footwear';
                 const colors = productColors[product.id] || [];
-                const sizes = productSizes[product.id] || [];
+                const sizes = productSizes[product.id] || {};
                 
                 // Build image URL
                 const imageUrl = product.image_url || getDefaultImageUrl(product.category?.slug);
+                
+                // Get available color count
+                const colorCount = colors.length;
                 
                 return `
                     <div class="product-card" data-product-id="${product.id}">
@@ -2418,6 +2543,7 @@
                                         <span class="variant-tag">
                                             <span class="color-dot" style="background: ${color.color_code || '#ccc'}"></span>
                                             ${color.color_name}
+                                            ${sizes[color.id] ? `(${sizes[color.id].length} sizes)` : ''}
                                         </span>
                                     `).join('')}
                                     ${colors.length > 3 ? `<span class="variant-tag">+${colors.length - 3} more</span>` : ''}
@@ -2520,7 +2646,12 @@
                         );
                         break;
                     case 'low_stock':
-                        filteredProducts = allProducts.filter(p => (p.stock || 0) < 10 && (p.stock || 0) > 0);
+                        filteredProducts = allProducts.filter(p => {
+                            if (p.total_stock !== undefined) {
+                                return p.total_stock < 10 && p.total_stock > 0;
+                            }
+                            return (p.stock || 0) < 10 && (p.stock || 0) > 0;
+                        });
                         break;
                     case 'inactive':
                         filteredProducts = allProducts.filter(p => !p.is_active);
@@ -2612,15 +2743,7 @@
                 // Reset variant sections
                 document.getElementById('colorManagementSection').style.display = 'none';
                 document.getElementById('sizeManagementSection').style.display = 'none';
-                document.getElementById('colorsContainer').innerHTML = `
-                    <div class="color-item" style="border-style: dashed; cursor: pointer; text-align: center;"
-                         onclick="AdminDashboard.addColor()">
-                        <div class="color-preview" style="background: var(--gray-200); display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-plus text-gray-400" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <div class="text-sm text-gray-600 mt-2">Add Color</div>
-                    </div>
-                `;
+                document.getElementById('colorsContainer').innerHTML = '';
                 document.getElementById('sizesContainer').innerHTML = `
                     <div class="text-center py-8 text-gray-500">
                         <i class="fas fa-shoe-prints mb-2" style="font-size: 2rem;"></i>
@@ -2629,6 +2752,23 @@
                 `;
                 
                 openModal();
+            }
+            
+            // Handle category change
+            function onCategoryChange() {
+                const categorySelect = document.getElementById('productCategory');
+                const categoryId = categorySelect.value;
+                const category = categories.find(c => c.id == categoryId);
+                
+                if (category && category.slug.includes('footwear')) {
+                    document.getElementById('isFootwear').value = 'true';
+                    document.getElementById('colorManagementSection').style.display = 'block';
+                    document.getElementById('sizeManagementSection').style.display = 'block';
+                } else {
+                    document.getElementById('isFootwear').value = 'false';
+                    document.getElementById('colorManagementSection').style.display = 'none';
+                    document.getElementById('sizeManagementSection').style.display = 'none';
+                }
             }
             
             // Edit product
@@ -2643,6 +2783,8 @@
                     const isFootwear = product.category?.slug?.includes('footwear') || 
                                       product.product_modals?.[0]?.modal_type === 'footwear';
                     
+                    currentProductId = productId;
+                    
                     // Set form values
                     document.getElementById('modalTitle').textContent = `Edit: ${product.name}`;
                     document.getElementById('productId').value = product.id;
@@ -2656,6 +2798,7 @@
                     const categorySelect = document.getElementById('productCategory');
                     if (categorySelect) {
                         categorySelect.value = product.category_id || '';
+                        onCategoryChange();
                     }
                     
                     // Parse image URL to get filename
@@ -2680,14 +2823,8 @@
                     
                     // Load colors and sizes for footwear
                     if (isFootwear) {
-                        document.getElementById('colorManagementSection').style.display = 'block';
-                        document.getElementById('sizeManagementSection').style.display = 'block';
-                        
                         await loadColorsForProduct(productId);
                         await loadSizesForProduct(productId);
-                    } else {
-                        document.getElementById('colorManagementSection').style.display = 'none';
-                        document.getElementById('sizeManagementSection').style.display = 'none';
                     }
                     
                     openModal();
@@ -2702,6 +2839,7 @@
             async function loadColorsForProduct(productId) {
                 try {
                     const colors = productColors[productId] || [];
+                    currentEditingColors = colors;
                     
                     const container = document.getElementById('colorsContainer');
                     if (!container) return;
@@ -2713,12 +2851,11 @@
                             html += `
                                 <div class="color-item" data-color-id="${color.id}">
                                     <div class="color-preview" style="background: ${color.color_code || '#ccc'}"></div>
-                                    <input type="text" class="color-name-input" value="${color.color_name}"
-                                           onchange="AdminDashboard.updateColorName(${color.id}, this.value)"
-                                           placeholder="Color name">
+                                    <div class="text-sm font-semibold mb-1">${color.color_name}</div>
+                                    <div class="text-xs text-gray-600 mb-2">${color.color_code}</div>
                                     <div class="color-actions">
-                                        <button class="btn btn-sm btn-secondary flex-1" onclick="AdminDashboard.updateColorCode(${color.id})">
-                                            <i class="fas fa-palette"></i> Change
+                                        <button class="btn btn-sm btn-secondary flex-1" onclick="AdminDashboard.editColor(${color.id})">
+                                            <i class="fas fa-edit"></i> Edit
                                         </button>
                                         <button class="btn btn-sm btn-secondary" onclick="AdminDashboard.deleteColor(${color.id})">
                                             <i class="fas fa-trash"></i>
@@ -2732,7 +2869,7 @@
                     // Add "Add Color" button
                     html += `
                         <div class="color-item" style="border-style: dashed; cursor: pointer; text-align: center;"
-                             onclick="AdminDashboard.addColor()">
+                             onclick="AdminDashboard.openAddColorModal()">
                             <div class="color-preview" style="background: var(--gray-200); display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-plus text-gray-400" style="font-size: 1.5rem;"></i>
                             </div>
@@ -2753,6 +2890,16 @@
                         colorSelector.innerHTML = options;
                     }
                     
+                    // Populate size color selector
+                    const sizeColorSelector = document.getElementById('sizeColorSelector');
+                    if (sizeColorSelector) {
+                        let options = '<option value="">Select a color</option>';
+                        colors.forEach(color => {
+                            options += `<option value="${color.id}">${color.color_name}</option>`;
+                        });
+                        sizeColorSelector.innerHTML = options;
+                    }
+                    
                 } catch (error) {
                     console.error('Error loading colors:', error);
                     showToast('Failed to load colors: ' + error.message, 'error');
@@ -2762,19 +2909,8 @@
             // Load sizes for product
             async function loadSizesForProduct(productId) {
                 try {
-                    const sizes = productSizes[productId] || [];
-                    
-                    // Group sizes by color
-                    const sizesByColor = {};
-                    sizes.forEach(size => {
-                        if (!sizesByColor[size.color_id]) {
-                            sizesByColor[size.color_id] = [];
-                        }
-                        sizesByColor[size.color_id].push(size);
-                    });
-                    
-                    // Store sizes for later use
-                    window.currentProductSizes = sizesByColor;
+                    const sizesByColor = productSizes[productId] || {};
+                    currentEditingSizes = sizesByColor;
                     
                 } catch (error) {
                     console.error('Error loading sizes:', error);
@@ -2784,8 +2920,8 @@
             // Load sizes for selected color
             function loadSizesForColor() {
                 const colorId = document.getElementById('colorSelector').value;
-                const productId = document.getElementById('productId').value;
-                const sizesByColor = window.currentProductSizes || {};
+                const productId = currentProductId;
+                const sizesByColor = productSizes[productId] || {};
                 const sizes = sizesByColor[colorId] || [];
                 
                 const container = document.getElementById('sizesContainer');
@@ -2798,44 +2934,352 @@
                             <p>Select a color to manage sizes</p>
                         </div>
                     `;
+                    document.getElementById('sizeCount').textContent = '(Select a color)';
                     return;
                 }
                 
-                // Common shoe sizes
-                const commonSizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+                // Get selected color name
+                const colorSelector = document.getElementById('colorSelector');
+                const colorName = colorSelector.options[colorSelector.selectedIndex].text;
                 
                 let html = '';
                 
+                // Create a map of existing sizes for quick lookup
+                const sizeMap = {};
+                sizes.forEach(size => {
+                    sizeMap[size.size_value] = size;
+                });
+                
                 commonSizes.forEach(size => {
-                    const sizeData = sizes.find(s => s.size_value === size);
+                    const sizeData = sizeMap[size];
                     const stock = sizeData ? sizeData.stock_quantity : 0;
+                    const isAvailable = sizeData ? sizeData.is_available : false;
+                    const sizeId = sizeData ? sizeData.id : null;
                     
                     html += `
-                        <div class="size-item" data-size="${size}">
+                        <div class="size-item" data-size="${size}" data-size-id="${sizeId || ''}">
                             <div class="size-label">Size</div>
                             <div class="size-value">${size}</div>
                             <input type="number" class="size-stock-input" value="${stock}" 
                                    data-color-id="${colorId}" data-size="${size}"
-                                   placeholder="0" min="0">
-                            <div class="text-xs text-gray-600 mt-1">Current: ${stock}</div>
+                                   placeholder="0" min="0"
+                                   onchange="AdminDashboard.updateSizeStock(this, ${colorId}, '${size}')">
+                            <div class="text-xs ${stock > 0 ? 'text-green-600' : 'text-gray-600'} mt-1">
+                                Stock: ${stock}
+                            </div>
+                            <div class="flex items-center justify-center mt-1">
+                                <input type="checkbox" ${isAvailable ? 'checked' : ''} 
+                                       onchange="AdminDashboard.toggleSizeAvailability(this, ${colorId}, '${size}')"
+                                       class="mr-1">
+                                <span class="text-xs">Available</span>
+                            </div>
                         </div>
                     `;
                 });
                 
                 container.innerHTML = html;
-                document.getElementById('sizeCount').textContent = `(${commonSizes.length} sizes)`;
+                document.getElementById('sizeCount').textContent = `(${commonSizes.length} sizes for ${colorName})`;
             }
             
-            // Add color
-            function addColor() {
+            // Open add color modal
+            function openAddColorModal() {
+                document.getElementById('addColorModal').style.display = 'flex';
+                document.getElementById('newColorName').value = '';
+                document.getElementById('newColorCode').value = '#000000';
+                document.getElementById('newColorPicker').value = '#000000';
+                document.getElementById('isDefaultColor').checked = true;
+            }
+            
+            // Close add color modal
+            function closeAddColorModal() {
+                document.getElementById('addColorModal').style.display = 'none';
+            }
+            
+            // Save new color
+            async function saveNewColor() {
                 const productId = document.getElementById('productId').value;
                 if (!productId) {
-                    showToast('Please save the product first before adding colors', 'warning');
+                    showToast('Please save the product first', 'warning');
                     return;
                 }
                 
-                // In a real implementation, this would open a modal to add a new color
-                showToast('Color management feature in development', 'info');
+                const colorName = document.getElementById('newColorName').value.trim();
+                const colorCode = document.getElementById('newColorCode').value.trim();
+                const isDefault = document.getElementById('isDefaultColor').checked;
+                
+                if (!colorName || !colorCode) {
+                    showToast('Please enter color name and code', 'warning');
+                    return;
+                }
+                
+                try {
+                    const colorData = {
+                        product_id: parseInt(productId),
+                        color_name: colorName,
+                        color_code: colorCode,
+                        is_default: isDefault,
+                        sort_order: 0,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    const { data, error } = await supabase
+                        .from('product_colors')
+                        .insert([colorData])
+                        .select();
+                    
+                    if (error) throw error;
+                    
+                    // Add to local cache
+                    if (!productColors[productId]) {
+                        productColors[productId] = [];
+                    }
+                    productColors[productId].push(data[0]);
+                    
+                    // Reload colors for this product
+                    await loadColorsForProduct(productId);
+                    
+                    closeAddColorModal();
+                    showToast('Color added successfully', 'success');
+                    
+                } catch (error) {
+                    console.error('Error saving color:', error);
+                    showToast('Failed to save color: ' + error.message, 'error');
+                }
+            }
+            
+            // Edit color
+            async function editColor(colorId) {
+                const color = currentEditingColors.find(c => c.id == colorId);
+                if (!color) return;
+                
+                document.getElementById('newColorName').value = color.color_name;
+                document.getElementById('newColorCode').value = color.color_code;
+                document.getElementById('newColorPicker').value = color.color_code;
+                document.getElementById('isDefaultColor').checked = color.is_default;
+                
+                // Store color ID for update
+                document.getElementById('addColorModal').dataset.colorId = colorId;
+                document.getElementById('addColorModal').querySelector('.modal-title').textContent = 'Edit Color';
+                
+                document.getElementById('addColorModal').style.display = 'flex';
+            }
+            
+            // Delete color
+            async function deleteColor(colorId) {
+                if (!confirm('Are you sure you want to delete this color? All associated sizes will also be deleted.')) {
+                    return;
+                }
+                
+                try {
+                    // First delete all sizes for this color
+                    const { error: sizesError } = await supabase
+                        .from('product_sizes')
+                        .delete()
+                        .eq('color_id', colorId);
+                    
+                    if (sizesError) throw sizesError;
+                    
+                    // Then delete the color
+                    const { error: colorError } = await supabase
+                        .from('product_colors')
+                        .delete()
+                        .eq('id', colorId);
+                    
+                    if (colorError) throw colorError;
+                    
+                    // Update local cache
+                    const productId = document.getElementById('productId').value;
+                    productColors[productId] = productColors[productId].filter(c => c.id != colorId);
+                    if (productSizes[productId]) {
+                        delete productSizes[productId][colorId];
+                    }
+                    
+                    // Reload colors and sizes
+                    await loadColorsForProduct(productId);
+                    loadSizesForColor();
+                    
+                    showToast('Color deleted successfully', 'success');
+                    
+                } catch (error) {
+                    console.error('Error deleting color:', error);
+                    showToast('Failed to delete color: ' + error.message, 'error');
+                }
+            }
+            
+            // Open add size modal
+            function openAddSizeModal() {
+                const colorId = document.getElementById('colorSelector').value;
+                if (!colorId) {
+                    showToast('Please select a color first', 'warning');
+                    return;
+                }
+                
+                document.getElementById('addSizeModal').style.display = 'flex';
+                document.getElementById('sizeColorSelector').value = colorId;
+                document.getElementById('newSizeValue').value = '';
+                document.getElementById('newSizeStock').value = 0;
+            }
+            
+            // Close add size modal
+            function closeAddSizeModal() {
+                document.getElementById('addSizeModal').style.display = 'none';
+            }
+            
+            // Save new size
+            async function saveNewSize() {
+                const productId = document.getElementById('productId').value;
+                const colorId = document.getElementById('sizeColorSelector').value;
+                const sizeValue = document.getElementById('newSizeValue').value.trim();
+                const stockQuantity = parseInt(document.getElementById('newSizeStock').value) || 0;
+                
+                if (!productId || !colorId || !sizeValue) {
+                    showToast('Please fill all required fields', 'warning');
+                    return;
+                }
+                
+                try {
+                    const sizeData = {
+                        product_id: parseInt(productId),
+                        color_id: parseInt(colorId),
+                        size_value: sizeValue,
+                        stock_quantity: stockQuantity,
+                        is_available: stockQuantity > 0,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    const { data, error } = await supabase
+                        .from('product_sizes')
+                        .insert([sizeData])
+                        .select();
+                    
+                    if (error) throw error;
+                    
+                    // Add to local cache
+                    if (!productSizes[productId]) {
+                        productSizes[productId] = {};
+                    }
+                    if (!productSizes[productId][colorId]) {
+                        productSizes[productId][colorId] = [];
+                    }
+                    productSizes[productId][colorId].push(data[0]);
+                    
+                    // Reload sizes for current color
+                    loadSizesForColor();
+                    
+                    closeAddSizeModal();
+                    showToast('Size added successfully', 'success');
+                    
+                } catch (error) {
+                    console.error('Error saving size:', error);
+                    showToast('Failed to save size: ' + error.message, 'error');
+                }
+            }
+            
+            // Update size stock
+            async function updateSizeStock(input, colorId, sizeValue) {
+                const productId = document.getElementById('productId').value;
+                const stockQuantity = parseInt(input.value) || 0;
+                
+                try {
+                    // Check if size already exists
+                    const sizes = productSizes[productId]?.[colorId] || [];
+                    const existingSize = sizes.find(s => s.size_value === sizeValue);
+                    
+                    if (existingSize) {
+                        // Update existing size
+                        const { error } = await supabase
+                            .from('product_sizes')
+                            .update({
+                                stock_quantity: stockQuantity,
+                                is_available: stockQuantity > 0,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', existingSize.id);
+                        
+                        if (error) throw error;
+                        
+                        // Update local cache
+                        existingSize.stock_quantity = stockQuantity;
+                        existingSize.is_available = stockQuantity > 0;
+                        
+                        showToast('Stock updated successfully', 'success');
+                    } else {
+                        // Create new size
+                        const sizeData = {
+                            product_id: parseInt(productId),
+                            color_id: parseInt(colorId),
+                            size_value: sizeValue,
+                            stock_quantity: stockQuantity,
+                            is_available: stockQuantity > 0,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        };
+                        
+                        const { data, error } = await supabase
+                            .from('product_sizes')
+                            .insert([sizeData])
+                            .select();
+                        
+                        if (error) throw error;
+                        
+                        // Add to local cache
+                        if (!productSizes[productId]) {
+                            productSizes[productId] = {};
+                        }
+                        if (!productSizes[productId][colorId]) {
+                            productSizes[productId][colorId] = [];
+                        }
+                        productSizes[productId][colorId].push(data[0]);
+                        
+                        showToast('Size added successfully', 'success');
+                    }
+                    
+                    // Update UI
+                    const stockElement = input.parentElement.querySelector('.text-xs');
+                    if (stockElement) {
+                        stockElement.textContent = `Stock: ${stockQuantity}`;
+                        stockElement.className = `text-xs ${stockQuantity > 0 ? 'text-green-600' : 'text-gray-600'} mt-1`;
+                    }
+                    
+                } catch (error) {
+                    console.error('Error updating size stock:', error);
+                    showToast('Failed to update stock: ' + error.message, 'error');
+                }
+            }
+            
+            // Toggle size availability
+            async function toggleSizeAvailability(checkbox, colorId, sizeValue) {
+                const productId = document.getElementById('productId').value;
+                const isAvailable = checkbox.checked;
+                
+                try {
+                    const sizes = productSizes[productId]?.[colorId] || [];
+                    const existingSize = sizes.find(s => s.size_value === sizeValue);
+                    
+                    if (existingSize) {
+                        const { error } = await supabase
+                            .from('product_sizes')
+                            .update({
+                                is_available: isAvailable,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', existingSize.id);
+                        
+                        if (error) throw error;
+                        
+                        // Update local cache
+                        existingSize.is_available = isAvailable;
+                        
+                        showToast('Availability updated', 'success');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error updating availability:', error);
+                    showToast('Failed to update availability: ' + error.message, 'error');
+                    checkbox.checked = !isAvailable; // Revert on error
+                }
             }
             
             // Update image preview
@@ -2913,7 +3357,7 @@
                     description: document.getElementById('productDescription').value.trim(),
                     image_url: imageUrl,
                     is_active: true,
-                    stock: parseInt(document.getElementById('productStock').value) || 0,
+                    stock: 0, // For footwear, stock is managed at color-size level
                     updated_at: new Date().toISOString()
                 };
                 
@@ -2944,6 +3388,7 @@
                         
                         // Update product ID for color/size management
                         document.getElementById('productId').value = result.id;
+                        currentProductId = result.id;
                         
                     } else {
                         // Update existing product
@@ -2959,11 +3404,6 @@
                     
                     console.log('✅ Product saved:', result);
                     
-                    // Handle footwear variants if needed
-                    if (isFootwear) {
-                        await saveFootwearVariants(result.id);
-                    }
-                    
                     // Reload data
                     await loadInitialData();
                     
@@ -2978,14 +3418,6 @@
                     console.error('❌ Save failed:', error);
                     showToast('❌ Save failed: ' + error.message, 'error');
                 }
-            }
-            
-            // Save footwear variants
-            async function saveFootwearVariants(productId) {
-                // This is a simplified implementation
-                // In production, you would save colors and sizes here
-                console.log('👟 Saving footwear variants for product:', productId);
-                showToast('Footwear variant management in development', 'info');
             }
             
             // Test write operation
@@ -3065,6 +3497,9 @@
             function closeModal() {
                 document.getElementById('productModal').style.display = 'none';
                 document.body.style.overflow = 'auto';
+                currentProductId = null;
+                currentEditingColors = [];
+                currentEditingSizes = [];
             }
             
             // Save as draft
@@ -3189,10 +3624,19 @@
                 testConnection,
                 closeModal,
                 saveAsDraft,
-                addColor,
-                loadColorsForProduct,
-                loadSizesForColor,
+                onCategoryChange,
                 updateImagePreview,
+                openAddColorModal,
+                closeAddColorModal,
+                saveNewColor,
+                editColor,
+                deleteColor,
+                openAddSizeModal,
+                closeAddSizeModal,
+                saveNewSize,
+                loadSizesForColor,
+                updateSizeStock,
+                toggleSizeAvailability,
                 filterProducts,
                 nextPage,
                 prevPage,
