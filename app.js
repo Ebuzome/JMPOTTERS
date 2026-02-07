@@ -278,9 +278,6 @@
         const categorySlug = product.category_slug || getCurrentCategory();
         const imageUrl = getImageUrl(categorySlug, product.image_url);
         
-        // Calculate fake price for discount display
-        const fakePrice = product.price ? Math.round(product.price * 1.35) : 0;
-        
         // Determine if it's footwear (needs size/color selectors)
         const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
         
@@ -312,11 +309,9 @@
                 <div class="product-details">
                     <h1 class="product-title">${product.name}</h1>
                     
-                    <!-- Price -->
+                    <!-- Price - SIMPLIFIED (No fake prices or discounts) -->
                     <div class="product-price-container">
                         <div class="current-price">${formatPrice(product.price)}</div>
-                        <div class="original-price">${formatPrice(fakePrice)}</div>
-                        <div class="discount-badge">35% OFF</div>
                     </div>
                     
                     <!-- Availability -->
@@ -498,7 +493,6 @@
             .product-price-container {
                 display: flex;
                 align-items: center;
-                gap: 20px;
                 margin-bottom: 20px;
                 padding: 15px;
                 background: rgba(0, 0, 0, 0.2);
@@ -509,21 +503,6 @@
                 font-size: 2rem;
                 font-weight: bold;
                 color: var(--gold);
-            }
-            
-            .original-price {
-                font-size: 1.2rem;
-                color: #888;
-                text-decoration: line-through;
-            }
-            
-            .discount-badge {
-                background: #e74c3c;
-                color: white;
-                padding: 5px 10px;
-                border-radius: 4px;
-                font-weight: bold;
-                font-size: 0.9rem;
             }
             
             .availability {
@@ -1220,57 +1199,37 @@
         
         productsGrid.innerHTML = '';
         
-        products.forEach((product, index) => {
+        products.forEach((product) => {
             const imageUrl = getImageUrl(categorySlug, product.image_url);
-            const displayDiscount = [10, 20, 35][index % 3];
-            const fakePrice = product.price ? Math.round(product.price * (1 + displayDiscount/100)) : 0;
             const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
             const isInWishlist = wishlist.some(item => item.id === product.id);
             
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.setAttribute('data-aos', 'fade-up');
+            productCard.setAttribute('role', 'article');
+            productCard.setAttribute('aria-label', `View details for ${product.name}`);
             productCard.innerHTML = `
-                <div class="product-image">
-                    <div class="product-badge">-${displayDiscount}%</div>
-                    <img src="${imageUrl}" alt="${product.name}" 
-                         onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
-                    <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
-                            data-id="${product.id}">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">${product.name}</h3>
-                    <div class="product-price">
-                        <del class="price-fake">${formatPrice(fakePrice)}</del>
-                        <span class="price-real">${formatPrice(product.price)}</span>
-                    </div>
-                    <div class="availability">
-                        <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                    </div>
-                    
-                    <div class="quantity-selector">
-                        <button class="toggle-bulk-options">
-                            Bulk Options <i class="fas fa-chevron-down"></i>
+                <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" class="product-card-clickable">
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.name}" 
+                             onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
+                                data-id="${product.id}"
+                                aria-label="${isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}">
+                            <i class="fas fa-heart"></i>
                         </button>
-                        <div class="quantity-options" style="display: none;">
-                            ${[1, 10, 25, 50, 100].map(qty => `
-                                <div class="quantity-option ${qty === 1 ? 'selected' : ''}" data-qty="${qty}">${qty} Unit${qty > 1 ? 's' : ''}</div>
-                            `).join('')}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.name}</h3>
+                        <div class="product-price">
+                            <span class="price-real">${formatPrice(product.price)}</span>
+                        </div>
+                        <div class="availability">
+                            <i class="fas fa-check-circle"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                         </div>
                     </div>
-                    
-                    <div class="action-buttons">
-                        <button class="btn-add-cart" data-id="${product.id}">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
-                        <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
-                           class="btn-view-details">
-                            <i class="fas fa-eye"></i> View Details
-                        </a>
-                    </div>
-                </div>
+                </a>
             `;
             
             productsGrid.appendChild(productCard);
@@ -1281,131 +1240,31 @@
     }
     
     // ====================
-    // MODAL FUNCTIONS (FOR BACKWARD COMPATIBILITY)
-    // ====================
-    async function openProductModal(productId) {
-        console.log(`📊 Opening modal for product ID: ${productId}`);
-        
-        const supabase = getSupabaseClient();
-        if (!supabase) {
-            showNotification('Database connection error', 'error');
-            return;
-        }
-        
-        try {
-            // Get product
-            const { data: product, error: productError } = await supabase
-                .from('products')
-                .select('*')
-                .eq('id', productId)
-                .single();
-            
-            if (productError || !product) {
-                throw new Error('Product not found in database');
-            }
-            
-            // Get colors
-            const { data: colors, error: colorsError } = await supabase
-                .from('product_colors')
-                .select('*')
-                .eq('product_id', productId)
-                .order('sort_order');
-            
-            if (colorsError) {
-                console.warn('⚠️ Colors fetch error:', colorsError);
-            }
-            
-            // Get sizes
-            const { data: sizes, error: sizesError } = await supabase
-                .from('product_sizes')
-                .select('*')
-                .eq('product_id', productId)
-                .order('size_value');
-            
-            if (sizesError) {
-                console.warn('⚠️ Sizes fetch error:', sizesError);
-            }
-            
-            // Set current state
-            currentProduct = product;
-            currentProductColors = colors || [];
-            currentProductSizes = sizes || [];
-            currentSelectedColor = null;
-            currentSelectedSize = null;
-            currentSelectedVariant = null;
-            
-            buildColorSizeMappings(currentProductColors, currentProductSizes);
-            
-            // Redirect to product page instead of opening modal
-            if (product.slug) {
-                window.location.href = `product.html?slug=${encodeURIComponent(product.slug)}`;
-            } else {
-                // Fallback to ID if no slug
-                window.location.href = `product.html?slug=${product.id}`;
-            }
-            
-        } catch (error) {
-            console.error('❌ Modal error:', error);
-            showNotification(`Failed to load product: ${error.message}`, 'error');
-        }
-    }
-    
-    // ====================
     // PRODUCT INTERACTIONS
     // ====================
     function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // Add to Cart buttons (from product cards)
-        document.addEventListener('click', function(event) {
-            const addCartBtn = event.target.closest('.btn-add-cart');
-            if (addCartBtn) {
-                event.preventDefault();
-                const productId = parseInt(addCartBtn.getAttribute('data-id'));
-                const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
-                
-                if (!product) {
-                    showNotification('Product not found', 'error');
-                    return;
-                }
-                
-                addToCart(product, 1);
-                showNotification(`${product.name} added to cart!`, 'success');
-            }
-        });
-        
-        // Wishlist buttons
+        // Wishlist buttons - prevent navigation when clicking inside clickable cards
         document.addEventListener('click', function(event) {
             const wishlistBtn = event.target.closest('.wishlist-btn');
             if (wishlistBtn) {
                 event.preventDefault();
+                event.stopPropagation(); // Prevent card navigation
+                
                 const productId = parseInt(wishlistBtn.getAttribute('data-id'));
                 const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
                 
                 if (product) {
                     toggleWishlist(product);
+                    
+                    // Update wishlist button state
+                    const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+                    const isInWishlist = wishlist.some(item => item.id === productId);
+                    wishlistBtn.classList.toggle('active', isInWishlist);
+                    wishlistBtn.setAttribute('aria-label', isInWishlist ? 'Remove from wishlist' : 'Add to wishlist');
                 }
             }
-        });
-        
-        // Quantity toggles
-        document.querySelectorAll('.toggle-bulk-options').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const options = this.nextElementSibling;
-                options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
-            });
-        });
-        
-        document.querySelectorAll('.quantity-option').forEach(option => {
-            option.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const container = this.closest('.quantity-options');
-                container.querySelectorAll('.quantity-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                this.classList.add('selected');
-            });
         });
         
         console.log('✅ Product interactions setup complete');
@@ -1475,14 +1334,15 @@
         const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
         const cartItems = document.getElementById('cartItems');
         const cartTotal = document.getElementById('cartTotal');
-        const whatsappCheckout = document.getElementById('whatsappCheckout');
         
         if (!cartItems || !cartTotal) return;
         
         if (cart.length === 0) {
             cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
             cartTotal.textContent = '₦0';
-            if (whatsappCheckout) whatsappCheckout.href = '#';
+            // Disable checkout button if it exists
+            const checkoutBtn = document.getElementById('checkoutButton');
+            if (checkoutBtn) checkoutBtn.disabled = true;
             return;
         }
         
@@ -1506,10 +1366,8 @@
                     <div class="cart-item-details">
                         <div class="cart-item-name">${itemDescription}</div>
                         <div class="cart-item-price">${formatPrice(item.price)}</div>
-                        <div class="cart-item-quantity">
-                            <button class="decrease-quantity" data-index="${index}">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="increase-quantity" data-index="${index}">+</button>
+                        <div class="cart-item-quantity-display">
+                            Quantity: <strong>${item.quantity}</strong>
                         </div>
                     </div>
                     <button class="cart-item-remove" data-index="${index}">
@@ -1519,12 +1377,37 @@
             `;
         });
         
+        // Add checkout section
+        html += `
+            <div class="cart-checkout-section">
+                <div class="cart-total-row">
+                    <span>Total:</span>
+                    <span class="cart-total-amount">${formatPrice(total)}</span>
+                </div>
+                <button class="btn btn-primary btn-checkout" id="checkoutButton">
+                    <i class="fas fa-shopping-bag"></i> Proceed to Checkout
+                </button>
+                <a href="#" class="btn btn-secondary btn-whatsapp" id="whatsappCheckout">
+                    <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
+                </a>
+            </div>
+        `;
+        
         cartItems.innerHTML = html;
         cartTotal.textContent = formatPrice(total);
         
-        setupCartInteractions();
+        // Setup checkout button
+        const checkoutBtn = document.getElementById('checkoutButton');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                // You can redirect to a checkout page or show a checkout modal
+                // For now, we'll use WhatsApp as the checkout method
+                document.getElementById('whatsappCheckout')?.click();
+            });
+        }
         
         // Update WhatsApp checkout link
+        const whatsappCheckout = document.getElementById('whatsappCheckout');
         if (whatsappCheckout) {
             let text = "I would like to purchase:\n";
             cart.forEach(item => {
@@ -1538,40 +1421,11 @@
             text += `\n*Total: ${formatPrice(total)}*\n\nPlease confirm order & shipping details.`;
             whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
         }
+        
+        setupCartInteractions();
     }
     
     function setupCartInteractions() {
-        // Decrease quantity
-        document.querySelectorAll('.decrease-quantity').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                
-                if (cart[index].quantity > 1) {
-                    cart[index].quantity--;
-                } else {
-                    cart.splice(index, 1);
-                }
-                
-                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
-                updateCartUI();
-                showNotification('Cart updated', 'info');
-            });
-        });
-        
-        // Increase quantity
-        document.querySelectorAll('.increase-quantity').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                
-                cart[index].quantity++;
-                localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
-                updateCartUI();
-                showNotification('Cart updated', 'info');
-            });
-        });
-        
         // Remove item
         document.querySelectorAll('.cart-item-remove').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1621,6 +1475,45 @@
     }
     
     // ====================
+    // HEADER CART/WISHLIST UNIVERSAL SETUP
+    // ====================
+    function ensureHeaderIconsExist() {
+        // This function helps ensure cart/wishlist icons are present on all pages
+        // You should have these in your HTML header:
+        // <button id="cartIcon"><i class="fas fa-shopping-cart"></i><span id="cartCount">0</span></button>
+        // <button id="wishlistIcon"><i class="fas fa-heart"></i><span id="wishlistCount">0</span></button>
+        
+        // If icons don't exist, you might need to add them to your HTML template
+        if (!document.getElementById('cartIcon')) {
+            console.warn('⚠️ Cart icon not found in HTML. Please add: <button id="cartIcon"><i class="fas fa-shopping-cart"></i><span id="cartCount">0</span></button>');
+        }
+        
+        if (!document.getElementById('wishlistIcon')) {
+            console.warn('⚠️ Wishlist icon not found in HTML. Please add: <button id="wishlistIcon"><i class="fas fa-heart"></i><span id="wishlistCount">0</span></button>');
+        }
+        
+        // Setup cart toggle
+        const cartIcon = document.getElementById('cartIcon');
+        if (cartIcon) {
+            cartIcon.addEventListener('click', function() {
+                const cartPanel = document.getElementById('cartPanel');
+                if (cartPanel) {
+                    cartPanel.classList.toggle('active');
+                }
+            });
+        }
+        
+        // Setup wishlist toggle (if you have a wishlist panel)
+        const wishlistIcon = document.getElementById('wishlistIcon');
+        if (wishlistIcon) {
+            wishlistIcon.addEventListener('click', function() {
+                // Redirect to wishlist page or open wishlist panel
+                window.location.href = 'wishlist.html'; // You'll need to create this page
+            });
+        }
+    }
+    
+    // ====================
     // INITIALIZATION
     // ====================
     async function initializePage() {
@@ -1635,6 +1528,9 @@
         } else {
             console.log('✅ Supabase client ready');
         }
+        
+        // Ensure header icons exist and work
+        ensureHeaderIconsExist();
         
         // Initialize UI
         updateCartUI();
@@ -1655,18 +1551,6 @@
             if (document.getElementById('productsGrid')) {
                 await loadProductsByCategory(currentCategory);
             }
-        }
-        
-        // Setup modal close button (for backward compatibility)
-        const modalClose = document.getElementById('modalClose');
-        if (modalClose) {
-            modalClose.addEventListener('click', () => {
-                const modalOverlay = document.getElementById('modalOverlay');
-                if (modalOverlay) {
-                    modalOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
         }
         
         console.log('✅ JMPOTTERS initialized successfully');
@@ -1697,5 +1581,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with Permanent Product URLs and all fixes');
+    console.log('✅ JMPOTTERS app loaded with Simplified Product Display and Fixed Cart');
 })();
