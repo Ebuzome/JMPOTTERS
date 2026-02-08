@@ -322,160 +322,129 @@
         }
     }
     
-    function renderProductPage(product) {
-        const productViewer = document.getElementById('productViewer');
-        if (!productViewer) return;
-        
-        const categorySlug = product.category_slug || getCurrentCategory();
-        const imageUrl = getImageUrl(categorySlug, product.image_url);
-        
-        // Determine if it's footwear (needs size/color selectors)
-        const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
-        
-        // Check wishlist status
-        const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
-        const isInWishlist = wishlist.some(item => item.id === product.id);
-        
-        productViewer.innerHTML = `
-            <!-- Breadcrumb -->
-            <div class="breadcrumb">
-                <a href="index.html">Home</a>
-                <i class="fas fa-chevron-right"></i>
-                <a href="${categorySlug}.html">${product.category_name || categorySlug}</a>
-                <i class="fas fa-chevron-right"></i>
-                <span>${product.name}</span>
+   function renderProductPage(product) {
+    const productViewer = document.getElementById('productViewer');
+    if (!productViewer) return;
+    
+    const categorySlug = product.category_slug || getCurrentCategory();
+    const imageUrl = getImageUrl(categorySlug, product.image_url);
+    
+    // Determine if it's footwear (needs size/color selectors)
+    const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
+    
+    // Check wishlist status
+    const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+    const isInWishlist = wishlist.some(item => item.id === product.id);
+    
+    productViewer.innerHTML = `
+        <div class="product-container">
+            <!-- Product Images -->
+            <div class="product-image-container">
+                <img src="${imageUrl}" alt="${product.name}" class="product-image"
+                     onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
             </div>
             
-            <!-- Product Main Container -->
-            <div class="product-page-container">
-                <!-- Product Images -->
-                <div class="product-images">
-                    <div class="main-image">
-                        <img src="${imageUrl}" alt="${product.name}" 
-                             onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+            <!-- Product Details -->
+            <div class="product-details">
+                <!-- Title -->
+                <h1 class="product-title">${product.name}</h1>
+                
+                <!-- Price -->
+                <div class="price-container">
+                    <div class="current-price">${formatPrice(product.price)}</div>
+                </div>
+                
+                <!-- Availability -->
+                <div class="stock-status ${product.stock > 0 ? '' : 'out-of-stock'}">
+                    <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i>
+                    <span>${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
+                    ${product.stock > 0 ? `<span class="stock-count">${product.stock} units available</span>` : ''}
+                </div>
+                
+                <!-- Description -->
+                <div class="detail-tile">
+                    <h3 class="tile-title">Description</h3>
+                    <div class="product-description">
+                        ${product.description ? product.description.replace(/\n/g, '<br>') : 'Premium quality product from JMPOTTERS.'}
                     </div>
                 </div>
                 
-                <!-- Product Details -->
-                <div class="product-details">
-                    <h1 class="product-title">${product.name}</h1>
-                    
-                    <!-- Price - SIMPLIFIED (No fake prices or discounts) -->
-                    <div class="product-price-container">
-                        <div class="current-price">${formatPrice(product.price)}</div>
-                    </div>
-                    
-                    <!-- Availability -->
-                    <div class="availability">
-                        <i class="fas fa-check-circle"></i>
-                        <span>${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
-                        <span class="stock-count">${product.stock > 0 ? `${product.stock} units available` : ''}</span>
-                    </div>
-                    
-                    <!-- Description -->
-                    <div class="product-description">
-                        <h3>Description</h3>
-                        <p>${product.description || 'Premium quality product from JMPOTTERS.'}</p>
-                    </div>
-                    
-                    <!-- Variant Selectors (for footwear) -->
-                    ${isFootwear && currentProductColors.length > 0 ? `
-                    <div class="variant-selectors" id="variantSelectors">
-                        <div class="variant-section">
-                            <h4>Select Color</h4>
-                            <div class="color-options" id="colorOptions">
-                                ${currentProductColors.map(color => `
-                                    <div class="color-option" 
-                                         data-color-id="${color.id}"
-                                         data-color-name="${color.color_name}"
-                                         style="background-color: ${color.color_code || '#666'}"
-                                         title="${color.color_name}">
-                                        ${color.color_name}
-                                    </div>
-                                `).join('')}
+                <!-- Variant Selectors (for footwear) -->
+                ${isFootwear && currentProductColors.length > 0 ? `
+                <div class="detail-tile">
+                    <h3 class="tile-title">Select Color</h3>
+                    <div class="color-options" id="colorOptions">
+                        ${currentProductColors.map(color => `
+                            <div class="color-option" 
+                                 data-color-id="${color.id}"
+                                 data-color-name="${color.color_name}"
+                                 style="background-color: ${color.color_code || '#666'}"
+                                 title="${color.color_name}">
+                                ${color.color_name}
                             </div>
-                        </div>
-                        
-                        <div class="variant-section">
-                            <h4>Select Size</h4>
-                            <div class="size-options" id="sizeOptions">
-                                <div class="no-selection">Please select a color first</div>
-                            </div>
-                        </div>
-                        
-                        <div class="selection-summary" id="selectionSummary" style="display: none;">
-                            <div class="selected-variant">
-                                <span id="selectedColorName"></span>
-                                <span class="separator">-</span>
-                                <span id="selectedSizeValue"></span>
-                            </div>
-                            <div class="stock-info">
-                                <i class="fas fa-box"></i>
-                                <span>Available Stock:</span>
-                                <strong id="availableStock">0</strong>
-                            </div>
-                        </div>
-                    </div>
-                    ` : ''}
-                    
-                    <!-- Quantity Selector -->
-                    <div class="quantity-selector-container">
-                        <h4>Quantity</h4>
-                        <div class="quantity-controls">
-                            <button class="quantity-btn minus">-</button>
-                            <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}">
-                            <button class="quantity-btn plus">+</button>
-                        </div>
-                        <div class="bulk-options">
-                            ${[1, 5, 10, 25, 50].map(qty => `
-                                <button class="bulk-option ${qty === 1 ? 'active' : ''}" data-qty="${qty}">
-                                    ${qty} Unit${qty > 1 ? 's' : ''}
-                                </button>
-                            `).join('')}
-                        </div>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <button class="btn btn-primary btn-add-cart" id="pageAddToCart">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
-                        <button class="btn btn-secondary btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist">
-                            <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
-                        </button>
-                    </div>
-                    
-                    <!-- Bulk Pricing Table -->
-                    <div class="bulk-pricing-table">
-                        <h3>Bulk Pricing</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Quantity</th>
-                                    <th>Price Per Unit</th>
-                                    <th>Total Price</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bulkPricingBody">
-                                ${[1, 10, 25, 50, 100].map(qty => {
-                                    const basePrice = product.price || 0;
-                                    const discount = qty === 1 ? 0 : Math.min(30, Math.floor(qty / 10) * 5);
-                                    const unitPrice = Math.round(basePrice * (1 - discount / 100));
-                                    return `
-                                        <tr>
-                                            <td>${qty} Unit${qty > 1 ? 's' : ''}</td>
-                                            <td>${formatPrice(unitPrice)}</td>
-                                            <td>${formatPrice(unitPrice * qty)}</td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
+                        `).join('')}
                     </div>
                 </div>
+                
+                <div class="detail-tile">
+                    <h3 class="tile-title">Select Size</h3>
+                    <div class="size-options" id="sizeOptions">
+                        <div class="no-selection">Please select a color first</div>
+                    </div>
+                </div>
+                
+                <div class="selection-summary" id="selectionSummary">
+                    <div class="selected-variant">
+                        <span id="selectedColorName"></span>
+                        <span class="separator">-</span>
+                        <span id="selectedSizeValue"></span>
+                    </div>
+                    <div class="stock-info">
+                        <i class="fas fa-box"></i>
+                        <span>Available Stock:</span>
+                        <strong id="availableStock">0</strong>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Quantity Selector -->
+                <div class="detail-tile">
+                    <h3 class="tile-title">Quantity</h3>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus">-</button>
+                        <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}" class="quantity-input">
+                        <button class="quantity-btn plus">+</button>
+                    </div>
+                    <div class="bulk-options">
+                        ${[1, 5, 10, 25, 50].map(qty => `
+                            <button class="bulk-option ${qty === 1 ? 'active' : ''}" data-qty="${qty}">
+                                ${qty} Unit${qty > 1 ? 's' : ''}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-btn btn-primary btn-add-cart" id="pageAddToCart">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="action-btn btn-secondary btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist">
+                        <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+                    </button>
+                </div>
             </div>
-        `;
-        
+        </div>
+    `;
+    
+    // Hide loading state and show product
+    const loadingState = document.getElementById('loadingState');
+    if (loadingState) {
+        loadingState.style.display = 'none';
+    }
+    
+    setupProductPageInteractions();
+}
         // Add styles for product page
         addProductPageStyles();
     }
