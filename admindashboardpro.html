@@ -140,6 +140,68 @@
             color: var(--gray-200);
         }
         
+        /* ===== FLOATING ANIMATIONS ===== */
+        .floating-icon-container {
+            text-align: center;
+            padding: var(--space-8) var(--space-4);
+            margin-bottom: var(--space-6);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(129, 140, 248, 0.05));
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .dark-mode .floating-icon-container {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(129, 140, 248, 0.08));
+            border-color: rgba(129, 140, 248, 0.3);
+        }
+        
+        .floating-icon {
+            width: 6rem;
+            height: 6rem;
+            margin: 0 auto var(--space-4);
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .floating-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+        }
+        
+        .dark-mode .floating-title {
+            color: var(--dark-text);
+        }
+        
+        .floating-description {
+            font-size: 1rem;
+            color: var(--gray-600);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .dark-mode .floating-description {
+            color: var(--dark-text-muted);
+        }
+        
         /* ===== MOBILE-FIRST LAYOUT ===== */
         .admin-container {
             min-height: 100vh;
@@ -1633,7 +1695,7 @@
             border-color: var(--dark-text);
         }
         
-        /* ===== TABLET RESPONSIVE ===== */
+        /* ===== ULTRA PRECISE DESKTOP VIEW FIXES ===== */
         @media (min-width: 640px) {
             html {
                 font-size: 15px;
@@ -1660,12 +1722,13 @@
             }
         }
         
-        /* ===== DESKTOP RESPONSIVE ===== */
+        /* ===== DESKTOP RESPONSIVE - ULTRA PRECISE FIXES ===== */
         @media (min-width: 1024px) {
             .admin-container {
                 display: grid;
                 grid-template-columns: var(--sidebar-width) 1fr;
-                grid-template-rows: auto 1fr;
+                min-height: 100vh;
+                position: relative;
             }
             
             .mobile-header {
@@ -1673,15 +1736,17 @@
             }
             
             .admin-sidebar {
-                display: block;
-                grid-column: 1;
-                grid-row: 1 / -1;
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: var(--sidebar-width);
                 background: var(--gray-900);
                 color: white;
                 border-right: 1px solid var(--gray-800);
-                height: 100vh;
-                position: sticky;
-                top: 0;
+                z-index: 50;
                 overflow-y: auto;
             }
             
@@ -1691,26 +1756,34 @@
             }
             
             .sidebar-header {
-                padding: var(--space-4);
+                padding: var(--space-6) var(--space-4);
                 border-bottom: 1px solid var(--gray-800);
+                position: sticky;
+                top: 0;
+                background: inherit;
+                z-index: 10;
+            }
+            
+            .dark-mode .sidebar-header {
+                border-bottom: 1px solid var(--dark-surface-2);
             }
             
             .admin-main {
-                grid-column: 2;
-                grid-row: 2;
-                padding: var(--space-6);
-                height: calc(100vh - var(--header-height));
-                overflow-y: auto;
+                margin-left: var(--sidebar-width);
+                padding: var(--space-6) var(--space-8);
+                min-height: 100vh;
+                width: calc(100% - var(--sidebar-width));
+                transition: margin-left var(--transition);
             }
             
             .dashboard-section {
-                max-width: 1200px;
+                max-width: 1400px;
                 margin: 0 auto;
                 width: 100%;
             }
             
             .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: var(--space-6);
             }
             
@@ -1729,15 +1802,55 @@
                 grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
                 gap: var(--space-4);
                 overflow: visible;
+                padding: var(--space-2) 0;
             }
             
             .quick-action-btn {
                 min-width: auto;
+                height: 100%;
             }
             
             .mobile-sidebar,
             .sidebar-overlay {
                 display: none !important;
+            }
+            
+            /* Ultra precise desktop form improvements */
+            .form-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-6);
+            }
+            
+            .modal-content {
+                max-width: 800px;
+                margin: var(--space-8) auto;
+            }
+            
+            /* Enhanced desktop action cards */
+            .action-card {
+                padding: var(--space-6);
+            }
+            
+            /* Perfect desktop floating icon adjustments */
+            .floating-icon-container {
+                padding: var(--space-10) var(--space-8);
+                margin: 0 auto var(--space-8);
+                max-width: 800px;
+            }
+            
+            .floating-icon {
+                width: 8rem;
+                height: 8rem;
+                font-size: 3.5rem;
+            }
+            
+            .floating-title {
+                font-size: 2rem;
+            }
+            
+            .floating-description {
+                font-size: 1.125rem;
+                max-width: 700px;
             }
         }
         
@@ -1747,16 +1860,29 @@
                 grid-template-columns: repeat(4, 1fr);
             }
             
-            .admin-main {
-                padding: var(--space-8);
-            }
-            
             .stats-grid {
                 grid-template-columns: repeat(6, 1fr);
             }
             
+            .admin-main {
+                padding: var(--space-8) var(--space-12);
+            }
+            
+            .sidebar-header {
+                padding: var(--space-8) var(--space-6);
+            }
+            
             .quick-actions {
                 grid-template-columns: repeat(6, 1fr);
+            }
+            
+            /* Ultra-wide desktop optimizations */
+            .dashboard-section {
+                max-width: 1600px;
+            }
+            
+            .form-row {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
         
@@ -1814,6 +1940,88 @@
         
         .dark-mode ::-webkit-scrollbar-thumb:hover {
             background: var(--gray-500);
+        }
+        
+        /* ===== PRODUCT STATUS DROPDOWN ===== */
+        .status-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .status-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 180px;
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius);
+            z-index: 1000;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .dark-mode .status-dropdown-content {
+            background-color: var(--dark-surface);
+            border-color: var(--dark-surface-2);
+        }
+        
+        .status-dropdown-content.show {
+            display: block;
+            animation: fadeInUp 0.2s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .status-option {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: background-color var(--transition-fast);
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .dark-mode .status-option {
+            border-bottom-color: var(--dark-surface-2);
+        }
+        
+        .status-option:last-child {
+            border-bottom: none;
+        }
+        
+        .status-option:hover {
+            background-color: var(--gray-50);
+        }
+        
+        .dark-mode .status-option:hover {
+            background-color: var(--dark-surface-2);
+        }
+        
+        .status-option.active {
+            background-color: var(--primary-50);
+            color: var(--primary-700);
+        }
+        
+        .dark-mode .status-option.active {
+            background-color: rgba(129, 140, 248, 0.2);
+            color: var(--primary-400);
+        }
+        
+        .status-option i {
+            width: 1.25rem;
+            text-align: center;
         }
     </style>
     <!-- Font Awesome -->
@@ -1989,7 +2197,112 @@
         </div>
         
         <nav class="sidebar-nav">
-            <!-- Same navigation as mobile sidebar -->
+            <div class="nav-section">
+                <div class="section-label">Main</div>
+                <ul class="nav-items">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" data-section="dashboard">
+                            <div class="nav-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="analytics">
+                            <div class="nav-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            Analytics
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="section-label">Commerce</div>
+                <ul class="nav-items">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="products">
+                            <div class="nav-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            Products
+                            <div class="nav-badge" id="productsCountDesktop">0</div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="categories">
+                            <div class="nav-icon">
+                                <i class="fas fa-tags"></i>
+                            </div>
+                            Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="inventory">
+                            <div class="nav-icon">
+                                <i class="fas fa-warehouse"></i>
+                            </div>
+                            Inventory
+                            <div class="nav-badge urgent" id="lowStockCountDesktop">0</div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="orders">
+                            <div class="nav-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            Orders
+                            <div class="nav-badge" id="ordersCountDesktop">0</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="section-label">Marketing</div>
+                <ul class="nav-items">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="coupons">
+                            <div class="nav-icon">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            Coupons
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="reviews">
+                            <div class="nav-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            Reviews
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="section-label">Settings</div>
+                <ul class="nav-items">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="users">
+                            <div class="nav-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="settings">
+                            <div class="nav-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </nav>
     </aside>
     
@@ -2148,6 +2461,118 @@
             </div>
         </section>
         
+        <!-- Analytics Section -->
+        <section id="analytics" class="dashboard-section">
+            <div class="section-header">
+                <h1 class="section-title">Analytics Dashboard</h1>
+                <p class="section-subtitle">Track your store performance with detailed analytics</p>
+            </div>
+            
+            <!-- Floating Icon Animation -->
+            <div class="floating-icon-container">
+                <div class="floating-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h2 class="floating-title">Analytics Center</h2>
+                <p class="floating-description">
+                    Monitor sales trends, customer behavior, and business performance with real-time analytics.
+                </p>
+            </div>
+            
+            <!-- Analytics Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="text-xs text-gray-600">30 days</div>
+                    </div>
+                    <div class="stat-value" id="monthlyRevenue">₦0</div>
+                    <div class="stat-label">Monthly Revenue</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon success">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="text-xs text-gray-600">Total</div>
+                    </div>
+                    <div class="stat-value" id="totalOrders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="text-xs text-gray-600">New</div>
+                    </div>
+                    <div class="stat-value" id="newCustomers">0</div>
+                    <div class="stat-label">New Customers</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon info">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="text-xs text-gray-600">Rate</div>
+                    </div>
+                    <div class="stat-value" id="conversionRate">0%</div>
+                    <div class="stat-label">Conversion Rate</div>
+                </div>
+            </div>
+            
+            <!-- Analytics Actions -->
+            <div class="quick-actions-scroll mb-6">
+                <div class="quick-action-btn" onclick="AdminDashboard.viewSalesReport()">
+                    <div class="quick-action-icon" style="background: linear-gradient(135deg, var(--success-500), var(--success-600));">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <span class="quick-action-text">Sales Report</span>
+                </div>
+                <div class="quick-action-btn" onclick="AdminDashboard.viewCustomerAnalytics()">
+                    <div class="quick-action-icon" style="background: linear-gradient(135deg, var(--info-500), var(--info-600));">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <span class="quick-action-text">Customers</span>
+                </div>
+                <div class="quick-action-btn" onclick="AdminDashboard.viewProductAnalytics()">
+                    <div class="quick-action-icon" style="background: linear-gradient(135deg, var(--warning-500), var(--warning-600));">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <span class="quick-action-text">Products</span>
+                </div>
+                <div class="quick-action-btn" onclick="AdminDashboard.exportAnalytics()">
+                    <div class="quick-action-icon" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <span class="quick-action-text">Export Data</span>
+                </div>
+            </div>
+            
+            <!-- Charts Placeholder -->
+            <div class="action-card mb-6">
+                <h3 class="section-title-sm mb-4">Sales Overview</h3>
+                <div class="empty-state" style="border: none; background: transparent; padding: 3rem;">
+                    <div class="empty-icon">
+                        <i class="fas fa-chart-area"></i>
+                    </div>
+                    <h3 class="empty-title">Analytics Charts</h3>
+                    <p class="empty-description">
+                        Real-time sales charts and graphs will appear here. Track revenue, orders, 
+                        and customer metrics with interactive visualizations.
+                    </p>
+                    <button class="btn btn-primary mt-4" onclick="AdminDashboard.loadDemoAnalytics()">
+                        <i class="fas fa-eye"></i> View Demo Analytics
+                    </button>
+                </div>
+            </div>
+        </section>
+        
         <!-- Products Management Section -->
         <section id="products" class="dashboard-section">
             <div class="section-header">
@@ -2245,6 +2670,47 @@
             </div>
         </section>
         
+        <!-- Categories Section -->
+        <section id="categories" class="dashboard-section">
+            <div class="section-header">
+                <h1 class="section-title">Category Management</h1>
+                <p class="section-subtitle">Organize your products with categories and tags</p>
+            </div>
+            
+            <!-- Floating Icon Animation -->
+            <div class="floating-icon-container">
+                <div class="floating-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h2 class="floating-title">Category Center</h2>
+                <p class="floating-description">
+                    Create and manage product categories to organize your store effectively.
+                </p>
+            </div>
+            
+            <!-- Categories Grid -->
+            <div class="products-grid" id="categoriesGrid">
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3 class="empty-title">Manage Categories</h3>
+                    <p class="empty-description">
+                        Create product categories to organize your inventory. Categories help customers
+                        browse your store and find products easily.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                        <button class="btn btn-secondary" onclick="AdminDashboard.viewAllCategories()">
+                            <i class="fas fa-list"></i> View All Categories
+                        </button>
+                        <button class="btn btn-primary" onclick="AdminDashboard.createNewCategory()">
+                            <i class="fas fa-plus"></i> Create Category
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
         <!-- Inventory Management Section -->
         <section id="inventory" class="dashboard-section">
             <div class="section-header">
@@ -2330,6 +2796,220 @@
             </div>
         </section>
         
+        <!-- Orders Section -->
+        <section id="orders" class="dashboard-section">
+            <div class="section-header">
+                <h1 class="section-title">Order Management</h1>
+                <p class="section-subtitle">Process and manage customer orders efficiently</p>
+            </div>
+            
+            <!-- Floating Icon Animation -->
+            <div class="floating-icon-container">
+                <div class="floating-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h2 class="floating-title">Order Center</h2>
+                <p class="floating-description">
+                    Manage all customer orders, process payments, update order status, and handle shipping.
+                </p>
+            </div>
+            
+            <!-- Orders Table -->
+            <div class="mb-6">
+                <div class="action-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="action-title">Recent Orders</h3>
+                        <div class="flex gap-2">
+                            <select class="form-control text-sm" style="width: 120px;" id="orderStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <input type="date" class="form-control text-sm" style="width: 140px;" id="orderDateFilter">
+                        </div>
+                    </div>
+                    
+                    <div id="ordersTable">
+                        <div class="empty-state" style="border: none; background: transparent;">
+                            <div class="empty-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <h3 class="empty-title">No Orders Yet</h3>
+                            <p class="empty-description">
+                                When customers place orders through your e-commerce store,
+                                they will appear here. You'll be able to view order details,
+                                update status, and process payments.
+                            </p>
+                            <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                                <button class="btn btn-secondary" onclick="AdminDashboard.createTestOrder()">
+                                    <i class="fas fa-vial"></i> Create Test Order
+                                </button>
+                                <button class="btn btn-primary" onclick="AdminDashboard.importOrders()">
+                                    <i class="fas fa-upload"></i> Import Orders
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3 class="action-title">Order Reports</h3>
+                    <p class="action-description">
+                        Generate detailed sales reports, export order data to CSV,
+                        and analyze sales trends.
+                    </p>
+                    <button class="btn btn-secondary btn-block mt-3" onclick="AdminDashboard.generateOrderReport()">
+                        <i class="fas fa-chart-bar"></i> Generate Report
+                    </button>
+                </div>
+                
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3 class="action-title">Shipping Management</h3>
+                    <p class="action-description">
+                        Configure shipping options, print shipping labels,
+                        and track order deliveries.
+                    </p>
+                    <button class="btn btn-secondary btn-block mt-3" onclick="AdminDashboard.configureShipping()">
+                        <i class="fas fa-cog"></i> Configure Shipping
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Users Section -->
+        <section id="users" class="dashboard-section">
+            <div class="section-header">
+                <h1 class="section-title">User Management</h1>
+                <p class="section-subtitle">Manage admin users and permissions</p>
+            </div>
+            
+            <!-- Floating Icon Animation -->
+            <div class="floating-icon-container">
+                <div class="floating-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h2 class="floating-title">User Center</h2>
+                <p class="floating-description">
+                    Manage admin users, set permissions, and control access to different sections of the dashboard.
+                </p>
+            </div>
+            
+            <!-- Users Grid -->
+            <div class="products-grid" id="usersGrid">
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <h3 class="empty-title">User Management</h3>
+                    <p class="empty-description">
+                        Add new admin users, set permissions, and manage access to different
+                        sections of your dashboard.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                        <button class="btn btn-secondary" onclick="AdminDashboard.viewAllUsers()">
+                            <i class="fas fa-list"></i> View All Users
+                        </button>
+                        <button class="btn btn-primary" onclick="AdminDashboard.inviteNewUser()">
+                            <i class="fas fa-user-plus"></i> Invite User
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Coupons Section -->
+        <section id="coupons" class="dashboard-section">
+            <div class="section-header">
+                <h1 class="section-title">Coupon Management</h1>
+                <p class="section-subtitle">Create and manage discount coupons</p>
+            </div>
+            
+            <!-- Floating Icon Animation -->
+            <div class="floating-icon-container">
+                <div class="floating-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <h2 class="floating-title">Coupon Center</h2>
+                <p class="floating-description">
+                    Create discount coupons, promo codes, and special offers to boost sales.
+                </p>
+            </div>
+            
+            <!-- Coupons Grid -->
+            <div class="products-grid" id="couponsGrid">
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <h3 class="empty-title">Discount Coupons</h3>
+                    <p class="empty-description">
+                        Create discount coupons and promo codes to attract customers
+                        and increase sales. Set expiration dates and usage limits.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                        <button class="btn btn-secondary" onclick="AdminDashboard.viewAllCoupons()">
+                            <i class="fas fa-list"></i> View All Coupons
+                        </button>
+                        <button class="btn btn-primary" onclick="AdminDashboard.createNewCoupon()">
+                            <i class="fas fa-plus"></i> Create Coupon
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Reviews Section -->
+        <section id="reviews" class="dashboard-section">
+            <div class="section-header">
+                <h1 class="section-title">Product Reviews</h1>
+                <p class="section-subtitle">Manage customer reviews and ratings</p>
+            </div>
+            
+            <!-- Floating Icon Animation -->
+            <div class="floating-icon-container">
+                <div class="floating-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h2 class="floating-title">Reviews Center</h2>
+                <p class="floating-description">
+                    Monitor and manage customer reviews, respond to feedback, and maintain product ratings.
+                </p>
+            </div>
+            
+            <!-- Reviews Grid -->
+            <div class="products-grid" id="reviewsGrid">
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="empty-title">Customer Reviews</h3>
+                    <p class="empty-description">
+                        View and manage customer reviews and ratings. Respond to feedback,
+                        approve reviews, and maintain your store's reputation.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                        <button class="btn btn-secondary" onclick="AdminDashboard.viewAllReviews()">
+                            <i class="fas fa-list"></i> View All Reviews
+                        </button>
+                        <button class="btn btn-primary" onclick="AdminDashboard.moderateReviews()">
+                            <i class="fas fa-check-double"></i> Moderate Reviews
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
         <!-- Settings Section -->
         <section id="settings" class="dashboard-section">
             <div class="section-header">
@@ -2370,6 +3050,18 @@
                         <input type="color" id="primaryColorPicker" value="#6366F1" 
                                onchange="AdminDashboard.changePrimaryColor(this.value)">
                     </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Button Style</div>
+                            <div class="setting-description">Choose button design style</div>
+                        </div>
+                        <select class="form-control text-sm" style="width: 140px;" id="buttonStyle" onchange="AdminDashboard.changeButtonStyle(this.value)">
+                            <option value="rounded">Rounded</option>
+                            <option value="square">Square</option>
+                            <option value="pill">Pill</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <!-- Database Settings -->
@@ -2405,6 +3097,73 @@
                             Backup Now
                         </button>
                     </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Sync Interval</div>
+                            <div class="setting-description">How often to sync with database</div>
+                        </div>
+                        <select class="form-control text-sm" style="width: 140px;" id="syncInterval" onchange="AdminDashboard.setSyncInterval(this.value)">
+                            <option value="realtime">Real-time</option>
+                            <option value="30s">30 seconds</option>
+                            <option value="1m" selected>1 minute</option>
+                            <option value="5m">5 minutes</option>
+                            <option value="manual">Manual Only</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- UI Assets Configuration -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">UI Assets</h3>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Custom Button Assets</div>
+                            <div class="setting-description">Manage reusable button styles</div>
+                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="AdminDashboard.manageButtonAssets()">
+                            <i class="fas fa-palette"></i> Manage
+                        </button>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Icon Library</div>
+                            <div class="setting-description">Choose icon set for dashboard</div>
+                        </div>
+                        <select class="form-control text-sm" style="width: 140px;" id="iconLibrary" onchange="AdminDashboard.changeIconLibrary(this.value)">
+                            <option value="fontawesome" selected>Font Awesome</option>
+                            <option value="material">Material Icons</option>
+                            <option value="bootstrap">Bootstrap Icons</option>
+                            <option value="custom">Custom Icons</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Animation Speed</div>
+                            <div class="setting-description">Control animation duration</div>
+                        </div>
+                        <select class="form-control text-sm" style="width: 140px;" id="animationSpeed" onchange="AdminDashboard.changeAnimationSpeed(this.value)">
+                            <option value="fast">Fast</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="slow">Slow</option>
+                            <option value="none">No Animations</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Grid Density</div>
+                            <div class="setting-description">Control spacing between elements</div>
+                        </div>
+                        <select class="form-control text-sm" style="width: 140px;" id="gridDensity" onchange="AdminDashboard.changeGridDensity(this.value)">
+                            <option value="compact">Compact</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="spacious">Spacious</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <!-- Image Configuration -->
@@ -2423,6 +3182,28 @@
                         <div class="text-sm text-gray-600 bg-gray-50 p-3 rounded border dark:bg-dark-surface-2 dark:border-dark-surface">
                             <pre id="categoryPaths" style="white-space: pre-wrap; font-family: monospace;"></pre>
                         </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Image Optimization</div>
+                            <div class="setting-description">Auto-compress uploaded images</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="imageOptimization" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Auto Watermark</div>
+                            <div class="setting-description">Add watermark to product images</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoWatermark">
+                            <span class="toggle-slider"></span>
+                        </label>
                     </div>
                 </div>
                 
@@ -2466,6 +3247,28 @@
                             <option value="excel">Excel</option>
                         </select>
                     </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Keyboard Shortcuts</div>
+                            <div class="setting-description">Enable keyboard navigation</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="keyboardShortcuts" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Developer Mode</div>
+                            <div class="setting-description">Show console logs and debug info</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="developerMode" onchange="AdminDashboard.toggleDeveloperMode()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
                 
                 <!-- Danger Zone -->
@@ -2494,9 +3297,6 @@
                 </div>
             </div>
         </section>
-        
-        <!-- Other Sections (Analytics, Orders, etc.) -->
-        <!-- ... (Keep existing sections as they are) ... -->
     </main>
     
     <!-- Product Edit/Add Modal -->
@@ -2773,6 +3573,39 @@
             let selectedColorIds = [];
             let colorDatabase = {};
             let refreshInterval = null;
+            let activeStatusDropdown = null;
+            
+            // UI Assets database
+            const uiAssets = {
+                buttonStyles: {
+                    rounded: {
+                        borderRadius: '0.5rem',
+                        padding: '0.625rem 1rem'
+                    },
+                    square: {
+                        borderRadius: '0.25rem',
+                        padding: '0.625rem 1rem'
+                    },
+                    pill: {
+                        borderRadius: '9999px',
+                        padding: '0.625rem 1.5rem'
+                    }
+                },
+                iconLibraries: {
+                    fontawesome: {
+                        prefix: 'fas fa-',
+                        url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+                    },
+                    material: {
+                        prefix: 'material-icons',
+                        url: 'https://fonts.googleapis.com/icon?family=Material+Icons'
+                    },
+                    bootstrap: {
+                        prefix: 'bi bi-',
+                        url: 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css'
+                    }
+                }
+            };
             
             // Image configuration - CORRECTED VERSION
             const imageConfig = {
@@ -2936,6 +3769,28 @@
                 
                 const notifications = localStorage.getItem('notifications') === 'true';
                 document.getElementById('notificationsToggle').checked = notifications;
+                
+                const buttonStyle = localStorage.getItem('buttonStyle') || 'rounded';
+                document.getElementById('buttonStyle').value = buttonStyle;
+                applyButtonStyle(buttonStyle);
+                
+                const iconLibrary = localStorage.getItem('iconLibrary') || 'fontawesome';
+                document.getElementById('iconLibrary').value = iconLibrary;
+                
+                const animationSpeed = localStorage.getItem('animationSpeed') || 'normal';
+                document.getElementById('animationSpeed').value = animationSpeed;
+                
+                const gridDensity = localStorage.getItem('gridDensity') || 'normal';
+                document.getElementById('gridDensity').value = gridDensity;
+                
+                const syncInterval = localStorage.getItem('syncInterval') || '1m';
+                document.getElementById('syncInterval').value = syncInterval;
+                
+                const keyboardShortcuts = localStorage.getItem('keyboardShortcuts') === 'true';
+                document.getElementById('keyboardShortcuts').checked = keyboardShortcuts;
+                
+                const developerMode = localStorage.getItem('developerMode') === 'true';
+                document.getElementById('developerMode').checked = developerMode;
             }
             
             // Setup auto-refresh
@@ -2984,7 +3839,7 @@
                     // Load colors for all products
                     await loadProductColorsBatch();
                     
-                    // Load sizes for all products - FIXED: This was missing!
+                    // Load sizes for all products
                     await loadProductSizesBatch();
                     
                     // Calculate total stock for each product
@@ -3037,7 +3892,7 @@
                 }
             }
             
-            // Load product sizes in batch - FIXED VERSION
+            // Load product sizes in batch
             async function loadProductSizesBatch() {
                 try {
                     console.log('📏 Loading product sizes...');
@@ -3066,7 +3921,6 @@
                     });
                     
                     console.log(`✅ Loaded sizes for ${Object.keys(productSizes).length} products`);
-                    console.log('Sample sizes data:', productSizes);
                     
                 } catch (error) {
                     console.error('❌ Failed to load sizes:', error);
@@ -3110,8 +3964,17 @@
                     return (p.stock || 0) === 0;
                 }).length;
                 
+                // Update mobile badges
                 document.getElementById('productsCount').textContent = totalProducts;
                 document.getElementById('lowStockCount').textContent = lowStock;
+                document.getElementById('ordersCount').textContent = '0'; // Placeholder
+                
+                // Update desktop badges
+                document.getElementById('productsCountDesktop').textContent = totalProducts;
+                document.getElementById('lowStockCountDesktop').textContent = lowStock;
+                document.getElementById('ordersCountDesktop').textContent = '0'; // Placeholder
+                
+                // Update stats
                 document.getElementById('lowStockCountStat').textContent = lowStock;
                 document.getElementById('outOfStockCount').textContent = outOfStock;
                 document.getElementById('totalProductsCount').textContent = totalProducts;
@@ -3171,7 +4034,7 @@
                 container.innerHTML = html;
             }
             
-            // Render product card
+            // Render product card with status dropdown
             function renderProductCard(product) {
                 const stock = product.total_stock !== undefined ? product.total_stock : (product.stock || 0);
                 const stockClass = stock > 10 ? 'stock-high' : stock > 0 ? 'stock-medium' : 'stock-low';
@@ -3180,19 +4043,17 @@
                                   product.product_modals?.[0]?.modal_type === 'footwear';
                 const colors = productColors[product.id] || [];
                 const sizes = productSizes[product.id] || {};
+                const isActive = product.is_active !== false;
                 
-                // Build image URL - CORRECTED VERSION
+                // Build image URL
                 const imageUrl = getProductImageUrl(product);
-                
-                // Get available color count
-                const colorCount = colors.length;
                 
                 return `
                     <div class="product-card" data-product-id="${product.id}">
                         <div class="product-image-container">
                             <img src="${imageUrl}" alt="${product.name}" class="product-image"
                                  onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
-                            ${!product.is_active ? `
+                            ${!isActive ? `
                                 <div class="product-badge" style="background: var(--danger-500);">
                                     <i class="fas fa-ban"></i> Inactive
                                 </div>
@@ -3213,8 +4074,9 @@
                             
                             <div class="product-meta">
                                 <div class="product-stock ${stockClass}">${stockText}</div>
-                                <div class="text-xs text-gray-600 dark:text-dark-text-muted">
-                                    ${isFootwear ? '<i class="fas fa-shoe-prints"></i> Footwear' : '<i class="fas fa-box"></i> Product'}
+                                <div class="text-xs ${isActive ? 'text-green-600' : 'text-red-600'}">
+                                    <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                                    ${isActive ? 'Active' : 'Inactive'}
                                 </div>
                             </div>
                             
@@ -3243,9 +4105,21 @@
                                 <button class="btn btn-sm btn-primary flex-1" onclick="AdminDashboard.editProduct(${product.id})">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
-                                <button class="btn btn-sm btn-secondary" onclick="AdminDashboard.toggleProductStatus(${product.id})">
-                                    <i class="fas fa-power-off"></i>
-                                </button>
+                                <div class="status-dropdown">
+                                    <button class="btn btn-sm ${isActive ? 'btn-success' : 'btn-secondary'}" onclick="AdminDashboard.toggleStatusDropdown(${product.id}, this)">
+                                        <i class="fas fa-power-off"></i>
+                                    </button>
+                                    <div class="status-dropdown-content" id="statusDropdown${product.id}">
+                                        <div class="status-option ${isActive ? 'active' : ''}" onclick="AdminDashboard.activateProduct(${product.id})">
+                                            <i class="fas fa-check-circle"></i>
+                                            <span>Activate Product</span>
+                                        </div>
+                                        <div class="status-option ${!isActive ? 'active' : ''}" onclick="AdminDashboard.deactivateProduct(${product.id})">
+                                            <i class="fas fa-ban"></i>
+                                            <span>Deactivate Product</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <button class="btn btn-sm btn-secondary" onclick="AdminDashboard.duplicateProduct(${product.id})">
                                     <i class="fas fa-copy"></i>
                                 </button>
@@ -3255,11 +4129,105 @@
                 `;
             }
             
-            // Get product image URL - CORRECTED VERSION
+            // Toggle status dropdown
+            function toggleStatusDropdown(productId, button) {
+                // Close any open dropdown
+                if (activeStatusDropdown && activeStatusDropdown !== productId) {
+                    const prevDropdown = document.getElementById('statusDropdown' + activeStatusDropdown);
+                    if (prevDropdown) prevDropdown.classList.remove('show');
+                }
+                
+                const dropdown = document.getElementById('statusDropdown' + productId);
+                if (dropdown) {
+                    dropdown.classList.toggle('show');
+                    activeStatusDropdown = dropdown.classList.contains('show') ? productId : null;
+                }
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function closeDropdown(e) {
+                    if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove('show');
+                        activeStatusDropdown = null;
+                        document.removeEventListener('click', closeDropdown);
+                    }
+                });
+            }
+            
+            // Activate product
+            async function activateProduct(productId) {
+                try {
+                    const { error } = await supabase
+                        .from('products')
+                        .update({ is_active: true, updated_at: new Date().toISOString() })
+                        .eq('id', productId);
+                    
+                    if (error) throw error;
+                    
+                    // Update local data
+                    const product = allProducts.find(p => p.id === productId);
+                    if (product) {
+                        product.is_active = true;
+                    }
+                    
+                    // Re-render products
+                    renderRecentProducts();
+                    renderProductsPage();
+                    
+                    showToast('Product activated successfully', 'success');
+                    
+                    // Close dropdown
+                    const dropdown = document.getElementById('statusDropdown' + productId);
+                    if (dropdown) dropdown.classList.remove('show');
+                    activeStatusDropdown = null;
+                    
+                } catch (error) {
+                    console.error('Error activating product:', error);
+                    showToast('Failed to activate product: ' + error.message, 'error');
+                }
+            }
+            
+            // Deactivate product
+            async function deactivateProduct(productId) {
+                if (!confirm('Are you sure you want to deactivate this product? It will no longer be visible to customers.')) {
+                    return;
+                }
+                
+                try {
+                    const { error } = await supabase
+                        .from('products')
+                        .update({ is_active: false, updated_at: new Date().toISOString() })
+                        .eq('id', productId);
+                    
+                    if (error) throw error;
+                    
+                    // Update local data
+                    const product = allProducts.find(p => p.id === productId);
+                    if (product) {
+                        product.is_active = false;
+                    }
+                    
+                    // Re-render products
+                    renderRecentProducts();
+                    renderProductsPage();
+                    
+                    showToast('Product deactivated successfully', 'success');
+                    
+                    // Close dropdown
+                    const dropdown = document.getElementById('statusDropdown' + productId);
+                    if (dropdown) dropdown.classList.remove('show');
+                    activeStatusDropdown = null;
+                    
+                } catch (error) {
+                    console.error('Error deactivating product:', error);
+                    showToast('Failed to deactivate product: ' + error.message, 'error');
+                }
+            }
+            
+            // Get product image URL
             function getProductImageUrl(product) {
                 const imageUrl = product.image_url || '';
                 
-                // Check if it's already a full URL with base path (incorrect)
+                // Check if it's already a full URL with base path
                 if (imageUrl.includes(imageConfig.baseUrl)) {
                     // Extract just the filename part
                     const baseUrl = imageConfig.baseUrl;
@@ -3289,7 +4257,7 @@
                 return imageConfig.baseUrl + categoryPath + filename;
             }
             
-            // Parse image filename from URL - NEW FUNCTION
+            // Parse image filename from URL
             function parseImageFilenameFromUrl(imageUrl) {
                 if (!imageUrl) return '';
                 
@@ -3547,7 +4515,7 @@
                         onCategoryChange();
                     }
                     
-                    // Parse image URL to get filename - CORRECTED VERSION
+                    // Parse image URL to get filename
                     const imageUrl = product.image_url || '';
                     const imageFilename = parseImageFilenameFromUrl(imageUrl);
                     document.getElementById('productImageName').value = imageFilename;
@@ -3653,37 +4621,22 @@
                 }
             }
             
-            // Load sizes for product - FIXED VERSION
+            // Load sizes for product
             async function loadSizesForProduct(productId) {
                 try {
-                    console.log('Loading sizes for product:', productId);
-                    console.log('Product sizes data:', productSizes[productId]);
-                    
                     currentEditingSizes = productSizes[productId] || {};
-                    
-                    // Verify data structure
-                    if (currentEditingSizes) {
-                        console.log('Current editing sizes:', currentEditingSizes);
-                        Object.keys(currentEditingSizes).forEach(colorId => {
-                            console.log(`Color ${colorId} has ${currentEditingSizes[colorId]?.length || 0} sizes`);
-                        });
-                    }
                     
                 } catch (error) {
                     console.error('Error loading sizes:', error);
                 }
             }
             
-            // Load sizes for selected color - FIXED VERSION
+            // Load sizes for selected color
             function loadSizesForColor() {
                 const colorId = document.getElementById('colorSelector').value;
                 const productId = currentProductId;
                 
-                console.log('Loading sizes for color:', colorId, 'product:', productId);
-                console.log('Current editing sizes:', currentEditingSizes);
-                
                 const sizes = currentEditingSizes[colorId] || [];
-                console.log('Found sizes:', sizes);
                 
                 const container = document.getElementById('sizesContainer');
                 if (!container) return;
@@ -3712,8 +4665,6 @@
                         sizeMap[size.size_value] = size;
                     }
                 });
-                
-                console.log('Size map:', sizeMap);
                 
                 commonSizes.forEach(size => {
                     const sizeData = sizeMap[size];
@@ -4228,7 +5179,7 @@
                 }
             }
             
-            // Update image preview - CORRECTED VERSION
+            // Update image preview
             function updateImagePreview() {
                 const categorySelect = document.getElementById('productCategory');
                 const imageName = document.getElementById('productImageName').value;
@@ -4274,7 +5225,7 @@
                 previewContainer.style.display = 'block';
             }
             
-            // Save product - CORRECTED VERSION
+            // Save product
             async function saveProduct(event) {
                 event.preventDefault();
                 
@@ -4297,8 +5248,8 @@
                     return;
                 }
                 
-                // IMPORTANT: Save only the filename, NOT the full URL
-                const imageUrl = imageName; // Just the filename
+                // Save only the filename, NOT the full URL
+                const imageUrl = imageName;
                 
                 // Build product data
                 const productData = {
@@ -4306,9 +5257,9 @@
                     price: parseFloat(document.getElementById('productPrice').value) || 0,
                     category_id: parseInt(categoryId),
                     description: document.getElementById('productDescription').value.trim(),
-                    image_url: imageUrl, // Just the filename
+                    image_url: imageUrl,
                     is_active: true,
-                    stock: 0, // For footwear, stock is managed at color-size level
+                    stock: 0,
                     updated_at: new Date().toISOString()
                 };
                 
@@ -4324,8 +5275,6 @@
                 }
                 
                 try {
-                    console.log('💾 Saving product:', productData);
-                    
                     let result;
                     if (isNew) {
                         // Insert new product
@@ -4352,8 +5301,6 @@
                         if (error) throw error;
                         result = data[0];
                     }
-                    
-                    console.log('✅ Product saved:', result);
                     
                     // Reload data
                     await loadInitialData();
@@ -4391,6 +5338,102 @@
                 document.documentElement.style.setProperty('--primary-500', color);
                 document.documentElement.style.setProperty('--primary-600', darkenColor(color, 20));
                 localStorage.setItem('primaryColor', color);
+            }
+            
+            // Apply button style
+            function applyButtonStyle(style) {
+                const styleData = uiAssets.buttonStyles[style] || uiAssets.buttonStyles.rounded;
+                const root = document.documentElement;
+                
+                root.style.setProperty('--radius', styleData.borderRadius);
+                
+                // Update all buttons
+                const buttons = document.querySelectorAll('.btn');
+                buttons.forEach(btn => {
+                    btn.style.borderRadius = styleData.borderRadius;
+                    btn.style.padding = styleData.padding;
+                });
+            }
+            
+            // Change button style
+            function changeButtonStyle(style) {
+                localStorage.setItem('buttonStyle', style);
+                applyButtonStyle(style);
+                showToast(`Button style changed to ${style}`, 'success');
+            }
+            
+            // Change icon library
+            function changeIconLibrary(library) {
+                localStorage.setItem('iconLibrary', library);
+                showToast(`Icon library changed to ${library}`, 'info');
+            }
+            
+            // Change animation speed
+            function changeAnimationSpeed(speed) {
+                localStorage.setItem('animationSpeed', speed);
+                
+                // Apply animation speed
+                const root = document.documentElement;
+                switch(speed) {
+                    case 'fast':
+                        root.style.setProperty('--transition-fast', '100ms cubic-bezier(0.4, 0, 0.2, 1)');
+                        root.style.setProperty('--transition', '150ms cubic-bezier(0.4, 0, 0.2, 1)');
+                        break;
+                    case 'slow':
+                        root.style.setProperty('--transition-fast', '300ms cubic-bezier(0.4, 0, 0.2, 1)');
+                        root.style.setProperty('--transition', '500ms cubic-bezier(0.4, 0, 0.2, 1)');
+                        break;
+                    case 'none':
+                        root.style.setProperty('--transition-fast', '0ms');
+                        root.style.setProperty('--transition', '0ms');
+                        break;
+                    default:
+                        root.style.setProperty('--transition-fast', '150ms cubic-bezier(0.4, 0, 0.2, 1)');
+                        root.style.setProperty('--transition', '250ms cubic-bezier(0.4, 0, 0.2, 1)');
+                }
+                
+                showToast(`Animation speed set to ${speed}`, 'success');
+            }
+            
+            // Change grid density
+            function changeGridDensity(density) {
+                localStorage.setItem('gridDensity', density);
+                
+                const root = document.documentElement;
+                switch(density) {
+                    case 'compact':
+                        root.style.setProperty('--space-4', '0.75rem');
+                        root.style.setProperty('--space-6', '1rem');
+                        break;
+                    case 'spacious':
+                        root.style.setProperty('--space-4', '1.25rem');
+                        root.style.setProperty('--space-6', '2rem');
+                        break;
+                    default:
+                        root.style.setProperty('--space-4', '1rem');
+                        root.style.setProperty('--space-6', '1.5rem');
+                }
+                
+                showToast(`Grid density set to ${density}`, 'success');
+            }
+            
+            // Set sync interval
+            function setSyncInterval(interval) {
+                localStorage.setItem('syncInterval', interval);
+                showToast(`Sync interval set to ${interval}`, 'success');
+            }
+            
+            // Toggle developer mode
+            function toggleDeveloperMode() {
+                const enabled = document.getElementById('developerMode').checked;
+                localStorage.setItem('developerMode', enabled);
+                
+                if (enabled) {
+                    console.log('🔧 Developer mode enabled');
+                    // Show debug info or enable logging
+                }
+                
+                showToast(enabled ? 'Developer mode enabled' : 'Developer mode disabled', 'info');
             }
             
             // Darken color utility
@@ -4556,7 +5599,7 @@
                     price: 999,
                     stock: 9,
                     category_id: 1,
-                    image_url: 'test-image.jpg', // Just filename
+                    image_url: 'test-image.jpg',
                     description: 'Database write test',
                     is_active: true,
                     created_at: new Date().toISOString(),
@@ -4695,6 +5738,17 @@
                         if (options) options.style.display = 'none';
                     }
                 });
+                
+                // Close dropdowns when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (activeStatusDropdown && !e.target.closest('.status-dropdown')) {
+                        const dropdown = document.getElementById('statusDropdown' + activeStatusDropdown);
+                        if (dropdown) {
+                            dropdown.classList.remove('show');
+                            activeStatusDropdown = null;
+                        }
+                    }
+                });
             }
             
             // Public API
@@ -4731,11 +5785,20 @@
                 toggleDarkMode,
                 changeFontSize,
                 changePrimaryColor,
+                changeButtonStyle,
+                changeIconLibrary,
+                changeAnimationSpeed,
+                changeGridDensity,
+                setSyncInterval,
+                toggleDeveloperMode,
                 setRefreshInterval,
                 toggleNotifications,
                 clearCache,
                 backupDatabase,
                 resetSettings,
+                toggleStatusDropdown,
+                activateProduct,
+                deactivateProduct,
                 showSection: function(sectionId) {
                     const link = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
                     if (link) link.click();
@@ -4778,9 +5841,6 @@
                 generateStockReport: function() {
                     showToast('Stock report generation coming soon', 'info');
                 },
-                toggleProductStatus: function(productId) {
-                    showToast('Product status toggle coming soon', 'info');
-                },
                 duplicateProduct: function(productId) {
                     showToast('Product duplication coming soon', 'info');
                 },
@@ -4788,6 +5848,61 @@
                     if (confirm('⚠️ DANGER: This will delete ALL data permanently! Are you absolutely sure?')) {
                         showToast('Delete all feature coming soon', 'warning');
                     }
+                },
+                // Feature page actions
+                viewSalesReport: function() {
+                    showToast('Sales report feature coming soon', 'info');
+                },
+                viewCustomerAnalytics: function() {
+                    showToast('Customer analytics feature coming soon', 'info');
+                },
+                viewProductAnalytics: function() {
+                    showToast('Product analytics feature coming soon', 'info');
+                },
+                exportAnalytics: function() {
+                    showToast('Analytics export feature coming soon', 'info');
+                },
+                loadDemoAnalytics: function() {
+                    showToast('Loading demo analytics...', 'info');
+                },
+                viewAllCategories: function() {
+                    showToast('View all categories feature coming soon', 'info');
+                },
+                createNewCategory: function() {
+                    showToast('Create category feature coming soon', 'info');
+                },
+                viewAllUsers: function() {
+                    showToast('View all users feature coming soon', 'info');
+                },
+                inviteNewUser: function() {
+                    showToast('Invite user feature coming soon', 'info');
+                },
+                viewAllCoupons: function() {
+                    showToast('View all coupons feature coming soon', 'info');
+                },
+                createNewCoupon: function() {
+                    showToast('Create coupon feature coming soon', 'info');
+                },
+                viewAllReviews: function() {
+                    showToast('View all reviews feature coming soon', 'info');
+                },
+                moderateReviews: function() {
+                    showToast('Moderate reviews feature coming soon', 'info');
+                },
+                createTestOrder: function() {
+                    showToast('Create test order feature coming soon', 'info');
+                },
+                importOrders: function() {
+                    showToast('Import orders feature coming soon', 'info');
+                },
+                generateOrderReport: function() {
+                    showToast('Generate order report feature coming soon', 'info');
+                },
+                configureShipping: function() {
+                    showToast('Configure shipping feature coming soon', 'info');
+                },
+                manageButtonAssets: function() {
+                    showToast('Button assets management feature coming soon', 'info');
                 }
             };
         })();
