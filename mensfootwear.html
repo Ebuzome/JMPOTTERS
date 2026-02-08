@@ -8,6 +8,7 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <!-- Configuration - ONLY SET CATEGORY HERE -->
     <script>
@@ -191,6 +192,57 @@
             color: var(--gold);
         }
 
+        /* Dropdown styles */
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 200px;
+            background: var(--white);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-top: 2px solid var(--gold);
+            z-index: 100;
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--transition);
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-content a {
+            padding: 10px 16px;
+            display: block;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            color: var(--gray);
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--gold-light);
+            color: var(--black);
+            padding-left: 20px;
+        }
+
+        .dropdown-content a i {
+            width: 18px;
+            text-align: center;
+        }
+
+        .dropdown > a .fa-chevron-down {
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .dropdown.active > a .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
         .header-icons {
             display: flex;
             align-items: center;
@@ -307,6 +359,27 @@
             padding-left: 16px;
         }
 
+        /* Mobile dropdown */
+        .mobile-dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            padding-left: 16px;
+        }
+
+        .mobile-dropdown.active .mobile-dropdown-content {
+            max-height: 250px;
+        }
+
+        .mobile-dropdown > a .fa-chevron-down {
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .mobile-dropdown.active > a .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
         .overlay {
             position: fixed;
             top: 0;
@@ -323,16 +396,39 @@
             display: block;
         }
 
-        /* === HERO SECTION === */
+        /* === HERO SECTION WITH CAROUSEL === */
         .hero {
             height: 100vh;
             display: flex;
             align-items: center;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/mensfootwear.jpg');
+        }
+
+        .hero-carousel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
             background-size: cover;
             background-position: center;
+            background-attachment: fixed;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
         }
 
         .hero-content {
@@ -348,13 +444,88 @@
             line-height: 1.1;
             text-transform: uppercase;
             letter-spacing: 1.5px;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+            opacity: 0;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
 
         .hero p {
             font-size: 1.2rem;
             margin-bottom: 30px;
+            animation: fadeInUp 1s ease-out 0.7s forwards;
+            opacity: 0;
             text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero .btn {
+            animation: fadeInUp 1s ease-out 0.9s forwards;
+            opacity: 0;
+            border-color: var(--white);
+            color: var(--white);
+        }
+
+        .hero .btn:hover {
+            color: var(--black);
+            background: var(--white);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* === PROMOTIONAL STRIP === */
+        .promo-strip {
+            background: linear-gradient(45deg, var(--black) 25%, var(--gray-dark) 25%, 
+                        var(--gray-dark) 50%, var(--black) 50%, var(--black) 75%, 
+                        var(--gray-dark) 75%, var(--gray-dark));
+            background-size: 50px 50px;
+            padding: 15px 0;
+            overflow: hidden;
+            position: relative;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .promo-container {
+            display: flex;
+            white-space: nowrap;
+            animation: scroll 40s linear infinite;
+        }
+
+        .promo-item {
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            color: var(--gold);
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+            position: relative;
+        }
+
+        .promo-item:after {
+            content: '•';
+            position: absolute;
+            right: -8px;
+            color: var(--gold);
+        }
+
+        .promo-item:last-child:after {
+            display: none;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         /* === PRODUCT GALLERY === */
@@ -926,8 +1097,16 @@
             <!-- Desktop Navigation -->
             <ul class="nav-links">
                 <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a></li>
-                <li><a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a></li>
+                
+                <!-- Footwear dropdown -->
+                <li class="dropdown">
+                    <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-content">
+                        <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
+                        <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
+                    </div>
+                </li>
+                
                 <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
                 <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
                 <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
@@ -964,8 +1143,16 @@
         </div>
         <ul class="mobile-nav-links">
             <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a></li>
-            <li><a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a></li>
+    
+            <!-- Mobile Footwear dropdown -->
+            <li class="mobile-dropdown" id="mobileFootwearDropdown">
+                <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
+                <div class="mobile-dropdown-content">
+                    <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
+                    <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
+                </div>
+            </li>
+            
             <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
             <li><a href="accessories.html"><i class="fas fa-vest"></i> Accessories</a></li>
             <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
@@ -975,8 +1162,15 @@
         </ul>
     </div>
 
-    <!-- Hero Section -->
+    <!-- Hero Section with Carousel -->
     <section class="hero">
+        <div class="hero-carousel">
+            <div class="hero-slide active" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/mensfootwear.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/mensfootwear2.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/mensfootwear3.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/mensfootwear4.jpg');"></div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/mensfootwear5.jpg');"></div>
+        </div>
         <div class="container">
             <div class="hero-content">
                 <h1>Elite. Durable. Bold.</h1>
@@ -986,10 +1180,28 @@
         </div>
     </section>
 
+    <!-- Promotional Strip -->
+    <section class="promo-strip">
+        <div class="promo-container">
+            <div class="promo-item">New Arrivals</div>
+            <div class="promo-item">25% Off Loafers</div>
+            <div class="promo-item">100 Pcs Mega Deal</div>
+            <div class="promo-item">Limited Edition Sneakers</div>
+            <div class="promo-item">Premium Leather Collection</div>
+            <div class="promo-item">Free Shipping Nationwide</div>
+            <div class="promo-item">New Arrivals</div>
+            <div class="promo-item">25% Off Loafers</div>
+            <div class="promo-item">100 Pcs Mega Deal</div>
+            <div class="promo-item">Limited Edition Sneakers</div>
+            <div class="promo-item">Premium Leather Collection</div>
+            <div class="promo-item">Free Shipping Nationwide</div>
+        </div>
+    </section>
+
     <!-- Product Gallery -->
     <section class="product-gallery" id="products">
         <div class="container">
-            <h2 class="section-title">Premium Men's Footwear</h2>
+            <h2 class="section-title" data-aos="fade-up">Premium Men's Footwear</h2>
             <div class="products-grid" id="productsGrid">
                 <!-- Products will be loaded from Supabase -->
                 <div class="loading-spinner">
@@ -1086,6 +1298,9 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
+    <!-- Libraries -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
     <!-- Supabase Client Library -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
@@ -1097,6 +1312,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Men\'s Footwear page UI initialized');
             
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                once: true
+            });
+
             // ========== HEADER FUNCTIONS ========== //
             function initializeHeader() {
                 const header = document.getElementById('header');
@@ -1107,6 +1328,18 @@
                         header.classList.remove('scrolled');
                     }
                 });
+            }
+
+            // ========== HERO CAROUSEL FUNCTIONS ========== //
+            function initializeCarousel() {
+                const slides = document.querySelectorAll('.hero-slide');
+                let currentSlide = 0;
+                
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, 5000);
             }
 
             // ========== TOAST MESSAGES ========== //
@@ -1145,6 +1378,34 @@
                 }, 5000);
             }
 
+            // ========== DROPDOWN TOGGLE ========== //
+            function setupDropdownToggle() {
+                // Desktop dropdown toggle
+                const desktopDropdown = document.querySelector('.nav-links .dropdown');
+                if (desktopDropdown) {
+                    const dropdownLink = desktopDropdown.querySelector('a');
+                    dropdownLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        desktopDropdown.classList.toggle('active');
+                    });
+                }
+                
+                // Mobile dropdown toggle
+                const mobileDropdown = document.querySelector('.mobile-nav .mobile-dropdown');
+                if (mobileDropdown) {
+                    const mobileDropdownLink = mobileDropdown.querySelector('a');
+                    mobileDropdownLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        mobileDropdown.classList.toggle('active');
+                    });
+                }
+            }
+
+            // ========== INITIALIZE ========== //
+            initializeHeader();
+            initializeCarousel();
+            setupDropdownToggle();
+            
             // ========== MOBILE NAVIGATION ========== //
             const mobileToggle = document.getElementById('mobileToggle');
             const mobileNav = document.getElementById('mobileNav');
@@ -1204,9 +1465,6 @@
                     document.body.style.overflow = '';
                 });
             }
-            
-            // ========== INITIALIZE ========== //
-            initializeHeader();
             
             console.log('✅ UI components initialized for men\'s footwear');
         });
