@@ -1366,12 +1366,12 @@
     // ====================
     // PRODUCT INTERACTIONS
     // ====================
-    function setupProductInteractions() {
+      function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // Wishlist buttons - using event delegation
+        // Wishlist buttons - using event delegation with data-action attribute
         document.addEventListener('click', function(event) {
-            const wishlistBtn = event.target.closest('.wishlist-btn');
+            const wishlistBtn = event.target.closest('[data-action="wishlist"]');
             if (wishlistBtn) {
                 event.preventDefault();
                 event.stopPropagation(); // Prevent card click
@@ -1381,9 +1381,9 @@
                 if (product) {
                     toggleWishlist(product);
                     // Update button appearance
+                    const isActive = wishlistBtn.classList.contains('active');
+                    wishlistBtn.classList.toggle('active');
                     wishlistBtn.innerHTML = `<i class="fas fa-heart"></i>`;
-                    wishlistBtn.style.color = '#e74c3c';
-                    wishlistBtn.classList.add('active');
                 }
             }
         });
