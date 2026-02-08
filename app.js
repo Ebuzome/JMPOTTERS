@@ -1243,7 +1243,7 @@
         }
     }
     
-    function renderProducts(products, categorySlug) {
+      function renderProducts(products, categorySlug) {
         const productsGrid = document.getElementById('productsGrid');
         if (!productsGrid) return;
         
@@ -1258,58 +1258,33 @@
             const productLink = document.createElement('a');
             productLink.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
             productLink.className = 'product-card-link';
-            productLink.style.cssText = `
-                display: block;
-                text-decoration: none;
-                color: inherit;
-            `;
+            productLink.style.cssText = 'text-decoration: none; color: inherit; display: block;';
             
-            // Create the product card
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.setAttribute('data-aos', 'fade-up');
-            productCard.style.cssText = `
-                cursor: pointer;
-                transition: transform 0.3s, box-shadow 0.3s;
-                border-radius: 10px;
-                overflow: hidden;
-                background: rgba(0, 0, 0, 0.2);
-                height: 100%;
-            `;
-            
             productCard.innerHTML = `
-                <div class="product-image" style="position: relative;">
+                <div class="product-image">
                     <img src="${imageUrl}" alt="${product.name}" 
-                         style="width: 100%; height: 250px; object-fit: cover;"
                          onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
                     <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
                             data-id="${product.id}"
-                            style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); border: none; width: 36px; height: 36px; border-radius: 50%; color: ${isInWishlist ? '#e74c3c' : 'white'}; cursor: pointer; z-index: 10;">
+                            data-action="wishlist"
+                            style="position: absolute; top: 10px; right: 10px; z-index: 10;">
                         <i class="fas fa-heart"></i>
                     </button>
                 </div>
-                <div class="product-info" style="padding: 15px;">
-                    <h3 class="product-title" style="margin: 0 0 10px 0; font-size: 1.1rem; color: white;">${product.name}</h3>
-                    <div class="product-price" style="margin-bottom: 8px;">
-                        <span class="price-real" style="font-size: 1.2rem; font-weight: bold; color: #d4af37;">${formatPrice(product.price)}</span>
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <div class="product-price">
+                        <span class="price-real">${formatPrice(product.price)}</span>
                     </div>
-                    <div class="availability" style="display: flex; align-items: center; gap: 5px; color: ${product.stock > 0 ? '#2ecc71' : '#e74c3c'}; font-size: 0.9rem;">
+                    <div class="availability ${product.stock <= 0 ? 'out-of-stock' : ''}">
                         <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i> 
                         ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                     </div>
                 </div>
             `;
-            
-            // Add hover effect
-            productCard.addEventListener('mouseenter', () => {
-                productCard.style.transform = 'translateY(-5px)';
-                productCard.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
-            });
-            
-            productCard.addEventListener('mouseleave', () => {
-                productCard.style.transform = 'translateY(0)';
-                productCard.style.boxShadow = 'none';
-            });
             
             productLink.appendChild(productCard);
             productsGrid.appendChild(productLink);
@@ -1318,7 +1293,6 @@
         setupProductInteractions();
         console.log(`✅ Rendered ${products.length} products with clickable cards`);
     }
-    
     // ====================
     // MODAL FUNCTIONS (FOR BACKWARD COMPATIBILITY)
     // ====================
