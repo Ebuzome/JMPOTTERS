@@ -841,27 +841,31 @@
         setupProductInteractions();
     }
     
-    // Add product card styles - optimized for 2 per row with precise spacing
+    // Add product card styles - FIXED for 2 per row without overflow
     function addProductCardStyles() {
         if (document.getElementById('product-card-styles')) return;
         
         const style = document.createElement('style');
         style.id = 'product-card-styles';
         style.textContent = `
+            /* Ensure the grid container doesn't overflow */
             .products-grid {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
-                padding: 16px;
+                gap: 12px;
+                padding: 12px;
+                width: 100%;
                 max-width: 100%;
-                margin: 0 auto;
+                box-sizing: border-box;
+                margin: 0;
             }
             
-            @media (min-width: 768px) {
-                .products-grid {
-                    gap: 20px;
-                    padding: 20px;
-                }
+            /* Ensure all grid items stay within bounds */
+            .products-grid > * {
+                min-width: 0; /* Prevents grid items from overflowing */
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
             }
             
             .product-card-link {
@@ -870,6 +874,8 @@
                 display: block;
                 transition: transform 0.2s ease;
                 height: 100%;
+                width: 100%;
+                max-width: 100%;
             }
             
             .product-card-link:hover {
@@ -892,6 +898,8 @@
                 height: 100%;
                 display: flex;
                 flex-direction: column;
+                width: 100%;
+                max-width: 100%;
             }
             
             .product-card:hover {
@@ -911,6 +919,7 @@
                 height: 100%;
                 object-fit: cover;
                 transition: transform 0.3s ease;
+                display: block;
             }
             
             .product-card:hover .product-image img {
@@ -961,6 +970,10 @@
                 font-size: 11px;
                 text-transform: capitalize;
                 pointer-events: none;
+                max-width: calc(100% - 16px);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             
             .product-info {
@@ -968,6 +981,8 @@
                 flex: 1;
                 display: flex;
                 flex-direction: column;
+                width: 100%;
+                box-sizing: border-box;
             }
             
             .product-title {
@@ -982,6 +997,7 @@
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 min-height: 40px;
+                word-break: break-word;
             }
             
             .product-price {
@@ -989,6 +1005,9 @@
                 font-weight: 700;
                 color: #2c3e50;
                 margin-bottom: 6px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             
             .stock-status {
@@ -997,6 +1016,9 @@
                 align-items: center;
                 gap: 4px;
                 margin-top: auto;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             
             .stock-status.in-stock {
@@ -1009,6 +1031,12 @@
             
             .stock-status i {
                 font-size: 12px;
+                flex-shrink: 0;
+            }
+            
+            .stock-status span {
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             
             /* Error and empty states */
@@ -1022,6 +1050,22 @@
                 background: #f9f9f9;
                 border-radius: 8px;
                 width: 100%;
+                box-sizing: border-box;
+            }
+            
+            /* Ensure body and main containers don't cause overflow */
+            body {
+                overflow-x: hidden;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            #productsGrid {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+                box-sizing: border-box;
             }
         `;
         
