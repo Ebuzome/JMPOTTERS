@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Product... | JMPOTTERS</title>
+    
+    <!-- Essential FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase JS -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- Your App.js - This is CRITICAL -->
+    <script src="app.js" defer></script>
+    
+    <style>
+        /* === MINIMAL PRODUCT VIEWER STYLES === */
+        :root {
+            --black: #000;
+            --white: #fff;
+            --gold: #d4af37;
+            --gold-light: #f5e6b8;
+            --gray-dark: #222;
+            --gray: #444;
+            --gray-light: #e0e0e0;
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --shadow-dark: 0 5px 15px rgba(0, 0, 0, 0.2);
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f8f8f8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Close/Back Button */
+        .close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .close-btn:hover {
+            background: var(--gold);
+            transform: scale(1.1);
+        }
+
+        /* WhatsApp Button */
+        .whatsapp-btn {
+            position: fixed;
+            top: 20px;
+            right: 80px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #25d366;
+            color: var(--white);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            text-decoration: none;
+        }
+
+        .whatsapp-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Product Container */
+        .product-container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+
+        @media (max-width: 900px) {
+            .product-container {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+        }
+
+        /* Product Image */
+        .product-image-section {
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            border-right: 1px solid #eee;
+        }
+
+        .product-image {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        /* Product Details */
+        .product-details-section {
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .product-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .product-price-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .current-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .original-price {
+            font-size: 1.4rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .discount-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .product-description {
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 1.05rem;
+        }
+
+        /* Stock Status */
+        .stock-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .stock-in {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+        }
+
+        .stock-low {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning);
+        }
+
+        .stock-out {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+
+        /* Variant Selectors */
+        .variant-selectors {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+        }
+
+        .variant-section {
+            margin-bottom: 20px;
+        }
+
+        .variant-section h4 {
+            margin-bottom: 10px;
+            color: var(--black);
+            font-size: 1.1rem;
+        }
+
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .color-option {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--black);
+            font-size: 0.9rem;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .color-option:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .color-option.selected {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: var(--gold);
+            color: var(--black);
+        }
+
+        .size-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .size-option {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--black);
+            font-weight: bold;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .size-option:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .size-option.selected {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: var(--gold);
+            color: var(--black);
+        }
+
+        .size-option.out-of-stock {
+            opacity: 0.5;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .size-option.low-stock {
+            position: relative;
+        }
+
+        .size-option.low-stock::after {
+            content: 'Low';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #f39c12;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .no-selection {
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            width: 100%;
+        }
+
+        /* Selection Summary */
+        .selection-summary {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 3px solid var(--gold);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .selected-variant {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .selected-variant .separator {
+            opacity: 0.5;
+        }
+
+        .stock-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+
+        .stock-info i {
+            color: var(--gold);
+        }
+
+        /* Quantity Selector */
+        .quantity-section {
+            margin-bottom: 30px;
+        }
+
+        .quantity-section h4 {
+            margin-bottom: 10px;
+            color: var(--black);
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--gold);
+            color: black;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn:hover {
+            background: #e0c04c;
+        }
+
+        #productQuantity {
+            width: 80px;
+            height: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--gray-light);
+            color: var(--black);
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+
+        .bulk-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .bulk-option {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--gray-light);
+            color: var(--black);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .bulk-option:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--gold);
+        }
+
+        .bulk-option.active {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: var(--gold);
+            color: var(--black);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: var(--black);
+            border: 2px solid #dee2e6 !important;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .btn-wishlist.active {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c !important;
+        }
+
+        /* Bulk Pricing Table */
+        .bulk-pricing-table {
+            margin-top: 30px;
+        }
+
+        .bulk-pricing-table h3 {
+            margin-bottom: 15px;
+            color: var(--black);
+        }
+
+        .bulk-pricing-table table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .bulk-pricing-table th {
+            background: rgba(212, 175, 55, 0.3);
+            color: var(--black);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .bulk-pricing-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            color: #666;
+        }
+
+        .bulk-pricing-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .bulk-pricing-table tr:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--black);
+            text-decoration: underline;
+        }
+
+        .breadcrumb i {
+            margin: 0 10px;
+            opacity: 0.5;
+        }
+
+        /* Loading & Error States */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--gray);
+        }
+
+        .loading-spinner {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 60px;
+            max-width: 500px;
+            margin: 0 auto;
+            background: #ffebee;
+            border-radius: 10px;
+            border: 2px solid #ffcdd2;
+        }
+
+        .error-title {
+            color: #d32f2f;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .error-message .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: var(--black);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .error-message .btn:hover {
+            background: var(--gold);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb" id="breadcrumb">
+        <a href="index.html">Home</a>
+        <i class="fas fa-chevron-right"></i>
+        <span id="categoryLink">Loading...</span>
+        <i class="fas fa-chevron-right"></i>
+        <span id="productName">Product</span>
+    </div>
+
+    <!-- Simple Back Button -->
+    <button class="close-btn" id="closeBtn" title="Go back">
+        <i class="fas fa-times"></i>
+    </button>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/2348139583320" class="whatsapp-btn" title="Chat on WhatsApp" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Product Container -->
+    <div id="productViewer">
+        <div class="loading">
+            <i class="fas fa-spinner loading-spinner"></i>
+            <p>Loading product details...</p>
+        </div>
+    </div>
+
+    <script>
+        // This script will be executed AFTER app.js loads
+        
+        // Wait for the JMPOTTERS app to initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Product page initialized');
+            
+            // Setup close button
+            const closeBtn = document.getElementById('closeBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    // Try to go back, otherwise go to homepage
+                    if (document.referrer && document.referrer.includes(window.location.hostname)) {
+                        window.history.back();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
+            
+            // Check if JMPOTTERS app is loaded
+            if (!window.JMPOTTERS) {
+                console.error('❌ JMPOTTERS app not loaded!');
+                showError('Application failed to load. Please refresh the page.');
+                return;
+            }
+            
+            console.log('✅ JMPOTTERS app found:', window.JMPOTTERS);
+            
+            // Get slug from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('slug');
+            
+            if (!slug) {
+                showError('No product specified in URL.');
+                return;
+            }
+            
+            // Use the JMPOTTERS app to load the product
+            loadProductBySlug(slug);
+        });
+        
+        async function loadProductBySlug(slug) {
+            const productViewer = document.getElementById('productViewer');
+            
+            try {
+                console.log('Loading product with slug:', slug);
+                
+                // Use the JMPOTTERS app function
+                if (window.JMPOTTERS && window.JMPOTTERS.loadSingleProductBySlug) {
+                    await window.JMPOTTERS.loadSingleProductBySlug(slug);
+                } else {
+                    // Fallback: Try to initialize the page first
+                    if (window.JMPOTTERS && window.JMPOTTERS.initializePage) {
+                        await window.JMPOTTERS.initializePage();
+                        
+                        // Try again after initialization
+                        if (window.JMPOTTERS.loadSingleProductBySlug) {
+                            await window.JMPOTTERS.loadSingleProductBySlug(slug);
+                        } else {
+                            throw new Error('Product loading function not available');
+                        }
+                    } else {
+                        throw new Error('JMPOTTERS app not properly initialized');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error loading product:', error);
+                showError(`Failed to load product: ${error.message}`);
+            }
+        }
+        
+        function showError(message) {
+            const productViewer = document.getElementById('productViewer');
+            productViewer.innerHTML = `
+                <div class="error-message">
+                    <div class="error-title"><i class="fas fa-exclamation-triangle"></i> Error</div>
+                    <p>${message}</p>
+                    <button onclick="window.location.href='index.html'" class="btn">
+                        Go to Homepage
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Update breadcrumb dynamically
+        function updateBreadcrumb(product) {
+            const breadcrumb = document.getElementById('breadcrumb');
+            const categoryLink = document.getElementById('categoryLink');
+            const productName = document.getElementById('productName');
+            
+            if (breadcrumb && product) {
+                const categoryName = product.category_name || 'Category';
+                const categorySlug = product.category_slug || 'mensfootwear';
+                
+                categoryLink.innerHTML = `<a href="${categorySlug}.html">${categoryName}</a>`;
+                productName.textContent = product.name;
+            }
+        }
+        
+        // Make updateBreadcrumb available globally for the app.js to call
+        window.updateProductBreadcrumb = updateBreadcrumb;
+    </script>
+</body>
+</html>
