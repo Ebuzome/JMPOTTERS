@@ -5,1097 +5,285 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product | JMPOTTERS</title>
     
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        'jmp': {
+                            'gold': '#d69e2e',
+                            'gold-light': '#fbbf24',
+                            'gold-dark': '#b7791f',
+                            'dark': '#0f172a',
+                            'darker': '#1a2639',
+                            'dark-light': '#1e293b',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'shimmer': 'shimmer 2s infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'scale-in': 'scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    },
+                    keyframes: {
+                        shimmer: {
+                            '0%': { backgroundPosition: '200% 0' },
+                            '100%': { backgroundPosition: '-200% 0' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.9)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    },
+                    spacing: {
+                        '128': '32rem',
+                        '144': '36rem',
+                    }
+                }
+            }
+        }
+    </script>
     
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
     
     <style>
-        /* Reset & Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Custom styles that complement Tailwind */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1a2639 100%);
-            color: #f7fafc;
             min-height: 100vh;
-            line-height: 1.6;
         }
-
-        /* Header */
-        header {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
         }
-
-        .header-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        
+        /* Hide number input spinners */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
         }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #d69e2e;
-            text-decoration: none;
-            letter-spacing: -0.5px;
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        
+        /* Glassmorphism effects */
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-hover {
+            transition: all 0.3s ease;
+        }
+        .glass-hover:hover {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(214, 158, 46, 0.3);
+            backdrop-filter: blur(16px);
+        }
+        
+        /* Gradient text */
+        .gradient-gold {
             background: linear-gradient(135deg, #d69e2e 0%, #fbbf24 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            transition: opacity 0.3s;
+            background-clip: text;
         }
-
-        .logo:hover {
-            opacity: 0.9;
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-
-        .header-actions {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
         }
-
-        .header-btn {
-            position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #cbd5e0;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.75rem;
-            border-radius: 12px;
-            transition: all 0.3s;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        ::-webkit-scrollbar-thumb {
+            background: #d69e2e;
+            border-radius: 9999px;
         }
-
-        .header-btn:hover {
-            background: rgba(214, 158, 46, 0.15);
-            border-color: #d69e2e;
-            color: #d69e2e;
-            transform: translateY(-2px);
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fbbf24;
         }
-
-        .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #e53e3e;
-            color: white;
-            font-size: 0.7rem;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            border: 2px solid #0f172a;
-        }
-
-        /* Main Content */
-        main {
-            max-width: 1280px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            min-height: calc(100vh - 100px);
-        }
-
-        /* Loading Skeletons - Modern Design */
-        .product-skeleton {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            margin-top: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .product-skeleton {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-        }
-
+        
+        /* Loading animation */
         .skeleton {
             background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%);
             background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 16px;
+            animation: shimmer 2s infinite;
         }
-
-        .skeleton-image {
-            width: 100%;
-            height: 500px;
-            background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 24px;
-        }
-
-        .skeleton-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .skeleton-title {
-            height: 3rem;
-            background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 12px;
-            width: 80%;
-        }
-
-        .skeleton-price {
-            height: 4rem;
-            background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 12px;
-            width: 40%;
-        }
-
-        .skeleton-text {
-            height: 2rem;
-            background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 8px;
-            width: 60%;
-        }
-
-        .skeleton-tile {
-            height: 5rem;
-            background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 16px;
-        }
-
-        .skeleton-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .skeleton-button {
-            height: 3.5rem;
-            background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 12px;
-            flex: 1;
-        }
-
-        @keyframes loading {
+        
+        @keyframes shimmer {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
-
-        /* Product Container - Modern Design */
-        #productContainer {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        #productContainer.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .product-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            margin-top: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .product-container {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-        }
-
-        /* Image Gallery */
-        .product-image-container {
-            background: #1e293b;
-            border-radius: 24px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .product-image-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-            transition: left 0.7s;
-        }
-
-        .product-image-container:hover::before {
-            left: 100%;
-        }
-
-        .product-image {
-            width: 100%;
-            height: auto;
-            border-radius: 16px;
-            display: block;
-            transition: transform 0.5s;
-        }
-
-        .product-image:hover {
-            transform: scale(1.02);
-        }
-
-        /* Product Details */
-        .product-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .product-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: white;
-            line-height: 1.2;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Price */
-        .price-container {
-            background: linear-gradient(135deg, rgba(214, 158, 46, 0.1) 0%, rgba(214, 158, 46, 0.05) 100%);
-            border: 1px solid rgba(214, 158, 46, 0.3);
-            border-radius: 20px;
-            padding: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .price-container::after {
-            content: '₦';
-            position: absolute;
-            bottom: -20px;
-            right: -20px;
-            font-size: 8rem;
-            color: rgba(214, 158, 46, 0.1);
-            font-weight: 800;
-        }
-
-        .current-price {
-            font-size: 3rem;
-            font-weight: 700;
-            color: #d69e2e;
-            line-height: 1;
-        }
-
-        /* Stock Status */
-        .stock-status {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.25rem 1.5rem;
-            background: rgba(56, 161, 105, 0.1);
-            border: 1px solid rgba(56, 161, 105, 0.3);
-            border-radius: 16px;
-            color: #38a169;
-            font-weight: 500;
-        }
-
-        .stock-status i {
-            font-size: 1.2rem;
-        }
-
-        .stock-status.out-of-stock {
-            background: rgba(229, 62, 62, 0.1);
-            border-color: rgba(229, 62, 62, 0.3);
-            color: #e53e3e;
-        }
-
-        .stock-count {
-            margin-left: auto;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        /* Tiles */
-        .detail-tile {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 1.75rem;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .detail-tile:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border-color: rgba(214, 158, 46, 0.3);
-        }
-
-        .tile-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1.25rem;
-            color: #d69e2e;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Description */
-        .product-description {
-            color: #cbd5e0;
-            line-height: 1.8;
-            font-size: 1rem;
-        }
-
-        /* Color Options */
-        .color-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .color-option {
-            padding: 0.75rem 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid transparent;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #cbd5e0;
-            min-width: 100px;
-            text-align: center;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .color-option::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(214, 158, 46, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .color-option:hover::before {
-            left: 100%;
-        }
-
-        .color-option:hover {
-            background: rgba(214, 158, 46, 0.1);
-            border-color: rgba(214, 158, 46, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .color-option.selected {
-            background: rgba(214, 158, 46, 0.2);
-            border-color: #d69e2e;
-            color: white;
-            box-shadow: 0 5px 15px rgba(214, 158, 46, 0.2);
-        }
-
-        /* Size Options */
-        .size-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-
-        .size-option {
-            padding: 0.75rem 1.25rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid transparent;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #cbd5e0;
-            min-width: 70px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .size-option:hover {
-            background: rgba(214, 158, 46, 0.1);
-            border-color: rgba(214, 158, 46, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .size-option.selected {
-            background: rgba(214, 158, 46, 0.2);
-            border-color: #d69e2e;
-            color: white;
-            box-shadow: 0 5px 15px rgba(214, 158, 46, 0.2);
-        }
-
-        .size-option.out-of-stock {
-            opacity: 0.5;
-            cursor: not-allowed;
-            text-decoration: line-through;
-            background: rgba(229, 62, 62, 0.1);
-            border-color: rgba(229, 62, 62, 0.3);
-        }
-
-        .size-option.out-of-stock:hover {
-            transform: none;
-            border-color: rgba(229, 62, 62, 0.3);
-        }
-
-        .size-option.low-stock {
-            border-color: #d69e2e;
-            position: relative;
-        }
-
-        .size-option.low-stock::after {
-            content: 'Low Stock';
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #d69e2e;
-            color: black;
-            font-size: 0.6rem;
-            padding: 2px 6px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        /* Quantity Selector */
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .quantity-btn {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
-            color: black;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-
-        .quantity-btn:hover {
-            background: linear-gradient(135deg, #b7791f 0%, #97580a 100%);
-            transform: scale(1.05);
-        }
-
-        .quantity-btn:active {
-            transform: scale(0.95);
-        }
-
-        .quantity-input {
-            width: 100px;
-            height: 48px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .quantity-input:focus {
-            outline: none;
-            border-color: #d69e2e;
-            box-shadow: 0 0 0 3px rgba(214, 158, 46, 0.2);
-        }
-
-        /* Bulk Options */
-        .bulk-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .bulk-option {
-            padding: 0.6rem 1.2rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            cursor: pointer;
-            color: #cbd5e0;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .bulk-option:hover {
-            background: rgba(214, 158, 46, 0.1);
-            border-color: #d69e2e;
-            transform: translateY(-2px);
-        }
-
-        .bulk-option.active {
-            background: #d69e2e;
-            border-color: #d69e2e;
-            color: black;
-            font-weight: 600;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .action-btn {
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            font-size: 1rem;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #d69e2e 0%, #fbbf24 100%);
-            color: black;
-            box-shadow: 0 5px 15px rgba(214, 158, 46, 0.3);
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #b7791f 0%, #d69e2e 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(214, 158, 46, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-            border-color: #e53e3e;
-            color: #e53e3e;
-        }
-
-        .btn-secondary.active {
-            background: #e53e3e;
-            border-color: #e53e3e;
-            color: white;
-        }
-
-        /* Selection Summary */
-        .selection-summary {
-            background: linear-gradient(135deg, rgba(214, 158, 46, 0.1) 0%, rgba(214, 158, 46, 0.05) 100%);
-            border: 1px solid rgba(214, 158, 46, 0.3);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-            display: none;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .selection-summary.active {
-            display: block;
-        }
-
-        .selected-variant {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .stock-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #cbd5e0;
-            font-size: 0.95rem;
-        }
-
-        /* Cart Panel */
-        .cart-panel {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 100%;
-            max-width: 450px;
-            height: 100vh;
-            background: linear-gradient(135deg, #1a2639 0%, #0f172a 100%);
-            z-index: 1000;
-            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: -10px 0 50px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .cart-panel.active {
-            right: 0;
-        }
-
-        .cart-header {
-            padding: 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .cart-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: white;
-        }
-
-        .close-cart {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #cbd5e0;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.75rem;
-            border-radius: 12px;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .close-cart:hover {
-            background: rgba(229, 62, 62, 0.1);
-            border-color: #e53e3e;
-            color: #e53e3e;
-        }
-
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.5rem;
-        }
-
-        .cart-empty {
-            text-align: center;
-            padding: 4rem 1rem;
-            color: #94a3b8;
-        }
-
-        .cart-empty i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
-        }
-
-        .cart-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.25rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            margin-bottom: 1rem;
-            transition: all 0.3s;
-        }
-
-        .cart-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(214, 158, 46, 0.2);
-            transform: translateX(-5px);
-        }
-
-        .cart-item-image {
-            width: 70px;
-            height: 70px;
-            border-radius: 12px;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .cart-item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .cart-item-details {
-            flex: 1;
-        }
-
-        .cart-item-name {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            font-size: 0.95rem;
-            color: white;
-        }
-
-        .cart-item-price {
-            color: #d69e2e;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            font-size: 0.95rem;
-        }
-
-        .cart-item-remove {
-            background: rgba(229, 62, 62, 0.1);
-            border: 1px solid rgba(229, 62, 62, 0.3);
-            color: #e53e3e;
-            border-radius: 10px;
-            padding: 0.5rem;
-            cursor: pointer;
-            font-size: 0.9rem;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .cart-item-remove:hover {
-            background: rgba(229, 62, 62, 0.2);
-            transform: scale(1.1);
-        }
-
-        .cart-footer {
-            padding: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .cart-total {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        .cart-total-amount {
-            color: #d69e2e;
-            font-size: 1.5rem;
-        }
-
-        .cart-checkout-btn, .cart-whatsapp-btn {
-            width: 100%;
-            padding: 1rem;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .cart-checkout-btn {
-            background: linear-gradient(135deg, #d69e2e 0%, #fbbf24 100%);
-            color: black;
-        }
-
-        .cart-checkout-btn:hover {
-            background: linear-gradient(135deg, #b7791f 0%, #d69e2e 100%);
-            transform: translateY(-2px);
-        }
-
-        .cart-whatsapp-btn {
-            background: #25d366;
-            color: white;
-            text-decoration: none;
-        }
-
-        .cart-whatsapp-btn:hover {
-            background: #1da851;
-            transform: translateY(-2px);
-        }
-
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 999;
-            display: none;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s;
-        }
-
-        .overlay.active {
-            display: block;
-        }
-
-        /* Notification */
-        .notification-container {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 1100;
-        }
-
-        .notification {
-            padding: 1rem 1.5rem;
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-            animation: slideIn 0.3s ease;
-            max-width: 350px;
-            backdrop-filter: blur(10px);
-            border-left: 4px solid;
-        }
-
-        .notification.success { border-left-color: #38a169; }
-        .notification.error { border-left-color: #e53e3e; }
-        .notification.warning { border-left-color: #d69e2e; }
-        .notification.info { border-left-color: #3b82f6; }
-
-        .notification-icon {
-            font-size: 1.25rem;
-        }
-
-        .notification.success .notification-icon { color: #38a169; }
-        .notification.error .notification-icon { color: #e53e3e; }
-        .notification.warning .notification-icon { color: #d69e2e; }
-        .notification.info .notification-icon { color: #3b82f6; }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Error State */
-        .error-state {
-            text-align: center;
-            padding: 5rem 1rem;
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .error-icon {
-            font-size: 4rem;
-            color: #e53e3e;
-            margin-bottom: 1.5rem;
-        }
-
-        .error-title {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: white;
-        }
-
-        .error-message {
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-            font-size: 1.1rem;
-        }
-
-        .error-btn {
-            display: inline-block;
-            padding: 1rem 2rem;
-            background: linear-gradient(135deg, #d69e2e 0%, #fbbf24 100%);
-            color: black;
-            text-decoration: none;
-            border-radius: 40px;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .error-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(214, 158, 46, 0.3);
-        }
-
-        /* No Selection State */
-        .no-selection {
-            padding: 1.5rem;
-            text-align: center;
-            color: #94a3b8;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-        }
     </style>
 </head>
-<body>
+<body class="font-sans antialiased text-gray-100 min-h-screen overflow-x-hidden">
     <!-- Header -->
-    <header>
-        <div class="header-container">
-            <a href="index.html" class="logo">JMPOTTERS</a>
-            <div class="header-actions">
-                <button id="wishlistBtn" class="header-btn" title="Wishlist">
-                    <i class="far fa-heart"></i>
-                    <span id="wishlistCount" class="badge" style="display: none;">0</span>
-                </button>
-                <button id="cartBtn" class="header-btn" title="Cart">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span id="cartCount" class="badge" style="display: none;">0</span>
-                </button>
+    <header class="sticky top-0 z-50 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Left section with navigation -->
+                <div class="flex items-center gap-4">
+                    <!-- Back button -->
+                    <button onclick="window.history.back()" 
+                            class="flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-jmp-gold hover:border-jmp-gold/30 hover:bg-jmp-gold/10 transition-all duration-300 group">
+                        <i class="fas fa-arrow-left text-lg group-hover:-translate-x-0.5 transition-transform"></i>
+                    </button>
+                    
+                    <!-- Home button -->
+                    <a href="index.html" 
+                       class="flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-jmp-gold hover:border-jmp-gold/30 hover:bg-jmp-gold/10 transition-all duration-300">
+                        <i class="fas fa-home text-lg"></i>
+                    </a>
+                </div>
+                
+                <!-- Logo -->
+                <a href="index.html" class="text-3xl font-black tracking-tight">
+                    <span class="gradient-gold">JMPOTTERS</span>
+                </a>
+                
+                <!-- Right actions -->
+                <div class="flex items-center gap-3">
+                    <button id="wishlistBtn" class="relative w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-jmp-gold hover:border-jmp-gold/30 hover:bg-jmp-gold/10 transition-all duration-300 group">
+                        <i class="far fa-heart text-xl group-hover:scale-110 transition-transform"></i>
+                        <span id="wishlistCount" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-jmp-dark" style="display: none;">0</span>
+                    </button>
+                    
+                    <button id="cartBtn" class="relative w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-jmp-gold hover:border-jmp-gold/30 hover:bg-jmp-gold/10 transition-all duration-300 group">
+                        <i class="fas fa-shopping-bag text-xl group-hover:scale-110 transition-transform"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-jmp-dark" style="display: none;">0</span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8 animate-fade-in">
+            <a href="index.html" class="hover:text-jmp-gold transition-colors">Home</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="#" class="hover:text-jmp-gold transition-colors" id="categoryBreadcrumb">Products</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-jmp-gold font-medium" id="productBreadcrumb">Loading...</span>
+        </nav>
+
         <!-- Loading Skeletons -->
-        <div id="loadingState">
-            <div class="product-skeleton">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-details">
-                    <div class="skeleton-title"></div>
-                    <div class="skeleton-price"></div>
-                    <div class="skeleton-text"></div>
-                    <div class="skeleton-tile"></div>
-                    <div class="skeleton-tile"></div>
-                    <div class="skeleton-tile"></div>
-                    <div class="skeleton-buttons">
-                        <div class="skeleton-button"></div>
-                        <div class="skeleton-button"></div>
+        <div id="loadingState" class="animate-pulse-slow">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                <!-- Image skeleton -->
+                <div class="aspect-square rounded-3xl skeleton"></div>
+                
+                <!-- Details skeleton -->
+                <div class="space-y-6">
+                    <div class="h-12 w-3/4 skeleton rounded-xl"></div>
+                    <div class="h-16 w-1/3 skeleton rounded-xl"></div>
+                    <div class="h-24 skeleton rounded-xl"></div>
+                    <div class="h-32 skeleton rounded-xl"></div>
+                    <div class="h-20 skeleton rounded-xl"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="h-14 skeleton rounded-xl"></div>
+                        <div class="h-14 skeleton rounded-xl"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Product Container (Fixed ID) -->
-        <div id="productContainer">
-            <!-- Product will be loaded here by app.js -->
+        <!-- Product Container -->
+        <div id="productContainer" class="hidden animate-fade-in">
+            <!-- Product will be loaded here by JavaScript -->
+            <div id="productViewer"></div>
         </div>
 
         <!-- Error State -->
-        <div id="errorState" class="error-state" style="display: none;">
-            <div class="error-icon">
-                <i class="fas fa-exclamation-triangle"></i>
+        <div id="errorState" class="hidden text-center py-16 lg:py-24 animate-scale-in">
+            <div class="glass rounded-3xl p-12 max-w-2xl mx-auto">
+                <div class="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-white mb-4">Product Not Found</h2>
+                <p class="text-gray-400 text-lg mb-8" id="errorMessage">The product you're looking for is not available or has been removed.</p>
+                <a href="index.html" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-semibold rounded-2xl hover:scale-105 transition-all duration-300 shadow-lg shadow-jmp-gold/20">
+                    <i class="fas fa-home"></i>
+                    Return to Homepage
+                </a>
             </div>
-            <h2 class="error-title">Product Not Found</h2>
-            <p class="error-message" id="errorMessage">The product you're looking for is not available or has been removed.</p>
-            <a href="index.html" class="error-btn">Return to Homepage</a>
         </div>
     </main>
 
     <!-- Cart Panel -->
-    <div class="overlay" id="cartOverlay"></div>
-    <div class="cart-panel" id="cartPanel">
-        <div class="cart-header">
-            <h3 class="cart-title">Your Cart</h3>
-            <button class="close-cart">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <div class="cart-empty">
-                <i class="fas fa-shopping-bag"></i>
-                <p>Your cart is empty</p>
+    <div id="cartOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden transition-opacity duration-300"></div>
+    
+    <div id="cartPanel" class="fixed top-0 right-0 w-full max-w-md h-full bg-gradient-to-b from-jmp-darker to-jmp-dark z-50 shadow-2xl translate-x-full transition-transform duration-500 ease-out-expo border-l border-white/10">
+        <div class="flex flex-col h-full">
+            <!-- Cart Header -->
+            <div class="p-6 border-b border-white/10">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <i class="fas fa-shopping-bag text-jmp-gold"></i>
+                        Your Cart
+                    </h3>
+                    <button class="close-cart w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-red-500 hover:border-red-500/30 hover:bg-red-500/10 transition-all duration-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total:</span>
-                <span class="cart-total-amount" id="cartTotal">₦0</span>
+            
+            <!-- Cart Items -->
+            <div id="cartItems" class="flex-1 overflow-y-auto p-6 space-y-4">
+                <!-- Cart items will be loaded here -->
             </div>
-            <button class="cart-checkout-btn" id="checkoutButton">
-                <i class="fas fa-shopping-bag"></i> Checkout
-            </button>
-            <a href="#" class="cart-whatsapp-btn" id="whatsappCheckout" target="_blank">
-                <i class="fab fa-whatsapp"></i> WhatsApp Order
-            </a>
+            
+            <!-- Cart Footer -->
+            <div class="p-6 border-t border-white/10 bg-black/20">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-400">Total:</span>
+                    <span id="cartTotal" class="text-2xl font-bold text-jmp-gold">₦0</span>
+                </div>
+                <button id="checkoutButton" class="w-full mb-3 px-6 py-4 bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-semibold rounded-2xl hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-jmp-gold/20 flex items-center justify-center gap-3">
+                    <i class="fas fa-shopping-bag"></i>
+                    Checkout
+                </button>
+                <a href="#" id="whatsappCheckout" target="_blank" class="block w-full px-6 py-4 bg-[#25d366] text-white font-semibold rounded-2xl hover:bg-[#1da851] hover:scale-[1.02] transition-all duration-300 text-center flex items-center justify-center gap-3">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                    WhatsApp Order
+                </a>
+            </div>
         </div>
     </div>
 
     <!-- Notification Container -->
-    <div class="notification-container" id="notificationContainer"></div>
+    <div id="notificationContainer" class="fixed top-4 right-4 z-[100] space-y-2"></div>
 
     <!-- Main app.js -->
     <script src="app.js"></script>
@@ -1103,49 +291,44 @@
     <!-- Page-specific UI interactions -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Product page initializing...');
-            
-            // Setup cart interactions
+            // Cart panel interactions
             const cartBtn = document.getElementById('cartBtn');
             const closeCartBtn = document.querySelector('.close-cart');
             const cartOverlay = document.getElementById('cartOverlay');
             const cartPanel = document.getElementById('cartPanel');
             
+            function openCart() {
+                cartPanel.classList.remove('translate-x-full');
+                cartOverlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            function closeCart() {
+                cartPanel.classList.add('translate-x-full');
+                cartOverlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+            
             if (cartBtn) {
-                cartBtn.addEventListener('click', function(e) {
+                cartBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    cartPanel?.classList.add('active');
-                    cartOverlay?.classList.add('active');
-                    document.body.style.overflow = 'hidden';
+                    openCart();
                 });
             }
             
             if (closeCartBtn) {
-                closeCartBtn.addEventListener('click', function() {
-                    cartPanel?.classList.remove('active');
-                    cartOverlay?.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
+                closeCartBtn.addEventListener('click', closeCart);
             }
             
             if (cartOverlay) {
-                cartOverlay.addEventListener('click', function() {
-                    cartPanel?.classList.remove('active');
-                    cartOverlay?.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
+                cartOverlay.addEventListener('click', closeCart);
             }
             
-            // Close cart with Escape key
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    cartPanel?.classList.remove('active');
-                    cartOverlay?.classList.remove('active');
-                    document.body.style.overflow = '';
+                    closeCart();
                 }
             });
-            
-            console.log('✅ Product page UI ready');
         });
     </script>
 </body>
