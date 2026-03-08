@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE FIXED VERSION WITH ALL FUNCTIONS
+// JMPOTTERS APP - COMPLETELY FIXED VERSION
 // ====================
 (function() {
     'use strict';
@@ -117,7 +117,7 @@
         }
         
         const toast = document.createElement('div');
-        toast.className = `glass rounded-xl p-4 pr-6 shadow-2xl transform transition-all duration-500 translate-x-full opacity-0 border-l-4 ${
+        toast.className = `bg-jmp-darker/95 backdrop-blur-sm border border-white/10 rounded-xl p-4 pr-6 shadow-2xl transform transition-all duration-500 translate-x-full opacity-0 border-l-4 ${
             type === 'success' ? 'border-l-green-500' :
             type === 'error' ? 'border-l-red-500' :
             type === 'warning' ? 'border-l-jmp-gold' :
@@ -140,7 +140,6 @@
         
         notificationContainer.appendChild(toast);
         
-        // Animate in
         setTimeout(() => {
             toast.classList.remove('translate-x-full', 'opacity-0');
         }, 10);
@@ -168,7 +167,7 @@
     }
     
     // ====================
-    // LOAD PRODUCTS BY CATEGORY (FOR CATEGORY PAGES)
+    // LOAD PRODUCTS BY CATEGORY
     // ====================
     async function loadProductsByCategory(categorySlug) {
         console.log(`📦 Loading products for category: ${categorySlug}`);
@@ -179,16 +178,16 @@
             return;
         }
         
-        // Show loading skeletons
+        // Clear and show loading
         productsGrid.innerHTML = `
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 w-full max-w-full">
                 ${Array(8).fill().map(() => `
-                    <div class="glass rounded-2xl overflow-hidden animate-pulse">
-                        <div class="aspect-square skeleton"></div>
-                        <div class="p-4 space-y-3">
-                            <div class="h-4 skeleton rounded w-3/4"></div>
-                            <div class="h-6 skeleton rounded w-1/2"></div>
-                            <div class="h-4 skeleton rounded w-1/4"></div>
+                    <div class="bg-jmp-dark-light/50 rounded-xl overflow-hidden animate-pulse">
+                        <div class="aspect-square bg-white/5"></div>
+                        <div class="p-3 space-y-2">
+                            <div class="h-4 bg-white/5 rounded w-3/4"></div>
+                            <div class="h-6 bg-white/5 rounded w-1/2"></div>
+                            <div class="h-3 bg-white/5 rounded w-1/4"></div>
                         </div>
                     </div>
                 `).join('')}
@@ -197,7 +196,7 @@
         
         const supabase = getSupabaseClient();
         if (!supabase) {
-            productsGrid.innerHTML = `<div class="text-center py-12 text-red-400">Database connection error</div>`;
+            productsGrid.innerHTML = `<div class="text-center py-12 text-red-400 col-span-full">Database connection error</div>`;
             return;
         }
         
@@ -211,7 +210,7 @@
             
             if (catError || !category) {
                 console.error('Category error:', catError);
-                productsGrid.innerHTML = `<div class="text-center py-12 text-gray-400">Category not found</div>`;
+                productsGrid.innerHTML = `<div class="text-center py-12 text-gray-400 col-span-full">Category not found</div>`;
                 return;
             }
             
@@ -241,7 +240,7 @@
             
         } catch (error) {
             console.error('❌ Error loading products:', error);
-            productsGrid.innerHTML = `<div class="text-center py-12 text-red-400">Error loading products. Please try again.</div>`;
+            productsGrid.innerHTML = `<div class="text-center py-12 text-red-400 col-span-full">Error loading products. Please try again.</div>`;
         }
     }
     
@@ -250,7 +249,7 @@
         if (!productsGrid) return;
         
         productsGrid.innerHTML = `
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 w-full max-w-full">
                 ${products.map(product => {
                     const imageUrl = getImageUrl(categorySlug, product.image_url);
                     const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
@@ -258,45 +257,45 @@
                     
                     return `
                         <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
-                           class="group block glass rounded-2xl overflow-hidden hover:scale-[1.02] hover:shadow-xl transition-all duration-300">
-                            <div class="relative aspect-square overflow-hidden bg-gradient-to-br from-jmp-dark-light to-jmp-darker">
+                           class="group block bg-jmp-dark-light/30 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden hover:border-jmp-gold/30 hover:shadow-lg hover:shadow-jmp-gold/5 transition-all duration-300 w-full">
+                            <div class="relative aspect-square overflow-hidden bg-jmp-darker">
                                 <img src="${imageUrl}" 
                                      alt="${product.name}" 
-                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                     loading="lazy"
                                      onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
                                 
-                                <!-- Wishlist Button -->
-                                <button class="wishlist-btn absolute top-3 right-3 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 ${
+                                <button class="wishlist-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 ${
                                     isInWishlist ? 'text-red-500' : 'text-gray-300 hover:text-red-500'
                                 }" 
                                         data-product-id="${product.id}"
                                         onclick="event.preventDefault(); event.stopPropagation();">
-                                    <i class="fas fa-heart"></i>
+                                    <i class="fas fa-heart text-sm"></i>
                                 </button>
                                 
-                                <!-- Stock Badge -->
-                                ${product.stock < 5 ? `
-                                    <div class="absolute bottom-3 left-3">
-                                        <span class="px-3 py-1.5 text-xs font-semibold rounded-full ${
-                                            product.stock > 0 
-                                                ? 'bg-jmp-gold/20 text-jmp-gold border border-jmp-gold/30' 
-                                                : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                        } backdrop-blur-sm">
-                                            <i class="fas fa-${product.stock > 0 ? 'exclamation-triangle' : 'times-circle'} mr-1"></i>
-                                            ${product.stock > 0 ? 'Low Stock' : 'Out of Stock'}
+                                ${product.stock < 1 ? `
+                                    <div class="absolute bottom-2 left-2">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-500/20 text-red-400 border border-red-500/30 backdrop-blur-sm">
+                                            Out of Stock
+                                        </span>
+                                    </div>
+                                ` : product.stock < 5 ? `
+                                    <div class="absolute bottom-2 left-2">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-jmp-gold/20 text-jmp-gold border border-jmp-gold/30 backdrop-blur-sm">
+                                            Low Stock
                                         </span>
                                     </div>
                                 ` : ''}
                             </div>
                             
-                            <div class="p-4">
-                                <h3 class="font-semibold text-white mb-2 line-clamp-2 group-hover:text-jmp-gold transition-colors">
+                            <div class="p-3">
+                                <h3 class="font-medium text-sm text-white mb-1 line-clamp-2 group-hover:text-jmp-gold transition-colors">
                                     ${product.name}
                                 </h3>
-                                <div class="text-2xl font-bold gradient-gold mb-2">
+                                <div class="text-lg font-bold text-jmp-gold mb-1">
                                     ${formatPrice(product.price)}
                                 </div>
-                                <div class="flex items-center gap-2 text-sm ${product.stock > 0 ? 'text-green-400' : 'text-red-400'}">
+                                <div class="flex items-center gap-1 text-xs ${product.stock > 0 ? 'text-green-400' : 'text-red-400'}">
                                     <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i>
                                     <span>${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
                                 </div>
@@ -326,7 +325,7 @@
     }
     
     // ====================
-    // LOAD SINGLE PRODUCT BY SLUG (FOR PRODUCT PAGE)
+    // LOAD SINGLE PRODUCT BY SLUG
     // ====================
     async function loadSingleProductBySlug(slug) {
         console.log(`📦 Loading single product by slug: ${slug}`);
@@ -334,12 +333,11 @@
         const loadingState = document.getElementById('loadingState');
         const errorState = document.getElementById('errorState');
         const productContainer = document.getElementById('productContainer');
-        const productViewer = document.getElementById('productViewer');
         const productBreadcrumb = document.getElementById('productBreadcrumb');
         const categoryBreadcrumb = document.getElementById('categoryBreadcrumb');
         
-        if (!productViewer || !productContainer) {
-            console.error('❌ Product viewer container not found');
+        if (!productContainer) {
+            console.error('❌ Product container not found');
             return;
         }
         
@@ -348,7 +346,7 @@
         
         // Show loading state
         if (loadingState) loadingState.style.display = 'block';
-        if (productContainer) productContainer.classList.add('hidden');
+        productContainer.style.display = 'none';
         
         const supabase = getSupabaseClient();
         if (!supabase) {
@@ -372,7 +370,7 @@
             
             console.log('✅ Loaded product:', product.name);
             
-            // Get category separately
+            // Get category
             const { data: category, error: catError } = await supabase
                 .from('categories')
                 .select('id, name, slug')
@@ -383,7 +381,7 @@
                 console.warn('⚠️ Category not found for product:', product.id);
             }
             
-            // Get colors separately
+            // Get colors
             const { data: colors, error: colorsError } = await supabase
                 .from('product_colors')
                 .select('*')
@@ -394,7 +392,7 @@
                 console.warn('⚠️ Could not load colors:', colorsError);
             }
             
-            // Get sizes separately
+            // Get sizes
             const { data: sizes, error: sizesError } = await supabase
                 .from('product_sizes')
                 .select('*')
@@ -432,7 +430,7 @@
             
             // Hide loading state, show product
             if (loadingState) loadingState.style.display = 'none';
-            productContainer.classList.remove('hidden');
+            productContainer.style.display = 'block';
             
         } catch (error) {
             console.error('❌ Error loading product by slug:', error);
@@ -444,8 +442,10 @@
         const loadingState = document.getElementById('loadingState');
         const errorState = document.getElementById('errorState');
         const errorMessage = document.getElementById('errorMessage');
+        const productContainer = document.getElementById('productContainer');
         
         if (loadingState) loadingState.style.display = 'none';
+        if (productContainer) productContainer.style.display = 'none';
         if (errorState) {
             errorState.style.display = 'block';
             if (errorMessage) errorMessage.textContent = message;
@@ -472,8 +472,8 @@
     }
     
     function renderProductPage(product) {
-        const productViewer = document.getElementById('productViewer');
-        if (!productViewer) return;
+        const productContainer = document.getElementById('productContainer');
+        if (!productContainer) return;
         
         const categorySlug = product.category_slug || getCurrentCategory();
         const imageUrl = getImageUrl(categorySlug, product.image_url);
@@ -482,19 +482,19 @@
         const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
         const isInWishlist = wishlist.some(item => item.id === product.id);
         
-        productViewer.innerHTML = `
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        productContainer.innerHTML = `
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 w-full max-w-full">
                 <!-- Product Image -->
-                <div class="relative group">
-                    <div class="glass rounded-3xl p-4 overflow-hidden transform transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-2xl">
-                        <div class="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-jmp-dark-light to-jmp-darker">
+                <div class="relative group w-full max-w-full">
+                    <div class="bg-jmp-dark-light/30 backdrop-blur-sm border border-white/5 rounded-2xl p-3 overflow-hidden">
+                        <div class="relative aspect-square rounded-xl overflow-hidden bg-jmp-darker w-full">
                             <img src="${imageUrl}" alt="${product.name}" 
-                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                 class="w-full h-full object-contain"
                                  onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
                             
                             <!-- Stock Badge -->
-                            <div class="absolute top-4 left-4">
-                                <span class="px-4 py-2 rounded-full text-sm font-semibold ${
+                            <div class="absolute top-3 left-3">
+                                <span class="px-3 py-1.5 rounded-full text-xs font-semibold ${
                                     product.stock > 0 
                                         ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
                                         : 'bg-red-500/20 text-red-400 border border-red-500/30'
@@ -505,8 +505,8 @@
                             </div>
                             
                             <!-- Category Badge -->
-                            <div class="absolute top-4 right-4">
-                                <span class="px-4 py-2 rounded-full text-sm font-semibold bg-jmp-gold/20 text-jmp-gold border border-jmp-gold/30 backdrop-blur-sm">
+                            <div class="absolute top-3 right-3">
+                                <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-jmp-gold/20 text-jmp-gold border border-jmp-gold/30 backdrop-blur-sm">
                                     <i class="fas fa-tag mr-1"></i>
                                     ${categorySlug.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                                 </span>
@@ -516,123 +516,116 @@
                 </div>
                 
                 <!-- Product Details -->
-                <div class="space-y-6">
+                <div class="space-y-4 w-full max-w-full">
                     <!-- Title -->
-                    <h1 class="text-4xl lg:text-5xl font-black text-white leading-tight">${product.name}</h1>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">${product.name}</h1>
                     
                     <!-- Price -->
-                    <div class="glass rounded-2xl p-6 relative overflow-hidden">
-                        <div class="relative z-10">
-                            <span class="text-gray-400 text-sm uppercase tracking-wider">Price</span>
-                            <div class="text-5xl font-black gradient-gold mt-1">${formatPrice(product.price)}</div>
-                        </div>
-                        <div class="absolute bottom-0 right-0 text-8xl opacity-5 pointer-events-none select-none">₦</div>
+                    <div class="bg-jmp-dark-light/30 backdrop-blur-sm border border-white/5 rounded-xl p-4 relative overflow-hidden">
+                        <span class="text-gray-400 text-xs uppercase tracking-wider">Price</span>
+                        <div class="text-3xl sm:text-4xl font-bold text-jmp-gold mt-1">${formatPrice(product.price)}</div>
                     </div>
                     
                     ${isFootwear && currentProductColors.length > 0 ? `
                         <!-- Color Selection -->
-                        <div class="glass rounded-2xl p-6">
-                            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                                <i class="fas fa-palette text-jmp-gold"></i>
+                        <div class="bg-jmp-dark-light/30 backdrop-blur-sm border border-white/5 rounded-xl p-4">
+                            <h3 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                                <i class="fas fa-palette text-jmp-gold text-xs"></i>
                                 Select Color
                             </h3>
-                            <div class="flex flex-wrap gap-3" id="colorOptions">
+                            <div class="flex flex-wrap gap-2" id="colorOptions">
                                 ${currentProductColors.map(color => `
-                                    <button class="color-option group relative px-5 py-3 rounded-xl bg-white/5 border-2 border-transparent hover:border-jmp-gold/50 hover:bg-jmp-gold/10 transition-all duration-300 text-gray-300 hover:text-white font-medium"
+                                    <button class="color-option px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-jmp-gold/50 hover:bg-jmp-gold/10 transition-all duration-300 text-xs sm:text-sm text-gray-300 hover:text-white font-medium"
                                             data-color-id="${color.id}"
                                             data-color-name="${color.color_name}">
-                                        <span class="relative z-10">${color.color_name}</span>
-                                        <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-jmp-gold/20 to-transparent"></div>
+                                        ${color.color_name}
                                     </button>
                                 `).join('')}
                             </div>
                         </div>
                         
                         <!-- Size Selection -->
-                        <div class="glass rounded-2xl p-6">
-                            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                                <i class="fas fa-ruler text-jmp-gold"></i>
+                        <div class="bg-jmp-dark-light/30 backdrop-blur-sm border border-white/5 rounded-xl p-4">
+                            <h3 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                                <i class="fas fa-ruler text-jmp-gold text-xs"></i>
                                 Select Size
                             </h3>
-                            <div id="sizeOptions" class="flex flex-wrap gap-3">
-                                <div class="text-gray-400 py-8 text-center w-full">
-                                    <i class="fas fa-hand-pointer text-2xl mb-2 opacity-50"></i>
-                                    <p>Please select a color first</p>
+                            <div id="sizeOptions" class="flex flex-wrap gap-2">
+                                <div class="text-gray-400 py-4 text-center w-full text-sm">
+                                    <i class="fas fa-hand-pointer mr-1"></i>
+                                    Please select a color first
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Selection Summary -->
-                        <div id="selectionSummary" class="glass rounded-2xl p-6 border-2 border-jmp-gold/30 hidden">
+                        <div id="selectionSummary" class="bg-jmp-gold/10 border border-jmp-gold/30 rounded-xl p-4 hidden">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <span class="text-sm text-gray-400">Selected</span>
-                                    <div class="text-xl font-bold text-white mt-1">
+                                    <span class="text-xs text-gray-400">Selected</span>
+                                    <div class="text-base font-bold text-white mt-1">
                                         <span id="selectedColorName"></span> - <span id="selectedSizeValue"></span>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-sm text-gray-400">Available</span>
-                                    <div class="text-2xl font-bold text-jmp-gold mt-1" id="availableStock">0</div>
+                                    <span class="text-xs text-gray-400">Available</span>
+                                    <div class="text-xl font-bold text-jmp-gold mt-1" id="availableStock">0</div>
                                 </div>
                             </div>
                         </div>
                     ` : ''}
                     
                     <!-- Quantity -->
-                    <div class="glass rounded-2xl p-6">
-                        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                            <i class="fas fa-cubes text-jmp-gold"></i>
+                    <div class="bg-jmp-dark-light/30 backdrop-blur-sm border border-white/5 rounded-xl p-4">
+                        <h3 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                            <i class="fas fa-cubes text-jmp-gold text-xs"></i>
                             Quantity
                         </h3>
                         
-                        <div class="flex items-center gap-4 mb-4">
-                            <button class="quantity-btn minus w-12 h-12 rounded-xl bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-bold text-xl hover:scale-105 transition-all duration-300 shadow-lg shadow-jmp-gold/20">
-                                <i class="fas fa-minus"></i>
+                        <div class="flex items-center gap-2 mb-3">
+                            <button class="quantity-btn minus w-10 h-10 rounded-lg bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-bold hover:scale-105 transition-all duration-300 shadow-lg shadow-jmp-gold/20">
+                                <i class="fas fa-minus text-sm"></i>
                             </button>
                             <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}" 
-                                   class="w-24 h-12 text-center bg-white/5 border-2 border-white/10 text-white font-bold text-xl rounded-xl focus:border-jmp-gold focus:outline-none transition-colors">
-                            <button class="quantity-btn plus w-12 h-12 rounded-xl bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-bold text-xl hover:scale-105 transition-all duration-300 shadow-lg shadow-jmp-gold/20">
-                                <i class="fas fa-plus"></i>
+                                   class="w-16 h-10 text-center bg-white/5 border border-white/10 text-white font-bold rounded-lg focus:border-jmp-gold focus:outline-none transition-colors text-sm">
+                            <button class="quantity-btn plus w-10 h-10 rounded-lg bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-bold hover:scale-105 transition-all duration-300 shadow-lg shadow-jmp-gold/20">
+                                <i class="fas fa-plus text-sm"></i>
                             </button>
                         </div>
                         
                         <div class="flex flex-wrap gap-2">
                             ${[1, 5, 10, 25, 50].map(qty => `
-                                <button class="bulk-option px-6 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-jmp-gold hover:bg-jmp-gold/10 transition-all duration-300 text-gray-300 hover:text-white font-medium ${
+                                <button class="bulk-option px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-jmp-gold hover:bg-jmp-gold/10 transition-all duration-300 text-xs text-gray-300 hover:text-white font-medium ${
                                     qty === 1 ? 'bg-jmp-gold/20 border-jmp-gold text-white' : ''
                                 }" data-qty="${qty}">
-                                    ${qty} Unit${qty > 1 ? 's' : ''}
+                                    ${qty}
                                 </button>
                             `).join('')}
                         </div>
                     </div>
                     
                     <!-- Description -->
-                    <div class="glass rounded-2xl p-6">
-                        <h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                            <i class="fas fa-info-circle text-jmp-gold"></i>
+                    <div class="bg-jmp-dark-light/30 backdrop-blur-sm border border-white/5 rounded-xl p-4">
+                        <h3 class="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+                            <i class="fas fa-info-circle text-jmp-gold text-xs"></i>
                             Description
                         </h3>
-                        <p class="text-gray-300 leading-relaxed">
+                        <p class="text-sm text-gray-300 leading-relaxed">
                             ${product.description ? product.description.replace(/\n/g, '<br>') : 'Premium quality product from JMPOTTERS.'}
                         </p>
                     </div>
                     
                     <!-- Action Buttons -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <button id="pageAddToCart" class="group relative px-6 py-4 bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-bold rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-jmp-gold/30">
-                            <span class="relative z-10 flex items-center justify-center gap-2">
-                                <i class="fas fa-shopping-cart"></i>
-                                Add to Cart
-                            </span>
-                            <div class="absolute inset-0 bg-gradient-to-r from-jmp-gold-dark to-jmp-gold opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="pageAddToCart" class="px-4 py-3 bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-bold rounded-xl text-sm hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-jmp-gold/20 flex items-center justify-center gap-2">
+                            <i class="fas fa-shopping-cart"></i>
+                            Add to Cart
                         </button>
                         
-                        <button id="pageWishlist" class="px-6 py-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                        <button id="pageWishlist" class="px-4 py-3 rounded-xl font-bold transition-all duration-300 text-sm flex items-center justify-center gap-2 ${
                             isInWishlist 
-                                ? 'bg-red-500/20 text-red-400 border-2 border-red-500/30 hover:bg-red-500/30' 
-                                : 'bg-white/5 text-gray-300 border-2 border-white/10 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/10'
+                                ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30' 
+                                : 'bg-white/5 text-gray-300 border border-white/10 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/10'
                         }">
                             <i class="fas fa-heart"></i>
                             ${isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
@@ -796,12 +789,12 @@
         
         if (availableSizes.length === 0) {
             sizeOptions.innerHTML = `
-                <div class="text-gray-400 py-8 text-center w-full">
-                    <i class="fas fa-times-circle text-2xl mb-2 opacity-50"></i>
-                    <p>No sizes available for this color</p>
+                <div class="text-gray-400 py-4 text-center w-full text-sm">
+                    <i class="fas fa-times-circle mr-1"></i>
+                    No sizes available for this color
                 </div>
             `;
-            if (selectionSummary) selectionSummary.style.display = 'none';
+            if (selectionSummary) selectionSummary.classList.add('hidden');
             currentSelectedSize = null;
             currentSelectedVariant = null;
             return;
@@ -812,12 +805,10 @@
             let stockClass = '';
             if (stock === 0) {
                 stockClass = 'opacity-50 cursor-not-allowed line-through bg-red-500/10 border-red-500/30 text-red-400';
-            } else if (stock < 5) {
-                stockClass = 'border-jmp-gold/50 relative';
             }
             
             return `
-                <button class="size-option px-5 py-3 rounded-xl bg-white/5 border-2 hover:border-jmp-gold hover:bg-jmp-gold/10 transition-all duration-300 text-gray-300 hover:text-white font-medium ${stockClass} ${
+                <button class="size-option px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-jmp-gold hover:bg-jmp-gold/10 transition-all duration-300 text-xs sm:text-sm text-gray-300 hover:text-white font-medium ${stockClass} ${
                     stock === 0 ? 'disabled' : ''
                 }" 
                         data-size-id="${size.id}"
@@ -825,7 +816,7 @@
                         data-stock="${stock}"
                         ${stock === 0 ? 'disabled' : ''}>
                     ${size.size_value}
-                    ${stock < 5 && stock > 0 ? '<span class="absolute -top-2 -right-2 text-xs bg-jmp-gold text-black px-2 py-1 rounded-full">Low Stock</span>' : ''}
+                    ${stock < 5 && stock > 0 ? '<span class="ml-1 text-[10px] text-jmp-gold">(Low Stock)</span>' : ''}
                 </button>
             `;
         }).join('');
@@ -873,7 +864,7 @@
         selectedSizeValue.textContent = currentSelectedSize.value;
         availableStock.textContent = currentSelectedSize.stock;
         
-        selectionSummary.style.display = 'block';
+        selectionSummary.classList.remove('hidden');
     }
     
     // ====================
@@ -950,11 +941,11 @@
         
         if (cart.length === 0) {
             cartItems.innerHTML = `
-                <div class="text-center py-16">
-                    <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-shopping-bag text-3xl text-gray-500"></i>
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-shopping-bag text-2xl text-gray-500"></i>
                     </div>
-                    <p class="text-gray-400">Your cart is empty</p>
+                    <p class="text-gray-400 text-sm">Your cart is empty</p>
                 </div>
             `;
             cartTotal.textContent = '₦0';
@@ -970,21 +961,21 @@
             
             let itemDescription = item.name;
             if (item.color_name) itemDescription += ` (${item.color_name})`;
-            if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
+            if (item.size_value) itemDescription += ` - ${item.size_value}`;
             
             html += `
-                <div class="glass rounded-xl p-4 hover:scale-[1.02] transition-transform duration-300">
-                    <div class="flex gap-4">
-                        <div class="w-20 h-20 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+                <div class="bg-white/5 rounded-lg p-3">
+                    <div class="flex gap-3">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden bg-jmp-darker flex-shrink-0">
                             <img src="${getImageUrl(item.category_slug, item.image_url)}" alt="${item.name}" class="w-full h-full object-cover">
                         </div>
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-white mb-1">${itemDescription}</h4>
-                            <div class="text-jmp-gold font-bold mb-1">${formatPrice(item.price)}</div>
-                            <div class="text-sm text-gray-400">Quantity: ${item.quantity}</div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-medium text-white text-sm mb-1 truncate">${itemDescription}</h4>
+                            <div class="text-jmp-gold font-bold text-sm mb-1">${formatPrice(item.price)}</div>
+                            <div class="text-xs text-gray-400">Qty: ${item.quantity}</div>
                         </div>
-                        <button class="cart-item-remove w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors" data-index="${index}">
-                            <i class="fas fa-trash"></i>
+                        <button class="cart-item-remove w-7 h-7 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors flex-shrink-0" data-index="${index}">
+                            <i class="fas fa-trash text-xs"></i>
                         </button>
                     </div>
                 </div>
