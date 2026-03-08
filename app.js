@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE FIXED VERSION WITH PRODUCT PAGE SUPPORT
+// JMPOTTERS APP - COMPLETE FIXED VERSION WITH ENHANCED PRODUCT PAGE
 // ====================
 (function() {
     'use strict';
@@ -9,7 +9,7 @@
         return;
     }
     
-    console.log('🚀 JMPOTTERS app starting (Fixed v3)...');
+    console.log('🚀 JMPOTTERS app starting...');
     window.JMPOTTERS_APP_INITIALIZED = true;
     
     // ====================
@@ -19,13 +19,11 @@
         window.JMPOTTERS_CONFIG = {};
     }
     
-    // Supabase configuration
     window.JMPOTTERS_CONFIG.supabase = {
         url: 'https://tmpggeeuwdvlngvfncaa.supabase.co',
         key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
     };
     
-    // Image configuration
     window.JMPOTTERS_CONFIG.images = {
         baseUrl: 'https://ebuzome.github.io/JMPOTTERS/assets/images/',
         paths: {
@@ -40,7 +38,7 @@
     };
     
     // ====================
-    // CURRENT PRODUCT STATE
+    // STATE MANAGEMENT
     // ====================
     let currentProduct = null;
     let currentSelectedQuantity = 1;
@@ -114,42 +112,45 @@
         if (!notificationContainer) {
             notificationContainer = document.createElement('div');
             notificationContainer.id = 'notificationContainer';
-            notificationContainer.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 9999;
-            `;
+            notificationContainer.className = 'fixed top-4 right-4 z-[100] space-y-2';
             document.body.appendChild(notificationContainer);
         }
         
         const toast = document.createElement('div');
-        toast.className = `notification ${type}`;
+        toast.className = `glass rounded-xl p-4 pr-6 shadow-2xl transform transition-all duration-500 translate-x-full opacity-0 border-l-4 ${
+            type === 'success' ? 'border-l-green-500' :
+            type === 'error' ? 'border-l-red-500' :
+            type === 'warning' ? 'border-l-jmp-gold' :
+            'border-l-blue-500'
+        }`;
         
         const icons = {
-            success: 'fas fa-check-circle',
-            error: 'fas fa-exclamation-circle',
-            warning: 'fas fa-exclamation-triangle',
-            info: 'fas fa-info-circle'
+            success: 'fa-check-circle text-green-500',
+            error: 'fa-exclamation-circle text-red-500',
+            warning: 'fa-exclamation-triangle text-jmp-gold',
+            info: 'fa-info-circle text-blue-500'
         };
         
         toast.innerHTML = `
-            <i class="${icons[type] || icons.info} notification-icon"></i>
-            <span>${message}</span>
+            <div class="flex items-center gap-3">
+                <i class="fas ${icons[type] || icons.info} text-xl"></i>
+                <span class="text-gray-200">${message}</span>
+            </div>
         `;
         
         notificationContainer.appendChild(toast);
         
+        // Animate in
         setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => toast.remove(), 300);
+            toast.classList.remove('translate-x-full', 'opacity-0');
+        }, 10);
+        
+        setTimeout(() => {
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 500);
         }, 5000);
     }
     
-    // ====================
-    // GET SUPABASE CLIENT
-    // ====================
     function getSupabaseClient() {
         if (window.JMPOTTERS_SUPABASE_CLIENT) {
             return window.JMPOTTERS_SUPABASE_CLIENT;
@@ -174,9 +175,11 @@
         
         const loadingState = document.getElementById('loadingState');
         const errorState = document.getElementById('errorState');
+        const productContainer = document.getElementById('productContainer');
         const productViewer = document.getElementById('productViewer');
+        const productBreadcrumb = document.getElementById('productBreadcrumb');
         
-        if (!productViewer) {
+        if (!productViewer || !productContainer) {
             console.error('❌ Product viewer container not found');
             return;
         }
@@ -186,6 +189,7 @@
         
         // Show loading state
         if (loadingState) loadingState.style.display = 'block';
+        if (productContainer) productContainer.classList.add('hidden');
         
         const supabase = getSupabaseClient();
         if (!supabase) {
@@ -242,8 +246,15 @@
                 console.warn('⚠️ Could not load sizes:', sizesError);
             }
             
-            // Update document title
+            // Update document title and breadcrumb
             document.title = `${product.name} - JMPOTTERS`;
+            if (productBreadcrumb) productBreadcrumb.textContent = product.name;
+            
+            const categoryBreadcrumb = document.getElementById('categoryBreadcrumb');
+            if (categoryBreadcrumb && category) {
+                categoryBreadcrumb.textContent = category.name;
+                categoryBreadcrumb.href = `${category.slug}.html`;
+            }
             
             // Set current product state
             currentProduct = product;
@@ -258,11 +269,12 @@
             // Build mappings
             buildColorSizeMappings(currentProductColors, currentProductSizes);
             
-            // Render product on standalone page
+            // Render product
             renderProductPage(currentProduct);
             
-            // Hide loading state
+            // Hide loading state, show product
             if (loadingState) loadingState.style.display = 'none';
+            productContainer.classList.remove('hidden');
             
         } catch (error) {
             console.error('❌ Error loading product by slug:', error);
@@ -283,16 +295,13 @@
     }
     
     function buildColorSizeMappings(colors, sizes) {
-        // Reset mappings
         colorSizeMap = {};
         sizeColorMap = {};
         
-        // Build color -> sizes map
         colors.forEach(color => {
             colorSizeMap[color.id] = sizes.filter(size => size.color_id === color.id);
         });
         
-        // Build size -> colors map
         const uniqueSizes = [...new Set(sizes.map(s => s.size_value))];
         uniqueSizes.forEach(sizeValue => {
             const sizeVariants = sizes.filter(s => s.size_value === sizeValue);
@@ -301,12 +310,7 @@
             );
         });
         
-        console.log('🗺️ Built color-size mappings:', {
-            colors: colors.length,
-            sizes: sizes.length,
-            colorSizeMapEntries: Object.keys(colorSizeMap).length,
-            sizeColorMapEntries: Object.keys(sizeColorMap).length
-        });
+        console.log('🗺️ Built color-size mappings');
     }
     
     function renderProductPage(product) {
@@ -315,109 +319,165 @@
         
         const categorySlug = product.category_slug || getCurrentCategory();
         const imageUrl = getImageUrl(categorySlug, product.image_url);
-        
-        // Determine if it's footwear (needs size/color selectors)
         const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
         
-        // Check wishlist status
         const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
         const isInWishlist = wishlist.some(item => item.id === product.id);
         
         productViewer.innerHTML = `
-            <div class="product-container">
-                <!-- Product Images -->
-                <div class="product-image-container">
-                    <img src="${imageUrl}" alt="${product.name}" class="product-image"
-                         onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                <!-- Product Image -->
+                <div class="relative group">
+                    <div class="glass rounded-3xl p-4 overflow-hidden transform transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-2xl">
+                        <div class="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-jmp-dark-light to-jmp-darker">
+                            <img src="${imageUrl}" alt="${product.name}" 
+                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                 onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                            
+                            <!-- Stock Badge -->
+                            <div class="absolute top-4 left-4">
+                                <span class="px-4 py-2 rounded-full text-sm font-semibold ${
+                                    product.stock > 0 
+                                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                } backdrop-blur-sm">
+                                    <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'} mr-1"></i>
+                                    ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                                </span>
+                            </div>
+                            
+                            <!-- Category Badge -->
+                            <div class="absolute top-4 right-4">
+                                <span class="px-4 py-2 rounded-full text-sm font-semibold bg-jmp-gold/20 text-jmp-gold border border-jmp-gold/30 backdrop-blur-sm">
+                                    <i class="fas fa-tag mr-1"></i>
+                                    ${categorySlug.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Product Details -->
-                <div class="product-details">
+                <div class="space-y-6">
                     <!-- Title -->
-                    <h1 class="product-title">${product.name}</h1>
+                    <h1 class="text-4xl lg:text-5xl font-black text-white leading-tight">${product.name}</h1>
                     
                     <!-- Price -->
-                    <div class="price-container">
-                        <div class="current-price">${formatPrice(product.price)}</div>
-                    </div>
-                    
-                    <!-- Availability -->
-                    <div class="stock-status ${product.stock > 0 ? '' : 'out-of-stock'}">
-                        <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i>
-                        <span>${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
-                        ${product.stock > 0 ? `<span class="stock-count">${product.stock} units available</span>` : ''}
-                    </div>
-                    
-                    <!-- Description -->
-                    <div class="detail-tile">
-                        <h3 class="tile-title">Description</h3>
-                        <div class="product-description">
-                            ${product.description ? product.description.replace(/\n/g, '<br>') : 'Premium quality product from JMPOTTERS.'}
+                    <div class="glass rounded-2xl p-6 relative overflow-hidden">
+                        <div class="relative z-10">
+                            <span class="text-gray-400 text-sm uppercase tracking-wider">Price</span>
+                            <div class="text-5xl font-black gradient-gold mt-1">${formatPrice(product.price)}</div>
                         </div>
+                        <div class="absolute bottom-0 right-0 text-8xl opacity-5 pointer-events-none select-none">₦</div>
                     </div>
                     
-                    <!-- Variant Selectors (for footwear) -->
                     ${isFootwear && currentProductColors.length > 0 ? `
-                    <div class="detail-tile">
-                        <h3 class="tile-title">Select Color</h3>
-                        <div class="color-options" id="colorOptions">
-                            ${currentProductColors.map(color => `
-                                <div class="color-option" 
-                                     data-color-id="${color.id}"
-                                     data-color-name="${color.color_name}"
-                                     style="background-color: ${color.color_code || '#666'}"
-                                     title="${color.color_name}">
-                                    ${color.color_name}
+                        <!-- Color Selection -->
+                        <div class="glass rounded-2xl p-6">
+                            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                                <i class="fas fa-palette text-jmp-gold"></i>
+                                Select Color
+                            </h3>
+                            <div class="flex flex-wrap gap-3" id="colorOptions">
+                                ${currentProductColors.map(color => `
+                                    <button class="color-option group relative px-5 py-3 rounded-xl bg-white/5 border-2 border-transparent hover:border-jmp-gold/50 hover:bg-jmp-gold/10 transition-all duration-300 text-gray-300 hover:text-white font-medium"
+                                            data-color-id="${color.id}"
+                                            data-color-name="${color.color_name}">
+                                        <span class="relative z-10">${color.color_name}</span>
+                                        <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-jmp-gold/20 to-transparent"></div>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Size Selection -->
+                        <div class="glass rounded-2xl p-6">
+                            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                                <i class="fas fa-ruler text-jmp-gold"></i>
+                                Select Size
+                            </h3>
+                            <div id="sizeOptions" class="flex flex-wrap gap-3">
+                                <div class="text-gray-400 py-8 text-center w-full">
+                                    <i class="fas fa-hand-pointer text-2xl mb-2 opacity-50"></i>
+                                    <p>Please select a color first</p>
                                 </div>
-                            `).join('')}
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="detail-tile">
-                        <h3 class="tile-title">Select Size</h3>
-                        <div class="size-options" id="sizeOptions">
-                            <div class="no-selection">Please select a color first</div>
+                        
+                        <!-- Selection Summary -->
+                        <div id="selectionSummary" class="glass rounded-2xl p-6 border-2 border-jmp-gold/30 hidden">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm text-gray-400">Selected</span>
+                                    <div class="text-xl font-bold text-white mt-1">
+                                        <span id="selectedColorName"></span> - <span id="selectedSizeValue"></span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm text-gray-400">Available</span>
+                                    <div class="text-2xl font-bold text-jmp-gold mt-1" id="availableStock">0</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="selection-summary" id="selectionSummary">
-                        <div class="selected-variant">
-                            <span id="selectedColorName"></span>
-                            <span class="separator">-</span>
-                            <span id="selectedSizeValue"></span>
-                        </div>
-                        <div class="stock-info">
-                            <i class="fas fa-box"></i>
-                            <span>Available Stock:</span>
-                            <strong id="availableStock">0</strong>
-                        </div>
-                    </div>
                     ` : ''}
                     
-                    <!-- Quantity Selector -->
-                    <div class="detail-tile">
-                        <h3 class="tile-title">Quantity</h3>
-                        <div class="quantity-controls">
-                            <button class="quantity-btn minus">-</button>
-                            <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}" class="quantity-input">
-                            <button class="quantity-btn plus">+</button>
+                    <!-- Quantity -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-cubes text-jmp-gold"></i>
+                            Quantity
+                        </h3>
+                        
+                        <div class="flex items-center gap-4 mb-4">
+                            <button class="quantity-btn minus w-12 h-12 rounded-xl bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-bold text-xl hover:scale-105 transition-all duration-300 shadow-lg shadow-jmp-gold/20">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}" 
+                                   class="w-24 h-12 text-center bg-white/5 border-2 border-white/10 text-white font-bold text-xl rounded-xl focus:border-jmp-gold focus:outline-none transition-colors">
+                            <button class="quantity-btn plus w-12 h-12 rounded-xl bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-bold text-xl hover:scale-105 transition-all duration-300 shadow-lg shadow-jmp-gold/20">
+                                <i class="fas fa-plus"></i>
+                            </button>
                         </div>
-                        <div class="bulk-options">
+                        
+                        <div class="flex flex-wrap gap-2">
                             ${[1, 5, 10, 25, 50].map(qty => `
-                                <button class="bulk-option ${qty === 1 ? 'active' : ''}" data-qty="${qty}">
+                                <button class="bulk-option px-6 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-jmp-gold hover:bg-jmp-gold/10 transition-all duration-300 text-gray-300 hover:text-white font-medium ${
+                                    qty === 1 ? 'bg-jmp-gold/20 border-jmp-gold text-white' : ''
+                                }" data-qty="${qty}">
                                     ${qty} Unit${qty > 1 ? 's' : ''}
                                 </button>
                             `).join('')}
                         </div>
                     </div>
                     
+                    <!-- Description -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                            <i class="fas fa-info-circle text-jmp-gold"></i>
+                            Description
+                        </h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            ${product.description ? product.description.replace(/\n/g, '<br>') : 'Premium quality product from JMPOTTERS.'}
+                        </p>
+                    </div>
+                    
                     <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <button class="action-btn btn-primary btn-add-cart" id="pageAddToCart">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="pageAddToCart" class="group relative px-6 py-4 bg-gradient-to-r from-jmp-gold to-jmp-gold-light text-black font-bold rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-jmp-gold/30">
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                <i class="fas fa-shopping-cart"></i>
+                                Add to Cart
+                            </span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-jmp-gold-dark to-jmp-gold opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </button>
-                        <button class="action-btn btn-secondary btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist">
-                            <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+                        
+                        <button id="pageWishlist" class="px-6 py-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                            isInWishlist 
+                                ? 'bg-red-500/20 text-red-400 border-2 border-red-500/30 hover:bg-red-500/30' 
+                                : 'bg-white/5 text-gray-300 border-2 border-white/10 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/10'
+                        }">
+                            <i class="fas fa-heart"></i>
+                            ${isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                         </button>
                     </div>
                 </div>
@@ -437,19 +497,16 @@
                 const colorOption = e.target.closest('.color-option');
                 if (!colorOption) return;
                 
-                // Update UI
                 colorOptions.querySelectorAll('.color-option').forEach(opt => {
-                    opt.classList.remove('selected');
+                    opt.classList.remove('border-jmp-gold', 'bg-jmp-gold/20', 'text-white');
                 });
-                colorOption.classList.add('selected');
+                colorOption.classList.add('border-jmp-gold', 'bg-jmp-gold/20', 'text-white');
                 
-                // Update state
                 currentSelectedColor = {
                     id: parseInt(colorOption.dataset.colorId),
                     name: colorOption.dataset.colorName
                 };
                 
-                // Update size options
                 updateSizeOptionsForColor(currentSelectedColor.id);
             });
         }
@@ -489,9 +546,9 @@
         document.querySelectorAll('.bulk-option').forEach(option => {
             option.addEventListener('click', function() {
                 document.querySelectorAll('.bulk-option').forEach(opt => {
-                    opt.classList.remove('active');
+                    opt.classList.remove('bg-jmp-gold/20', 'border-jmp-gold', 'text-white');
                 });
-                this.classList.add('active');
+                this.classList.add('bg-jmp-gold/20', 'border-jmp-gold', 'text-white');
                 
                 const qty = parseInt(this.dataset.qty);
                 if (quantityInput) {
@@ -553,8 +610,13 @@
         if (pageWishlist && currentProduct) {
             pageWishlist.addEventListener('click', () => {
                 toggleWishlist(currentProduct);
-                const isActive = pageWishlist.classList.contains('active');
-                pageWishlist.classList.toggle('active');
+                const isActive = pageWishlist.classList.contains('bg-red-500/20');
+                pageWishlist.classList.toggle('bg-red-500/20');
+                pageWishlist.classList.toggle('text-red-400');
+                pageWishlist.classList.toggle('border-red-500/30');
+                pageWishlist.classList.toggle('bg-white/5');
+                pageWishlist.classList.toggle('text-gray-300');
+                pageWishlist.classList.toggle('border-white/10');
                 pageWishlist.innerHTML = `
                     <i class="fas fa-heart"></i> 
                     ${isActive ? 'Add to Wishlist' : 'In Wishlist'}
@@ -569,45 +631,50 @@
         
         if (!sizeOptions) return;
         
-        // Get sizes for this color
         const availableSizes = colorSizeMap[colorId] || [];
         
         if (availableSizes.length === 0) {
-            sizeOptions.innerHTML = '<div class="no-selection">No sizes available for this color</div>';
+            sizeOptions.innerHTML = `
+                <div class="text-gray-400 py-8 text-center w-full">
+                    <i class="fas fa-times-circle text-2xl mb-2 opacity-50"></i>
+                    <p>No sizes available for this color</p>
+                </div>
+            `;
             if (selectionSummary) selectionSummary.style.display = 'none';
             currentSelectedSize = null;
             currentSelectedVariant = null;
             return;
         }
         
-        // Populate size options
         sizeOptions.innerHTML = availableSizes.map(size => {
             const stock = size.stock_quantity || 0;
             let stockClass = '';
             if (stock === 0) {
-                stockClass = 'out-of-stock';
+                stockClass = 'opacity-50 cursor-not-allowed line-through bg-red-500/10 border-red-500/30 text-red-400';
             } else if (stock < 5) {
-                stockClass = 'low-stock';
+                stockClass = 'border-jmp-gold/50 relative';
             }
             
             return `
-                <div class="size-option ${stockClass}" 
-                     data-size-id="${size.id}"
-                     data-size-value="${size.size_value}"
-                     data-stock="${stock}"
-                     ${stock === 0 ? 'disabled' : ''}>
+                <button class="size-option px-5 py-3 rounded-xl bg-white/5 border-2 hover:border-jmp-gold hover:bg-jmp-gold/10 transition-all duration-300 text-gray-300 hover:text-white font-medium ${stockClass} ${
+                    stock === 0 ? 'disabled' : ''
+                }" 
+                        data-size-id="${size.id}"
+                        data-size-value="${size.size_value}"
+                        data-stock="${stock}"
+                        ${stock === 0 ? 'disabled' : ''}>
                     ${size.size_value}
-                </div>
+                    ${stock < 5 && stock > 0 ? '<span class="absolute -top-2 -right-2 text-xs bg-jmp-gold text-black px-2 py-1 rounded-full">Low Stock</span>' : ''}
+                </button>
             `;
         }).join('');
         
-        // Add event listeners to size options
-        sizeOptions.querySelectorAll('.size-option:not(.out-of-stock)').forEach(option => {
+        sizeOptions.querySelectorAll('.size-option:not(.disabled)').forEach(option => {
             option.addEventListener('click', function() {
                 sizeOptions.querySelectorAll('.size-option').forEach(opt => {
-                    opt.classList.remove('selected');
+                    opt.classList.remove('border-jmp-gold', 'bg-jmp-gold/20', 'text-white');
                 });
-                this.classList.add('selected');
+                this.classList.add('border-jmp-gold', 'bg-jmp-gold/20', 'text-white');
                 
                 currentSelectedSize = {
                     id: parseInt(this.dataset.sizeId),
@@ -646,453 +713,6 @@
         availableStock.textContent = currentSelectedSize.stock;
         
         selectionSummary.style.display = 'block';
-    }
-    
-    // ====================
-    // LOAD PRODUCTS BY CATEGORY
-    // ====================
-    async function loadProductsByCategory(categorySlug) {
-        console.log(`📦 Loading products for: ${categorySlug}`);
-        
-        const productsGrid = document.getElementById('productsGrid');
-        if (!productsGrid) {
-            console.error('❌ Products grid not found');
-            return;
-        }
-        
-        // Show skeleton loading with improved styling - 2 per row
-        productsGrid.innerHTML = `
-            <div class="products-grid">
-                ${Array(6).fill().map(() => `
-                    <div class="product-card-skeleton">
-                        <div class="skeleton-image"></div>
-                        <div class="skeleton-content">
-                            <div class="skeleton-title"></div>
-                            <div class="skeleton-price"></div>
-                            <div class="skeleton-stock"></div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        
-        // Add skeleton styles if not already present
-        addSkeletonStyles();
-        
-        const supabase = getSupabaseClient();
-        if (!supabase) {
-            productsGrid.innerHTML = `<div class="error-message">Database connection error</div>`;
-            return;
-        }
-        
-        try {
-            const { data: category, error: catError } = await supabase
-                .from('categories')
-                .select('id, name, slug')
-                .eq('slug', categorySlug)
-                .single();
-            
-            if (catError || !category) {
-                productsGrid.innerHTML = `<div class="error-message">Category not found</div>`;
-                return;
-            }
-            
-            const { data: products, error: prodError } = await supabase
-                .from('products')
-                .select('id, name, price, image_url, stock, slug, description')
-                .eq('category_id', category.id)
-                .eq('is_active', true)
-                .order('created_at', { ascending: false });
-            
-            if (prodError) throw prodError;
-            
-            if (!products || products.length === 0) {
-                productsGrid.innerHTML = `<div class="no-products">No products found in this category</div>`;
-                return;
-            }
-            
-            window.JMPOTTERS_PRODUCTS_CACHE = products;
-            renderProducts(products, categorySlug);
-            
-        } catch (error) {
-            console.error('❌ Error loading products:', error);
-            productsGrid.innerHTML = `<div class="error-message">Error loading products. Please try again.</div>`;
-        }
-    }
-    
-    // Add skeleton loading styles - optimized for 2 per row
-    function addSkeletonStyles() {
-        if (document.getElementById('skeleton-styles')) return;
-        
-        const style = document.createElement('style');
-        style.id = 'skeleton-styles';
-        style.textContent = `
-            .product-card-skeleton {
-                background: #fff;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                animation: skeleton-pulse 1.5s ease-in-out infinite;
-                width: 100%;
-            }
-            
-            .skeleton-image {
-                width: 100%;
-                aspect-ratio: 1 / 1;
-                background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
-                background-size: 200% 100%;
-                animation: skeleton-shimmer 1.5s infinite;
-            }
-            
-            .skeleton-content {
-                padding: 12px;
-            }
-            
-            .skeleton-title {
-                height: 18px;
-                width: 90%;
-                background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
-                background-size: 200% 100%;
-                animation: skeleton-shimmer 1.5s infinite;
-                margin-bottom: 8px;
-                border-radius: 4px;
-            }
-            
-            .skeleton-price {
-                height: 20px;
-                width: 60%;
-                background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
-                background-size: 200% 100%;
-                animation: skeleton-shimmer 1.5s infinite;
-                margin-bottom: 8px;
-                border-radius: 4px;
-            }
-            
-            .skeleton-stock {
-                height: 14px;
-                width: 40%;
-                background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
-                background-size: 200% 100%;
-                animation: skeleton-shimmer 1.5s infinite;
-                border-radius: 4px;
-            }
-            
-            @keyframes skeleton-pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.8; }
-            }
-            
-            @keyframes skeleton-shimmer {
-                0% { background-position: -200% 0; }
-                100% { background-position: 200% 0; }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    function renderProducts(products, categorySlug) {
-        const productsGrid = document.getElementById('productsGrid');
-        if (!productsGrid) return;
-        
-        // Add product card styles if not already present - optimized for 2 per row
-        addProductCardStyles();
-        
-        productsGrid.innerHTML = '';
-        
-        products.forEach((product) => {
-            const imageUrl = getImageUrl(categorySlug, product.image_url);
-            const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
-            const isInWishlist = wishlist.some(item => item.id === product.id);
-            
-            const productLink = document.createElement('a');
-            productLink.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
-            productLink.className = 'product-card-link';
-            
-            const productCard = document.createElement('div');
-            productCard.className = 'product-card';
-            
-            productCard.innerHTML = `
-                <div class="product-image">
-                    <img src="${imageUrl}" alt="${product.name}" 
-                         loading="lazy"
-                         onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
-                    <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
-                            data-action="wishlist"
-                            data-product-id="${product.id}"
-                            onclick="event.preventDefault(); event.stopPropagation();">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                    <span class="category-badge">${categorySlug.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">${product.name}</h3>
-                    <div class="product-price">${formatPrice(product.price)}</div>
-                    <div class="stock-status ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}">
-                        <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i> 
-                        ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                    </div>
-                </div>
-            `;
-            
-            productLink.appendChild(productCard);
-            productsGrid.appendChild(productLink);
-        });
-        
-        setupProductInteractions();
-    }
-    
-    // Add product card styles - FIXED for 2 per row without overflow
-    function addProductCardStyles() {
-        if (document.getElementById('product-card-styles')) return;
-        
-        const style = document.createElement('style');
-        style.id = 'product-card-styles';
-        style.textContent = `
-            /* Ensure the grid container doesn't overflow */
-            .products-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-                padding: 12px;
-                width: 100%;
-                max-width: 100%;
-                box-sizing: border-box;
-                margin: 0;
-            }
-            
-            /* Ensure all grid items stay within bounds */
-            .products-grid > * {
-                min-width: 0; /* Prevents grid items from overflowing */
-                width: 100%;
-                max-width: 100%;
-                box-sizing: border-box;
-            }
-            
-            .product-card-link {
-                text-decoration: none;
-                color: inherit;
-                display: block;
-                transition: transform 0.2s ease;
-                height: 100%;
-                width: 100%;
-                max-width: 100%;
-            }
-            
-            .product-card-link:hover {
-                transform: translateY(-4px);
-            }
-            
-            .product-card-link:visited,
-            .product-card-link:active,
-            .product-card-link:focus {
-                color: inherit;
-                outline: none;
-            }
-            
-            .product-card {
-                background: #fff;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                transition: box-shadow 0.2s ease;
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-                width: 100%;
-                max-width: 100%;
-            }
-            
-            .product-card:hover {
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            }
-            
-            .product-image {
-                position: relative;
-                width: 100%;
-                aspect-ratio: 1 / 1;
-                overflow: hidden;
-                background: #f5f5f5;
-            }
-            
-            .product-image img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                transition: transform 0.3s ease;
-                display: block;
-            }
-            
-            .product-card:hover .product-image img {
-                transform: scale(1.05);
-            }
-            
-            .wishlist-btn {
-                position: absolute;
-                top: 8px;
-                right: 8px;
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                background: white;
-                border: none;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10;
-                transition: all 0.2s ease;
-                padding: 0;
-                color: #666;
-            }
-            
-            .wishlist-btn:hover {
-                transform: scale(1.1);
-                background: #fff0f0;
-            }
-            
-            .wishlist-btn.active {
-                color: #e74c3c;
-            }
-            
-            .wishlist-btn.active i {
-                color: #e74c3c;
-            }
-            
-            .category-badge {
-                position: absolute;
-                bottom: 8px;
-                left: 8px;
-                background: rgba(0,0,0,0.7);
-                color: white;
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-size: 11px;
-                text-transform: capitalize;
-                pointer-events: none;
-                max-width: calc(100% - 16px);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            
-            .product-info {
-                padding: 12px;
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            
-            .product-title {
-                margin: 0 0 6px 0;
-                font-size: 14px;
-                font-weight: 600;
-                color: #333;
-                line-height: 1.4;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                min-height: 40px;
-                word-break: break-word;
-            }
-            
-            .product-price {
-                font-size: 18px;
-                font-weight: 700;
-                color: #2c3e50;
-                margin-bottom: 6px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            
-            .stock-status {
-                font-size: 12px;
-                display: flex;
-                align-items: center;
-                gap: 4px;
-                margin-top: auto;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            
-            .stock-status.in-stock {
-                color: #27ae60;
-            }
-            
-            .stock-status.out-of-stock {
-                color: #e74c3c;
-            }
-            
-            .stock-status i {
-                font-size: 12px;
-                flex-shrink: 0;
-            }
-            
-            .stock-status span {
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            
-            /* Error and empty states */
-            .error-message,
-            .no-products {
-                grid-column: 1 / -1;
-                text-align: center;
-                padding: 40px 20px;
-                color: #666;
-                font-size: 16px;
-                background: #f9f9f9;
-                border-radius: 8px;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            
-            /* Ensure body and main containers don't cause overflow */
-            body {
-                overflow-x: hidden;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }
-            
-            #productsGrid {
-                width: 100%;
-                max-width: 100%;
-                overflow-x: hidden;
-                box-sizing: border-box;
-            }
-        `;
-        
-        document.head.appendChild(style);
-    }
-    
-    function setupProductInteractions() {
-        document.addEventListener('click', function(event) {
-            const wishlistBtn = event.target.closest('[data-action="wishlist"]');
-            if (wishlistBtn) {
-                event.preventDefault();
-                event.stopPropagation();
-                const productId = parseInt(wishlistBtn.getAttribute('data-product-id'));
-                const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
-                
-                if (product) {
-                    toggleWishlist(product);
-                    wishlistBtn.classList.toggle('active');
-                    
-                    // Update icon color
-                    const icon = wishlistBtn.querySelector('i');
-                    if (icon) {
-                        icon.style.color = wishlistBtn.classList.contains('active') ? '#e74c3c' : '';
-                    }
-                }
-            }
-        });
     }
     
     // ====================
@@ -1168,7 +788,14 @@
         if (!cartItems || !cartTotal) return;
         
         if (cart.length === 0) {
-            cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+            cartItems.innerHTML = `
+                <div class="text-center py-16">
+                    <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shopping-bag text-3xl text-gray-500"></i>
+                    </div>
+                    <p class="text-gray-400">Your cart is empty</p>
+                </div>
+            `;
             cartTotal.textContent = '₦0';
             return;
         }
@@ -1185,33 +812,23 @@
             if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
             
             html += `
-                <div class="cart-item">
-                    <div class="cart-item-image">
-                        <img src="${getImageUrl(item.category_slug, item.image_url)}" alt="${item.name}">
-                    </div>
-                    <div class="cart-item-details">
-                        <div class="cart-item-name">${itemDescription}</div>
-                        <div class="cart-item-price">${formatPrice(item.price)}</div>
-                        <div class="cart-item-quantity-display">
-                            Quantity: <strong>${item.quantity}</strong>
+                <div class="glass rounded-xl p-4 hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex gap-4">
+                        <div class="w-20 h-20 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+                            <img src="${getImageUrl(item.category_slug, item.image_url)}" alt="${item.name}" class="w-full h-full object-cover">
                         </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-white mb-1">${itemDescription}</h4>
+                            <div class="text-jmp-gold font-bold mb-1">${formatPrice(item.price)}</div>
+                            <div class="text-sm text-gray-400">Quantity: ${item.quantity}</div>
+                        </div>
+                        <button class="cart-item-remove w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-                    <button class="cart-item-remove" data-index="${index}">
-                        <i class="fas fa-trash"></i>
-                    </button>
                 </div>
             `;
         });
-        
-        html += `
-            <div class="cart-total">
-                <span>Total:</span>
-                <span class="cart-total-amount">${formatPrice(total)}</span>
-            </div>
-            <button class="cart-checkout-btn" id="checkoutButton">
-                <i class="fas fa-shopping-bag"></i> Proceed to Checkout
-            </button>
-        `;
         
         cartItems.innerHTML = html;
         cartTotal.textContent = formatPrice(total);
@@ -1284,11 +901,11 @@
         const cartOverlay = document.getElementById('cartOverlay');
         
         if (cartPanel) {
-            cartPanel.classList.add('active');
+            cartPanel.classList.remove('translate-x-full');
         }
         
         if (cartOverlay) {
-            cartOverlay.classList.add('active');
+            cartOverlay.classList.remove('hidden');
         }
         
         document.body.style.overflow = 'hidden';
@@ -1299,11 +916,11 @@
         const cartOverlay = document.getElementById('cartOverlay');
         
         if (cartPanel) {
-            cartPanel.classList.remove('active');
+            cartPanel.classList.add('translate-x-full');
         }
         
         if (cartOverlay) {
-            cartOverlay.classList.remove('active');
+            cartOverlay.classList.add('hidden');
         }
         
         document.body.style.overflow = '';
@@ -1339,16 +956,14 @@
     }
     
     // ====================
-    // INITIALIZATION - THIS IS THE KEY PART
+    // INITIALIZATION
     // ====================
     async function initializePage() {
         console.log('🚀 Initializing JMPOTTERS page...');
-        console.log('Current page:', window.location.pathname);
         
         setupHeaderInteractions();
         updateCartUI();
         
-        // Check if we're on a product page
         if (isProductPage()) {
             const slug = getSlugFromURL();
             console.log('📦 Product page detected, slug:', slug);
@@ -1357,31 +972,24 @@
                 await loadSingleProductBySlug(slug);
             } else {
                 console.error('❌ No slug found in URL');
-                // Show error state
                 const errorState = document.getElementById('errorState');
                 if (errorState) {
                     errorState.style.display = 'block';
                 }
+                const loadingState = document.getElementById('loadingState');
+                if (loadingState) loadingState.style.display = 'none';
             }
         } else {
-            // Load products if on category page
             const currentCategory = getCurrentCategory();
             if (document.getElementById('productsGrid')) {
                 await loadProductsByCategory(currentCategory);
             }
         }
-        
-        console.log('✅ JMPOTTERS initialized successfully');
     }
     
-    // ====================
-    // START THE APP
-    // ====================
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initializePage);
     } else {
         initializePage();
     }
-    
-    console.log('✅ JMPOTTERS app loaded with all fixes');
 })();
