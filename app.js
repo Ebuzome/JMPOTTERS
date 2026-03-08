@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE FIXED VERSION WITH ENHANCED PRODUCT PAGE
+// JMPOTTERS APP - COMPLETE FIXED VERSION WITH ALL FUNCTIONS
 // ====================
 (function() {
     'use strict';
@@ -168,7 +168,165 @@
     }
     
     // ====================
-    // LOAD SINGLE PRODUCT BY SLUG
+    // LOAD PRODUCTS BY CATEGORY (FOR CATEGORY PAGES)
+    // ====================
+    async function loadProductsByCategory(categorySlug) {
+        console.log(`📦 Loading products for category: ${categorySlug}`);
+        
+        const productsGrid = document.getElementById('productsGrid');
+        if (!productsGrid) {
+            console.log('No products grid found - not a category page');
+            return;
+        }
+        
+        // Show loading skeletons
+        productsGrid.innerHTML = `
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                ${Array(8).fill().map(() => `
+                    <div class="glass rounded-2xl overflow-hidden animate-pulse">
+                        <div class="aspect-square skeleton"></div>
+                        <div class="p-4 space-y-3">
+                            <div class="h-4 skeleton rounded w-3/4"></div>
+                            <div class="h-6 skeleton rounded w-1/2"></div>
+                            <div class="h-4 skeleton rounded w-1/4"></div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            productsGrid.innerHTML = `<div class="text-center py-12 text-red-400">Database connection error</div>`;
+            return;
+        }
+        
+        try {
+            // Get category first
+            const { data: category, error: catError } = await supabase
+                .from('categories')
+                .select('id, name, slug')
+                .eq('slug', categorySlug)
+                .single();
+            
+            if (catError || !category) {
+                console.error('Category error:', catError);
+                productsGrid.innerHTML = `<div class="text-center py-12 text-gray-400">Category not found</div>`;
+                return;
+            }
+            
+            // Get products for this category
+            const { data: products, error: prodError } = await supabase
+                .from('products')
+                .select('id, name, price, image_url, stock, slug, description')
+                .eq('category_id', category.id)
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+            
+            if (prodError) throw prodError;
+            
+            if (!products || products.length === 0) {
+                productsGrid.innerHTML = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-box-open text-3xl text-gray-500"></i>
+                        </div>
+                        <p class="text-gray-400 text-lg">No products found in this category</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            renderProducts(products, categorySlug);
+            
+        } catch (error) {
+            console.error('❌ Error loading products:', error);
+            productsGrid.innerHTML = `<div class="text-center py-12 text-red-400">Error loading products. Please try again.</div>`;
+        }
+    }
+    
+    function renderProducts(products, categorySlug) {
+        const productsGrid = document.getElementById('productsGrid');
+        if (!productsGrid) return;
+        
+        productsGrid.innerHTML = `
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                ${products.map(product => {
+                    const imageUrl = getImageUrl(categorySlug, product.image_url);
+                    const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+                    const isInWishlist = wishlist.some(item => item.id === product.id);
+                    
+                    return `
+                        <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" 
+                           class="group block glass rounded-2xl overflow-hidden hover:scale-[1.02] hover:shadow-xl transition-all duration-300">
+                            <div class="relative aspect-square overflow-hidden bg-gradient-to-br from-jmp-dark-light to-jmp-darker">
+                                <img src="${imageUrl}" 
+                                     alt="${product.name}" 
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                     onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                                
+                                <!-- Wishlist Button -->
+                                <button class="wishlist-btn absolute top-3 right-3 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 ${
+                                    isInWishlist ? 'text-red-500' : 'text-gray-300 hover:text-red-500'
+                                }" 
+                                        data-product-id="${product.id}"
+                                        onclick="event.preventDefault(); event.stopPropagation();">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                                
+                                <!-- Stock Badge -->
+                                ${product.stock < 5 ? `
+                                    <div class="absolute bottom-3 left-3">
+                                        <span class="px-3 py-1.5 text-xs font-semibold rounded-full ${
+                                            product.stock > 0 
+                                                ? 'bg-jmp-gold/20 text-jmp-gold border border-jmp-gold/30' 
+                                                : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                        } backdrop-blur-sm">
+                                            <i class="fas fa-${product.stock > 0 ? 'exclamation-triangle' : 'times-circle'} mr-1"></i>
+                                            ${product.stock > 0 ? 'Low Stock' : 'Out of Stock'}
+                                        </span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="p-4">
+                                <h3 class="font-semibold text-white mb-2 line-clamp-2 group-hover:text-jmp-gold transition-colors">
+                                    ${product.name}
+                                </h3>
+                                <div class="text-2xl font-bold gradient-gold mb-2">
+                                    ${formatPrice(product.price)}
+                                </div>
+                                <div class="flex items-center gap-2 text-sm ${product.stock > 0 ? 'text-green-400' : 'text-red-400'}">
+                                    <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i>
+                                    <span>${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                }).join('')}
+            </div>
+        `;
+        
+        // Add wishlist event listeners
+        document.querySelectorAll('.wishlist-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const productId = parseInt(this.dataset.productId);
+                const product = products.find(p => p.id === productId);
+                
+                if (product) {
+                    toggleWishlist(product);
+                    this.classList.toggle('text-red-500');
+                    this.classList.toggle('text-gray-300');
+                }
+            });
+        });
+    }
+    
+    // ====================
+    // LOAD SINGLE PRODUCT BY SLUG (FOR PRODUCT PAGE)
     // ====================
     async function loadSingleProductBySlug(slug) {
         console.log(`📦 Loading single product by slug: ${slug}`);
@@ -178,6 +336,7 @@
         const productContainer = document.getElementById('productContainer');
         const productViewer = document.getElementById('productViewer');
         const productBreadcrumb = document.getElementById('productBreadcrumb');
+        const categoryBreadcrumb = document.getElementById('categoryBreadcrumb');
         
         if (!productViewer || !productContainer) {
             console.error('❌ Product viewer container not found');
@@ -250,7 +409,6 @@
             document.title = `${product.name} - JMPOTTERS`;
             if (productBreadcrumb) productBreadcrumb.textContent = product.name;
             
-            const categoryBreadcrumb = document.getElementById('categoryBreadcrumb');
             if (categoryBreadcrumb && category) {
                 categoryBreadcrumb.textContent = category.name;
                 categoryBreadcrumb.href = `${category.slug}.html`;
@@ -521,7 +679,7 @@
                 const currentValue = parseInt(quantityInput.value) || 1;
                 if (currentValue > 1) {
                     quantityInput.value = currentValue - 1;
-                    currentSelectedQuantity = quantityInput.value;
+                    currentSelectedQuantity = parseInt(quantityInput.value);
                 }
             });
             
@@ -530,7 +688,7 @@
                 const maxStock = currentSelectedSize?.stock || currentProduct?.stock || 100;
                 if (currentValue < maxStock) {
                     quantityInput.value = currentValue + 1;
-                    currentSelectedQuantity = quantityInput.value;
+                    currentSelectedQuantity = parseInt(quantityInput.value);
                 }
             });
             
@@ -538,7 +696,7 @@
                 const value = parseInt(quantityInput.value) || 1;
                 const maxStock = currentSelectedSize?.stock || currentProduct?.stock || 100;
                 quantityInput.value = Math.max(1, Math.min(value, maxStock));
-                currentSelectedQuantity = quantityInput.value;
+                currentSelectedQuantity = parseInt(quantityInput.value);
             });
         }
         
@@ -592,7 +750,8 @@
                         color_name: currentSelectedColor.name,
                         size_id: currentSelectedSize.id,
                         size_value: currentSelectedSize.value,
-                        variant_id: currentSelectedVariant?.id
+                        variant_id: currentSelectedVariant?.id,
+                        category_slug: currentProduct.category_slug
                     });
                 } else {
                     if (currentSelectedQuantity > currentProduct.stock) {
@@ -600,7 +759,9 @@
                         return;
                     }
                     
-                    addToCart(currentProduct, currentSelectedQuantity);
+                    addToCart(currentProduct, currentSelectedQuantity, {
+                        category_slug: currentProduct.category_slug
+                    });
                 }
             });
         }
