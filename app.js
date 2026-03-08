@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE FIXED VERSION
+// JMPOTTERS APP - COMPLETE FIXED VERSION WITH PRODUCT PAGE SUPPORT
 // ====================
 (function() {
     'use strict';
@@ -9,7 +9,7 @@
         return;
     }
     
-    console.log('🚀 JMPOTTERS app starting...');
+    console.log('🚀 JMPOTTERS app starting (Fixed v3)...');
     window.JMPOTTERS_APP_INITIALIZED = true;
     
     // ====================
@@ -39,7 +39,9 @@
         }
     };
     
-    // Current product state
+    // ====================
+    // CURRENT PRODUCT STATE
+    // ====================
     let currentProduct = null;
     let currentSelectedQuantity = 1;
     let currentSelectedColor = null;
@@ -168,24 +170,22 @@
     // LOAD SINGLE PRODUCT BY SLUG
     // ====================
     async function loadSingleProductBySlug(slug) {
-        console.log(`📦 Loading product by slug: ${slug}`);
+        console.log(`📦 Loading single product by slug: ${slug}`);
         
-        // FIXED: Changed from 'productViewer' to 'productContainer'
-        const productContainer = document.getElementById('productContainer');
         const loadingState = document.getElementById('loadingState');
         const errorState = document.getElementById('errorState');
+        const productViewer = document.getElementById('productViewer');
         
-        if (!productContainer) {
-            console.error('❌ Product container not found');
+        if (!productViewer) {
+            console.error('❌ Product viewer container not found');
             return;
         }
         
-        // Hide error state
+        // Hide error state if visible
         if (errorState) errorState.style.display = 'none';
         
-        // Show loading
+        // Show loading state
         if (loadingState) loadingState.style.display = 'block';
-        if (productContainer) productContainer.style.display = 'none';
         
         const supabase = getSupabaseClient();
         if (!supabase) {
@@ -194,7 +194,7 @@
         }
         
         try {
-            // Get product
+            // Get product first
             const { data: product, error: productError } = await supabase
                 .from('products')
                 .select('*')
@@ -209,7 +209,7 @@
             
             console.log('✅ Loaded product:', product.name);
             
-            // Get category
+            // Get category separately
             const { data: category, error: catError } = await supabase
                 .from('categories')
                 .select('id, name, slug')
@@ -217,10 +217,10 @@
                 .single();
             
             if (catError) {
-                console.warn('⚠️ Category not found');
+                console.warn('⚠️ Category not found for product:', product.id);
             }
             
-            // Get colors
+            // Get colors separately
             const { data: colors, error: colorsError } = await supabase
                 .from('product_colors')
                 .select('*')
@@ -231,7 +231,7 @@
                 console.warn('⚠️ Could not load colors:', colorsError);
             }
             
-            // Get sizes
+            // Get sizes separately
             const { data: sizes, error: sizesError } = await supabase
                 .from('product_sizes')
                 .select('*')
@@ -242,10 +242,10 @@
                 console.warn('⚠️ Could not load sizes:', sizesError);
             }
             
-            // Update title
+            // Update document title
             document.title = `${product.name} - JMPOTTERS`;
             
-            // Set state
+            // Set current product state
             currentProduct = product;
             currentProduct.category_slug = category?.slug || getCurrentCategory();
             currentProduct.category_name = category?.name || 'Category';
@@ -258,47 +258,72 @@
             // Build mappings
             buildColorSizeMappings(currentProductColors, currentProductSizes);
             
-            // Render product
-            renderProductPage(currentProduct, productContainer);
+            // Render product on standalone page
+            renderProductPage(currentProduct);
             
-            // Hide loading, show product
+            // Hide loading state
             if (loadingState) loadingState.style.display = 'none';
-            if (productContainer) productContainer.style.display = 'block';
             
         } catch (error) {
-            console.error('❌ Error loading product:', error);
+            console.error('❌ Error loading product by slug:', error);
             showError(error.message || 'Failed to load product');
         }
     }
     
     function showError(message) {
         const loadingState = document.getElementById('loadingState');
-        const productContainer = document.getElementById('productContainer');
         const errorState = document.getElementById('errorState');
         const errorMessage = document.getElementById('errorMessage');
         
         if (loadingState) loadingState.style.display = 'none';
-        if (productContainer) productContainer.style.display = 'none';
         if (errorState) {
             errorState.style.display = 'block';
             if (errorMessage) errorMessage.textContent = message;
         }
     }
     
-    function renderProductPage(product, container) {
-        if (!container) return;
+    function buildColorSizeMappings(colors, sizes) {
+        // Reset mappings
+        colorSizeMap = {};
+        sizeColorMap = {};
+        
+        // Build color -> sizes map
+        colors.forEach(color => {
+            colorSizeMap[color.id] = sizes.filter(size => size.color_id === color.id);
+        });
+        
+        // Build size -> colors map
+        const uniqueSizes = [...new Set(sizes.map(s => s.size_value))];
+        uniqueSizes.forEach(sizeValue => {
+            const sizeVariants = sizes.filter(s => s.size_value === sizeValue);
+            sizeColorMap[sizeValue] = colors.filter(color => 
+                sizeVariants.some(s => s.color_id === color.id)
+            );
+        });
+        
+        console.log('🗺️ Built color-size mappings:', {
+            colors: colors.length,
+            sizes: sizes.length,
+            colorSizeMapEntries: Object.keys(colorSizeMap).length,
+            sizeColorMapEntries: Object.keys(sizeColorMap).length
+        });
+    }
+    
+    function renderProductPage(product) {
+        const productViewer = document.getElementById('productViewer');
+        if (!productViewer) return;
         
         const categorySlug = product.category_slug || getCurrentCategory();
         const imageUrl = getImageUrl(categorySlug, product.image_url);
         
-        // Check if footwear
+        // Determine if it's footwear (needs size/color selectors)
         const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
         
-        // Check wishlist
+        // Check wishlist status
         const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
         const isInWishlist = wishlist.some(item => item.id === product.id);
         
-        container.innerHTML = `
+        productViewer.innerHTML = `
             <div class="product-container">
                 <!-- Product Images -->
                 <div class="product-image-container">
@@ -308,18 +333,22 @@
                 
                 <!-- Product Details -->
                 <div class="product-details">
+                    <!-- Title -->
                     <h1 class="product-title">${product.name}</h1>
                     
+                    <!-- Price -->
                     <div class="price-container">
                         <div class="current-price">${formatPrice(product.price)}</div>
                     </div>
                     
+                    <!-- Availability -->
                     <div class="stock-status ${product.stock > 0 ? '' : 'out-of-stock'}">
                         <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i>
                         <span>${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
                         ${product.stock > 0 ? `<span class="stock-count">${product.stock} units available</span>` : ''}
                     </div>
                     
+                    <!-- Description -->
                     <div class="detail-tile">
                         <h3 class="tile-title">Description</h3>
                         <div class="product-description">
@@ -327,6 +356,7 @@
                         </div>
                     </div>
                     
+                    <!-- Variant Selectors (for footwear) -->
                     ${isFootwear && currentProductColors.length > 0 ? `
                     <div class="detail-tile">
                         <h3 class="tile-title">Select Color</h3>
@@ -335,6 +365,7 @@
                                 <div class="color-option" 
                                      data-color-id="${color.id}"
                                      data-color-name="${color.color_name}"
+                                     style="background-color: ${color.color_code || '#666'}"
                                      title="${color.color_name}">
                                     ${color.color_name}
                                 </div>
@@ -363,6 +394,7 @@
                     </div>
                     ` : ''}
                     
+                    <!-- Quantity Selector -->
                     <div class="detail-tile">
                         <h3 class="tile-title">Quantity</h3>
                         <div class="quantity-controls">
@@ -379,11 +411,12 @@
                         </div>
                     </div>
                     
+                    <!-- Action Buttons -->
                     <div class="action-buttons">
-                        <button class="action-btn btn-primary" id="pageAddToCart">
+                        <button class="action-btn btn-primary btn-add-cart" id="pageAddToCart">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
-                        <button class="action-btn btn-secondary ${isInWishlist ? 'active' : ''}" id="pageWishlist">
+                        <button class="action-btn btn-secondary btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist">
                             <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                         </button>
                     </div>
@@ -392,23 +425,6 @@
         `;
         
         setupProductPageInteractions();
-    }
-    
-    function buildColorSizeMappings(colors, sizes) {
-        colorSizeMap = {};
-        sizeColorMap = {};
-        
-        colors.forEach(color => {
-            colorSizeMap[color.id] = sizes.filter(size => size.color_id === color.id);
-        });
-        
-        const uniqueSizes = [...new Set(sizes.map(s => s.size_value))];
-        uniqueSizes.forEach(sizeValue => {
-            const sizeVariants = sizes.filter(s => s.size_value === sizeValue);
-            sizeColorMap[sizeValue] = colors.filter(color => 
-                sizeVariants.some(s => s.color_id === color.id)
-            );
-        });
     }
     
     function setupProductPageInteractions() {
@@ -421,16 +437,19 @@
                 const colorOption = e.target.closest('.color-option');
                 if (!colorOption) return;
                 
+                // Update UI
                 colorOptions.querySelectorAll('.color-option').forEach(opt => {
                     opt.classList.remove('selected');
                 });
                 colorOption.classList.add('selected');
                 
+                // Update state
                 currentSelectedColor = {
                     id: parseInt(colorOption.dataset.colorId),
                     name: colorOption.dataset.colorName
                 };
                 
+                // Update size options
                 updateSizeOptionsForColor(currentSelectedColor.id);
             });
         }
@@ -482,7 +501,7 @@
             });
         });
         
-        // Add to Cart
+        // Add to Cart button
         const pageAddToCart = document.getElementById('pageAddToCart');
         if (pageAddToCart && currentProduct) {
             pageAddToCart.addEventListener('click', () => {
@@ -529,7 +548,7 @@
             });
         }
         
-        // Wishlist
+        // Wishlist button
         const pageWishlist = document.getElementById('pageWishlist');
         if (pageWishlist && currentProduct) {
             pageWishlist.addEventListener('click', () => {
@@ -550,6 +569,7 @@
         
         if (!sizeOptions) return;
         
+        // Get sizes for this color
         const availableSizes = colorSizeMap[colorId] || [];
         
         if (availableSizes.length === 0) {
@@ -560,6 +580,7 @@
             return;
         }
         
+        // Populate size options
         sizeOptions.innerHTML = availableSizes.map(size => {
             const stock = size.stock_quantity || 0;
             let stockClass = '';
@@ -580,6 +601,7 @@
             `;
         }).join('');
         
+        // Add event listeners to size options
         sizeOptions.querySelectorAll('.size-option:not(.out-of-stock)').forEach(option => {
             option.addEventListener('click', function() {
                 sizeOptions.querySelectorAll('.size-option').forEach(opt => {
@@ -624,6 +646,453 @@
         availableStock.textContent = currentSelectedSize.stock;
         
         selectionSummary.style.display = 'block';
+    }
+    
+    // ====================
+    // LOAD PRODUCTS BY CATEGORY
+    // ====================
+    async function loadProductsByCategory(categorySlug) {
+        console.log(`📦 Loading products for: ${categorySlug}`);
+        
+        const productsGrid = document.getElementById('productsGrid');
+        if (!productsGrid) {
+            console.error('❌ Products grid not found');
+            return;
+        }
+        
+        // Show skeleton loading with improved styling - 2 per row
+        productsGrid.innerHTML = `
+            <div class="products-grid">
+                ${Array(6).fill().map(() => `
+                    <div class="product-card-skeleton">
+                        <div class="skeleton-image"></div>
+                        <div class="skeleton-content">
+                            <div class="skeleton-title"></div>
+                            <div class="skeleton-price"></div>
+                            <div class="skeleton-stock"></div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        // Add skeleton styles if not already present
+        addSkeletonStyles();
+        
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            productsGrid.innerHTML = `<div class="error-message">Database connection error</div>`;
+            return;
+        }
+        
+        try {
+            const { data: category, error: catError } = await supabase
+                .from('categories')
+                .select('id, name, slug')
+                .eq('slug', categorySlug)
+                .single();
+            
+            if (catError || !category) {
+                productsGrid.innerHTML = `<div class="error-message">Category not found</div>`;
+                return;
+            }
+            
+            const { data: products, error: prodError } = await supabase
+                .from('products')
+                .select('id, name, price, image_url, stock, slug, description')
+                .eq('category_id', category.id)
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+            
+            if (prodError) throw prodError;
+            
+            if (!products || products.length === 0) {
+                productsGrid.innerHTML = `<div class="no-products">No products found in this category</div>`;
+                return;
+            }
+            
+            window.JMPOTTERS_PRODUCTS_CACHE = products;
+            renderProducts(products, categorySlug);
+            
+        } catch (error) {
+            console.error('❌ Error loading products:', error);
+            productsGrid.innerHTML = `<div class="error-message">Error loading products. Please try again.</div>`;
+        }
+    }
+    
+    // Add skeleton loading styles - optimized for 2 per row
+    function addSkeletonStyles() {
+        if (document.getElementById('skeleton-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'skeleton-styles';
+        style.textContent = `
+            .product-card-skeleton {
+                background: #fff;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                animation: skeleton-pulse 1.5s ease-in-out infinite;
+                width: 100%;
+            }
+            
+            .skeleton-image {
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+                background-size: 200% 100%;
+                animation: skeleton-shimmer 1.5s infinite;
+            }
+            
+            .skeleton-content {
+                padding: 12px;
+            }
+            
+            .skeleton-title {
+                height: 18px;
+                width: 90%;
+                background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+                background-size: 200% 100%;
+                animation: skeleton-shimmer 1.5s infinite;
+                margin-bottom: 8px;
+                border-radius: 4px;
+            }
+            
+            .skeleton-price {
+                height: 20px;
+                width: 60%;
+                background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+                background-size: 200% 100%;
+                animation: skeleton-shimmer 1.5s infinite;
+                margin-bottom: 8px;
+                border-radius: 4px;
+            }
+            
+            .skeleton-stock {
+                height: 14px;
+                width: 40%;
+                background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+                background-size: 200% 100%;
+                animation: skeleton-shimmer 1.5s infinite;
+                border-radius: 4px;
+            }
+            
+            @keyframes skeleton-pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.8; }
+            }
+            
+            @keyframes skeleton-shimmer {
+                0% { background-position: -200% 0; }
+                100% { background-position: 200% 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    function renderProducts(products, categorySlug) {
+        const productsGrid = document.getElementById('productsGrid');
+        if (!productsGrid) return;
+        
+        // Add product card styles if not already present - optimized for 2 per row
+        addProductCardStyles();
+        
+        productsGrid.innerHTML = '';
+        
+        products.forEach((product) => {
+            const imageUrl = getImageUrl(categorySlug, product.image_url);
+            const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+            const isInWishlist = wishlist.some(item => item.id === product.id);
+            
+            const productLink = document.createElement('a');
+            productLink.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
+            productLink.className = 'product-card-link';
+            
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            
+            productCard.innerHTML = `
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${product.name}" 
+                         loading="lazy"
+                         onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                    <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
+                            data-action="wishlist"
+                            data-product-id="${product.id}"
+                            onclick="event.preventDefault(); event.stopPropagation();">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <span class="category-badge">${categorySlug.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <div class="product-price">${formatPrice(product.price)}</div>
+                    <div class="stock-status ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}">
+                        <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i> 
+                        ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                    </div>
+                </div>
+            `;
+            
+            productLink.appendChild(productCard);
+            productsGrid.appendChild(productLink);
+        });
+        
+        setupProductInteractions();
+    }
+    
+    // Add product card styles - FIXED for 2 per row without overflow
+    function addProductCardStyles() {
+        if (document.getElementById('product-card-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'product-card-styles';
+        style.textContent = `
+            /* Ensure the grid container doesn't overflow */
+            .products-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 12px;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                margin: 0;
+            }
+            
+            /* Ensure all grid items stay within bounds */
+            .products-grid > * {
+                min-width: 0; /* Prevents grid items from overflowing */
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .product-card-link {
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                transition: transform 0.2s ease;
+                height: 100%;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .product-card-link:hover {
+                transform: translateY(-4px);
+            }
+            
+            .product-card-link:visited,
+            .product-card-link:active,
+            .product-card-link:focus {
+                color: inherit;
+                outline: none;
+            }
+            
+            .product-card {
+                background: #fff;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                transition: box-shadow 0.2s ease;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .product-card:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+            
+            .product-image {
+                position: relative;
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                overflow: hidden;
+                background: #f5f5f5;
+            }
+            
+            .product-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+                display: block;
+            }
+            
+            .product-card:hover .product-image img {
+                transform: scale(1.05);
+            }
+            
+            .wishlist-btn {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: white;
+                border: none;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+                transition: all 0.2s ease;
+                padding: 0;
+                color: #666;
+            }
+            
+            .wishlist-btn:hover {
+                transform: scale(1.1);
+                background: #fff0f0;
+            }
+            
+            .wishlist-btn.active {
+                color: #e74c3c;
+            }
+            
+            .wishlist-btn.active i {
+                color: #e74c3c;
+            }
+            
+            .category-badge {
+                position: absolute;
+                bottom: 8px;
+                left: 8px;
+                background: rgba(0,0,0,0.7);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                text-transform: capitalize;
+                pointer-events: none;
+                max-width: calc(100% - 16px);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            
+            .product-info {
+                padding: 12px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .product-title {
+                margin: 0 0 6px 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                line-height: 1.4;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                min-height: 40px;
+                word-break: break-word;
+            }
+            
+            .product-price {
+                font-size: 18px;
+                font-weight: 700;
+                color: #2c3e50;
+                margin-bottom: 6px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .stock-status {
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                margin-top: auto;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .stock-status.in-stock {
+                color: #27ae60;
+            }
+            
+            .stock-status.out-of-stock {
+                color: #e74c3c;
+            }
+            
+            .stock-status i {
+                font-size: 12px;
+                flex-shrink: 0;
+            }
+            
+            .stock-status span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            /* Error and empty states */
+            .error-message,
+            .no-products {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 40px 20px;
+                color: #666;
+                font-size: 16px;
+                background: #f9f9f9;
+                border-radius: 8px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            /* Ensure body and main containers don't cause overflow */
+            body {
+                overflow-x: hidden;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            #productsGrid {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+                box-sizing: border-box;
+            }
+        `;
+        
+        document.head.appendChild(style);
+    }
+    
+    function setupProductInteractions() {
+        document.addEventListener('click', function(event) {
+            const wishlistBtn = event.target.closest('[data-action="wishlist"]');
+            if (wishlistBtn) {
+                event.preventDefault();
+                event.stopPropagation();
+                const productId = parseInt(wishlistBtn.getAttribute('data-product-id'));
+                const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
+                
+                if (product) {
+                    toggleWishlist(product);
+                    wishlistBtn.classList.toggle('active');
+                    
+                    // Update icon color
+                    const icon = wishlistBtn.querySelector('i');
+                    if (icon) {
+                        icon.style.color = wishlistBtn.classList.contains('active') ? '#e74c3c' : '';
+                    }
+                }
+            }
+        });
     }
     
     // ====================
@@ -699,7 +1168,7 @@
         if (!cartItems || !cartTotal) return;
         
         if (cart.length === 0) {
-            cartItems.innerHTML = '<div class="cart-empty"><i class="fas fa-shopping-bag"></i><p>Your cart is empty</p></div>';
+            cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
             cartTotal.textContent = '₦0';
             return;
         }
@@ -723,7 +1192,9 @@
                     <div class="cart-item-details">
                         <div class="cart-item-name">${itemDescription}</div>
                         <div class="cart-item-price">${formatPrice(item.price)}</div>
-                        <div>Qty: ${item.quantity}</div>
+                        <div class="cart-item-quantity-display">
+                            Quantity: <strong>${item.quantity}</strong>
+                        </div>
                     </div>
                     <button class="cart-item-remove" data-index="${index}">
                         <i class="fas fa-trash"></i>
@@ -732,23 +1203,18 @@
             `;
         });
         
+        html += `
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="cart-total-amount">${formatPrice(total)}</span>
+            </div>
+            <button class="cart-checkout-btn" id="checkoutButton">
+                <i class="fas fa-shopping-bag"></i> Proceed to Checkout
+            </button>
+        `;
+        
         cartItems.innerHTML = html;
         cartTotal.textContent = formatPrice(total);
-        
-        const whatsappCheckout = document.getElementById('whatsappCheckout');
-        if (whatsappCheckout) {
-            let text = "I would like to purchase:\n";
-            cart.forEach(item => {
-                let itemDescription = item.name;
-                if (item.color_name) itemDescription += ` (${item.color_name})`;
-                if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
-                
-                const itemTotal = (item.price || 0) * item.quantity;
-                text += `- ${itemDescription} (${item.quantity} × ${formatPrice(item.price)}) = ${formatPrice(itemTotal)}\n`;
-            });
-            text += `\n*Total: ${formatPrice(total)}*\n\nPlease confirm order & shipping details.`;
-            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
-        }
         
         setupCartInteractions();
     }
@@ -767,6 +1233,28 @@
                 showNotification(`${removedItem.name} removed from cart`, 'info');
             });
         });
+        
+        const checkoutBtn = document.getElementById('checkoutButton');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                let text = "I would like to purchase:\n";
+                const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                let total = 0;
+                
+                cart.forEach(item => {
+                    let itemDescription = item.name;
+                    if (item.color_name) itemDescription += ` (${item.color_name})`;
+                    if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
+                    
+                    const itemTotal = (item.price || 0) * item.quantity;
+                    total += itemTotal;
+                    text += `- ${itemDescription} (${item.quantity} × ${formatPrice(item.price)}) = ${formatPrice(itemTotal)}\n`;
+                });
+                
+                text += `\n*Total: ${formatPrice(total)}*\n\nPlease confirm order & shipping details.`;
+                window.open(`https://wa.me/2348139583320?text=${encodeURIComponent(text)}`, '_blank');
+            });
+        }
     }
     
     function toggleWishlist(product) {
@@ -795,24 +1283,32 @@
         const cartPanel = document.getElementById('cartPanel');
         const cartOverlay = document.getElementById('cartOverlay');
         
-        if (cartPanel) cartPanel.classList.add('active');
-        if (cartOverlay) cartOverlay.classList.add('active');
+        if (cartPanel) {
+            cartPanel.classList.add('active');
+        }
+        
+        if (cartOverlay) {
+            cartOverlay.classList.add('active');
+        }
+        
         document.body.style.overflow = 'hidden';
-        updateCartPanel();
     }
     
     function closeCart() {
         const cartPanel = document.getElementById('cartPanel');
         const cartOverlay = document.getElementById('cartOverlay');
         
-        if (cartPanel) cartPanel.classList.remove('active');
-        if (cartOverlay) cartOverlay.classList.remove('active');
+        if (cartPanel) {
+            cartPanel.classList.remove('active');
+        }
+        
+        if (cartOverlay) {
+            cartOverlay.classList.remove('active');
+        }
+        
         document.body.style.overflow = '';
     }
     
-    // ====================
-    // HEADER FUNCTIONS
-    // ====================
     function setupHeaderInteractions() {
         const cartBtn = document.getElementById('cartBtn');
         if (cartBtn && !cartBtn.hasAttribute('data-listener-added')) {
@@ -843,61 +1339,49 @@
     }
     
     // ====================
-    // INITIALIZATION
+    // INITIALIZATION - THIS IS THE KEY PART
     // ====================
     async function initializePage() {
-        console.log('🚀 Initializing JMPOTTERS...');
-        
-        const supabase = getSupabaseClient();
-        if (!supabase) {
-            console.error('❌ Supabase client not initialized');
-        } else {
-            console.log('✅ Supabase client ready');
-        }
+        console.log('🚀 Initializing JMPOTTERS page...');
+        console.log('Current page:', window.location.pathname);
         
         setupHeaderInteractions();
         updateCartUI();
         
+        // Check if we're on a product page
         if (isProductPage()) {
             const slug = getSlugFromURL();
+            console.log('📦 Product page detected, slug:', slug);
+            
             if (slug) {
                 await loadSingleProductBySlug(slug);
             } else {
-                window.location.href = 'index.html';
+                console.error('❌ No slug found in URL');
+                // Show error state
+                const errorState = document.getElementById('errorState');
+                if (errorState) {
+                    errorState.style.display = 'block';
+                }
+            }
+        } else {
+            // Load products if on category page
+            const currentCategory = getCurrentCategory();
+            if (document.getElementById('productsGrid')) {
+                await loadProductsByCategory(currentCategory);
             }
         }
         
-        console.log('✅ JMPOTTERS initialized');
+        console.log('✅ JMPOTTERS initialized successfully');
     }
     
     // ====================
-    // EXPOSE TO WINDOW
+    // START THE APP
     // ====================
-    if (!window.JMPOTTERS) {
-        window.JMPOTTERS = {
-            openProductModal: function(productId) {
-                const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
-                if (product?.slug) {
-                    window.location.href = `product.html?slug=${encodeURIComponent(product.slug)}`;
-                }
-            },
-            addToCart,
-            toggleWishlist,
-            initializePage,
-            formatPrice,
-            loadSingleProductBySlug,
-            getImageUrl,
-            openCart,
-            closeCart
-        };
-    }
-    
-    // Start the app
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initializePage);
     } else {
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded');
+    console.log('✅ JMPOTTERS app loaded with all fixes');
 })();
