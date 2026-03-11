@@ -5,8 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading Product... | JMPOTTERS</title>
     
-    <!-- Essential FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font - Modern, professional sans-serif -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons - Clean, professional icon set -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Supabase JS -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -15,635 +23,205 @@
     <script src="app.js" defer></script>
     
     <style>
-        /* === MINIMAL PRODUCT VIEWER STYLES === */
-        :root {
-            --black: #000;
-            --white: #fff;
-            --gold: #d4af37;
-            --gold-light: #f5e6b8;
-            --gray-dark: #222;
-            --gray: #444;
-            --gray-light: #e0e0e0;
-            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            --shadow-dark: 0 5px 15px rgba(0, 0, 0, 0.2);
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #f8f8f8;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-        }
-
-        /* Close/Back Button */
-        .close-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 1000;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        }
-
-        .close-btn:hover {
-            background: var(--gold);
-            transform: scale(1.1);
-        }
-
-        /* WhatsApp Button */
-        .whatsapp-btn {
-            position: fixed;
-            top: 20px;
-            right: 80px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #25d366;
-            color: var(--white);
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 1000;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-            text-decoration: none;
-        }
-
-        .whatsapp-btn:hover {
-            transform: scale(1.1);
-        }
-
-        /* Product Container */
-        .product-container {
-            width: 100%;
-            max-width: 1000px;
-            background: var(--white);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: 600px;
-        }
-
-        @media (max-width: 900px) {
-            .product-container {
-                grid-template-columns: 1fr;
-                max-width: 500px;
+        /* Custom utilities and animations */
+        @layer utilities {
+            .text-balance {
+                text-wrap: balance;
+            }
+            
+            .animation-delay-200 {
+                animation-delay: 200ms;
+            }
+            
+            .animation-delay-400 {
+                animation-delay: 400ms;
             }
         }
 
-        /* Product Image */
-        .product-image-section {
-            background: #f9f9f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            border-right: 1px solid #eee;
-        }
-
-        .product-image {
-            max-width: 100%;
-            max-height: 500px;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
-        /* Product Details */
-        .product-details-section {
-            padding: 40px;
-            overflow-y: auto;
-            max-height: 600px;
-        }
-
-        .product-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--black);
-            margin-bottom: 15px;
-            line-height: 1.3;
-        }
-
-        .product-price-container {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 25px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .current-price {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--black);
-        }
-
-        .original-price {
-            font-size: 1.4rem;
-            color: #999;
-            text-decoration: line-through;
-        }
-
-        .discount-badge {
-            background: #e74c3c;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .product-description {
-            color: var(--gray);
-            line-height: 1.6;
-            margin-bottom: 30px;
-            font-size: 1.05rem;
-        }
-
-        /* Stock Status */
-        .stock-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .stock-in {
-            background: rgba(39, 174, 96, 0.1);
-            color: var(--success);
-        }
-
-        .stock-low {
-            background: rgba(243, 156, 18, 0.1);
-            color: var(--warning);
-        }
-
-        .stock-out {
-            background: rgba(231, 76, 60, 0.1);
-            color: var(--danger);
-        }
-
-        /* Variant Selectors */
-        .variant-selectors {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border-left: 3px solid var(--gold);
-        }
-
-        .variant-section {
-            margin-bottom: 20px;
-        }
-
-        .variant-section h4 {
-            margin-bottom: 10px;
-            color: var(--black);
-            font-size: 1.1rem;
-        }
-
-        .color-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .color-option {
-            padding: 10px 15px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: var(--black);
-            font-size: 0.9rem;
-            text-align: center;
-            min-width: 80px;
-        }
-
-        .color-option:hover {
-            background: rgba(212, 175, 55, 0.2);
-            border-color: rgba(212, 175, 55, 0.5);
-        }
-
-        .color-option.selected {
-            background: rgba(212, 175, 55, 0.3);
-            border-color: var(--gold);
-            color: var(--black);
-        }
-
-        .size-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .size-option {
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: var(--black);
-            font-weight: bold;
-            text-align: center;
-            min-width: 60px;
-        }
-
-        .size-option:hover {
-            background: rgba(212, 175, 55, 0.2);
-            border-color: rgba(212, 175, 55, 0.5);
-        }
-
-        .size-option.selected {
-            background: rgba(212, 175, 55, 0.3);
-            border-color: var(--gold);
-            color: var(--black);
-        }
-
-        .size-option.out-of-stock {
-            opacity: 0.5;
-            cursor: not-allowed;
-            text-decoration: line-through;
-        }
-
-        .size-option.low-stock {
-            position: relative;
-        }
-
-        .size-option.low-stock::after {
-            content: 'Low';
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #f39c12;
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-
-        .no-selection {
-            color: #888;
-            font-style: italic;
-            padding: 20px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            width: 100%;
-        }
-
-        /* Selection Summary */
-        .selection-summary {
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 6px;
-            margin-top: 20px;
-            border-left: 3px solid var(--gold);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .selected-variant {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--black);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .selected-variant .separator {
-            opacity: 0.5;
-        }
-
-        .stock-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #666;
-        }
-
-        .stock-info i {
-            color: var(--gold);
-        }
-
-        /* Quantity Selector */
-        .quantity-section {
-            margin-bottom: 30px;
-        }
-
-        .quantity-section h4 {
-            margin-bottom: 10px;
-            color: var(--black);
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .quantity-btn {
-            width: 40px;
-            height: 40px;
-            background: var(--gold);
-            color: black;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .quantity-btn:hover {
-            background: #e0c04c;
-        }
-
-        #productQuantity {
-            width: 80px;
-            height: 40px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--gray-light);
-            color: var(--black);
-            border-radius: 6px;
-            font-size: 1.1rem;
-        }
-
-        .bulk-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .bulk-option {
-            padding: 8px 15px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--gray-light);
-            color: var(--black);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .bulk-option:hover {
-            background: rgba(212, 175, 55, 0.2);
-            border-color: var(--gold);
-        }
-
-        .bulk-option.active {
-            background: rgba(212, 175, 55, 0.3);
-            border-color: var(--gold);
-            color: var(--black);
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .action-buttons .btn {
-            flex: 1;
-            padding: 15px;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
-        }
-
-        .btn-primary {
-            background: var(--black);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background: var(--gold);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-        }
-
-        .btn-secondary {
-            background: #f8f9fa;
-            color: var(--black);
-            border: 2px solid #dee2e6 !important;
-        }
-
-        .btn-secondary:hover {
-            background: #e9ecef;
-        }
-
-        .btn-wishlist.active {
-            background: #e74c3c;
-            color: white;
-            border-color: #e74c3c !important;
-        }
-
-        /* Bulk Pricing Table */
-        .bulk-pricing-table {
-            margin-top: 30px;
-        }
-
-        .bulk-pricing-table h3 {
-            margin-bottom: 15px;
-            color: var(--black);
-        }
-
-        .bulk-pricing-table table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #f9f9f9;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .bulk-pricing-table th {
-            background: rgba(212, 175, 55, 0.3);
-            color: var(--black);
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .bulk-pricing-table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            color: #666;
-        }
-
-        .bulk-pricing-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .bulk-pricing-table tr:hover {
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        /* Breadcrumb */
-        .breadcrumb {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            color: #666;
-            font-size: 0.9rem;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 15px;
-            border-radius: 6px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        .breadcrumb a {
-            color: var(--gold);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .breadcrumb a:hover {
-            color: var(--black);
-            text-decoration: underline;
-        }
-
-        .breadcrumb i {
-            margin: 0 10px;
-            opacity: 0.5;
-        }
-
-        /* Loading & Error States */
-        .loading {
-            text-align: center;
-            padding: 60px;
-            color: var(--gray);
-        }
-
-        .loading-spinner {
-            font-size: 2.5rem;
-            color: var(--gold);
-            margin-bottom: 20px;
-            animation: spin 1s linear infinite;
-        }
-
-        .error-message {
-            text-align: center;
-            padding: 60px;
-            max-width: 500px;
-            margin: 0 auto;
-            background: #ffebee;
-            border-radius: 10px;
-            border: 2px solid #ffcdd2;
-        }
-
-        .error-title {
-            color: #d32f2f;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-
-        .error-message .btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: var(--black);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .error-message .btn:hover {
-            background: var(--gold);
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Smooth scrolling and better font rendering */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: "Inter", system-ui, -apple-system, sans-serif;
+        }
+
+        /* Custom animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .animate-spin-slow {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Loading skeleton animation */
+        .shimmer {
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.05) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+
+        /* Focus styles */
+        *:focus-visible {
+            outline: 2px solid #d4af37;
+            outline-offset: 2px;
         }
     </style>
 </head>
-<body>
-    <!-- Breadcrumb -->
-    <div class="breadcrumb" id="breadcrumb">
-        <a href="index.html">Home</a>
-        <i class="fas fa-chevron-right"></i>
-        <span id="categoryLink">Loading...</span>
-        <i class="fas fa-chevron-right"></i>
-        <span id="productName">Product</span>
-    </div>
+<body class="bg-[#fafafa] antialiased min-h-screen flex items-center justify-center p-4 md:p-6 lg:p-8">
+    <!-- Navigation Bar - Ultra precise positioning -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Breadcrumb with improved typography -->
+                <div class="flex items-center space-x-2 text-sm">
+                    <a href="index.html" class="text-gray-500 hover:text-[#d4af37] transition-colors duration-200 font-medium">
+                        Home
+                    </a>
+                    <i class="ph ph-caret-right text-gray-400 text-sm"></i>
+                    <span id="categoryLink" class="text-gray-500">Loading...</span>
+                    <i class="ph ph-caret-right text-gray-400 text-sm"></i>
+                    <span id="productName" class="text-gray-900 font-semibold truncate max-w-[200px]">
+                        Product
+                    </span>
+                </div>
 
-    <!-- Simple Back Button -->
-    <button class="close-btn" id="closeBtn" title="Go back">
-        <i class="fas fa-times"></i>
-    </button>
+                <!-- Action Buttons -->
+                <div class="flex items-center space-x-3">
+                    <!-- WhatsApp Button -->
+                    <a href="https://wa.me/2348139583320" 
+                       target="_blank"
+                       class="relative group"
+                       aria-label="Chat on WhatsApp">
+                        <div class="absolute inset-0 bg-[#25d366] rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                        <div class="relative w-10 h-10 rounded-full bg-[#25d366] text-white flex items-center justify-center hover:scale-110 transition-transform duration-200">
+                            <i class="ph ph-whatsapp-logo text-xl"></i>
+                        </div>
+                    </a>
 
-    <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-btn" title="Chat on WhatsApp" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+                    <!-- Back Button -->
+                    <button id="closeBtn" 
+                            class="relative group"
+                            aria-label="Go back">
+                        <div class="absolute inset-0 bg-gray-900 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                        <div class="relative w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center hover:scale-110 transition-transform duration-200">
+                            <i class="ph ph-x text-xl"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <!-- Product Container -->
-    <div id="productViewer">
-        <div class="loading">
-            <i class="fas fa-spinner loading-spinner"></i>
-            <p>Loading product details...</p>
+    <!-- Main Content Container -->
+    <div class="w-full max-w-7xl mx-auto mt-16 pt-8">
+        <div id="productViewer" class="w-full">
+            <!-- Enhanced Loading State -->
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
+                    <!-- Image Skeleton -->
+                    <div class="bg-gray-50 p-8 lg:p-12 flex items-center justify-center">
+                        <div class="w-full max-w-md aspect-square rounded-2xl bg-gray-200 shimmer relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent shimmer"></div>
+                        </div>
+                    </div>
+
+                    <!-- Details Skeleton -->
+                    <div class="p-8 lg:p-12 space-y-8">
+                        <!-- Title -->
+                        <div>
+                            <div class="h-8 w-3/4 bg-gray-200 rounded-lg shimmer mb-3"></div>
+                            <div class="h-8 w-1/2 bg-gray-200 rounded-lg shimmer"></div>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="h-16 w-48 bg-gray-200 rounded-xl shimmer"></div>
+
+                        <!-- Description -->
+                        <div class="space-y-3">
+                            <div class="h-4 w-full bg-gray-200 rounded shimmer"></div>
+                            <div class="h-4 w-5/6 bg-gray-200 rounded shimmer"></div>
+                            <div class="h-4 w-4/6 bg-gray-200 rounded shimmer"></div>
+                        </div>
+
+                        <!-- Variant Skeletons -->
+                        <div class="space-y-4">
+                            <div class="h-6 w-32 bg-gray-200 rounded shimmer"></div>
+                            <div class="flex gap-3">
+                                <div class="h-12 w-24 bg-gray-200 rounded-lg shimmer"></div>
+                                <div class="h-12 w-24 bg-gray-200 rounded-lg shimmer"></div>
+                                <div class="h-12 w-24 bg-gray-200 rounded-lg shimmer"></div>
+                            </div>
+                        </div>
+
+                        <!-- Button Skeletons -->
+                        <div class="flex gap-4">
+                            <div class="h-14 flex-1 bg-gray-200 rounded-xl shimmer"></div>
+                            <div class="h-14 w-14 bg-gray-200 rounded-xl shimmer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // This script will be executed AFTER app.js loads
-        
         // Wait for the JMPOTTERS app to initialize
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Product page initialized');
@@ -652,7 +230,6 @@
             const closeBtn = document.getElementById('closeBtn');
             if (closeBtn) {
                 closeBtn.addEventListener('click', function() {
-                    // Try to go back, otherwise go to homepage
                     if (document.referrer && document.referrer.includes(window.location.hostname)) {
                         window.history.back();
                     } else {
@@ -689,15 +266,12 @@
             try {
                 console.log('Loading product with slug:', slug);
                 
-                // Use the JMPOTTERS app function
                 if (window.JMPOTTERS && window.JMPOTTERS.loadSingleProductBySlug) {
                     await window.JMPOTTERS.loadSingleProductBySlug(slug);
                 } else {
-                    // Fallback: Try to initialize the page first
                     if (window.JMPOTTERS && window.JMPOTTERS.initializePage) {
                         await window.JMPOTTERS.initializePage();
                         
-                        // Try again after initialization
                         if (window.JMPOTTERS.loadSingleProductBySlug) {
                             await window.JMPOTTERS.loadSingleProductBySlug(slug);
                         } else {
@@ -717,11 +291,16 @@
         function showError(message) {
             const productViewer = document.getElementById('productViewer');
             productViewer.innerHTML = `
-                <div class="error-message">
-                    <div class="error-title"><i class="fas fa-exclamation-triangle"></i> Error</div>
-                    <p>${message}</p>
-                    <button onclick="window.location.href='index.html'" class="btn">
-                        Go to Homepage
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-12 text-center max-w-lg mx-auto">
+                    <div class="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="ph ph-warning-circle text-4xl text-red-500"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-3">Error Loading Product</h2>
+                    <p class="text-gray-600 mb-8">${message}</p>
+                    <button onclick="window.location.href='index.html'" 
+                            class="inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors duration-200 font-medium">
+                        Return to Homepage
+                        <i class="ph ph-arrow-right ml-2"></i>
                     </button>
                 </div>
             `;
@@ -729,21 +308,461 @@
         
         // Update breadcrumb dynamically
         function updateBreadcrumb(product) {
-            const breadcrumb = document.getElementById('breadcrumb');
             const categoryLink = document.getElementById('categoryLink');
             const productName = document.getElementById('productName');
             
-            if (breadcrumb && product) {
+            if (product) {
                 const categoryName = product.category_name || 'Category';
                 const categorySlug = product.category_slug || 'mensfootwear';
                 
-                categoryLink.innerHTML = `<a href="${categorySlug}.html">${categoryName}</a>`;
+                categoryLink.innerHTML = `<a href="${categorySlug}.html" class="text-gray-700 hover:text-[#d4af37] transition-colors duration-200 font-medium">${categoryName}</a>`;
                 productName.textContent = product.name;
             }
         }
         
-        // Make updateBreadcrumb available globally for the app.js to call
+        // Make updateBreadcrumb available globally
         window.updateProductBreadcrumb = updateBreadcrumb;
     </script>
+
+    <!-- Add custom styles for product rendering -->
+    <style>
+        /* Product container styles - these will be applied to the rendered product */
+        .product-container {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: clamp(1.5rem, 5vw, 3rem);
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        @media (min-width: 1024px) {
+            .product-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .product-image-section {
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: clamp(1.5rem, 4vw, 3rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: min(100%, 500px);
+            height: auto;
+            aspect-ratio: 1;
+            object-fit: contain;
+            border-radius: 1rem;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .product-image:hover {
+            transform: scale(1.02);
+        }
+
+        .product-details-section {
+            padding: clamp(1.5rem, 4vw, 3rem);
+            background: white;
+        }
+
+        .product-title {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: #1a1a1a;
+            margin-bottom: 1.5rem;
+        }
+
+        .price-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .current-price {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            color: #d4af37;
+        }
+
+        .original-price {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .discount-badge {
+            background: #ef4444;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .stock-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stock-in {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .stock-low {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .stock-out {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .product-description {
+            color: #4b5563;
+            line-height: 1.8;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .variant-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #fafafa;
+            border-radius: 1rem;
+            border-left: 3px solid #d4af37;
+        }
+
+        .variant-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .color-option {
+            padding: 0.625rem 1.25rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-option:hover {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .color-option.selected {
+            background: #d4af37;
+            border-color: #d4af37;
+            color: white;
+        }
+
+        .size-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .size-option {
+            min-width: 4rem;
+            padding: 0.625rem 1rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .size-option:hover:not(.out-of-stock) {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .size-option.selected {
+            background: #d4af37;
+            border-color: #d4af37;
+            color: white;
+        }
+
+        .size-option.out-of-stock {
+            opacity: 0.5;
+            cursor: not-allowed;
+            text-decoration: line-through;
+            background: #f3f4f6;
+        }
+
+        .size-option.low-stock {
+            position: relative;
+        }
+
+        .size-option.low-stock::after {
+            content: 'Low';
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            background: #f59e0b;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        .selection-summary {
+            padding: 1.25rem;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 1rem;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        .selected-variant {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .stock-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .quantity-section {
+            margin: 2rem 0;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .quantity-btn {
+            width: 3rem;
+            height: 3rem;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn:hover {
+            background: #d4af37;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        #productQuantity {
+            width: 5rem;
+            height: 3rem;
+            text-align: center;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            transition: all 0.2s;
+        }
+
+        #productQuantity:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .bulk-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .bulk-option {
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bulk-option:hover {
+            background: #d4af37;
+            border-color: #d4af37;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .bulk-option.active {
+            background: #d4af37;
+            border-color: #d4af37;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d4af37;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-wishlist {
+            background: white;
+            color: #1a1a1a;
+            border: 2px solid #e5e7eb !important;
+        }
+
+        .btn-wishlist:hover {
+            border-color: #ef4444 !important;
+            color: #ef4444;
+        }
+
+        .btn-wishlist.active {
+            background: #ef4444;
+            border-color: #ef4444 !important;
+            color: white;
+        }
+
+        .bulk-pricing-table {
+            margin-top: 2rem;
+            background: #fafafa;
+            border-radius: 1rem;
+            overflow: hidden;
+            border: 1px solid #eaeaea;
+        }
+
+        .bulk-pricing-table h3 {
+            padding: 1.25rem;
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            background: white;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .bulk-pricing-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bulk-pricing-table th {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            background: #f9fafb;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .bulk-pricing-table td {
+            padding: 1rem 1.25rem;
+            color: #4b5563;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .bulk-pricing-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .bulk-pricing-table tr:hover td {
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </body>
 </html>
