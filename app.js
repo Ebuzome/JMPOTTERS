@@ -54,16 +54,13 @@
     // UTILITY FUNCTIONS
     // ====================
     function getCurrentCategory() {
-        // First check if config has currentCategory (set in HTML)
         if (window.JMPOTTERS_CONFIG && window.JMPOTTERS_CONFIG.currentCategory) {
             return window.JMPOTTERS_CONFIG.currentCategory;
         }
         
-        // Fallback to URL detection
         const path = window.location.pathname;
         const page = path.split('/').pop().replace('.html', '');
         
-        // Map your actual category slugs from database
         const pageToCategory = {
             'mensfootwear': 'mensfootwear',
             'womensfootwear': 'womensfootwear',
@@ -72,7 +69,7 @@
             'kids': 'kids',
             'accessories': 'accessories',
             'healthcare': 'healthcare',
-            'product': 'mensfootwear' // Default for product pages
+            'product': 'mensfootwear'
         };
         
         return pageToCategory[page] || 'mensfootwear';
@@ -88,7 +85,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('slug');
         
-        // Decode the slug to handle spaces and special characters
         return slug ? decodeURIComponent(slug) : null;
     }
     
@@ -113,7 +109,6 @@
     function showNotification(message, type = 'success') {
         console.log(`${type.toUpperCase()}: ${message}`);
         
-        // Create or get notification container
         let notificationContainer = document.getElementById('notificationContainer');
         if (!notificationContainer) {
             notificationContainer = document.createElement('div');
@@ -144,7 +139,6 @@
         
         notificationContainer.appendChild(toast);
         
-        // Auto remove after 5 seconds
         setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(100%)';
@@ -172,7 +166,7 @@
     }
     
     // ====================
-    // LOAD SINGLE PRODUCT BY SLUG (FOR PERMANENT URLS)
+    // LOAD SINGLE PRODUCT BY SLUG
     // ====================
     async function loadSingleProductBySlug(slug) {
         console.log(`📦 Loading single product by slug: ${slug}`);
@@ -186,10 +180,7 @@
             return;
         }
         
-        // Hide error state if visible
         if (errorState) errorState.style.display = 'none';
-        
-        // Show loading state
         if (loadingState) loadingState.style.display = 'block';
         
         const supabase = getSupabaseClient();
@@ -199,7 +190,6 @@
         }
         
         try {
-            // Get product first
             const { data: product, error: productError } = await supabase
                 .from('products')
                 .select('*')
@@ -214,7 +204,6 @@
             
             console.log('✅ Loaded product:', product.name);
             
-            // Get category separately
             const { data: category, error: catError } = await supabase
                 .from('categories')
                 .select('id, name, slug')
@@ -225,7 +214,6 @@
                 console.warn('⚠️ Category not found for product:', product.id);
             }
             
-            // Get colors separately
             const { data: colors, error: colorsError } = await supabase
                 .from('product_colors')
                 .select('*')
@@ -236,7 +224,6 @@
                 console.warn('⚠️ Could not load colors:', colorsError);
             }
             
-            // Get sizes separately
             const { data: sizes, error: sizesError } = await supabase
                 .from('product_sizes')
                 .select('*')
@@ -247,10 +234,8 @@
                 console.warn('⚠️ Could not load sizes:', sizesError);
             }
             
-            // Update document title
             document.title = `${product.name} - JMPOTTERS`;
             
-            // Set current product state
             currentProduct = product;
             currentProduct.category_slug = category?.slug || getCurrentCategory();
             currentProduct.category_name = category?.name || 'Category';
@@ -260,13 +245,9 @@
             currentSelectedColor = null;
             currentSelectedSize = null;
             
-            // Build mappings
             buildColorSizeMappings(currentProductColors, currentProductSizes);
-            
-            // Render product on standalone page
             renderProductPage(currentProduct);
             
-            // Hide loading state
             if (loadingState) loadingState.style.display = 'none';
             
         } catch (error) {
@@ -293,40 +274,31 @@
         
         const categorySlug = product.category_slug || getCurrentCategory();
         const imageUrl = getImageUrl(categorySlug, product.image_url);
-        
-        // Determine if it's footwear (needs size/color selectors)
         const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
         
-        // Check wishlist status
         const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
         const isInWishlist = wishlist.some(item => item.id === product.id);
         
         productViewer.innerHTML = `
             <div class="product-container">
-                <!-- Product Images -->
                 <div class="product-image-container">
                     <img src="${imageUrl}" alt="${product.name}" class="product-image"
                          onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
                 </div>
                 
-                <!-- Product Details -->
                 <div class="product-details">
-                    <!-- Title -->
                     <h1 class="product-title">${product.name}</h1>
                     
-                    <!-- Price -->
                     <div class="price-container">
                         <div class="current-price">${formatPrice(product.price)}</div>
                     </div>
                     
-                    <!-- Availability -->
                     <div class="stock-status ${product.stock > 0 ? '' : 'out-of-stock'}">
                         <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i>
                         <span>${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
                         ${product.stock > 0 ? `<span class="stock-count">${product.stock} units available</span>` : ''}
                     </div>
                     
-                    <!-- Description -->
                     <div class="detail-tile">
                         <h3 class="tile-title">Description</h3>
                         <div class="product-description">
@@ -334,7 +306,6 @@
                         </div>
                     </div>
                     
-                    <!-- Variant Selectors (for footwear) -->
                     ${isFootwear && currentProductColors.length > 0 ? `
                     <div class="detail-tile">
                         <h3 class="tile-title">Select Color</h3>
@@ -372,7 +343,6 @@
                     </div>
                     ` : ''}
                     
-                    <!-- Quantity Selector -->
                     <div class="detail-tile">
                         <h3 class="tile-title">Quantity</h3>
                         <div class="quantity-controls">
@@ -389,7 +359,6 @@
                         </div>
                     </div>
                     
-                    <!-- Action Buttons -->
                     <div class="action-buttons">
                         <button class="action-btn btn-primary btn-add-cart" id="pageAddToCart">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
@@ -406,16 +375,13 @@
     }
     
     function buildColorSizeMappings(colors, sizes) {
-        // Reset mappings
         colorSizeMap = {};
         sizeColorMap = {};
         
-        // Build color -> sizes map
         colors.forEach(color => {
             colorSizeMap[color.id] = sizes.filter(size => size.color_id === color.id);
         });
         
-        // Build size -> colors map
         const uniqueSizes = [...new Set(sizes.map(s => s.size_value))];
         uniqueSizes.forEach(sizeValue => {
             const sizeVariants = sizes.filter(s => s.size_value === sizeValue);
@@ -435,31 +401,26 @@
     function setupProductPageInteractions() {
         if (!isProductPage()) return;
         
-        // Color selection
         const colorOptions = document.getElementById('colorOptions');
         if (colorOptions) {
             colorOptions.addEventListener('click', (e) => {
                 const colorOption = e.target.closest('.color-option');
                 if (!colorOption) return;
                 
-                // Update UI
                 colorOptions.querySelectorAll('.color-option').forEach(opt => {
                     opt.classList.remove('selected');
                 });
                 colorOption.classList.add('selected');
                 
-                // Update state
                 currentSelectedColor = {
                     id: parseInt(colorOption.dataset.colorId),
                     name: colorOption.dataset.colorName
                 };
                 
-                // Update size options
                 updateSizeOptionsForColor(currentSelectedColor.id);
             });
         }
         
-        // Quantity controls
         const quantityInput = document.getElementById('productQuantity');
         const minusBtn = document.querySelector('.quantity-btn.minus');
         const plusBtn = document.querySelector('.quantity-btn.plus');
@@ -490,7 +451,6 @@
             });
         }
         
-        // Bulk options
         document.querySelectorAll('.bulk-option').forEach(option => {
             option.addEventListener('click', function() {
                 document.querySelectorAll('.bulk-option').forEach(opt => {
@@ -506,11 +466,9 @@
             });
         });
         
-        // Add to Cart button
         const pageAddToCart = document.getElementById('pageAddToCart');
         if (pageAddToCart && currentProduct) {
             pageAddToCart.addEventListener('click', () => {
-                // For footwear, validate selection
                 const isFootwear = ['mensfootwear', 'womensfootwear'].includes(
                     currentProduct.category_slug || getCurrentCategory()
                 );
@@ -536,7 +494,6 @@
                         return;
                     }
                     
-                    // Add to cart with variant details
                     addToCart(currentProduct, currentSelectedQuantity, {
                         color_id: currentSelectedColor.id,
                         color_name: currentSelectedColor.name,
@@ -545,7 +502,6 @@
                         variant_id: currentSelectedVariant?.id
                     });
                 } else {
-                    // For non-footwear, simple add to cart
                     if (currentSelectedQuantity > currentProduct.stock) {
                         showNotification(`Only ${currentProduct.stock} units available`, 'error');
                         return;
@@ -556,7 +512,6 @@
             });
         }
         
-        // Wishlist button
         const pageWishlist = document.getElementById('pageWishlist');
         if (pageWishlist && currentProduct) {
             pageWishlist.addEventListener('click', () => {
@@ -577,7 +532,6 @@
         
         if (!sizeOptions) return;
         
-        // Get sizes for this color
         const availableSizes = colorSizeMap[colorId] || [];
         
         if (availableSizes.length === 0) {
@@ -588,7 +542,6 @@
             return;
         }
         
-        // Populate size options
         sizeOptions.innerHTML = availableSizes.map(size => {
             const stock = size.stock_quantity || 0;
             let stockClass = '';
@@ -609,31 +562,25 @@
             `;
         }).join('');
         
-        // Add event listeners to size options
         sizeOptions.querySelectorAll('.size-option:not(.out-of-stock)').forEach(option => {
             option.addEventListener('click', function() {
-                // Update UI
                 sizeOptions.querySelectorAll('.size-option').forEach(opt => {
                     opt.classList.remove('selected');
                 });
                 this.classList.add('selected');
                 
-                // Update state
                 currentSelectedSize = {
                     id: parseInt(this.dataset.sizeId),
                     value: this.dataset.sizeValue,
                     stock: parseInt(this.dataset.stock)
                 };
                 
-                // Find the exact variant
                 currentSelectedVariant = currentProductSizes.find(s => 
                     s.id === currentSelectedSize.id && s.color_id === currentSelectedColor?.id
                 );
                 
-                // Update selection summary
                 updateSelectionSummary();
                 
-                // Update quantity max
                 const quantityInput = document.getElementById('productQuantity');
                 if (quantityInput) {
                     quantityInput.max = currentSelectedSize.stock;
@@ -673,7 +620,6 @@
             return;
         }
         
-        // Show skeleton loading
         productsGrid.innerHTML = `
             <div class="products-grid">
                 ${Array(6).fill().map(() => `
@@ -700,7 +646,6 @@
         }
         
         try {
-            // Get category by slug first
             const { data: category, error: catError } = await supabase
                 .from('categories')
                 .select('id, name, slug')
@@ -721,7 +666,6 @@
             
             console.log(`✅ Found category: ${category.name} (ID: ${category.id})`);
             
-            // Get products for this category
             const { data: products, error: prodError } = await supabase
                 .from('products')
                 .select('id, name, price, image_url, stock, slug, description')
@@ -747,10 +691,7 @@
                 return;
             }
             
-            // Cache products
             window.JMPOTTERS_PRODUCTS_CACHE = products;
-            
-            // Render products
             renderProducts(products, categorySlug);
             
         } catch (error) {
@@ -769,10 +710,8 @@
         const productsGrid = document.getElementById('productsGrid');
         if (!productsGrid) return;
         
-        // Clear any skeleton loading
         productsGrid.innerHTML = '';
         
-        // Add CSS for clickable cards if not already present
         if (!document.getElementById('product-card-css')) {
             const style = document.createElement('style');
             style.id = 'product-card-css';
@@ -795,12 +734,10 @@
             const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
             const isInWishlist = wishlist.some(item => item.id === product.id);
             
-            // Create wrapper link
             const productLink = document.createElement('a');
             productLink.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
             productLink.className = 'product-card-wrapper';
             
-            // Create product card
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.style.cssText = `
@@ -844,13 +781,9 @@
         console.log(`✅ Rendered ${products.length} products with clickable cards`);
     }
     
-    // ====================
-    // PRODUCT INTERACTIONS
-    // ====================
     function setupProductInteractions() {
         console.log('🔧 Setting up product interactions...');
         
-        // Wishlist buttons
         document.addEventListener('click', function(event) {
             const wishlistBtn = event.target.closest('[data-action="wishlist"]');
             if (wishlistBtn) {
@@ -877,7 +810,6 @@
     function addToCart(product, quantity = 1, options = {}) {
         let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
         
-        // Create cart item
         const cartItem = {
             product_id: product.id,
             quantity: quantity,
@@ -893,7 +825,6 @@
             added_at: new Date().toISOString()
         };
         
-        // Check if same variant already in cart
         const existingIndex = cart.findIndex(item => 
             item.product_id === cartItem.product_id && 
             item.color_id === cartItem.color_id && 
@@ -909,15 +840,12 @@
         localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
         updateCartUI();
         
-        // Show detailed notification
         let notificationText = `${product.name}`;
         if (options.color_name) notificationText += ` (${options.color_name})`;
         if (options.size_value) notificationText += ` - Size ${options.size_value}`;
         notificationText += ' added to cart!';
         
         showNotification(notificationText, 'success');
-        
-        // Open cart panel
         openCart();
     }
     
@@ -926,14 +854,12 @@
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
         const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
         
-        // Update cart count
         const cartCount = document.getElementById('cartCount');
         if (cartCount) {
             cartCount.textContent = totalItems;
             cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
         }
         
-        // Update wishlist count
         const wishlistCount = document.getElementById('wishlistCount');
         if (wishlistCount) {
             wishlistCount.textContent = wishlist.length;
@@ -941,12 +867,6 @@
         }
         
         updateCartPanel();
-        
-        // Setup checkout button overrides after cart panel updates
-        setTimeout(() => {
-            setupCheckoutButtonOverride();
-            setupWhatsAppButtonOverride();
-        }, 100);
     }
     
     function updateCartPanel() {
@@ -969,7 +889,6 @@
             const itemTotal = (item.price || 0) * item.quantity;
             total += itemTotal;
             
-            // Build item description
             let itemDescription = item.name;
             if (item.color_name) itemDescription += ` (${item.color_name})`;
             if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
@@ -993,7 +912,6 @@
             `;
         });
         
-        // Add checkout section
         html += `
             <div class="cart-total">
                 <span>Total:</span>
@@ -1011,10 +929,10 @@
         cartTotal.textContent = formatPrice(total);
         
         setupCartInteractions();
+        setupCheckoutButtons();
     }
     
     function setupCartInteractions() {
-        // Remove item
         document.querySelectorAll('.cart-item-remove').forEach(btn => {
             btn.addEventListener('click', function() {
                 const index = parseInt(this.getAttribute('data-index'));
@@ -1092,7 +1010,6 @@
     function setupHeaderInteractions() {
         console.log('🔧 Setting up header interactions...');
         
-        // Cart button - already handled in product.html, but add backup
         const cartBtn = document.getElementById('cartBtn');
         if (cartBtn && !cartBtn.hasAttribute('data-listener-added')) {
             cartBtn.setAttribute('data-listener-added', 'true');
@@ -1104,7 +1021,6 @@
             });
         }
         
-        // Wishlist button
         const wishlistBtn = document.getElementById('wishlistBtn');
         if (wishlistBtn) {
             wishlistBtn.addEventListener('click', function() {
@@ -1116,7 +1032,6 @@
             });
         }
         
-        // Close cart with Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeCart();
@@ -1130,19 +1045,16 @@
     // CHECKOUT SIGNUP MODAL FUNCTIONS
     // ====================
     
-    // Show checkout signup modal
     function showCheckoutSignupModal() {
         const modal = document.getElementById('checkoutSignupModal');
         if (modal) {
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
-            // Clear any previous form data
             const form = document.getElementById('checkoutSignupForm');
             if (form) form.reset();
         }
     }
     
-    // Close checkout signup modal
     function closeCheckoutSignupModal() {
         const modal = document.getElementById('checkoutSignupModal');
         if (modal) {
@@ -1151,7 +1063,6 @@
         }
     }
     
-    // Save user to Supabase and localStorage
     async function saveCheckoutUser(userData) {
         const supabase = getSupabaseClient();
         
@@ -1161,7 +1072,6 @@
         }
         
         try {
-            // Check if user already exists by email
             const { data: existingUser, error: checkError } = await supabase
                 .from('user_profiles')
                 .select('id, email, full_name, phone, address, city, state')
@@ -1169,7 +1079,6 @@
                 .maybeSingle();
             
             if (existingUser) {
-                // User exists - update their info with latest details
                 const { data: updatedUser, error: updateError } = await supabase
                     .from('user_profiles')
                     .update({
@@ -1186,7 +1095,6 @@
                 
                 if (updateError) throw updateError;
                 
-                // Save to localStorage
                 localStorage.setItem('jmpotters_user', JSON.stringify({
                     id: updatedUser.id,
                     email: updatedUser.email,
@@ -1202,7 +1110,6 @@
                 return updatedUser;
                 
             } else {
-                // Create new user
                 const { data: newUser, error: insertError } = await supabase
                     .from('user_profiles')
                     .insert({
@@ -1219,7 +1126,6 @@
                 
                 if (insertError) throw insertError;
                 
-                // Save to localStorage
                 localStorage.setItem('jmpotters_user', JSON.stringify({
                     id: newUser.id,
                     email: newUser.email,
@@ -1242,7 +1148,6 @@
         }
     }
     
-    // Handle checkout signup form submission
     async function handleCheckoutSignup(event) {
         event.preventDefault();
         
@@ -1250,12 +1155,10 @@
         const btnText = submitBtn.querySelector('.btn-text');
         const btnLoading = submitBtn.querySelector('.btn-loading');
         
-        // Show loading state
         submitBtn.disabled = true;
         btnText.style.display = 'none';
         btnLoading.style.display = 'flex';
         
-        // Get form data
         const userData = {
             fullName: document.getElementById('checkoutFullName').value.trim(),
             email: document.getElementById('checkoutEmail').value.trim(),
@@ -1266,7 +1169,6 @@
             newsletter: document.getElementById('checkoutNewsletter')?.checked || false
         };
         
-        // Validate
         if (!userData.fullName || !userData.email || !userData.phone || !userData.address || !userData.city || !userData.state) {
             showNotification('Please fill in all required fields', 'warning');
             submitBtn.disabled = false;
@@ -1275,7 +1177,6 @@
             return;
         }
         
-        // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(userData.email)) {
             showNotification('Please enter a valid email address', 'warning');
@@ -1285,7 +1186,6 @@
             return;
         }
         
-        // Validate phone (basic Nigerian format)
         const phoneRegex = /^[0-9]{10,11}$/;
         const cleanPhone = userData.phone.replace(/\D/g, '');
         if (!phoneRegex.test(cleanPhone)) {
@@ -1297,19 +1197,15 @@
         }
         userData.phone = cleanPhone;
         
-        // Save user
         const savedUser = await saveCheckoutUser(userData);
         
-        // Reset button
         submitBtn.disabled = false;
         btnText.style.display = 'flex';
         btnLoading.style.display = 'none';
         
         if (savedUser) {
-            // Close modal
             closeCheckoutSignupModal();
             
-            // Store checkout data for order creation
             window.pendingCheckoutData = {
                 user_id: savedUser.id,
                 email: savedUser.email,
@@ -1321,12 +1217,10 @@
                 notes: ''
             };
             
-            // Trigger the checkout process
             proceedToCheckout();
         }
     }
     
-    // Proceed to checkout with WhatsApp
     function proceedToCheckout() {
         const user = JSON.parse(localStorage.getItem('jmpotters_user'));
         const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
@@ -1336,10 +1230,8 @@
             return;
         }
         
-        // Calculate total
         const total = cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
         
-        // Build WhatsApp message with user data
         let message = `*NEW ORDER FROM JMPOTTERS*\n\n`;
         message += `*Customer Details:*\n`;
         message += `Name: ${user.full_name}\n`;
@@ -1362,19 +1254,16 @@
         window.open(whatsappUrl, '_blank');
     }
     
-    // Initialize checkout signup modal listeners
     function initCheckoutSignupModal() {
         const modal = document.getElementById('checkoutSignupModal');
         if (!modal) return;
         
-        // Form submit handler
         const form = document.getElementById('checkoutSignupForm');
         if (form) {
             form.removeEventListener('submit', handleCheckoutSignup);
             form.addEventListener('submit', handleCheckoutSignup);
         }
         
-        // Close button handlers
         const closeBtn = document.getElementById('closeModalBtn');
         if (closeBtn) {
             closeBtn.removeEventListener('click', closeCheckoutSignupModal);
@@ -1393,7 +1282,6 @@
             overlay.addEventListener('click', closeCheckoutSignupModal);
         }
         
-        // Close on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && modal.style.display === 'flex') {
                 closeCheckoutSignupModal();
@@ -1401,12 +1289,10 @@
         });
     }
     
-    // Check if user is logged in
     function isUserLoggedIn() {
         return JSON.parse(localStorage.getItem('jmpotters_user'));
     }
     
-    // Update UI based on login state
     function updateUserUI() {
         const user = isUserLoggedIn();
         if (user) {
@@ -1414,16 +1300,11 @@
         }
     }
     
-    // Override checkout button to show modal if not logged in
-    function setupCheckoutButtonOverride() {
+    function setupCheckoutButtons() {
         const checkoutBtn = document.getElementById('checkoutButton');
-        if (checkoutBtn && !checkoutBtn.hasAttribute('data-modal-listener')) {
-            checkoutBtn.setAttribute('data-modal-listener', 'true');
-            
-            const newCheckoutBtn = checkoutBtn.cloneNode(true);
-            checkoutBtn.parentNode.replaceChild(newCheckoutBtn, checkoutBtn);
-            
-            newCheckoutBtn.addEventListener('click', function(e) {
+        if (checkoutBtn && !checkoutBtn._modalListenerAttached) {
+            checkoutBtn._modalListenerAttached = true;
+            checkoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
@@ -1436,18 +1317,11 @@
                 }
             });
         }
-    }
-    
-    // Override WhatsApp button to show modal if not logged in
-    function setupWhatsAppButtonOverride() {
+        
         const whatsappBtn = document.getElementById('whatsappCheckout');
-        if (whatsappBtn && !whatsappBtn.hasAttribute('data-modal-listener')) {
-            whatsappBtn.setAttribute('data-modal-listener', 'true');
-            
-            const newWhatsappBtn = whatsappBtn.cloneNode(true);
-            whatsappBtn.parentNode.replaceChild(newWhatsappBtn, whatsappBtn);
-            
-            newWhatsappBtn.addEventListener('click', function(e) {
+        if (whatsappBtn && !whatsappBtn._modalListenerAttached) {
+            whatsappBtn._modalListenerAttached = true;
+            whatsappBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
@@ -1460,14 +1334,6 @@
                 }
             });
         }
-    }
-    
-    // Initialize modal hooks
-    function initModalHooks() {
-        setTimeout(() => {
-            setupCheckoutButtonOverride();
-            setupWhatsAppButtonOverride();
-        }, 500);
     }
     
     // ====================
@@ -1478,7 +1344,6 @@
         console.log('Current page:', window.location.pathname);
         console.log('Current category:', getCurrentCategory());
         
-        // Check Supabase connection
         const supabase = getSupabaseClient();
         if (!supabase) {
             console.error('❌ Supabase client not initialized');
@@ -1486,28 +1351,19 @@
             console.log('✅ Supabase client ready');
         }
         
-        // Setup header interactions
         setupHeaderInteractions();
-        
-        // Initialize modal
         initCheckoutSignupModal();
-        initModalHooks();
-        
-        // Initialize UI
         updateCartUI();
         updateUserUI();
         
-        // Check if we're on a product page
         if (isProductPage()) {
             const slug = getSlugFromURL();
             if (slug) {
                 await loadSingleProductBySlug(slug);
             } else {
-                // Redirect to home if no slug
                 window.location.href = 'index.html';
             }
         } else {
-            // Load products if on category page
             const currentCategory = getCurrentCategory();
             if (document.getElementById('productsGrid')) {
                 await loadProductsByCategory(currentCategory);
