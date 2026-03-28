@@ -941,6 +941,12 @@
         }
         
         updateCartPanel();
+        
+        // Setup checkout button overrides after cart panel updates
+        setTimeout(() => {
+            setupCheckoutButtonOverride();
+            setupWhatsAppButtonOverride();
+        }, 100);
     }
     
     function updateCartPanel() {
@@ -1003,31 +1009,6 @@
         
         cartItems.innerHTML = html;
         cartTotal.textContent = formatPrice(total);
-        
-        // Setup checkout button
-        const checkoutBtn = document.getElementById('checkoutButton');
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', function() {
-                // Use WhatsApp as the checkout method
-                document.getElementById('whatsappCheckout')?.click();
-            });
-        }
-        
-        // Update WhatsApp checkout link
-        const whatsappCheckout = document.getElementById('whatsappCheckout');
-        if (whatsappCheckout) {
-            let text = "I would like to purchase:\n";
-            cart.forEach(item => {
-                let itemDescription = item.name;
-                if (item.color_name) itemDescription += ` (${item.color_name})`;
-                if (item.size_value) itemDescription += ` - Size ${item.size_value}`;
-                
-                const itemTotal = (item.price || 0) * item.quantity;
-                text += `- ${itemDescription} (${item.quantity} × ${formatPrice(item.price)}) = ${formatPrice(itemTotal)}\n`;
-            });
-            text += `\n*Total: ${formatPrice(total)}*\n\nPlease confirm order & shipping details.`;
-            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
-        }
         
         setupCartInteractions();
     }
@@ -1146,6 +1127,350 @@
     }
     
     // ====================
+    // CHECKOUT SIGNUP MODAL FUNCTIONS
+    // ====================
+    
+    // Show checkout signup modal
+    function showCheckoutSignupModal() {
+        const modal = document.getElementById('checkoutSignupModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            // Clear any previous form data
+            const form = document.getElementById('checkoutSignupForm');
+            if (form) form.reset();
+        }
+    }
+    
+    // Close checkout signup modal
+    function closeCheckoutSignupModal() {
+        const modal = document.getElementById('checkoutSignupModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+    
+    // Save user to Supabase and localStorage
+    async function saveCheckoutUser(userData) {
+        const supabase = getSupabaseClient();
+        
+        if (!supabase) {
+            showNotification('Connection error. Please try again.', 'error');
+            return null;
+        }
+        
+        try {
+            // Check if user already exists by email
+            const { data: existingUser, error: checkError } = await supabase
+                .from('user_profiles')
+                .select('id, email, full_name, phone, address, city, state')
+                .eq('email', userData.email)
+                .maybeSingle();
+            
+            if (existingUser) {
+                // User exists - update their info with latest details
+                const { data: updatedUser, error: updateError } = await supabase
+                    .from('user_profiles')
+                    .update({
+                        full_name: userData.fullName,
+                        phone: userData.phone,
+                        address: userData.address,
+                        city: userData.city,
+                        state: userData.state,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', existingUser.id)
+                    .select()
+                    .single();
+                
+                if (updateError) throw updateError;
+                
+                // Save to localStorage
+                localStorage.setItem('jmpotters_user', JSON.stringify({
+                    id: updatedUser.id,
+                    email: updatedUser.email,
+                    full_name: updatedUser.full_name,
+                    phone: updatedUser.phone,
+                    address: updatedUser.address,
+                    city: updatedUser.city,
+                    state: updatedUser.state,
+                    role: updatedUser.role || 'customer'
+                }));
+                
+                showNotification(`Welcome back ${updatedUser.full_name}!`, 'success');
+                return updatedUser;
+                
+            } else {
+                // Create new user
+                const { data: newUser, error: insertError } = await supabase
+                    .from('user_profiles')
+                    .insert({
+                        email: userData.email,
+                        full_name: userData.fullName,
+                        phone: userData.phone,
+                        address: userData.address,
+                        city: userData.city,
+                        state: userData.state,
+                        role: 'customer'
+                    })
+                    .select()
+                    .single();
+                
+                if (insertError) throw insertError;
+                
+                // Save to localStorage
+                localStorage.setItem('jmpotters_user', JSON.stringify({
+                    id: newUser.id,
+                    email: newUser.email,
+                    full_name: newUser.full_name,
+                    phone: newUser.phone,
+                    address: newUser.address,
+                    city: newUser.city,
+                    state: newUser.state,
+                    role: newUser.role
+                }));
+                
+                showNotification(`Welcome to JMPOTTERS, ${newUser.full_name}! 🎉`, 'success');
+                return newUser;
+            }
+            
+        } catch (error) {
+            console.error('Signup error:', error);
+            showNotification(error.message || 'Signup failed. Please try again.', 'error');
+            return null;
+        }
+    }
+    
+    // Handle checkout signup form submission
+    async function handleCheckoutSignup(event) {
+        event.preventDefault();
+        
+        const submitBtn = document.getElementById('checkoutSubmitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'flex';
+        
+        // Get form data
+        const userData = {
+            fullName: document.getElementById('checkoutFullName').value.trim(),
+            email: document.getElementById('checkoutEmail').value.trim(),
+            phone: document.getElementById('checkoutPhone').value.trim(),
+            address: document.getElementById('checkoutAddress').value.trim(),
+            city: document.getElementById('checkoutCity').value.trim(),
+            state: document.getElementById('checkoutState').value,
+            newsletter: document.getElementById('checkoutNewsletter')?.checked || false
+        };
+        
+        // Validate
+        if (!userData.fullName || !userData.email || !userData.phone || !userData.address || !userData.city || !userData.state) {
+            showNotification('Please fill in all required fields', 'warning');
+            submitBtn.disabled = false;
+            btnText.style.display = 'flex';
+            btnLoading.style.display = 'none';
+            return;
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(userData.email)) {
+            showNotification('Please enter a valid email address', 'warning');
+            submitBtn.disabled = false;
+            btnText.style.display = 'flex';
+            btnLoading.style.display = 'none';
+            return;
+        }
+        
+        // Validate phone (basic Nigerian format)
+        const phoneRegex = /^[0-9]{10,11}$/;
+        const cleanPhone = userData.phone.replace(/\D/g, '');
+        if (!phoneRegex.test(cleanPhone)) {
+            showNotification('Please enter a valid phone number (10-11 digits)', 'warning');
+            submitBtn.disabled = false;
+            btnText.style.display = 'flex';
+            btnLoading.style.display = 'none';
+            return;
+        }
+        userData.phone = cleanPhone;
+        
+        // Save user
+        const savedUser = await saveCheckoutUser(userData);
+        
+        // Reset button
+        submitBtn.disabled = false;
+        btnText.style.display = 'flex';
+        btnLoading.style.display = 'none';
+        
+        if (savedUser) {
+            // Close modal
+            closeCheckoutSignupModal();
+            
+            // Store checkout data for order creation
+            window.pendingCheckoutData = {
+                user_id: savedUser.id,
+                email: savedUser.email,
+                full_name: savedUser.full_name,
+                phone: savedUser.phone,
+                address: userData.address,
+                city: userData.city,
+                state: userData.state,
+                notes: ''
+            };
+            
+            // Trigger the checkout process
+            proceedToCheckout();
+        }
+    }
+    
+    // Proceed to checkout with WhatsApp
+    function proceedToCheckout() {
+        const user = JSON.parse(localStorage.getItem('jmpotters_user'));
+        const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+        
+        if (cart.length === 0) {
+            showNotification('Your cart is empty', 'warning');
+            return;
+        }
+        
+        // Calculate total
+        const total = cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
+        
+        // Build WhatsApp message with user data
+        let message = `*NEW ORDER FROM JMPOTTERS*\n\n`;
+        message += `*Customer Details:*\n`;
+        message += `Name: ${user.full_name}\n`;
+        message += `Email: ${user.email}\n`;
+        message += `Phone: ${user.phone}\n`;
+        if (user.address) message += `Address: ${user.address}, ${user.city || ''}, ${user.state || ''}\n`;
+        message += `\n*Order Items:*\n`;
+        
+        cart.forEach(item => {
+            let itemDesc = item.name;
+            if (item.color_name) itemDesc += ` (${item.color_name})`;
+            if (item.size_value) itemDesc += ` - Size ${item.size_value}`;
+            message += `- ${itemDesc} x${item.quantity} = ₦${((item.price || 0) * item.quantity).toLocaleString()}\n`;
+        });
+        
+        message += `\n*Total: ₦${total.toLocaleString()}*\n\n`;
+        message += `Please confirm my order and provide payment details.`;
+        
+        const whatsappUrl = `https://wa.me/2348139583320?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    }
+    
+    // Initialize checkout signup modal listeners
+    function initCheckoutSignupModal() {
+        const modal = document.getElementById('checkoutSignupModal');
+        if (!modal) return;
+        
+        // Form submit handler
+        const form = document.getElementById('checkoutSignupForm');
+        if (form) {
+            form.removeEventListener('submit', handleCheckoutSignup);
+            form.addEventListener('submit', handleCheckoutSignup);
+        }
+        
+        // Close button handlers
+        const closeBtn = document.getElementById('closeModalBtn');
+        if (closeBtn) {
+            closeBtn.removeEventListener('click', closeCheckoutSignupModal);
+            closeBtn.addEventListener('click', closeCheckoutSignupModal);
+        }
+        
+        const cancelBtn = document.getElementById('cancelCheckoutBtn');
+        if (cancelBtn) {
+            cancelBtn.removeEventListener('click', closeCheckoutSignupModal);
+            cancelBtn.addEventListener('click', closeCheckoutSignupModal);
+        }
+        
+        const overlay = document.querySelector('.checkout-modal-overlay');
+        if (overlay) {
+            overlay.removeEventListener('click', closeCheckoutSignupModal);
+            overlay.addEventListener('click', closeCheckoutSignupModal);
+        }
+        
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                closeCheckoutSignupModal();
+            }
+        });
+    }
+    
+    // Check if user is logged in
+    function isUserLoggedIn() {
+        return JSON.parse(localStorage.getItem('jmpotters_user'));
+    }
+    
+    // Update UI based on login state
+    function updateUserUI() {
+        const user = isUserLoggedIn();
+        if (user) {
+            console.log('User logged in:', user.full_name);
+        }
+    }
+    
+    // Override checkout button to show modal if not logged in
+    function setupCheckoutButtonOverride() {
+        const checkoutBtn = document.getElementById('checkoutButton');
+        if (checkoutBtn && !checkoutBtn.hasAttribute('data-modal-listener')) {
+            checkoutBtn.setAttribute('data-modal-listener', 'true');
+            
+            const newCheckoutBtn = checkoutBtn.cloneNode(true);
+            checkoutBtn.parentNode.replaceChild(newCheckoutBtn, checkoutBtn);
+            
+            newCheckoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const user = isUserLoggedIn();
+                
+                if (user) {
+                    proceedToCheckout();
+                } else {
+                    showCheckoutSignupModal();
+                }
+            });
+        }
+    }
+    
+    // Override WhatsApp button to show modal if not logged in
+    function setupWhatsAppButtonOverride() {
+        const whatsappBtn = document.getElementById('whatsappCheckout');
+        if (whatsappBtn && !whatsappBtn.hasAttribute('data-modal-listener')) {
+            whatsappBtn.setAttribute('data-modal-listener', 'true');
+            
+            const newWhatsappBtn = whatsappBtn.cloneNode(true);
+            whatsappBtn.parentNode.replaceChild(newWhatsappBtn, whatsappBtn);
+            
+            newWhatsappBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const user = isUserLoggedIn();
+                
+                if (user) {
+                    proceedToCheckout();
+                } else {
+                    showCheckoutSignupModal();
+                }
+            });
+        }
+    }
+    
+    // Initialize modal hooks
+    function initModalHooks() {
+        setTimeout(() => {
+            setupCheckoutButtonOverride();
+            setupWhatsAppButtonOverride();
+        }, 500);
+    }
+    
+    // ====================
     // INITIALIZATION
     // ====================
     async function initializePage() {
@@ -1164,8 +1489,13 @@
         // Setup header interactions
         setupHeaderInteractions();
         
+        // Initialize modal
+        initCheckoutSignupModal();
+        initModalHooks();
+        
         // Initialize UI
         updateCartUI();
+        updateUserUI();
         
         // Check if we're on a product page
         if (isProductPage()) {
@@ -1206,7 +1536,11 @@
             getImageUrl,
             loadProductsByCategory,
             openCart,
-            closeCart
+            closeCart,
+            showCheckoutSignupModal,
+            closeCheckoutSignupModal,
+            proceedToCheckout,
+            isUserLoggedIn
         };
     }
     
