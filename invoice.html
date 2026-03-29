@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Invoice | JMPOTTERS</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="app.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f1f5f9;
+            padding: 2rem;
+        }
+        
+        .invoice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        
+        .invoice-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .invoice-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        .invoice-header p {
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+        
+        .invoice-number {
+            background: rgba(212, 175, 55, 0.2);
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #d4af37;
+        }
+        
+        .invoice-body {
+            padding: 2rem;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .info-section h3 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-section p {
+            color: #1e293b;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+        
+        .info-section strong {
+            color: #0f172a;
+        }
+        
+        .order-summary {
+            margin-bottom: 2rem;
+        }
+        
+        .order-summary h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #0f172a;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 0.85rem;
+        }
+        
+        td {
+            color: #334155;
+            font-size: 0.9rem;
+        }
+        
+        .totals {
+            text-align: right;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .totals-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .totals-label {
+            font-weight: 500;
+            color: #475569;
+        }
+        
+        .totals-value {
+            font-weight: 600;
+            min-width: 120px;
+            color: #1e293b;
+        }
+        
+        .grand-total {
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .grand-total .totals-label,
+        .grand-total .totals-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #d4af37;
+        }
+        
+        .invoice-footer {
+            background: #f8fafc;
+            padding: 1.5rem;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+        
+        .action-buttons {
+            max-width: 900px;
+            margin: 1.5rem auto 0;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #0f172a;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #d4af37;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+        
+        .loading-state {
+            text-align: center;
+            padding: 4rem;
+        }
+        
+        .loading-state i {
+            font-size: 2rem;
+            color: #d4af37;
+            margin-bottom: 1rem;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .action-buttons {
+                display: none;
+            }
+            .invoice-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            th, td {
+                padding: 0.75rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="invoiceContent" class="invoice-container">
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading invoice...</p>
+        </div>
+    </div>
+    
+    <div class="action-buttons" id="actionButtons" style="display: none;">
+        <button class="btn btn-secondary" onclick="window.print()">
+            <i class="fas fa-print"></i> Print
+        </button>
+        <button class="btn btn-secondary" onclick="downloadPDF()">
+            <i class="fas fa-download"></i> Download PDF
+        </button>
+        <a href="index.html" class="btn btn-primary">
+            <i class="fas fa-home"></i> Continue Shopping
+        </a>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        async function loadInvoice() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderNumber = urlParams.get('order');
+            
+            if (!orderNumber) {
+                document.getElementById('invoiceContent').innerHTML = `
+                    <div class="loading-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #dc2626;"></i>
+                        <p>No order specified</p>
+                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Fetch order from database
+            const { data: order, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('order_number', orderNumber)
+                .single();
+            
+            if (error || !order) {
+                document.getElementById('invoiceContent').innerHTML = `
+                    <div class="loading-state">
+                        <i class="fas fa-search" style="color: #dc2626;"></i>
+                        <p>Order not found</p>
+                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Parse items from JSONB
+            const items = order.items || [];
+            const subtotal = order.total_amount || 0;
+            const shippingFee = order.shipping_fee || 0;
+            const grandTotal = order.grand_total || subtotal + shippingFee;
+            const orderDate = new Date(order.created_at).toLocaleDateString('en-NG', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            
+            const statusClass = order.payment_status === 'paid' ? 'status-paid' : 'status-pending';
+            const statusText = order.status === 'pending' ? 'Pending' : 
+                              order.status === 'processing' ? 'Processing' :
+                              order.status === 'shipped' ? 'Shipped' :
+                              order.status === 'delivered' ? 'Delivered' : 'Cancelled';
+            
+            document.getElementById('invoiceContent').innerHTML = `
+                <div class="invoice-header">
+                    <h1>JMPOTTERS</h1>
+                    <p>Premium Quality Products</p>
+                    <div class="invoice-number">${order.order_number}</div>
+                </div>
+                
+                <div class="invoice-body">
+                    <div class="info-grid">
+                        <div class="info-section">
+                            <h3>BILLING DETAILS</h3>
+                            <p>
+                                <strong>${order.full_name || order.user_name}</strong><br>
+                                ${order.user_email || 'No email provided'}<br>
+                                ${order.user_phone || 'No phone provided'}
+                            </p>
+                        </div>
+                        <div class="info-section">
+                            <h3>SHIPPING ADDRESS</h3>
+                            <p>
+                                ${order.shipping_address || 'No address provided'}<br>
+                                ${order.city ? order.city + ', ' : ''}${order.state || ''}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-section">
+                            <h3>ORDER DATE</h3>
+                            <p>${orderDate}</p>
+                        </div>
+                        <div class="info-section">
+                            <h3>ORDER STATUS</h3>
+                            <p><span class="status-badge ${statusClass}">${statusText}</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="order-summary">
+                        <h3>Order Summary</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Variant</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${items.map(item => `
+                                    <tr>
+                                        <td>${item.name || 'Product'}</td>
+                                        <td>${item.color_name ? item.color_name + (item.size_value ? ' / ' + item.size_value : '') : '-'}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>₦${(item.price || 0).toLocaleString()}</td>
+                                        <td>₦${((item.price || 0) * item.quantity).toLocaleString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        
+                        <div class="totals">
+                            <div class="totals-row">
+                                <span class="totals-label">Subtotal:</span>
+                                <span class="totals-value">₦${subtotal.toLocaleString()}</span>
+                            </div>
+                            <div class="totals-row">
+                                <span class="totals-label">Shipping Fee:</span>
+                                <span class="totals-value">₦${shippingFee.toLocaleString()}</span>
+                            </div>
+                            <div class="totals-row grand-total">
+                                <span class="totals-label">Grand Total:</span>
+                                <span class="totals-value">₦${grandTotal.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${order.notes ? `
+                        <div class="info-section" style="margin-top: 1rem;">
+                            <h3>ORDER NOTES</h3>
+                            <p>${order.notes}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="info-section" style="margin-top: 1rem; text-align: center; padding: 1rem; background: #f8fafc; border-radius: 0.75rem;">
+                        <p style="font-size: 0.85rem; color: #64748b;">
+                            <i class="fas fa-clock"></i> Please complete payment within 24 hours.<br>
+                            For inquiries, contact us on WhatsApp: <strong>+234 813 958 3320</strong>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="invoice-footer">
+                    <p>Thank you for shopping with JMPOTTERS!</p>
+                    <p>This is a system-generated invoice. No signature required.</p>
+                </div>
+            `;
+            
+            document.getElementById('actionButtons').style.display = 'flex';
+        }
+        
+        function downloadPDF() {
+            const element = document.getElementById('invoiceContent');
+            const orderNumber = document.querySelector('.invoice-number')?.innerText || 'invoice';
+            html2pdf().from(element).set({
+                margin: 0.5,
+                filename: `JMPOTTERS_${orderNumber}.pdf`,
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            }).save();
+        }
+        
+        loadInvoice();
+    </script>
+</body>
+</html>
