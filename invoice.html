@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="app.js"></script>
     
     <style>
         * {
@@ -299,11 +300,8 @@
     </div>
 
     <script>
-        const supabaseUrl = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-        
-        async function loadInvoice() {
+        // Wait for app.js to load and expose JMPOTTERS
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Loading invoice...');
             
             const urlParams = new URLSearchParams(window.location.search);
@@ -325,29 +323,37 @@
             
             document.getElementById('orderNumberDisplay').textContent = orderNumber;
             
-            console.log('🔄 Fetching order from Supabase...');
+            // Wait for JMPOTTERS to be available (app.js loads asynchronously)
+            let retries = 0;
+            while (!window.JMPOTTERS && retries < 20) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            
+            if (!window.JMPOTTERS || !window.JMPOTTERS.getOrderByNumber) {
+                console.error('❌ JMPOTTERS not loaded properly');
+                document.getElementById('invoiceContent').innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #dc2626;"></i>
+                        <p>Application not loaded. Please refresh the page.</p>
+                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            console.log('✅ JMPOTTERS loaded, fetching order...');
             
             try {
-                // Fetch order from database
-                const { data: order, error } = await supabase
-                    .from('orders')
-                    .select('*')
-                    .eq('order_number', orderNumber)
-                    .single();
+                // Use the function from app.js
+                const order = await window.JMPOTTERS.getOrderByNumber(orderNumber);
                 
-                console.log('📊 Supabase response:', { order, error });
-                
-                if (error) {
-                    console.error('❌ Supabase error:', error);
-                    throw error;
-                }
+                console.log('📊 Order data:', order);
                 
                 if (!order) {
                     console.error('❌ Order not found for number:', orderNumber);
                     throw new Error('Order not found');
                 }
-                
-                console.log('✅ Order found:', order);
                 
                 // Parse items from JSONB
                 const items = order.items || [];
@@ -421,8 +427,8 @@
                                 <tbody>
                                     ${items.length > 0 ? items.map(item => `
                                         <tr>
-                                            <td>${item.name || 'Product'}</td>
-                                            <td>${item.color_name ? item.color_name + (item.size_value ? ' / ' + item.size_value : '') : '-'}</td>
+                                            <td>${escapeHtml(item.name || 'Product')}</td>
+                                            <td>${item.color_name ? escapeHtml(item.color_name) + (item.size_value ? ' / ' + escapeHtml(item.size_value) : '') : '-'}</td>
                                             <td>${item.quantity}</td>
                                             <td>₦${(item.price || 0).toLocaleString()}</td>
                                             <td>₦${((item.price || 0) * item.quantity).toLocaleString()}</td>
@@ -454,7 +460,7 @@
                         ${order.notes ? `
                             <div class="info-section" style="margin-top: 1rem;">
                                 <h3>ORDER NOTES</h3>
-                                <p>${order.notes}</p>
+                                <p>${escapeHtml(order.notes)}</p>
                             </div>
                         ` : ''}
                         
@@ -486,6 +492,13 @@
                     </div>
                 `;
             }
+        });
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         function downloadPDF() {
@@ -498,9 +511,6 @@
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             }).save();
         }
-        
-        // Load invoice when page is ready
-        document.addEventListener('DOMContentLoaded', loadInvoice);
     </script>
 </body>
 </html>
