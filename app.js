@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE FIXED VERSION WITH ORDER SYSTEM
+// JMPOTTERS APP - COMPLETE FIXED VERSION WITH PROFESSIONAL NOTIFICATIONS
 // ====================
 (function() {
     'use strict';
@@ -9,7 +9,7 @@
         return;
     }
     
-    console.log('🚀 JMPOTTERS app starting (Order System v4)...');
+    console.log('🚀 JMPOTTERS app starting (Professional v5)...');
     window.JMPOTTERS_APP_INITIALIZED = true;
     
     // ====================
@@ -49,6 +49,115 @@
     let currentProductSizes = [];
     let colorSizeMap = {};
     let sizeColorMap = {};
+    
+    // ====================
+    // PROFESSIONAL NOTIFICATION SYSTEM
+    // ====================
+    function showNotification(message, type = 'success') {
+        console.log(`${type.toUpperCase()}: ${message}`);
+        
+        // Create notification container if it doesn't exist
+        let container = document.getElementById('jmpottersNotificationContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'jmpottersNotificationContainer';
+            container.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                z-index: 10000;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                pointer-events: none;
+            `;
+            document.body.appendChild(container);
+        }
+        
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `jmpotters-notification jmpotters-notification-${type}`;
+        
+        // Icons based on type
+        const icons = {
+            success: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+            error: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+            warning: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+            info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+        };
+        
+        // Colors based on type
+        const colors = {
+            success: { bg: '#f0fdf4', border: '#22c55e', icon: '#22c55e', text: '#166534' },
+            error: { bg: '#fef2f2', border: '#ef4444', icon: '#ef4444', text: '#991b1b' },
+            warning: { bg: '#fffbeb', border: '#f59e0b', icon: '#f59e0b', text: '#92400e' },
+            info: { bg: '#eff6ff', border: '#3b82f6', icon: '#3b82f6', text: '#1e40af' }
+        };
+        
+        const color = colors[type];
+        
+        notification.style.cssText = `
+            background: ${color.bg};
+            border-left: 4px solid ${color.border};
+            border-radius: 12px;
+            padding: 14px 18px;
+            min-width: 320px;
+            max-width: 420px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: jmpottersSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        `;
+        
+        notification.innerHTML = `
+            <div style="flex-shrink: 0; width: 22px; height: 22px; color: ${color.icon};">${icons[type]}</div>
+            <div style="flex: 1; color: ${color.text}; font-size: 0.875rem; font-weight: 500; line-height: 1.4;">${message}</div>
+            <button class="jmpotters-notification-close" style="background: none; border: none; cursor: pointer; padding: 4px; margin: -4px; opacity: 0.6; transition: opacity 0.2s;" onclick="this.parentElement.remove()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: ${color.text};"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        `;
+        
+        container.appendChild(notification);
+        
+        // Auto remove after 4.5 seconds
+        setTimeout(() => {
+            if (notification && notification.parentElement) {
+                notification.style.animation = 'jmpottersSlideOut 0.2s ease forwards';
+                setTimeout(() => {
+                    if (notification.parentElement) notification.remove();
+                }, 200);
+            }
+        }, 4500);
+    }
+    
+    // Add global styles for notifications
+    const notificationStyle = document.createElement('style');
+    notificationStyle.textContent = `
+        @keyframes jmpottersSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes jmpottersSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+        }
+    `;
+    document.head.appendChild(notificationStyle);
     
     // ====================
     // UTILITY FUNCTIONS
@@ -104,46 +213,6 @@
             return '₦0';
         }
         return `₦${parseInt(price).toLocaleString()}`;
-    }
-    
-    function showNotification(message, type = 'success') {
-        console.log(`${type.toUpperCase()}: ${message}`);
-        
-        let notificationContainer = document.getElementById('notificationContainer');
-        if (!notificationContainer) {
-            notificationContainer = document.createElement('div');
-            notificationContainer.id = 'notificationContainer';
-            notificationContainer.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 9999;
-            `;
-            document.body.appendChild(notificationContainer);
-        }
-        
-        const toast = document.createElement('div');
-        toast.className = `notification ${type}`;
-        
-        const icons = {
-            success: 'fas fa-check-circle',
-            error: 'fas fa-exclamation-circle',
-            warning: 'fas fa-exclamation-triangle',
-            info: 'fas fa-info-circle'
-        };
-        
-        toast.innerHTML = `
-            <i class="${icons[type] || icons.info} notification-icon"></i>
-            <span>${message}</span>
-        `;
-        
-        notificationContainer.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => toast.remove(), 300);
-        }, 5000);
     }
     
     // ====================
@@ -833,19 +902,17 @@
         
         if (existingIndex !== -1) {
             cart[existingIndex].quantity += quantity;
+            showNotification(`Updated quantity for ${product.name}`, 'info');
         } else {
             cart.push(cartItem);
+            let notificationText = `${product.name}`;
+            if (options.color_name) notificationText += ` (${options.color_name})`;
+            if (options.size_value) notificationText += ` - Size ${options.size_value}`;
+            showNotification(`${notificationText} added to cart`, 'success');
         }
         
         localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
         updateCartUI();
-        
-        let notificationText = `${product.name}`;
-        if (options.color_name) notificationText += ` (${options.color_name})`;
-        if (options.size_value) notificationText += ` - Size ${options.size_value}`;
-        notificationText += ' added to cart!';
-        
-        showNotification(notificationText, 'success');
         openCart();
     }
     
@@ -1229,11 +1296,14 @@
         const supabase = getSupabaseClient();
         
         if (!supabase) {
+            console.error('❌ No Supabase client');
             showNotification('Database connection error', 'error');
             return null;
         }
         
         try {
+            console.log('📦 Starting order creation...');
+            
             const subtotal = cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             const shippingFee = subtotal >= 50000 ? 0 : 2000;
             const grandTotal = subtotal + shippingFee;
@@ -1248,52 +1318,84 @@
                 image_url: item.image_url
             }));
             
-            // Generate order number using database sequence
-            const { data: orderNumberResult, error: seqError } = await supabase
-                .rpc('generate_order_number');
+            // Generate unique order number with retry logic
+            let finalOrderNumber = null;
+            let attempts = 0;
+            const maxAttempts = 5;
             
-            let finalOrderNumber;
-            if (seqError || !orderNumberResult) {
-                // Fallback: generate manually
-                const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-                finalOrderNumber = 'JMP-' + new Date().getFullYear().toString().slice(-2) + '-' + randomNum;
-            } else {
-                finalOrderNumber = orderNumberResult;
+            while (!finalOrderNumber && attempts < maxAttempts) {
+                attempts++;
+                
+                try {
+                    const { data: orderNumberResult, error: seqError } = await supabase
+                        .rpc('generate_order_number');
+                    
+                    let tempOrderNumber;
+                    if (seqError || !orderNumberResult) {
+                        const timestamp = Date.now().toString().slice(-6);
+                        const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                        tempOrderNumber = 'JMP-' + new Date().getFullYear().toString().slice(-2) + '-' + timestamp + randomNum;
+                    } else {
+                        tempOrderNumber = orderNumberResult;
+                    }
+                    
+                    const { data: existing, error: checkError } = await supabase
+                        .from('orders')
+                        .select('order_number')
+                        .eq('order_number', tempOrderNumber)
+                        .maybeSingle();
+                    
+                    if (!existing) {
+                        finalOrderNumber = tempOrderNumber;
+                        console.log('✅ Unique order number found:', finalOrderNumber);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Order number generation error:', e);
+                }
             }
+            
+            if (!finalOrderNumber) {
+                finalOrderNumber = 'JMP-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+            }
+            
+            const orderInsert = {
+                order_number: finalOrderNumber,
+                user_id: orderData.user_id || null,
+                user_name: orderData.full_name,
+                user_email: orderData.email,
+                user_phone: orderData.phone,
+                full_name: orderData.full_name,
+                shipping_address: orderData.address,
+                city: orderData.city || null,
+                state: orderData.state || null,
+                total_amount: subtotal,
+                shipping_fee: shippingFee,
+                grand_total: grandTotal,
+                status: 'pending',
+                payment_status: 'pending',
+                payment_method: 'whatsapp',
+                notes: orderData.notes || '',
+                items: items
+            };
             
             const { data: order, error: orderError } = await supabase
                 .from('orders')
-                .insert({
-                    order_number: finalOrderNumber,
-                    user_id: orderData.user_id || null,
-                    user_name: orderData.full_name,
-                    user_email: orderData.email,
-                    user_phone: orderData.phone,
-                    full_name: orderData.full_name,
-                    shipping_address: orderData.address,
-                    city: orderData.city,
-                    state: orderData.state,
-                    total_amount: subtotal,
-                    shipping_fee: shippingFee,
-                    grand_total: grandTotal,
-                    status: 'pending',
-                    payment_status: 'pending',
-                    payment_method: 'whatsapp',
-                    notes: orderData.notes || '',
-                    items: items
-                })
+                .insert(orderInsert)
                 .select()
                 .single();
             
             if (orderError) {
-                console.error('Order insert error:', orderError);
-                throw orderError;
+                console.error('❌ Order insert error:', orderError);
+                showNotification(`Order failed: ${orderError.message}`, 'error');
+                return null;
             }
+            
+            console.log('✅ Order created successfully:', order);
             
             localStorage.removeItem('jmpotters_cart');
             updateCartUI();
             
-            showNotification(`Order placed! Order #${finalOrderNumber}`, 'success');
+            showNotification(`Order #${finalOrderNumber} placed successfully!`, 'success');
             
             localStorage.setItem('jmpotters_last_order', JSON.stringify({
                 order: order,
@@ -1306,8 +1408,8 @@
             return order;
             
         } catch (error) {
-            console.error('Order creation error:', error);
-            showNotification('Failed to place order. Please try again.', 'error');
+            console.error('❌ Order creation error:', error);
+            showNotification(`Failed to place order: ${error.message || 'Unknown error'}`, 'error');
             return null;
         }
     }
@@ -1340,23 +1442,40 @@
             return;
         }
         
-        const checkoutData = window.pendingCheckoutData || {
-            user_id: user?.id,
-            email: user?.email,
-            full_name: user?.full_name,
-            phone: user?.phone,
-            address: user?.address,
-            city: user?.city,
-            state: user?.state,
-            notes: ''
-        };
+        let checkoutData;
         
+        if (window.pendingCheckoutData) {
+            checkoutData = window.pendingCheckoutData;
+            window.pendingCheckoutData = null;
+        } else if (user) {
+            console.log('🔄 Returning user detected, building checkout data from profile:', user);
+            
+            checkoutData = {
+                user_id: user.id,
+                email: user.email,
+                full_name: user.full_name,
+                phone: user.phone,
+                address: user.address || '',
+                city: user.city || '',
+                state: user.state || '',
+                notes: ''
+            };
+            
+            if (!checkoutData.address || !checkoutData.city || !checkoutData.state) {
+                showNotification('Please ensure your shipping address is correct', 'info');
+            }
+        } else {
+            console.error('❌ No user data available');
+            showNotification('Please sign in to continue', 'warning');
+            return;
+        }
+        
+        console.log('📦 Checkout data:', checkoutData);
         showNotification('Placing your order...', 'info');
         
         const order = await createOrder(checkoutData, cart);
         
         if (order) {
-            window.pendingCheckoutData = null;
             window.location.href = `invoice.html?order=${order.order_number}`;
         }
     }
@@ -1518,5 +1637,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with order system');
+    console.log('✅ JMPOTTERS app loaded with professional notifications');
 })();
