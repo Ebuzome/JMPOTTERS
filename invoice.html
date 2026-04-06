@@ -9,21 +9,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="app.js"></script>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: #f1f5f9;
             padding: 2rem;
         }
-        
         .invoice-container {
             max-width: 900px;
             margin: 0 auto;
@@ -32,25 +25,13 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             overflow: hidden;
         }
-        
         .invoice-header {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
             padding: 2rem;
             text-align: center;
         }
-        
-        .invoice-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-        
-        .invoice-header p {
-            color: #94a3b8;
-            margin-top: 0.25rem;
-        }
-        
+        .invoice-header h1 { font-size: 2rem; font-weight: 700; }
         .invoice-number {
             background: rgba(212, 175, 55, 0.2);
             display: inline-block;
@@ -62,24 +43,16 @@
             font-weight: 600;
             color: #d4af37;
         }
-        
-        .invoice-body {
-            padding: 2rem;
-        }
-        
+        .invoice-body { padding: 2rem; }
         .status-badge {
             display: inline-block;
             padding: 0.25rem 1rem;
             border-radius: 2rem;
             font-size: 0.75rem;
             font-weight: 600;
-        }
-        
-        .status-pending {
             background: #fef3c7;
             color: #d97706;
         }
-        
         .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -88,7 +61,6 @@
             padding-bottom: 2rem;
             border-bottom: 1px solid #e2e8f0;
         }
-        
         .info-section h3 {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -96,90 +68,19 @@
             color: #94a3b8;
             margin-bottom: 0.75rem;
         }
-        
-        .info-section p {
-            color: #1e293b;
-            line-height: 1.6;
-            font-size: 0.9rem;
-        }
-        
-        .info-section strong {
-            color: #0f172a;
-        }
-        
-        .order-summary {
-            margin-bottom: 2rem;
-        }
-        
-        .order-summary h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #0f172a;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th, td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #0f172a;
-            font-size: 0.85rem;
-        }
-        
-        td {
-            color: #334155;
-            font-size: 0.9rem;
-        }
-        
-        .totals {
-            text-align: right;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 2px solid #e2e8f0;
-        }
-        
-        .totals-row {
-            display: flex;
-            justify-content: flex-end;
-            gap: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .totals-label {
-            font-weight: 500;
-            color: #475569;
-        }
-        
-        .totals-value {
-            font-weight: 600;
-            min-width: 120px;
-            color: #1e293b;
-        }
-        
-        .grand-total {
-            font-size: 1.2rem;
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        .grand-total .totals-label,
-        .grand-total .totals-value {
+        .info-section p { color: #1e293b; line-height: 1.6; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; font-weight: 600; }
+        .totals { text-align: right; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0; }
+        .totals-row { display: flex; justify-content: flex-end; gap: 2rem; margin-bottom: 0.5rem; }
+        .totals-label { font-weight: 500; color: #475569; }
+        .totals-value { font-weight: 600; min-width: 120px; }
+        .grand-total .totals-label, .grand-total .totals-value {
             font-size: 1.2rem;
             font-weight: 700;
             color: #d4af37;
         }
-        
         .invoice-footer {
             background: #f8fafc;
             padding: 1.5rem;
@@ -187,7 +88,6 @@
             color: #64748b;
             font-size: 0.8rem;
         }
-        
         .action-buttons {
             max-width: 900px;
             margin: 1.5rem auto 0;
@@ -195,7 +95,6 @@
             gap: 1rem;
             justify-content: center;
         }
-        
         .btn {
             padding: 0.75rem 1.5rem;
             border-radius: 0.75rem;
@@ -209,72 +108,27 @@
             align-items: center;
             gap: 0.5rem;
         }
-        
-        .btn-primary {
-            background: #0f172a;
-            color: white;
+        .btn-primary { background: #0f172a; color: white; }
+        .btn-primary:hover { background: #d4af37; transform: translateY(-2px); }
+        .btn-secondary { background: white; color: #0f172a; border: 1px solid #e2e8f0; }
+        .loading-state, .error-state { text-align: center; padding: 4rem; }
+        .loading-state i, .error-state i { font-size: 2rem; margin-bottom: 1rem; }
+        .debug-info {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+            margin-top: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
-        
-        .btn-primary:hover {
-            background: #d4af37;
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background: white;
-            color: #0f172a;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .btn-secondary:hover {
-            border-color: #d4af37;
-            color: #d4af37;
-        }
-        
-        .loading-state, .error-state {
-            text-align: center;
-            padding: 4rem;
-        }
-        
-        .loading-state i, .error-state i {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .loading-state i {
-            color: #d4af37;
-        }
-        
-        .error-state i {
-            color: #dc2626;
-        }
-        
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            .action-buttons {
-                display: none;
-            }
-            .invoice-container {
-                box-shadow: none;
-                border-radius: 0;
-            }
-        }
-        
         @media (max-width: 640px) {
-            body {
-                padding: 1rem;
-            }
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            th, td {
-                padding: 0.75rem;
-                font-size: 0.8rem;
-            }
+            body { padding: 1rem; }
+            .info-grid { grid-template-columns: 1fr; gap: 1rem; }
+            th, td { padding: 0.75rem; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -283,20 +137,14 @@
         <div class="loading-state">
             <i class="fas fa-spinner fa-spin"></i>
             <p>Loading invoice...</p>
-            <p style="font-size: 0.8rem; margin-top: 1rem; color: #64748b;">Order number: <span id="orderNumberDisplay">-</span></p>
+            <p style="font-size: 0.8rem; margin-top: 1rem;">Order number: <span id="orderNumberDisplay">-</span></p>
         </div>
     </div>
     
     <div class="action-buttons" id="actionButtons" style="display: none;">
-        <button class="btn btn-secondary" onclick="window.print()">
-            <i class="fas fa-print"></i> Print
-        </button>
-        <button class="btn btn-secondary" onclick="downloadPDF()">
-            <i class="fas fa-download"></i> Download PDF
-        </button>
-        <a href="index.html" class="btn btn-primary">
-            <i class="fas fa-home"></i> Continue Shopping
-        </a>
+        <button class="btn btn-secondary" onclick="window.print()">Print</button>
+        <button class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
+        <a href="index.html" class="btn btn-primary">Continue Shopping</a>
     </div>
 
     <script>
@@ -304,39 +152,98 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
         const supabase = supabase.createClient(supabaseUrl, supabaseKey);
         
+        // Debug log function
+        function addDebugLog(message, data) {
+            console.log(`[DEBUG] ${message}`, data || '');
+            
+            // Also show on page for debugging
+            let debugDiv = document.getElementById('debugInfo');
+            if (!debugDiv) {
+                debugDiv = document.createElement('div');
+                debugDiv.id = 'debugInfo';
+                debugDiv.className = 'debug-info';
+                const container = document.getElementById('invoiceContent');
+                if (container) {
+                    container.appendChild(debugDiv);
+                }
+            }
+            const timestamp = new Date().toLocaleTimeString();
+            debugDiv.innerHTML += `[${timestamp}] ${message} ${data ? JSON.stringify(data, null, 2) : ''}\n`;
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+        }
+        
         async function loadInvoice() {
-            console.log('🚀 Loading invoice...');
+            addDebugLog('🚀 Invoice page loaded');
             
             const urlParams = new URLSearchParams(window.location.search);
             const orderNumber = urlParams.get('order');
             
-            console.log('📦 Order number from URL:', orderNumber);
+            addDebugLog('📦 Order number from URL:', orderNumber);
             
             if (!orderNumber) {
+                addDebugLog('❌ No order number in URL');
                 document.getElementById('invoiceContent').innerHTML = `
                     <div class="error-state">
-                        <i class="fas fa-exclamation-triangle" style="color: #dc2626;"></i>
+                        <i class="fas fa-exclamation-triangle"></i>
                         <p>No order specified</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">URL must contain ?order=ORDER_NUMBER</p>
                         <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
                     </div>
+                    <div class="debug-info" id="debugInfo"></div>
                 `;
                 return;
             }
             
             document.getElementById('orderNumberDisplay').textContent = orderNumber;
             
+            addDebugLog('🔄 Fetching order from Supabase...');
+            
             try {
+                // First, let's check if we can connect to Supabase at all
+                addDebugLog('Testing Supabase connection...');
+                const { data: testData, error: testError } = await supabase
+                    .from('orders')
+                    .select('count', { count: 'exact', head: true });
+                
+                if (testError) {
+                    addDebugLog('❌ Supabase connection failed:', testError);
+                    throw new Error(`Supabase connection failed: ${testError.message}`);
+                }
+                addDebugLog('✅ Supabase connection successful');
+                
+                // Now fetch the specific order
+                addDebugLog(`🔍 Looking for order: ${orderNumber}`);
+                
                 const { data: order, error } = await supabase
                     .from('orders')
                     .select('*')
                     .eq('order_number', orderNumber)
-                    .single();
+                    .maybeSingle();  // Using maybeSingle to avoid 406 errors
                 
-                console.log('📊 Supabase response:', { order, error });
+                addDebugLog('📊 Supabase response:', { order, error });
                 
-                if (error) throw error;
+                if (error) {
+                    addDebugLog('❌ Supabase error:', error);
+                    throw new Error(error.message);
+                }
                 
-                if (!order) throw new Error('Order not found');
+                if (!order) {
+                    addDebugLog('❌ Order not found for number:', orderNumber);
+                    
+                    // Let's also check what orders exist
+                    const { data: allOrders, error: listError } = await supabase
+                        .from('orders')
+                        .select('order_number')
+                        .limit(5);
+                    
+                    if (!listError && allOrders) {
+                        addDebugLog('📋 Recent orders in database:', allOrders.map(o => o.order_number));
+                    }
+                    
+                    throw new Error(`Order ${orderNumber} not found in database`);
+                }
+                
+                addDebugLog('✅ Order found:', order);
                 
                 const items = order.items || [];
                 const subtotal = order.total_amount || 0;
@@ -355,11 +262,12 @@
                 
                 let itemsHtml = '';
                 if (items.length > 0) {
-                    items.forEach(item => {
+                    items.forEach((item, idx) => {
+                        addDebugLog(`Item ${idx + 1}:`, item);
                         itemsHtml += `
                             <tr>
-                                <td>${item.name || 'Product'}</td>
-                                <td>${item.color_name ? item.color_name + (item.size_value ? ' / ' + item.size_value : '') : '-'}</td>
+                                <td>${escapeHtml(item.name || 'Product')}</td>
+                                <td>${item.color_name ? escapeHtml(item.color_name) + (item.size_value ? ' / ' + escapeHtml(item.size_value) : '') : '-'}</td>
                                 <td>${item.quantity}</td>
                                 <td>₦${(item.price || 0).toLocaleString()}</td>
                                 <td>₦${((item.price || 0) * item.quantity).toLocaleString()}</td>
@@ -367,8 +275,10 @@
                         `;
                     });
                 } else {
-                    itemsHtml = `<tr><td colspan="5" style="text-align: center;">No items found</td></tr>`;
+                    itemsHtml = `<td><td colspan="5" style="text-align: center;">No items found</td></tr>`;
                 }
+                
+                addDebugLog('🎨 Rendering invoice HTML...');
                 
                 document.getElementById('invoiceContent').innerHTML = `
                     <div class="invoice-header">
@@ -382,16 +292,16 @@
                             <div class="info-section">
                                 <h3>BILLING DETAILS</h3>
                                 <p>
-                                    <strong>${order.full_name || order.user_name || 'N/A'}</strong><br>
-                                    ${order.user_email || 'No email provided'}<br>
-                                    ${order.user_phone || 'No phone provided'}
+                                    <strong>${escapeHtml(order.full_name || order.user_name || 'N/A')}</strong><br>
+                                    ${escapeHtml(order.user_email || 'No email provided')}<br>
+                                    ${escapeHtml(order.user_phone || 'No phone provided')}
                                 </p>
                             </div>
                             <div class="info-section">
                                 <h3>SHIPPING ADDRESS</h3>
                                 <p>
-                                    ${order.shipping_address || 'No address provided'}<br>
-                                    ${order.city ? order.city + ', ' : ''}${order.state || ''}
+                                    ${escapeHtml(order.shipping_address || 'No address provided')}<br>
+                                    ${order.city ? escapeHtml(order.city) + ', ' : ''}${order.state ? escapeHtml(order.state) : ''}
                                 </p>
                             </div>
                         </div>
@@ -403,7 +313,7 @@
                             </div>
                             <div class="info-section">
                                 <h3>ORDER STATUS</h3>
-                                <p><span class="status-badge status-pending">${statusText}</span></p>
+                                <p><span class="status-badge">${statusText}</span></p>
                             </div>
                         </div>
                         
@@ -411,17 +321,9 @@
                             <h3>Order Summary</h3>
                             <table>
                                 <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Variant</th>
-                                        <th>Qty</th>
-                                        <th>Price</th>
-                                        <th>Total</th>
-                                    </tr>
+                                    <tr><th>Product</th><th>Variant</th><th>Qty</th><th>Price</th><th>Total</th></tr>
                                 </thead>
-                                <tbody>
-                                    ${itemsHtml}
-                                </tbody>
+                                <tbody>${itemsHtml}</tbody>
                             </table>
                             
                             <div class="totals">
@@ -445,21 +347,30 @@
                         <p>Thank you for shopping with JMPOTTERS!</p>
                         <p>For inquiries, contact us on WhatsApp: <strong>+234 813 958 3320</strong></p>
                     </div>
+                    <div class="debug-info" id="debugInfo"></div>
                 `;
                 
                 document.getElementById('actionButtons').style.display = 'flex';
-                console.log('✅ Invoice rendered successfully');
+                addDebugLog('✅ Invoice rendered successfully');
                 
             } catch (error) {
-                console.error('❌ Error loading invoice:', error);
+                addDebugLog('❌ Error loading invoice:', error.message);
                 document.getElementById('invoiceContent').innerHTML = `
                     <div class="error-state">
-                        <i class="fas fa-exclamation-triangle" style="color: #dc2626;"></i>
+                        <i class="fas fa-exclamation-triangle"></i>
                         <p>Error loading invoice: ${error.message}</p>
                         <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
                     </div>
+                    <div class="debug-info" id="debugInfo"></div>
                 `;
             }
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         function downloadPDF() {
@@ -473,7 +384,8 @@
             }).save();
         }
         
-        document.addEventListener('DOMContentLoaded', loadInvoice);
+        // Run when page loads
+        loadInvoice();
     </script>
 </body>
 </html>
