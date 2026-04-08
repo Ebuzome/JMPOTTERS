@@ -11,12 +11,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #f1f5f9;
             padding: 2rem;
         }
+        
         .invoice-container {
             max-width: 900px;
             margin: 0 auto;
@@ -25,13 +31,25 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             overflow: hidden;
         }
+        
         .invoice-header {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
             padding: 2rem;
             text-align: center;
         }
-        .invoice-header h1 { font-size: 2rem; font-weight: 700; }
+        
+        .invoice-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        .invoice-header p {
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+        
         .invoice-number {
             background: rgba(212, 175, 55, 0.2);
             display: inline-block;
@@ -43,16 +61,24 @@
             font-weight: 600;
             color: #d4af37;
         }
-        .invoice-body { padding: 2rem; }
+        
+        .invoice-body {
+            padding: 2rem;
+        }
+        
         .status-badge {
             display: inline-block;
             padding: 0.25rem 1rem;
             border-radius: 2rem;
             font-size: 0.75rem;
             font-weight: 600;
+        }
+        
+        .status-pending {
             background: #fef3c7;
             color: #d97706;
         }
+        
         .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -61,6 +87,7 @@
             padding-bottom: 2rem;
             border-bottom: 1px solid #e2e8f0;
         }
+        
         .info-section h3 {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -68,19 +95,90 @@
             color: #94a3b8;
             margin-bottom: 0.75rem;
         }
-        .info-section p { color: #1e293b; line-height: 1.6; font-size: 0.9rem; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        th { background: #f8fafc; font-weight: 600; }
-        .totals { text-align: right; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0; }
-        .totals-row { display: flex; justify-content: flex-end; gap: 2rem; margin-bottom: 0.5rem; }
-        .totals-label { font-weight: 500; color: #475569; }
-        .totals-value { font-weight: 600; min-width: 120px; }
-        .grand-total .totals-label, .grand-total .totals-value {
+        
+        .info-section p {
+            color: #1e293b;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+        
+        .info-section strong {
+            color: #0f172a;
+        }
+        
+        .order-summary {
+            margin-bottom: 2rem;
+        }
+        
+        .order-summary h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #0f172a;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 0.85rem;
+        }
+        
+        td {
+            color: #334155;
+            font-size: 0.9rem;
+        }
+        
+        .totals {
+            text-align: right;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .totals-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .totals-label {
+            font-weight: 500;
+            color: #475569;
+        }
+        
+        .totals-value {
+            font-weight: 600;
+            min-width: 120px;
+            color: #1e293b;
+        }
+        
+        .grand-total {
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .grand-total .totals-label,
+        .grand-total .totals-value {
             font-size: 1.2rem;
             font-weight: 700;
             color: #d4af37;
         }
+        
         .invoice-footer {
             background: #f8fafc;
             padding: 1.5rem;
@@ -88,6 +186,7 @@
             color: #64748b;
             font-size: 0.8rem;
         }
+        
         .action-buttons {
             max-width: 900px;
             margin: 1.5rem auto 0;
@@ -95,6 +194,7 @@
             gap: 1rem;
             justify-content: center;
         }
+        
         .btn {
             padding: 0.75rem 1.5rem;
             border-radius: 0.75rem;
@@ -108,14 +208,72 @@
             align-items: center;
             gap: 0.5rem;
         }
-        .btn-primary { background: #0f172a; color: white; }
-        .btn-primary:hover { background: #d4af37; transform: translateY(-2px); }
-        .btn-secondary { background: white; color: #0f172a; border: 1px solid #e2e8f0; }
-        .loading-state, .error-state { text-align: center; padding: 4rem; }
-        .loading-state i, .error-state i { font-size: 2rem; margin-bottom: 1rem; }
+        
+        .btn-primary {
+            background: #0f172a;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #d4af37;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+        
+        .loading-state, .error-state {
+            text-align: center;
+            padding: 4rem;
+        }
+        
+        .loading-state i, .error-state i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .loading-state i {
+            color: #d4af37;
+        }
+        
+        .error-state i {
+            color: #dc2626;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .action-buttons {
+                display: none;
+            }
+            .invoice-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+        
         @media (max-width: 640px) {
-            body { padding: 1rem; }
-            .info-grid { grid-template-columns: 1fr; gap: 1rem; }
+            body {
+                padding: 1rem;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            th, td {
+                padding: 0.75rem;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -135,18 +293,17 @@
 
     <script>
         // Supabase configuration
-        const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseUrl = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
         
         async function loadInvoice() {
-            console.log('1. loadInvoice started');
+            console.log('🚀 Loading invoice...');
             
-            // Get order number from URL
             const urlParams = new URLSearchParams(window.location.search);
             const orderNumber = urlParams.get('order');
             
-            console.log('2. Order number:', orderNumber);
+            console.log('Order number:', orderNumber);
             
             if (!orderNumber) {
                 document.getElementById('invoiceContent').innerHTML = `
@@ -160,42 +317,33 @@
             }
             
             try {
-                console.log('3. Fetching order from Supabase...');
-                
-                // Fetch the order
                 const { data: order, error } = await supabase
                     .from('orders')
                     .select('*')
                     .eq('order_number', orderNumber)
                     .single();
                 
-                console.log('4. Supabase response:', { order, error });
+                console.log('Order data:', order);
                 
-                if (error) {
-                    console.error('5. Error:', error);
-                    throw error;
-                }
+                if (error) throw error;
                 
-                if (!order) {
-                    console.error('5. Order not found');
-                    throw new Error('Order not found');
-                }
+                if (!order) throw new Error('Order not found');
                 
-                console.log('6. Order found:', order);
-                
-                // Parse order data
                 const items = order.items || [];
                 const subtotal = order.total_amount || 0;
                 const shippingFee = order.shipping_fee || 0;
                 const grandTotal = order.grand_total || subtotal + shippingFee;
-                const orderDate = new Date(order.created_at).toLocaleDateString('en-NG');
+                const orderDate = new Date(order.created_at).toLocaleDateString('en-NG', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
                 
                 const statusText = order.status === 'pending' ? 'Pending' : 
                                   order.status === 'processing' ? 'Processing' :
                                   order.status === 'shipped' ? 'Shipped' :
                                   order.status === 'delivered' ? 'Delivered' : 'Cancelled';
                 
-                // Build items HTML
                 let itemsHtml = '';
                 if (items.length > 0) {
                     items.forEach(item => {
@@ -213,9 +361,6 @@
                     itemsHtml = `<tr><td colspan="5" style="text-align: center;">No items found</td></tr>`;
                 }
                 
-                console.log('7. Rendering invoice...');
-                
-                // Render invoice
                 document.getElementById('invoiceContent').innerHTML = `
                     <div class="invoice-header">
                         <h1>JMPOTTERS</h1>
@@ -249,14 +394,16 @@
                             </div>
                             <div class="info-section">
                                 <h3>ORDER STATUS</h3>
-                                <p><span class="status-badge">${statusText}</span></p>
+                                <p><span class="status-badge status-pending">${statusText}</span></p>
                             </div>
                         </div>
                         
                         <div class="order-summary">
                             <h3>Order Summary</h3>
                             <table>
-                                <thead><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+                                <thead>
+                                    <tr><th>Product</th><th>Variant</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+                                </thead>
                                 <tbody>${itemsHtml}</tbody>
                             </table>
                             
@@ -275,15 +422,14 @@
                 `;
                 
                 document.getElementById('actionButtons').style.display = 'flex';
-                console.log('8. Invoice rendered successfully');
+                console.log('✅ Invoice rendered successfully');
                 
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('invoiceContent').innerHTML = `
                     <div class="error-state">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <p>Error loading invoice: ${error.message}</p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Order: ${orderNumber}</p>
+                        <p>Error: ${error.message}</p>
                         <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
                     </div>
                 `;
@@ -301,7 +447,6 @@
             }).save();
         }
         
-        // Start loading
         loadInvoice();
     </script>
 </body>
