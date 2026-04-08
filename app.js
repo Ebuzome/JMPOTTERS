@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE FIXED VERSION WITH PROFESSIONAL NOTIFICATIONS
+// JMPOTTERS APP - COMPLETE WITH RECOMMENDATION ENGINE
 // ====================
 (function() {
     'use strict';
@@ -9,7 +9,7 @@
         return;
     }
     
-    console.log('🚀 JMPOTTERS app starting (Professional v5)...');
+    console.log('🚀 JMPOTTERS app starting (With Recommendations)...');
     window.JMPOTTERS_APP_INITIALIZED = true;
     
     // ====================
@@ -56,7 +56,6 @@
     function showNotification(message, type = 'success') {
         console.log(`${type.toUpperCase()}: ${message}`);
         
-        // Create notification container if it doesn't exist
         let container = document.getElementById('jmpottersNotificationContainer');
         if (!container) {
             container = document.createElement('div');
@@ -74,11 +73,9 @@
             document.body.appendChild(container);
         }
         
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `jmpotters-notification jmpotters-notification-${type}`;
         
-        // Icons based on type
         const icons = {
             success: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
             error: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
@@ -86,7 +83,6 @@
             info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
         };
         
-        // Colors based on type
         const colors = {
             success: { bg: '#f0fdf4', border: '#22c55e', icon: '#22c55e', text: '#166534' },
             error: { bg: '#fef2f2', border: '#ef4444', icon: '#ef4444', text: '#991b1b' },
@@ -122,7 +118,6 @@
         
         container.appendChild(notification);
         
-        // Auto remove after 4.5 seconds
         setTimeout(() => {
             if (notification && notification.parentElement) {
                 notification.style.animation = 'jmpottersSlideOut 0.2s ease forwards';
@@ -133,7 +128,6 @@
         }, 4500);
     }
     
-    // Add global styles for notifications
     const notificationStyle = document.createElement('style');
     notificationStyle.textContent = `
         @keyframes jmpottersSlideIn {
@@ -235,6 +229,152 @@
     }
     
     // ====================
+    // RECOMMENDATION ENGINE
+    // ====================
+    
+    async function loadRecommendations(currentProduct) {
+        try {
+            const supabase = getSupabaseClient();
+            if (!supabase) return [];
+            
+            const currentCategoryId = currentProduct.category_id;
+            const currentProductName = currentProduct.name.toLowerCase();
+            const currentProductId = currentProduct.id;
+            
+            const nameWords = currentProductName.split(' ').filter(w => w.length > 2);
+            
+            let recommendations = [];
+            
+            // Step 1: Search by brand/keywords from name
+            if (nameWords.length > 0) {
+                let nameQuery = supabase
+                    .from('products')
+                    .select('id, name, price, image_url, slug, stock, category_id')
+                    .eq('is_active', true)
+                    .neq('id', currentProductId);
+                
+                if (nameWords.length > 1) {
+                    nameQuery = supabase
+                        .from('products')
+                        .select('id, name, price, image_url, slug, stock, category_id')
+                        .eq('is_active', true)
+                        .neq('id', currentProductId)
+                        .or(nameWords.map(w => `name.ilike.%${w}%`).join(','));
+                } else {
+                    nameQuery = nameQuery.ilike('name', `%${nameWords[0]}%`);
+                }
+                
+                const { data: keywordMatches } = await nameQuery.limit(10);
+                
+                if (keywordMatches && keywordMatches.length > 0) {
+                    recommendations = keywordMatches;
+                }
+            }
+            
+            // Step 2: If not enough recommendations, get from same category
+            if (recommendations.length < 15) {
+                const needed = 15 - recommendations.length;
+                const existingIds = recommendations.map(r => r.id);
+                
+                let categoryQuery = supabase
+                    .from('products')
+                    .select('id, name, price, image_url, slug, stock, category_id')
+                    .eq('category_id', currentCategoryId)
+                    .eq('is_active', true)
+                    .neq('id', currentProductId);
+                
+                if (existingIds.length > 0) {
+                    categoryQuery = categoryQuery.not('id', 'in', `(${existingIds.join(',')})`);
+                }
+                
+                const { data: categoryProducts } = await categoryQuery.limit(needed);
+                
+                if (categoryProducts && categoryProducts.length > 0) {
+                    recommendations = [...recommendations, ...categoryProducts];
+                }
+            }
+            
+            // Step 3: If still not enough, get random products from any category
+            if (recommendations.length < 15) {
+                const needed = 15 - recommendations.length;
+                const existingIds = recommendations.map(r => r.id);
+                
+                let randomQuery = supabase
+                    .from('products')
+                    .select('id, name, price, image_url, slug, stock, category_id')
+                    .eq('is_active', true)
+                    .neq('id', currentProductId);
+                
+                if (existingIds.length > 0) {
+                    randomQuery = randomQuery.not('id', 'in', `(${existingIds.join(',')})`);
+                }
+                
+                const { data: randomProducts } = await randomQuery.limit(needed);
+                
+                if (randomProducts && randomProducts.length > 0) {
+                    recommendations = [...recommendations, ...randomProducts];
+                }
+            }
+            
+            // Remove duplicates
+            recommendations = recommendations.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+            
+            // Limit to 15
+            recommendations = recommendations.slice(0, 15);
+            
+            return recommendations;
+            
+        } catch (error) {
+            console.error('Error loading recommendations:', error);
+            return [];
+        }
+    }
+    
+    async function renderRecommendations(currentProduct) {
+        const section = document.getElementById('recommendationsSection');
+        const container = document.getElementById('recommendationsContainer');
+        
+        if (!section || !container) return;
+        
+        const recommendations = await loadRecommendations(currentProduct);
+        
+        if (recommendations.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+        
+        let html = '';
+        for (const product of recommendations) {
+            const categorySlug = currentProduct.category_slug || getCurrentCategory();
+            const imageUrl = getImageUrl(categorySlug, product.image_url);
+            
+            html += `
+                <a href="product.html?slug=${product.slug}" class="recommendation-card">
+                    <img src="${imageUrl}" alt="${product.name}" class="rec-image"
+                         onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                    <div class="rec-info">
+                        <div class="rec-name">${escapeHtml(product.name)}</div>
+                        <div class="rec-price">${formatPrice(product.price)}</div>
+                        <div class="text-xs ${product.stock > 0 ? 'text-green-600' : 'text-red-600'} mt-1">
+                            ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                        </div>
+                    </div>
+                </a>
+            `;
+        }
+        
+        container.innerHTML = html;
+        section.style.display = 'block';
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // ====================
     // LOAD SINGLE PRODUCT BY SLUG
     // ====================
     async function loadSingleProductBySlug(slug) {
@@ -317,12 +457,29 @@
             buildColorSizeMappings(currentProductColors, currentProductSizes);
             renderProductPage(currentProduct);
             
+            // Load recommendations
+            await renderRecommendations(currentProduct);
+            
             if (loadingState) loadingState.style.display = 'none';
+            
+            // Setup image magnification if PhotoSwipe is available
+            if (typeof PhotoSwipeLightbox !== 'undefined') {
+                setupImageMagnification();
+            }
             
         } catch (error) {
             console.error('❌ Error loading product by slug:', error);
             showError(error.message || 'Failed to load product');
         }
+    }
+    
+    function setupImageMagnification() {
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: '.product-image-section',
+            children: '.product-image-wrapper',
+            pswpModule: PhotoSwipe
+        });
+        lightbox.init();
     }
     
     function showError(message) {
@@ -344,96 +501,103 @@
         const categorySlug = product.category_slug || getCurrentCategory();
         const imageUrl = getImageUrl(categorySlug, product.image_url);
         const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
+        const hasComparePrice = product.compare_price && product.compare_price > product.price;
+        const discountPercent = hasComparePrice ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
         
         const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
         const isInWishlist = wishlist.some(item => item.id === product.id);
         
+        const stockStatus = product.stock > 10 ? 'in-stock' : (product.stock > 0 ? 'low-stock' : 'out-of-stock');
+        const stockText = product.stock > 10 ? 'In Stock' : (product.stock > 0 ? `Only ${product.stock} left` : 'Out of Stock');
+        
         productViewer.innerHTML = `
             <div class="product-container">
-                <div class="product-image-container">
-                    <img src="${imageUrl}" alt="${product.name}" class="product-image"
-                         onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                <div class="product-image-section" id="productImageSection">
+                    <div class="product-image-wrapper">
+                        <img src="${imageUrl}" alt="${product.name}" class="product-image"
+                             onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                        <div class="magnify-icon">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="product-details">
-                    <h1 class="product-title">${product.name}</h1>
+                    <h1 class="product-title">${escapeHtml(product.name)}</h1>
                     
-                    <div class="price-container">
-                        <div class="current-price">${formatPrice(product.price)}</div>
+                    <div class="price-section">
+                        <span class="current-price">${formatPrice(product.price)}</span>
+                        ${hasComparePrice ? `<span class="original-price">${formatPrice(product.compare_price)}</span>` : ''}
+                        ${hasComparePrice ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
                     </div>
                     
-                    <div class="stock-status ${product.stock > 0 ? '' : 'out-of-stock'}">
-                        <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i>
-                        <span>${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
-                        ${product.stock > 0 ? `<span class="stock-count">${product.stock} units available</span>` : ''}
+                    <div class="stock-tile">
+                        <div class="stock-status ${stockStatus}">
+                            <i class="fas ${product.stock > 0 ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                            <span>${stockText}</span>
+                            ${product.stock > 0 && product.stock <= 10 ? `<span class="stock-count">Hurry up!</span>` : ''}
+                        </div>
                     </div>
                     
-                    <div class="detail-tile">
-                        <h3 class="tile-title">Description</h3>
+                    <div class="description-tile">
+                        <div class="tile-label"><i class="fas fa-info-circle"></i> Description</div>
                         <div class="product-description">
                             ${product.description ? product.description.replace(/\n/g, '<br>') : 'Premium quality product from JMPOTTERS.'}
                         </div>
                     </div>
                     
                     ${isFootwear && currentProductColors.length > 0 ? `
-                    <div class="detail-tile">
-                        <h3 class="tile-title">Select Color</h3>
-                        <div class="color-options" id="colorOptions">
-                            ${currentProductColors.map(color => `
-                                <div class="color-option" 
-                                     data-color-id="${color.id}"
-                                     data-color-name="${color.color_name}"
-                                     style="background-color: ${color.color_code || '#666'}"
-                                     title="${color.color_name}">
-                                    ${color.color_name}
-                                </div>
-                            `).join('')}
+                        <div class="variant-tile">
+                            <div class="tile-label"><i class="fas fa-palette"></i> Select Color</div>
+                            <div class="color-options" id="colorOptions">
+                                ${currentProductColors.map(color => `
+                                    <div class="color-option" 
+                                         data-color-id="${color.id}"
+                                         data-color-name="${color.color_name}"
+                                         style="background: ${color.color_code ? `linear-gradient(135deg, ${color.color_code.split('+').join(', ')})` : '#f3f4f6'};">
+                                        ${color.color_name}
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="detail-tile">
-                        <h3 class="tile-title">Select Size</h3>
-                        <div class="size-options" id="sizeOptions">
-                            <div class="no-selection">Please select a color first</div>
+                        
+                        <div class="variant-tile">
+                            <div class="tile-label"><i class="fas fa-ruler"></i> Select Size</div>
+                            <div class="size-options" id="sizeOptions">
+                                <div class="text-gray-400 text-sm">Please select a color first</div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="selection-summary" id="selectionSummary">
-                        <div class="selected-variant">
-                            <span id="selectedColorName"></span>
-                            <span class="separator">-</span>
-                            <span id="selectedSizeValue"></span>
+                        
+                        <div class="selection-summary" id="selectionSummary" style="display: none;">
+                            <div class="selected-variant">
+                                <span id="selectedColorName"></span> - <span id="selectedSizeValue"></span>
+                            </div>
+                            <div class="stock-info">
+                                <i class="fas fa-box"></i> Available Stock: <strong id="availableStock">0</strong>
+                            </div>
                         </div>
-                        <div class="stock-info">
-                            <i class="fas fa-box"></i>
-                            <span>Available Stock:</span>
-                            <strong id="availableStock">0</strong>
-                        </div>
-                    </div>
                     ` : ''}
                     
-                    <div class="detail-tile">
-                        <h3 class="tile-title">Quantity</h3>
+                    <div class="quantity-tile">
+                        <div class="tile-label"><i class="fas fa-calculator"></i> Quantity</div>
                         <div class="quantity-controls">
                             <button class="quantity-btn minus">-</button>
-                            <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}" class="quantity-input">
+                            <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}">
                             <button class="quantity-btn plus">+</button>
                         </div>
                         <div class="bulk-options">
-                            ${[1, 5, 10, 25, 50].map(qty => `
-                                <button class="bulk-option ${qty === 1 ? 'active' : ''}" data-qty="${qty}">
-                                    ${qty} Unit${qty > 1 ? 's' : ''}
-                                </button>
+                            ${[2, 3, 5, 10].map(qty => `
+                                <button class="bulk-option" data-qty="${qty}">${qty} Units</button>
                             `).join('')}
                         </div>
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="action-btn btn-primary btn-add-cart" id="pageAddToCart">
+                        <button class="action-btn btn-add-cart" id="pageAddToCart">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
-                        <button class="action-btn btn-secondary btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist">
-                            <i class="fas fa-heart"></i> ${isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+                        <button class="action-btn btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist">
+                            <i class="fas fa-heart"></i> ${isInWishlist ? 'Saved' : 'Wishlist'}
                         </button>
                     </div>
                 </div>
@@ -589,7 +753,7 @@
                 pageWishlist.classList.toggle('active');
                 pageWishlist.innerHTML = `
                     <i class="fas fa-heart"></i> 
-                    ${isActive ? 'Add to Wishlist' : 'In Wishlist'}
+                    ${isActive ? 'Wishlist' : 'Saved'}
                 `;
             });
         }
@@ -604,7 +768,7 @@
         const availableSizes = colorSizeMap[colorId] || [];
         
         if (availableSizes.length === 0) {
-            sizeOptions.innerHTML = '<div class="no-selection">No sizes available for this color</div>';
+            sizeOptions.innerHTML = '<div class="text-gray-400 text-sm">No sizes available for this color</div>';
             if (selectionSummary) selectionSummary.style.display = 'none';
             currentSelectedSize = null;
             currentSelectedVariant = null;
@@ -613,25 +777,25 @@
         
         sizeOptions.innerHTML = availableSizes.map(size => {
             const stock = size.stock_quantity || 0;
-            let stockClass = '';
+            let disabledClass = '';
+            let disabledAttr = '';
             if (stock === 0) {
-                stockClass = 'out-of-stock';
-            } else if (stock < 5) {
-                stockClass = 'low-stock';
+                disabledClass = 'disabled';
+                disabledAttr = 'disabled';
             }
             
             return `
-                <div class="size-option ${stockClass}" 
+                <div class="size-option ${disabledClass}" 
                      data-size-id="${size.id}"
                      data-size-value="${size.size_value}"
                      data-stock="${stock}"
-                     ${stock === 0 ? 'disabled' : ''}>
+                     ${disabledAttr}>
                     ${size.size_value}
                 </div>
             `;
         }).join('');
         
-        sizeOptions.querySelectorAll('.size-option:not(.out-of-stock)').forEach(option => {
+        sizeOptions.querySelectorAll('.size-option:not(.disabled)').forEach(option => {
             option.addEventListener('click', function() {
                 sizeOptions.querySelectorAll('.size-option').forEach(opt => {
                     opt.classList.remove('selected');
@@ -693,10 +857,9 @@
             <div class="products-grid">
                 ${Array(6).fill().map(() => `
                     <div class="product-card-skeleton">
-                        <div class="skeleton-image" style="height: 250px; border-radius: 8px; margin-bottom: 1rem;"></div>
-                        <div class="skeleton-title" style="height: 1.25rem; width: 80%; margin-bottom: 0.5rem;"></div>
-                        <div class="skeleton-price" style="height: 1.5rem; width: 40%; margin-bottom: 0.5rem;"></div>
-                        <div class="skeleton-stock" style="height: 1rem; width: 60%;"></div>
+                        <div class="skeleton-image"></div>
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-price"></div>
                     </div>
                 `).join('')}
             </div>
@@ -704,13 +867,7 @@
         
         const supabase = getSupabaseClient();
         if (!supabase) {
-            productsGrid.innerHTML = `
-                <div class="error-message">
-                    <h3>⚠️ Database Connection Error</h3>
-                    <p>Failed to connect to database.</p>
-                    <button onclick="location.reload()" class="btn">Retry</button>
-                </div>
-            `;
+            productsGrid.innerHTML = `<div class="error-message"><h3>⚠️ Database Connection Error</h3><button onclick="location.reload()">Retry</button></div>`;
             return;
         }
         
@@ -722,18 +879,9 @@
                 .single();
             
             if (catError || !category) {
-                console.error('❌ Category not found:', categorySlug);
-                productsGrid.innerHTML = `
-                    <div class="error-message">
-                        <h3>⚠️ Category Not Found</h3>
-                        <p>The category "${categorySlug}" was not found.</p>
-                        <a href="index.html" class="btn">Return to Home</a>
-                    </div>
-                `;
+                productsGrid.innerHTML = `<div class="error-message"><h3>⚠️ Category Not Found</h3><a href="index.html">Return to Home</a></div>`;
                 return;
             }
-            
-            console.log(`✅ Found category: ${category.name} (ID: ${category.id})`);
             
             const { data: products, error: prodError } = await supabase
                 .from('products')
@@ -742,21 +890,10 @@
                 .eq('is_active', true)
                 .order('created_at', { ascending: false });
             
-            if (prodError) {
-                console.error('❌ Products error:', prodError);
-                throw prodError;
-            }
-            
-            console.log(`✅ Loaded ${products?.length || 0} products`);
+            if (prodError) throw prodError;
             
             if (!products || products.length === 0) {
-                productsGrid.innerHTML = `
-                    <div class="no-products">
-                        <i class="fas fa-box-open"></i>
-                        <h3>No Products Found</h3>
-                        <p>No products available in this category yet.</p>
-                    </div>
-                `;
+                productsGrid.innerHTML = `<div class="no-products"><h3>No Products Found</h3></div>`;
                 return;
             }
             
@@ -765,13 +902,7 @@
             
         } catch (error) {
             console.error('❌ Error loading products:', error);
-            productsGrid.innerHTML = `
-                <div class="error-message">
-                    <h3>⚠️ Error Loading Products</h3>
-                    <p>${error.message}</p>
-                    <button onclick="location.reload()" class="btn">Retry</button>
-                </div>
-            `;
+            productsGrid.innerHTML = `<div class="error-message"><h3>⚠️ Error Loading Products</h3><button onclick="location.reload()">Retry</button></div>`;
         }
     }
     
@@ -780,23 +911,6 @@
         if (!productsGrid) return;
         
         productsGrid.innerHTML = '';
-        
-        if (!document.getElementById('product-card-css')) {
-            const style = document.createElement('style');
-            style.id = 'product-card-css';
-            style.textContent = `
-                .product-card-wrapper {
-                    text-decoration: none;
-                    color: inherit;
-                    display: block;
-                }
-                .product-card-wrapper:hover .product-card {
-                    transform: translateY(-5px);
-                    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-                }
-            `;
-            document.head.appendChild(style);
-        }
         
         products.forEach((product) => {
             const imageUrl = getImageUrl(categorySlug, product.image_url);
@@ -809,33 +923,18 @@
             
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
-            productCard.style.cssText = `
-                background: #1e293b;
-                border-radius: 10px;
-                overflow: hidden;
-                transition: all 0.3s ease;
-                height: 100%;
-                border: 1px solid rgba(255,255,255,0.1);
-            `;
             
             productCard.innerHTML = `
-                <div class="product-image" style="position: relative; height: 250px; overflow: hidden;">
-                    <img src="${imageUrl}" alt="${product.name}" 
-                         style="width: 100%; height: 100%; object-fit: cover;"
-                         onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
-                    <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
-                            data-id="${product.id}"
-                            data-action="wishlist"
-                            style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); border: none; width: 36px; height: 36px; border-radius: 50%; color: ${isInWishlist ? '#e74c3c' : 'white'}; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center;">
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${product.name}" onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                    <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}" data-action="wishlist">
                         <i class="fas fa-heart"></i>
                     </button>
                 </div>
-                <div class="product-info" style="padding: 15px;">
-                    <h3 class="product-title" style="margin: 0 0 10px 0; font-size: 1.1rem; color: white; font-weight: 600;">${product.name}</h3>
-                    <div class="product-price" style="margin-bottom: 8px;">
-                        <span class="price-real" style="font-size: 1.2rem; font-weight: bold; color: #d4af37;">${formatPrice(product.price)}</span>
-                    </div>
-                    <div class="availability ${product.stock <= 0 ? 'out-of-stock' : ''}" style="display: flex; align-items: center; gap: 5px; color: ${product.stock > 0 ? '#2ecc71' : '#e74c3c'}; font-size: 0.9rem;">
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <div class="product-price">${formatPrice(product.price)}</div>
+                    <div class="availability ${product.stock <= 0 ? 'out-of-stock' : ''}">
                         <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i> 
                         ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                     </div>
@@ -847,12 +946,9 @@
         });
         
         setupProductInteractions();
-        console.log(`✅ Rendered ${products.length} products with clickable cards`);
     }
     
     function setupProductInteractions() {
-        console.log('🔧 Setting up product interactions...');
-        
         document.addEventListener('click', function(event) {
             const wishlistBtn = event.target.closest('[data-action="wishlist"]');
             if (wishlistBtn) {
@@ -865,12 +961,9 @@
                     toggleWishlist(product);
                     const isActive = wishlistBtn.classList.contains('active');
                     wishlistBtn.classList.toggle('active');
-                    wishlistBtn.style.color = isActive ? 'white' : '#e74c3c';
                 }
             }
         });
-        
-        console.log('✅ Product interactions setup complete');
     }
     
     // ====================
@@ -968,9 +1061,7 @@
                     <div class="cart-item-details">
                         <div class="cart-item-name">${itemDescription}</div>
                         <div class="cart-item-price">${formatPrice(item.price)}</div>
-                        <div class="cart-item-quantity-display">
-                            Quantity: <strong>${item.quantity}</strong>
-                        </div>
+                        <div class="cart-item-quantity-display">Quantity: ${item.quantity}</div>
                     </div>
                     <button class="cart-item-remove" data-index="${index}">
                         <i class="fas fa-trash"></i>
@@ -1075,15 +1166,12 @@
     // HEADER FUNCTIONS
     // ====================
     function setupHeaderInteractions() {
-        console.log('🔧 Setting up header interactions...');
-        
         const cartBtn = document.getElementById('cartBtn');
         if (cartBtn && !cartBtn.hasAttribute('data-listener-added')) {
             cartBtn.setAttribute('data-listener-added', 'true');
             cartBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('🛒 Cart button clicked from app.js');
                 openCart();
             });
         }
@@ -1104,8 +1192,6 @@
                 closeCart();
             }
         });
-        
-        console.log('✅ Header interactions setup complete');
     }
     
     // ====================
@@ -1296,14 +1382,11 @@
         const supabase = getSupabaseClient();
         
         if (!supabase) {
-            console.error('❌ No Supabase client');
             showNotification('Database connection error', 'error');
             return null;
         }
         
         try {
-            console.log('📦 Starting order creation...');
-            
             const subtotal = cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             const shippingFee = subtotal >= 50000 ? 0 : 2000;
             const grandTotal = subtotal + shippingFee;
@@ -1318,7 +1401,6 @@
                 image_url: item.image_url
             }));
             
-            // Generate unique order number with retry logic
             let finalOrderNumber = null;
             let attempts = 0;
             const maxAttempts = 5;
@@ -1339,7 +1421,7 @@
                         tempOrderNumber = orderNumberResult;
                     }
                     
-                    const { data: existing, error: checkError } = await supabase
+                    const { data: existing } = await supabase
                         .from('orders')
                         .select('order_number')
                         .eq('order_number', tempOrderNumber)
@@ -1347,10 +1429,9 @@
                     
                     if (!existing) {
                         finalOrderNumber = tempOrderNumber;
-                        console.log('✅ Unique order number found:', finalOrderNumber);
                     }
                 } catch (e) {
-                    console.warn('⚠️ Order number generation error:', e);
+                    console.warn('Order number generation error:', e);
                 }
             }
             
@@ -1385,12 +1466,9 @@
                 .single();
             
             if (orderError) {
-                console.error('❌ Order insert error:', orderError);
                 showNotification(`Order failed: ${orderError.message}`, 'error');
                 return null;
             }
-            
-            console.log('✅ Order created successfully:', order);
             
             localStorage.removeItem('jmpotters_cart');
             updateCartUI();
@@ -1408,7 +1486,7 @@
             return order;
             
         } catch (error) {
-            console.error('❌ Order creation error:', error);
+            console.error('Order creation error:', error);
             showNotification(`Failed to place order: ${error.message || 'Unknown error'}`, 'error');
             return null;
         }
@@ -1422,7 +1500,7 @@
                 .from('orders')
                 .select('*')
                 .eq('order_number', orderNumber)
-                .single();
+                .maybeSingle();
             
             if (error) throw error;
             return order;
@@ -1448,8 +1526,6 @@
             checkoutData = window.pendingCheckoutData;
             window.pendingCheckoutData = null;
         } else if (user) {
-            console.log('🔄 Returning user detected, building checkout data from profile:', user);
-            
             checkoutData = {
                 user_id: user.id,
                 email: user.email,
@@ -1465,12 +1541,10 @@
                 showNotification('Please ensure your shipping address is correct', 'info');
             }
         } else {
-            console.error('❌ No user data available');
             showNotification('Please sign in to continue', 'warning');
             return;
         }
         
-        console.log('📦 Checkout data:', checkoutData);
         showNotification('Placing your order...', 'info');
         
         const order = await createOrder(checkoutData, cart);
@@ -1567,8 +1641,6 @@
     // ====================
     async function initializePage() {
         console.log('🚀 Initializing JMPOTTERS page...');
-        console.log('Current page:', window.location.pathname);
-        console.log('Current category:', getCurrentCategory());
         
         const supabase = getSupabaseClient();
         if (!supabase) {
@@ -1624,7 +1696,9 @@
             proceedToCheckout,
             isUserLoggedIn,
             createOrder,
-            getOrderByNumber
+            getOrderByNumber,
+            loadRecommendations,
+            renderRecommendations
         };
     }
     
@@ -1637,5 +1711,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with professional notifications');
+    console.log('✅ JMPOTTERS app loaded with recommendation engine');
 })();
