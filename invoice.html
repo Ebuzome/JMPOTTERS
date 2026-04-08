@@ -9,20 +9,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Load your app.js which has the working Supabase client -->
+    <script src="app.js"></script>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: #f1f5f9;
             padding: 2rem;
         }
-        
         .invoice-container {
             max-width: 900px;
             margin: 0 auto;
@@ -31,25 +27,13 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             overflow: hidden;
         }
-        
         .invoice-header {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
             padding: 2rem;
             text-align: center;
         }
-        
-        .invoice-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-        
-        .invoice-header p {
-            color: #94a3b8;
-            margin-top: 0.25rem;
-        }
-        
+        .invoice-header h1 { font-size: 2rem; font-weight: 700; }
         .invoice-number {
             background: rgba(212, 175, 55, 0.2);
             display: inline-block;
@@ -61,24 +45,16 @@
             font-weight: 600;
             color: #d4af37;
         }
-        
-        .invoice-body {
-            padding: 2rem;
-        }
-        
+        .invoice-body { padding: 2rem; }
         .status-badge {
             display: inline-block;
             padding: 0.25rem 1rem;
             border-radius: 2rem;
             font-size: 0.75rem;
             font-weight: 600;
-        }
-        
-        .status-pending {
             background: #fef3c7;
             color: #d97706;
         }
-        
         .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -87,7 +63,6 @@
             padding-bottom: 2rem;
             border-bottom: 1px solid #e2e8f0;
         }
-        
         .info-section h3 {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -95,90 +70,19 @@
             color: #94a3b8;
             margin-bottom: 0.75rem;
         }
-        
-        .info-section p {
-            color: #1e293b;
-            line-height: 1.6;
-            font-size: 0.9rem;
-        }
-        
-        .info-section strong {
-            color: #0f172a;
-        }
-        
-        .order-summary {
-            margin-bottom: 2rem;
-        }
-        
-        .order-summary h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #0f172a;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th, td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #0f172a;
-            font-size: 0.85rem;
-        }
-        
-        td {
-            color: #334155;
-            font-size: 0.9rem;
-        }
-        
-        .totals {
-            text-align: right;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 2px solid #e2e8f0;
-        }
-        
-        .totals-row {
-            display: flex;
-            justify-content: flex-end;
-            gap: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .totals-label {
-            font-weight: 500;
-            color: #475569;
-        }
-        
-        .totals-value {
-            font-weight: 600;
-            min-width: 120px;
-            color: #1e293b;
-        }
-        
-        .grand-total {
-            font-size: 1.2rem;
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        .grand-total .totals-label,
-        .grand-total .totals-value {
+        .info-section p { color: #1e293b; line-height: 1.6; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; font-weight: 600; }
+        .totals { text-align: right; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0; }
+        .totals-row { display: flex; justify-content: flex-end; gap: 2rem; margin-bottom: 0.5rem; }
+        .totals-label { font-weight: 500; color: #475569; }
+        .totals-value { font-weight: 600; min-width: 120px; }
+        .grand-total .totals-label, .grand-total .totals-value {
             font-size: 1.2rem;
             font-weight: 700;
             color: #d4af37;
         }
-        
         .invoice-footer {
             background: #f8fafc;
             padding: 1.5rem;
@@ -186,7 +90,6 @@
             color: #64748b;
             font-size: 0.8rem;
         }
-        
         .action-buttons {
             max-width: 900px;
             margin: 1.5rem auto 0;
@@ -194,7 +97,6 @@
             gap: 1rem;
             justify-content: center;
         }
-        
         .btn {
             padding: 0.75rem 1.5rem;
             border-radius: 0.75rem;
@@ -208,72 +110,14 @@
             align-items: center;
             gap: 0.5rem;
         }
-        
-        .btn-primary {
-            background: #0f172a;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #d4af37;
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background: white;
-            color: #0f172a;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .btn-secondary:hover {
-            border-color: #d4af37;
-            color: #d4af37;
-        }
-        
-        .loading-state, .error-state {
-            text-align: center;
-            padding: 4rem;
-        }
-        
-        .loading-state i, .error-state i {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .loading-state i {
-            color: #d4af37;
-        }
-        
-        .error-state i {
-            color: #dc2626;
-        }
-        
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            .action-buttons {
-                display: none;
-            }
-            .invoice-container {
-                box-shadow: none;
-                border-radius: 0;
-            }
-        }
-        
+        .btn-primary { background: #0f172a; color: white; }
+        .btn-primary:hover { background: #d4af37; transform: translateY(-2px); }
+        .btn-secondary { background: white; color: #0f172a; border: 1px solid #e2e8f0; }
+        .loading-state, .error-state { text-align: center; padding: 4rem; }
+        .loading-state i, .error-state i { font-size: 2rem; margin-bottom: 1rem; }
         @media (max-width: 640px) {
-            body {
-                padding: 1rem;
-            }
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            th, td {
-                padding: 0.75rem;
-                font-size: 0.8rem;
-            }
+            body { padding: 1rem; }
+            .info-grid { grid-template-columns: 1fr; gap: 1rem; }
         }
     </style>
 </head>
@@ -292,18 +136,28 @@
     </div>
 
     <script>
-        // Supabase configuration
-        const supabaseUrl = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-        
+        // Wait for JMPOTTERS to be ready, then use its functions
         async function loadInvoice() {
-            console.log('🚀 Loading invoice...');
+            // Wait for JMPOTTERS to be available
+            let attempts = 0;
+            while (!window.JMPOTTERS && attempts < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                attempts++;
+            }
+            
+            if (!window.JMPOTTERS) {
+                document.getElementById('invoiceContent').innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>App not loaded. Please refresh.</p>
+                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
+                    </div>
+                `;
+                return;
+            }
             
             const urlParams = new URLSearchParams(window.location.search);
             const orderNumber = urlParams.get('order');
-            
-            console.log('Order number:', orderNumber);
             
             if (!orderNumber) {
                 document.getElementById('invoiceContent').innerHTML = `
@@ -317,49 +171,32 @@
             }
             
             try {
-                const { data: order, error } = await supabase
-                    .from('orders')
-                    .select('*')
-                    .eq('order_number', orderNumber)
-                    .single();
+                // Use the function from app.js
+                const order = await window.JMPOTTERS.getOrderByNumber(orderNumber);
                 
-                console.log('Order data:', order);
+                if (!order) {
+                    throw new Error('Order not found');
+                }
                 
-                if (error) throw error;
-                
-                if (!order) throw new Error('Order not found');
-                
+                // Render the invoice (same as before)
                 const items = order.items || [];
                 const subtotal = order.total_amount || 0;
                 const shippingFee = order.shipping_fee || 0;
                 const grandTotal = order.grand_total || subtotal + shippingFee;
-                const orderDate = new Date(order.created_at).toLocaleDateString('en-NG', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
-                
-                const statusText = order.status === 'pending' ? 'Pending' : 
-                                  order.status === 'processing' ? 'Processing' :
-                                  order.status === 'shipped' ? 'Shipped' :
-                                  order.status === 'delivered' ? 'Delivered' : 'Cancelled';
+                const orderDate = new Date(order.created_at).toLocaleDateString('en-NG');
                 
                 let itemsHtml = '';
-                if (items.length > 0) {
-                    items.forEach(item => {
-                        itemsHtml += `
-                            <tr>
-                                <td>${item.name || 'Product'}</td>
-                                <td>${item.color_name ? item.color_name + (item.size_value ? ' / ' + item.size_value : '') : '-'}</td>
-                                <td>${item.quantity}</td>
-                                <td>₦${(item.price || 0).toLocaleString()}</td>
-                                <td>₦${((item.price || 0) * item.quantity).toLocaleString()}</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    itemsHtml = `<tr><td colspan="5" style="text-align: center;">No items found</td></tr>`;
-                }
+                items.forEach(item => {
+                    itemsHtml += `
+                        <tr>
+                            <td>${item.name || 'Product'}</td>
+                            <td>${item.color_name ? item.color_name + (item.size_value ? ' / ' + item.size_value : '') : '-'}</td>
+                            <td>${item.quantity}</td>
+                            <td>₦${(item.price || 0).toLocaleString()}</td>
+                            <td>₦${((item.price || 0) * item.quantity).toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
                 
                 document.getElementById('invoiceContent').innerHTML = `
                     <div class="invoice-header">
@@ -373,59 +210,41 @@
                             <div class="info-section">
                                 <h3>BILLING DETAILS</h3>
                                 <p>
-                                    <strong>${order.full_name || order.user_name || 'N/A'}</strong><br>
-                                    ${order.user_email || 'No email provided'}<br>
-                                    ${order.user_phone || 'No phone provided'}
+                                    <strong>${order.full_name || order.user_name}</strong><br>
+                                    ${order.user_email}<br>
+                                    ${order.user_phone}
                                 </p>
                             </div>
                             <div class="info-section">
                                 <h3>SHIPPING ADDRESS</h3>
-                                <p>
-                                    ${order.shipping_address || 'No address provided'}<br>
-                                    ${order.city ? order.city + ', ' : ''}${order.state || ''}
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="info-grid">
-                            <div class="info-section">
-                                <h3>ORDER DATE</h3>
-                                <p>${orderDate}</p>
-                            </div>
-                            <div class="info-section">
-                                <h3>ORDER STATUS</h3>
-                                <p><span class="status-badge status-pending">${statusText}</span></p>
+                                <p>${order.shipping_address}<br>${order.city || ''} ${order.state || ''}</p>
                             </div>
                         </div>
                         
                         <div class="order-summary">
                             <h3>Order Summary</h3>
                             <table>
-                                <thead>
-                                    <tr><th>Product</th><th>Variant</th><th>Qty</th><th>Price</th><th>Total</th></tr>
-                                </thead>
-                                <tbody>${itemsHtml}</tbody>
+                                <thead><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+                                <tbody>${itemsHtml || '<tr><td colspan="5">No items</td></tr>'}</tbody>
                             </table>
                             
                             <div class="totals">
                                 <div class="totals-row"><span class="totals-label">Subtotal:</span><span class="totals-value">₦${subtotal.toLocaleString()}</span></div>
-                                <div class="totals-row"><span class="totals-label">Shipping Fee:</span><span class="totals-value">₦${shippingFee.toLocaleString()}</span></div>
-                                <div class="totals-row grand-total"><span class="totals-label">Grand Total:</span><span class="totals-value">₦${grandTotal.toLocaleString()}</span></div>
+                                <div class="totals-row"><span class="totals-label">Shipping:</span><span class="totals-value">₦${shippingFee.toLocaleString()}</span></div>
+                                <div class="totals-row grand-total"><span class="totals-label">Total:</span><span class="totals-value">₦${grandTotal.toLocaleString()}</span></div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="invoice-footer">
                         <p>Thank you for shopping with JMPOTTERS!</p>
-                        <p>For inquiries, contact us on WhatsApp: <strong>+234 813 958 3320</strong></p>
+                        <p>WhatsApp: <strong>+234 813 958 3320</strong></p>
                     </div>
                 `;
                 
                 document.getElementById('actionButtons').style.display = 'flex';
-                console.log('✅ Invoice rendered successfully');
                 
             } catch (error) {
-                console.error('Error:', error);
                 document.getElementById('invoiceContent').innerHTML = `
                     <div class="error-state">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -447,6 +266,7 @@
             }).save();
         }
         
+        // Start loading
         loadInvoice();
     </script>
 </body>
