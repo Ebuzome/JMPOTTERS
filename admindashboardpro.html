@@ -4089,14 +4089,18 @@
                 return getProductImageUrlFromProduct(product);
             }
 
-            function getProductImageUrlFromProduct(product) {
-                if (!product) return null;
-                const imageUrl = product.image_url || '';
-                if (imageUrl.includes(imageConfig.baseUrl)) return imageUrl;
-                const category = categories.find(c => c.id === product.category_id);
-                const categorySlug = category ? category.slug : '';
-                return buildCorrectImageUrl(imageUrl, categorySlug);
-            }
+            function getProductImageUrl(product) {
+    const imageUrl = product.image_url || '';
+    if (!imageUrl) return buildCorrectImageUrl(imageUrl, product.category?.slug);
+    
+    // If it's already a full URL (Supabase, or any http/https URL), return it as-is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return imageUrl;
+    }
+    
+    // Otherwise, treat it as a filename and build the GitHub Pages URL
+    return buildCorrectImageUrl(imageUrl, product.category?.slug);
+}
 
             function buildCorrectImageUrl(filename, categorySlug) {
                 if (!filename) return null;
