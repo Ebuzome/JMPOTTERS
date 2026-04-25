@@ -191,15 +191,26 @@
         return slug ? decodeURIComponent(slug) : null;
     }
     
-    function getImageUrl(categorySlug, imageFilename) {
-        if (!imageFilename) {
-            return window.JMPOTTERS_CONFIG.images.baseUrl + 'placeholder.jpg';
-        }
-        
-        const config = window.JMPOTTERS_CONFIG.images;
-        const folder = config.paths[categorySlug] || '';
-        return config.baseUrl + folder + imageFilename;
+   function getImageUrl(categorySlug, imageFilename) {
+    if (!imageFilename) {
+        return window.JMPOTTERS_CONFIG.images.baseUrl + 'placeholder.jpg';
     }
+    
+    // If it's already a full Supabase URL, return it directly
+    if (imageFilename.startsWith('https://tmpggeeuwdvlngvfncaa.supabase.co')) {
+        return imageFilename;
+    }
+    
+    // If it's any other full URL (http/https), return it directly
+    if (imageFilename.startsWith('http://') || imageFilename.startsWith('https://')) {
+        return imageFilename;
+    }
+    
+    // Otherwise, it's a filename - build the GitHub Pages URL (for legacy products)
+    const config = window.JMPOTTERS_CONFIG.images;
+    const folder = config.paths[categorySlug] || '';
+    return config.baseUrl + folder + imageFilename;
+}
     
     function formatPrice(price) {
         if (!price && price !== 0) {
