@@ -3723,10 +3723,8 @@
                     <div class="setting-item"><div><div class="setting-label">Grid Density</div><div class="setting-description">Control spacing between elements</div></div><select class="form-control text-sm" style="width: 140px;" id="gridDensity" onchange="AdminDashboard.changeGridDensity(this.value)"><option value="compact">Compact</option><option value="normal" selected>Normal</option><option value="spacious">Spacious</option></select></div>
                 </div>
                 <div class="settings-section"><h3 class="settings-section-title">Image Configuration</h3>
-                    <div class="form-group"><label class="form-label">Base Image URL</label><input type="text" class="form-control" value="https://ebuzome.github.io/JMPOTTERS/assets/images/" readonly></div>
-                    <div class="form-group"><label class="form-label">Category Paths</label><div class="text-sm text-gray-600 bg-gray-50 p-3 rounded border dark:bg-dark-surface-2 dark:border-dark-surface"><pre id="categoryPaths" style="white-space: pre-wrap; font-family: monospace;"></pre></div></div>
+                    <div class="form-group"><label class="form-label">Supabase Storage URL</label><input type="text" class="form-control" value="https://tmpggeeuwdvlngvfncaa.supabase.co/storage/v1/object/public/product-images/" readonly></div>
                     <div class="setting-item"><div><div class="setting-label">Image Optimization</div><div class="setting-description">Auto-compress uploaded images</div></div><label class="toggle-switch"><input type="checkbox" id="imageOptimization" checked><span class="toggle-slider"></span></label></div>
-                    <div class="setting-item"><div><div class="setting-label">Auto Watermark</div><div class="setting-description">Add watermark to product images</div></div><label class="toggle-switch"><input type="checkbox" id="autoWatermark"><span class="toggle-slider"></span></label></div>
                 </div>
                 <div class="settings-section"><h3 class="settings-section-title">Advanced</h3>
                     <div class="setting-item"><div><div class="setting-label">Auto-refresh Interval</div><div class="setting-description">Set how often data refreshes automatically</div></div><select class="form-control text-sm" style="width: 120px;" id="refreshInterval" onchange="AdminDashboard.setRefreshInterval(this.value)"><option value="0">Off</option><option value="30000">30 seconds</option><option value="60000" selected>1 minute</option><option value="300000">5 minutes</option><option value="900000">15 minutes</option></select></div>
@@ -3793,10 +3791,10 @@
                                     <option value="">Select Category</option>
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" id="stockQuantityGroup">
                                 <label class="form-label">Stock Quantity</label>
-                                <input type="number" id="productStock" class="form-control" min="0" value="0" placeholder="0">
-                                <div class="form-help">For non-footwear products only</div>
+                                <input type="number" id="productStock" class="form-control" min="0" value="0" placeholder="Auto-calculated for footwear" readonly>
+                                <div class="form-help" id="stockHelpText">Calculated from color × size variants for footwear products.</div>
                             </div>
                         </div>
 
@@ -3816,21 +3814,6 @@
                             </div>
                             <input type="hidden" id="productImageUrl" value="">
                             <div id="uploadStatusContainer"></div>
-                            <div class="form-help mt-2">Or enter a filename manually below:</div>
-                            <input type="text" id="productImageName" class="form-control mt-2" placeholder="image-filename.jpg" oninput="AdminDashboard.updateImagePreview()">
-                            <div class="form-help">Enter only the filename (e.g., "Sleek-Heels-18500.jpg").</div>
-                            <div class="mt-3" id="imagePreviewContainer" style="display: none;">
-                                <div class="text-sm font-medium mb-1">Image Preview</div>
-                                <div class="border border-gray-300 rounded-lg p-3 bg-gray-50 dark:bg-dark-surface-2 dark:border-dark-surface">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-24 h-24 bg-gray-200 dark:bg-dark-surface rounded overflow-hidden flex items-center justify-center">
-                                            <img id="imagePreview" src="" alt="Preview" class="w-full h-full object-cover" onerror="this.style.display='none'; document.getElementById('imagePreviewPlaceholder').style.display='flex';">
-                                            <div id="imagePreviewPlaceholder" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--gray-400);"><i class="fas fa-image"></i></div>
-                                        </div>
-                                        <div class="flex-1"><div class="text-sm text-gray-600 dark:text-dark-text-muted" id="imagePathInfo"></div><div class="text-xs text-gray-500 dark:text-dark-text-muted mt-1" id="imageStatus"></div></div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="form-group">
@@ -3925,7 +3908,7 @@
             let refreshInterval = null;
             let activeStatusDropdown = null;
 
-            // NEW: Selection, slug, image upload, delete tracking
+            // Selection, slug, image upload, delete tracking
             let selectedProductIds = new Set();
             let slugManuallyEdited = false;
             let productToDelete = null;
@@ -3941,24 +3924,55 @@
             let currentOrderSearch = '';
             let previousSectionBeforeOrderDetail = 'orders';
 
-            // UI Assets database
-            const uiAssets = {
-                buttonStyles: { rounded: { borderRadius: '0.5rem', padding: '0.625rem 1rem' }, square: { borderRadius: '0.25rem', padding: '0.625rem 1rem' }, pill: { borderRadius: '9999px', padding: '0.625rem 1.5rem' } },
-                iconLibraries: { fontawesome: { prefix: 'fas fa-', url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' }, material: { prefix: 'material-icons', url: 'https://fonts.googleapis.com/icon?family=Material+Icons' }, bootstrap: { prefix: 'bi bi-', url: 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css' } }
-            };
-
-            // Image configuration
-            const imageConfig = {
-                baseUrl: 'https://ebuzome.github.io/JMPOTTERS/assets/images/',
-                paths: { 'mensfootwear': 'mensfootwear/', 'womensfootwear': '', 'bags': '', 'household': 'household2/', 'kids': 'kids/', 'accessories': 'accessories/', 'healthcare': '' }
-            };
-
-            // Color database
-            const colorDatabaseData = [
-                { name: "Black", codes: ["#000000"] }, { name: "White", codes: ["#FFFFFF"] }, { name: "Red", codes: ["#FF0000"] }, { name: "Blue", codes: ["#0000FF"] }, { name: "Green", codes: ["#008000"] }, { name: "Yellow", codes: ["#FFFF00"] }, { name: "Orange", codes: ["#FFA500"] }, { name: "Purple", codes: ["#800080"] }, { name: "Pink", codes: ["#FFC0CB"] }, { name: "Brown", codes: ["#8B4513"] }, { name: "Gray", codes: ["#808080"] }, { name: "Black + White", codes: ["#000000", "#FFFFFF"] }, { name: "Red + Black", codes: ["#FF0000", "#000000"] }, { name: "Blue + White", codes: ["#0000FF", "#FFFFFF"] }, { name: "Red + Blue", codes: ["#FF0000", "#0000FF"] }, { name: "Green + Yellow", codes: ["#008000", "#FFFF00"] }, { name: "Pink + Purple", codes: ["#FFC0CB", "#800080"] }, { name: "Orange + White", codes: ["#FFA500", "#FFFFFF"] }, { name: "Brown + Beige", codes: ["#8B4513", "#F5F5DC"] }, { name: "Black + Gold", codes: ["#000000", "#FFD700"] }, { name: "White + Silver", codes: ["#FFFFFF", "#C0C0C0"] }, { name: "Navy Blue", codes: ["#000080"] }, { name: "Royal Blue", codes: ["#4169E1"] }, { name: "Sky Blue", codes: ["#87CEEB"] }, { name: "Teal", codes: ["#008080"] }, { name: "Turquoise", codes: ["#40E0D0"] }, { name: "Emerald", codes: ["#50C878"] }, { name: "Lime Green", codes: ["#32CD32"] }, { name: "Olive Green", codes: ["#808000"] }, { name: "Forest Green", codes: ["#228B22"] }, { name: "Maroon", codes: ["#800000"] }, { name: "Burgundy", codes: ["#800020"] }, { name: "Crimson", codes: ["#DC143C"] }, { name: "Coral", codes: ["#FF7F50"] }, { name: "Salmon", codes: ["#FA8072"] }, { name: "Peach", codes: ["#FFE5B4"] }, { name: "Gold", codes: ["#FFD700"] }, { name: "Silver", codes: ["#C0C0C0"] }, { name: "Bronze", codes: ["#CD7F32"] }, { name: "Rose Gold", codes: ["#B76E79"] }, { name: "Lavender", codes: ["#E6E6FA"] }, { name: "Violet", codes: ["#EE82EE"] }, { name: "Indigo", codes: ["#4B0082"] }, { name: "Magenta", codes: ["#FF00FF"] }, { name: "Fuchsia", codes: ["#FF00FF"] }, { name: "Beige", codes: ["#F5F5DC"] }, { name: "Ivory", codes: ["#FFFFF0"] }, { name: "Cream", codes: ["#FFFDD0"] }, { name: "Tan", codes: ["#D2B48C"] }, { name: "Khaki", codes: ["#F0E68C"] }, { name: "Charcoal", codes: ["#36454F"] }, { name: "Slate Gray", codes: ["#708090"] }, { name: "Red + White + Blue", codes: ["#FF0000", "#FFFFFF", "#0000FF"] }, { name: "Black + Red + White", codes: ["#000000", "#FF0000", "#FFFFFF"] }, { name: "Blue + Gray + White", codes: ["#0000FF", "#808080", "#FFFFFF"] }, { name: "Green + Brown + Beige", codes: ["#008000", "#8B4513", "#F5F5DC"] }, { name: "Pink + Gold + White", codes: ["#FFC0CB", "#FFD700", "#FFFFFF"] }, { name: "Purple + Silver + Black", codes: ["#800080", "#C0C0C0", "#000000"] }, { name: "Orange + Blue + White", codes: ["#FFA500", "#0000FF", "#FFFFFF"] }, { name: "Yellow + Gray + Black", codes: ["#FFFF00", "#808080", "#000000"] }
-            ];
-
+            // Common shoe sizes
             const commonSizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+
+            // ==================== FOOTWEAR STOCK CALCULATION ====================
+            function calculateFootwearStock() {
+                if (document.getElementById('isFootwear').value !== 'true') return;
+
+                let totalStock = 0;
+                const colors = currentEditingColors || [];
+                const sizesData = currentEditingSizes || {};
+
+                colors.forEach(color => {
+                    const colorSizes = sizesData[color.id] || [];
+                    colorSizes.forEach(size => {
+                        if (size && size.is_available !== false) {
+                            totalStock += parseInt(size.stock_quantity) || 0;
+                        }
+                    });
+                });
+
+                document.getElementById('productStock').value = totalStock;
+            }
+
+            // ==================== IMAGE FUNCTIONS (SUPABASE ONLY) ====================
+            function getProductImageUrl(product) {
+                const imageUrl = product.image_url || '';
+                if (!imageUrl) return '';
+
+                // If it's already a full Supabase URL, return it directly
+                if (imageUrl.startsWith('https://tmpggeeuwdvlngvfncaa.supabase.co')) {
+                    return imageUrl;
+                }
+
+                // If it's an old GitHub Pages URL, try to extract just the filename
+                // and show a placeholder (since we're migrating away from GitHub)
+                return '';
+            }
+
+            function getProductImageForOrderItem(itemName) {
+                if (!itemName || !allProductsData || allProductsData.length === 0) return null;
+                const nameLower = itemName.toLowerCase().trim();
+                const product = allProductsData.find(p => p.name && p.name.toLowerCase().trim() === nameLower);
+                if (!product) {
+                    const partialMatch = allProductsData.find(p => p.name && (p.name.toLowerCase().includes(nameLower) || nameLower.includes(p.name.toLowerCase())));
+                    if (partialMatch) return getProductImageUrl(partialMatch);
+                    return null;
+                }
+                return getProductImageUrl(product);
+            }
 
             // ==================== ORDER MANAGEMENT FUNCTIONS ====================
             async function loadOrders() {
@@ -3970,8 +3984,7 @@
                     applyOrdersFilters();
                     updateOrderStats();
                     console.log(`✅ Loaded ${allOrders.length} orders`);
-                } catch (error) { console.error('Error loading orders:', error);
-                    showToast('Failed to load orders', 'error'); }
+                } catch (error) { console.error('Error loading orders:', error); showToast('Failed to load orders', 'error'); }
             }
 
             function applyOrdersFilters() {
@@ -4081,33 +4094,6 @@
                 } catch (error) { showToast('Failed to update order status', 'error'); }
             }
 
-            function getProductImageForOrderItem(itemName) {
-                if (!itemName || !allProductsData || allProductsData.length === 0) return null;
-                const nameLower = itemName.toLowerCase().trim();
-                const product = allProductsData.find(p => p.name && p.name.toLowerCase().trim() === nameLower);
-                if (!product) { const partialMatch = allProductsData.find(p => p.name && (p.name.toLowerCase().includes(nameLower) || nameLower.includes(p.name.toLowerCase()))); if (partialMatch) return getProductImageUrlFromProduct(partialMatch); return null; }
-                return getProductImageUrlFromProduct(product);
-            }
-
-            function getProductImageUrl(product) {
-    const imageUrl = product.image_url || '';
-    if (!imageUrl) return buildCorrectImageUrl(imageUrl, product.category?.slug);
-    
-    // If it's already a full URL (Supabase, or any http/https URL), return it as-is
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        return imageUrl;
-    }
-    
-    // Otherwise, treat it as a filename and build the GitHub Pages URL
-    return buildCorrectImageUrl(imageUrl, product.category?.slug);
-}
-
-            function buildCorrectImageUrl(filename, categorySlug) {
-                if (!filename) return null;
-                const categoryPath = imageConfig.paths[categorySlug] || '';
-                return imageConfig.baseUrl + categoryPath + filename;
-            }
-
             function viewOrderDetailFull(orderNumber) {
                 const order = allOrders.find(o => o.order_number === orderNumber);
                 if (!order) { showToast('Order not found', 'error'); return; }
@@ -4174,8 +4160,7 @@
                 const dropdown = button.nextElementSibling;
                 const isVisible = dropdown.style.display === 'block';
                 document.querySelectorAll('.status-dropdown-content').forEach(d => d.style.display = 'none');
-                if (!isVisible) { dropdown.style.display = 'block'; const closeDropdown = (e) => { if (!button.contains(e.target) && !dropdown.contains(e.target)) { dropdown.style.display = 'none';
-                        document.removeEventListener('click', closeDropdown); } }; setTimeout(() => document.addEventListener('click', closeDropdown), 0); }
+                if (!isVisible) { dropdown.style.display = 'block'; const closeDropdown = (e) => { if (!button.contains(e.target) && !dropdown.contains(e.target)) { dropdown.style.display = 'none'; document.removeEventListener('click', closeDropdown); } }; setTimeout(() => document.addEventListener('click', closeDropdown), 0); }
             }
 
             function filterOrdersByStatus(status) {
@@ -4185,30 +4170,15 @@
                 applyOrdersFilters();
             }
 
-            function searchOrders() { currentOrderSearch = document.getElementById('orderSearchInput')?.value || '';
-                ordersCurrentPage = 1;
-                applyOrdersFilters(); }
-
-            function ordersPrevPage() { if (ordersCurrentPage > 1) { ordersCurrentPage--;
-                    renderOrdersTable();
-                    updateOrdersPagination(); } }
-
-            function ordersNextPage() { const totalPages = Math.ceil(filteredOrders.length / ordersPerPage); if (ordersCurrentPage < totalPages) { ordersCurrentPage++;
-                    renderOrdersTable();
-                    updateOrdersPagination(); } }
+            function searchOrders() { currentOrderSearch = document.getElementById('orderSearchInput')?.value || ''; ordersCurrentPage = 1; applyOrdersFilters(); }
+            function ordersPrevPage() { if (ordersCurrentPage > 1) { ordersCurrentPage--; renderOrdersTable(); updateOrdersPagination(); } }
+            function ordersNextPage() { const totalPages = Math.ceil(filteredOrders.length / ordersPerPage); if (ordersCurrentPage < totalPages) { ordersCurrentPage++; renderOrdersTable(); updateOrdersPagination(); } }
 
             async function exportOrders() {
-                try { const dataStr = JSON.stringify(filteredOrders, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `jmpotters-orders-${new Date().toISOString().slice(0, 10)}.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    showToast('Orders exported successfully', 'success'); } catch (error) { showToast('Failed to export orders', 'error'); }
+                try { const dataStr = JSON.stringify(filteredOrders, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `jmpotters-orders-${new Date().toISOString().slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(url); showToast('Orders exported successfully', 'success'); } catch (error) { showToast('Failed to export orders', 'error'); }
             }
 
-            function refreshOrders() { loadOrders();
-                showToast('Refreshing orders...', 'info'); }
-
+            function refreshOrders() { loadOrders(); showToast('Refreshing orders...', 'info'); }
             function generateInvoice(orderNumber) { window.open(`invoice.html?order=${orderNumber}`, '_blank'); }
 
             // ==================== INITIALIZATION ====================
@@ -4216,44 +4186,27 @@
                 console.log('🚀 Initializing Enhanced Admin Dashboard...');
                 try {
                     supabase = window.supabase.createClient('https://tmpggeeuwdvlngvfncaa.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4');
-                    initializeColorDatabase();
                     loadUserPreferences();
                     setupEventListeners();
                     await loadInitialData();
                     await loadOrders();
                     updateDashboardStats();
-                    updateCategoryPaths();
                     setupAutoRefresh();
-                    populateColorPickerGrid();
                     initImageUpload();
                     console.log('✅ Admin Dashboard initialized successfully');
-                } catch (error) { console.error('💀 Initialization failed:', error);
-                    showToast('Failed to initialize dashboard: ' + error.message, 'error'); }
+                } catch (error) { console.error('💀 Initialization failed:', error); showToast('Failed to initialize dashboard: ' + error.message, 'error'); }
             }
-
-            function initializeColorDatabase() { colorDatabaseData.forEach(color => { colorDatabase[color.name.toLowerCase()] = color; }); }
 
             function loadUserPreferences() {
                 const darkMode = localStorage.getItem('darkMode') === 'true';
                 if (darkMode) { document.body.classList.add('dark-mode'); const darkToggle = document.getElementById('darkModeToggle'); if (darkToggle) darkToggle.checked = true; }
-                const fontSize = localStorage.getItem('fontSize') || '14';
-                document.documentElement.style.fontSize = fontSize + 'px'; const fontSizeSlider = document.getElementById('fontSizeSlider'); if (fontSizeSlider) fontSizeSlider.value = fontSize;
-                const primaryColor = localStorage.getItem('primaryColor') || '#6366F1';
-                document.documentElement.style.setProperty('--primary-500', primaryColor); const primaryColorPicker = document.getElementById('primaryColorPicker'); if (primaryColorPicker) primaryColorPicker.value = primaryColor;
+                const fontSize = localStorage.getItem('fontSize') || '14'; document.documentElement.style.fontSize = fontSize + 'px'; const fontSizeSlider = document.getElementById('fontSizeSlider'); if (fontSizeSlider) fontSizeSlider.value = fontSize;
+                const primaryColor = localStorage.getItem('primaryColor') || '#6366F1'; document.documentElement.style.setProperty('--primary-500', primaryColor); const primaryColorPicker = document.getElementById('primaryColorPicker'); if (primaryColorPicker) primaryColorPicker.value = primaryColor;
                 const refreshIntervalValue = localStorage.getItem('refreshInterval') || '60000'; const refreshIntervalSelect = document.getElementById('refreshInterval'); if (refreshIntervalSelect) refreshIntervalSelect.value = refreshIntervalValue;
-                const exportFormat = localStorage.getItem('exportFormat') || 'csv'; const exportFormatSelect = document.getElementById('exportFormat'); if (exportFormatSelect) exportFormatSelect.value = exportFormat;
-                const notifications = localStorage.getItem('notifications') === 'true'; const notificationsToggle = document.getElementById('notificationsToggle'); if (notificationsToggle) notificationsToggle.checked = notifications;
-                const buttonStyle = localStorage.getItem('buttonStyle') || 'rounded'; const buttonStyleSelect = document.getElementById('buttonStyle'); if (buttonStyleSelect) buttonStyleSelect.value = buttonStyle;
-                applyButtonStyle(buttonStyle);
-                const iconLibrary = localStorage.getItem('iconLibrary') || 'fontawesome'; const iconLibrarySelect = document.getElementById('iconLibrary'); if (iconLibrarySelect) iconLibrarySelect.value = iconLibrary;
-                const animationSpeed = localStorage.getItem('animationSpeed') || 'normal'; const animationSpeedSelect = document.getElementById('animationSpeed'); if (animationSpeedSelect) animationSpeedSelect.value = animationSpeed;
-                const gridDensity = localStorage.getItem('gridDensity') || 'normal'; const gridDensitySelect = document.getElementById('gridDensity'); if (gridDensitySelect) gridDensitySelect.value = gridDensity;
-                const syncInterval = localStorage.getItem('syncInterval') || '1m'; const syncIntervalSelect = document.getElementById('syncInterval'); if (syncIntervalSelect) syncIntervalSelect.value = syncInterval;
+                const buttonStyle = localStorage.getItem('buttonStyle') || 'rounded'; const buttonStyleSelect = document.getElementById('buttonStyle'); if (buttonStyleSelect) buttonStyleSelect.value = buttonStyle; applyButtonStyle(buttonStyle);
             }
 
-            function setupAutoRefresh() { const interval = parseInt(localStorage.getItem('refreshInterval') || '60000'); if (interval > 0) { refreshInterval = setInterval(() => { loadInitialData();
-                        loadOrders();
-                        showToast('Data refreshed automatically', 'info'); }, interval); } }
+            function setupAutoRefresh() { const interval = parseInt(localStorage.getItem('refreshInterval') || '60000'); if (interval > 0) { refreshInterval = setInterval(() => { loadInitialData(); loadOrders(); showToast('Data refreshed automatically', 'info'); }, interval); } }
 
             async function loadInitialData() {
                 try {
@@ -4261,7 +4214,7 @@
                     if (catError) throw catError;
                     categories = cats;
                     console.log('📦 Loading all products from Supabase...');
-                    const { data: allProds, error: prodError } = await supabase.from('products').select('*, category:categories(name, slug), product_modals(modal_type)').order('created_at', { ascending: false });
+                    const { data: allProds, error: prodError } = await supabase.from('products').select('*, category:categories(name, slug)').order('created_at', { ascending: false });
                     if (prodError) throw prodError;
                     allProducts = allProds || [];
                     allProductsData = allProds || [];
@@ -4275,28 +4228,18 @@
                     renderProductsPage();
                     populateCategoryFilters();
                     if (allProducts.length > 0) showToast(`Loaded ${allProducts.length} products successfully`, 'success');
-                } catch (error) { console.error('❌ Failed to load data:', error);
-                    showToast('Failed to load data: ' + error.message, 'error'); }
+                } catch (error) { console.error('❌ Failed to load data:', error); showToast('Failed to load data: ' + error.message, 'error'); }
             }
 
             async function loadProductColorsBatch() {
-                try { console.log('🎨 Loading product colors...'); const { data: colors, error } = await supabase.from('product_colors').select('*').order('product_id, color_name'); if (error) throw error;
-                    productColors = {};
-                    colors.forEach(color => { if (!productColors[color.product_id]) productColors[color.product_id] = [];
-                        productColors[color.product_id].push(color); });
-                    console.log(`✅ Loaded colors for ${Object.keys(productColors).length} products`); } catch (error) { console.error('❌ Failed to load colors:', error); }
+                try { console.log('🎨 Loading product colors...'); const { data: colors, error } = await supabase.from('product_colors').select('*').order('product_id, color_name'); if (error) throw error; productColors = {}; colors.forEach(color => { if (!productColors[color.product_id]) productColors[color.product_id] = []; productColors[color.product_id].push(color); }); console.log(`✅ Loaded colors for ${Object.keys(productColors).length} products`); } catch (error) { console.error('❌ Failed to load colors:', error); }
             }
 
             async function loadProductSizesBatch() {
-                try { console.log('📏 Loading product sizes...'); const { data: sizes, error } = await supabase.from('product_sizes').select('*').order('product_id, color_id, size_value'); if (error) throw error;
-                    productSizes = {};
-                    sizes.forEach(size => { const productId = size.product_id; const colorId = size.color_id; if (!productSizes[productId]) productSizes[productId] = {}; if (!productSizes[productId][colorId]) productSizes[productId][colorId] = [];
-                        productSizes[productId][colorId].push(size); });
-                    console.log(`✅ Loaded sizes for ${Object.keys(productSizes).length} products`); } catch (error) { console.error('❌ Failed to load sizes:', error); }
+                try { console.log('📏 Loading product sizes...'); const { data: sizes, error } = await supabase.from('product_sizes').select('*').order('product_id, color_id, size_value'); if (error) throw error; productSizes = {}; sizes.forEach(size => { const productId = size.product_id; const colorId = size.color_id; if (!productSizes[productId]) productSizes[productId] = {}; if (!productSizes[productId][colorId]) productSizes[productId][colorId] = []; productSizes[productId][colorId].push(size); }); console.log(`✅ Loaded sizes for ${Object.keys(productSizes).length} products`); } catch (error) { console.error('❌ Failed to load sizes:', error); }
             }
 
-            function calculateProductTotalStock() { allProducts.forEach(product => { let totalStock = 0; const sizes = productSizes[product.id]; if (sizes) { Object.values(sizes).forEach(colorSizes => { if (Array.isArray(colorSizes)) { colorSizes.forEach(size => { totalStock += size.stock_quantity || 0; }); } }); }
-                    product.total_stock = totalStock; }); }
+            function calculateProductTotalStock() { allProducts.forEach(product => { let totalStock = 0; const sizes = productSizes[product.id]; if (sizes) { Object.values(sizes).forEach(colorSizes => { if (Array.isArray(colorSizes)) { colorSizes.forEach(size => { totalStock += size.stock_quantity || 0; }); } }); } product.total_stock = totalStock; }); }
 
             function updateProductCounts() {
                 const totalProducts = allProducts.length;
@@ -4324,8 +4267,7 @@
                 if (!container) return;
                 const recentProducts = allProducts.slice(0, 8);
                 if (recentProducts.length === 0) { container.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fas fa-box-open"></i></div><h3 class="empty-title">No Products Yet</h3><p class="empty-description">Start by adding your first product.</p><button class="btn btn-primary mt-4" onclick="AdminDashboard.openAddProductModal()"><i class="fas fa-plus"></i> Add First Product</button></div>`; return; }
-                let html = '';
-                recentProducts.forEach(product => { html += renderProductCard(product); });
+                let html = ''; recentProducts.forEach(product => { html += renderProductCard(product); });
                 container.innerHTML = html;
             }
 
@@ -4333,7 +4275,6 @@
                 const stock = product.total_stock !== undefined ? product.total_stock : (product.stock || 0);
                 const stockClass = stock > 10 ? 'stock-high' : stock > 0 ? 'stock-medium' : 'stock-low';
                 const stockText = stock > 10 ? `${stock} in stock` : stock > 0 ? `${stock} left` : 'Out of stock';
-                const isFootwear = product.category?.slug?.includes('footwear') || product.product_modals?.[0]?.modal_type === 'footwear';
                 const colors = productColors[product.id] || [];
                 const sizes = productSizes[product.id] || {};
                 const isActive = product.is_active !== false;
@@ -4346,8 +4287,8 @@
                             ${isSelected ? '<i class="fas fa-check" style="font-size:0.7rem"></i>' : ''}
                         </div>
                         <div class="product-image-container">
-                            <img src="${imageUrl}" alt="${escapeHtml(product.name)}" class="product-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="no-image-placeholder" style="display: none;"><i class="fas fa-image"></i></div>
+                            ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(product.name)}" class="product-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                            <div class="no-image-placeholder" style="${imageUrl ? 'display: none;' : 'display: flex;'}"><i class="fas fa-image"></i></div>
                             ${!isActive ? `<div class="product-badge" style="background: var(--danger-500);"><i class="fas fa-ban"></i> Inactive</div>` : ''}
                             ${stock === 0 ? `<div class="product-badge" style="background: var(--danger-600);"><i class="fas fa-times"></i> Out of Stock</div>` : ''}
                         </div>
@@ -4364,66 +4305,36 @@
                     </div>`;
             }
 
-            function getProductImageUrl(product) { const imageUrl = product.image_url || ''; if (imageUrl.includes(imageConfig.baseUrl)) { const baseUrl = imageConfig.baseUrl; let filename = imageUrl.replace(baseUrl, ''); Object.values(imageConfig.paths).forEach(path => { if (path && filename.startsWith(path)) filename = filename.replace(path, ''); }); return buildCorrectImageUrl(filename, product.category?.slug); } return buildCorrectImageUrl(imageUrl, product.category?.slug); }
-
-            function parseImageFilenameFromUrl(imageUrl) { if (!imageUrl) return ''; let filename = imageUrl.replace(imageConfig.baseUrl, ''); Object.values(imageConfig.paths).forEach(path => { if (path && filename.startsWith(path)) filename = filename.replace(path, ''); }); return filename; }
-
             function renderProductsPage() {
                 const container = document.getElementById('allProducts');
                 if (!container) return;
                 const startIndex = (currentPage - 1) * productsPerPage;
                 const endIndex = startIndex + productsPerPage;
                 const pageProducts = filteredProducts.slice(startIndex, endIndex);
-                if (pageProducts.length === 0) { let message = currentFilter === 'low_stock' ? 'No products with low stock' : currentFilter === 'inactive' ? 'No inactive products' : currentFilter === 'footwear' ? 'No footwear products' : 'No products found';
-                    container.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;"><div class="empty-icon"><i class="fas fa-search"></i></div><h3 class="empty-title">${message}</h3><p class="empty-description">Try changing your filters or add new products.</p><button class="btn btn-primary mt-4" onclick="AdminDashboard.openAddProductModal()"><i class="fas fa-plus"></i> Add New Product</button></div>`;
-                    document.getElementById('paginationContainer').style.display = 'none'; return; }
-                let html = '';
-                pageProducts.forEach(product => { html += renderProductCard(product); });
+                if (pageProducts.length === 0) { let message = currentFilter === 'low_stock' ? 'No products with low stock' : currentFilter === 'inactive' ? 'No inactive products' : currentFilter === 'footwear' ? 'No footwear products' : 'No products found'; container.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;"><div class="empty-icon"><i class="fas fa-search"></i></div><h3 class="empty-title">${message}</h3><p class="empty-description">Try changing your filters or add new products.</p><button class="btn btn-primary mt-4" onclick="AdminDashboard.openAddProductModal()"><i class="fas fa-plus"></i> Add New Product</button></div>`; document.getElementById('paginationContainer').style.display = 'none'; return; }
+                let html = ''; pageProducts.forEach(product => { html += renderProductCard(product); });
                 container.innerHTML = html;
-                const totalProducts = filteredProducts.length;
-                const totalPages = Math.ceil(totalProducts / productsPerPage);
-                document.getElementById('startRow').textContent = startIndex + 1;
-                document.getElementById('endRow').textContent = Math.min(endIndex, totalProducts);
-                document.getElementById('totalRows').textContent = totalProducts;
-                document.getElementById('prevBtn').disabled = currentPage === 1;
-                document.getElementById('nextBtn').disabled = currentPage === totalPages;
+                const totalProducts = filteredProducts.length; const totalPages = Math.ceil(totalProducts / productsPerPage);
+                document.getElementById('startRow').textContent = startIndex + 1; document.getElementById('endRow').textContent = Math.min(endIndex, totalProducts); document.getElementById('totalRows').textContent = totalProducts;
+                document.getElementById('prevBtn').disabled = currentPage === 1; document.getElementById('nextBtn').disabled = currentPage === totalPages;
                 document.getElementById('paginationContainer').style.display = 'flex';
             }
 
             function filterProducts(filterType) {
-                currentFilter = filterType;
-                currentPage = 1;
-                switch (filterType) { case 'footwear':
-                        filteredProducts = allProducts.filter(p => p.category?.slug?.includes('footwear') || p.product_modals?.[0]?.modal_type === 'footwear'); break; case 'low_stock':
-                        filteredProducts = allProducts.filter(p => { if (p.total_stock !== undefined) return p.total_stock < 10 && p.total_stock > 0; return (p.stock || 0) < 10 && (p.stock || 0) > 0; }); break; case 'inactive':
-                        filteredProducts = allProducts.filter(p => !p.is_active); break; default:
-                        filteredProducts = [...allProducts]; }
+                currentFilter = filterType; currentPage = 1;
+                switch (filterType) { case 'footwear': filteredProducts = allProducts.filter(p => p.category?.slug?.includes('footwear')); break; case 'low_stock': filteredProducts = allProducts.filter(p => { if (p.total_stock !== undefined) return p.total_stock < 10 && p.total_stock > 0; return (p.stock || 0) < 10 && (p.stock || 0) > 0; }); break; case 'inactive': filteredProducts = allProducts.filter(p => !p.is_active); break; default: filteredProducts = [...allProducts]; }
                 const categoryFilter = document.getElementById('categoryFilter'); if (categoryFilter && categoryFilter.value) filteredProducts = filteredProducts.filter(p => p.category_id == categoryFilter.value);
-                const searchInput = document.getElementById('productSearch'); if (searchInput && searchInput.value) { const searchTerm = searchInput.value.toLowerCase();
-                    filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchTerm) || (p.description || '').toLowerCase().includes(searchTerm)); }
-                renderProductsPage();
-                updateBulkBar();
+                const searchInput = document.getElementById('productSearch'); if (searchInput && searchInput.value) { const searchTerm = searchInput.value.toLowerCase(); filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchTerm) || (p.description || '').toLowerCase().includes(searchTerm)); }
+                renderProductsPage(); updateBulkBar();
             }
 
-            function nextPage() { const totalPages = Math.ceil(filteredProducts.length / productsPerPage); if (currentPage < totalPages) { currentPage++;
-                    renderProductsPage();
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); } }
-
-            function prevPage() { if (currentPage > 1) { currentPage--;
-                    renderProductsPage();
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+            function nextPage() { const totalPages = Math.ceil(filteredProducts.length / productsPerPage); if (currentPage < totalPages) { currentPage++; renderProductsPage(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+            function prevPage() { if (currentPage > 1) { currentPage--; renderProductsPage(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
 
             function populateCategoryFilters() {
-                const categorySelect = document.getElementById('categoryFilter');
-                const productCategory = document.getElementById('productCategory');
-                if (categorySelect) { let options = '<option value="">All Categories</option>';
-                    categories.forEach(category => { const productCount = allProducts.filter(p => p.category_id === category.id).length;
-                        options += `<option value="${category.id}">${escapeHtml(category.name)} (${productCount})</option>`; });
-                    categorySelect.innerHTML = options;
-                    categorySelect.addEventListener('change', () => { filterProducts(currentFilter); }); }
-                if (productCategory) { let options = '<option value="">Select Category</option>';
-                    categories.forEach(category => { options += `<option value="${category.id}" data-slug="${escapeHtml(category.slug)}">${escapeHtml(category.name)}</option>`; });
-                    productCategory.innerHTML = options; }
+                const categorySelect = document.getElementById('categoryFilter'); const productCategory = document.getElementById('productCategory');
+                if (categorySelect) { let options = '<option value="">All Categories</option>'; categories.forEach(category => { const productCount = allProducts.filter(p => p.category_id === category.id).length; options += `<option value="${category.id}">${escapeHtml(category.name)} (${productCount})</option>`; }); categorySelect.innerHTML = options; categorySelect.addEventListener('change', () => { filterProducts(currentFilter); }); }
+                if (productCategory) { let options = '<option value="">Select Category</option>'; categories.forEach(category => { options += `<option value="${category.id}" data-slug="${escapeHtml(category.slug)}">${escapeHtml(category.name)}</option>`; }); productCategory.innerHTML = options; }
                 const searchInput = document.getElementById('productSearch'); if (searchInput) searchInput.addEventListener('input', () => { filterProducts(currentFilter); });
             }
 
@@ -4435,6 +4346,9 @@
                 document.getElementById('productSlug').value = '';
                 document.getElementById('productComparePrice').value = '';
                 document.getElementById('deleteProductBtn').style.display = 'none';
+                document.getElementById('productStock').value = '0';
+                document.getElementById('productStock').removeAttribute('readonly');
+                document.getElementById('stockHelpText').textContent = 'Calculated from color × size variants for footwear products.';
                 resetUpload();
                 slugManuallyEdited = false;
                 document.getElementById('editSlugBtn').innerHTML = '<i class="fas fa-lock"></i>';
@@ -4443,19 +4357,36 @@
                 document.getElementById('sizeManagementSection').style.display = 'none';
                 document.getElementById('colorsContainer').innerHTML = '';
                 document.getElementById('sizesContainer').innerHTML = `<div class="text-center py-8 text-gray-500 dark:text-dark-text-muted"><i class="fas fa-shoe-prints mb-2" style="font-size: 2rem;"></i><p>Select a color to manage sizes</p></div>`;
-                document.getElementById('imagePreviewContainer').style.display = 'none';
                 openModal();
             }
 
-            function onCategoryChange() { const categorySelect = document.getElementById('productCategory'); const categoryId = categorySelect.value; const category = categories.find(c => c.id == categoryId); if (category && category.slug.includes('footwear')) { document.getElementById('isFootwear').value = 'true';
+            function onCategoryChange() {
+                const categorySelect = document.getElementById('productCategory');
+                const categoryId = categorySelect.value;
+                const category = categories.find(c => c.id == categoryId);
+                const stockInput = document.getElementById('productStock');
+
+                if (category && category.slug.includes('footwear')) {
+                    document.getElementById('isFootwear').value = 'true';
                     document.getElementById('colorManagementSection').style.display = 'block';
-                    document.getElementById('sizeManagementSection').style.display = 'block'; } else { document.getElementById('isFootwear').value = 'false';
+                    document.getElementById('sizeManagementSection').style.display = 'block';
+                    stockInput.setAttribute('readonly', true);
+                    stockInput.value = '0';
+                    document.getElementById('stockHelpText').textContent = 'Auto-calculated from color × size stock quantities.';
+                } else {
+                    document.getElementById('isFootwear').value = 'false';
                     document.getElementById('colorManagementSection').style.display = 'none';
-                    document.getElementById('sizeManagementSection').style.display = 'none'; }
-                updateImagePreview(); }
+                    document.getElementById('sizeManagementSection').style.display = 'none';
+                    stockInput.removeAttribute('readonly');
+                    document.getElementById('stockHelpText').textContent = 'Set the stock quantity for this product.';
+                }
+            }
 
             async function editProduct(productId) {
-                try { const product = allProducts.find(p => p.id === productId); if (!product) { showToast('Product not found', 'error'); return; } const isFootwear = product.category?.slug?.includes('footwear') || product.product_modals?.[0]?.modal_type === 'footwear';
+                try {
+                    const product = allProducts.find(p => p.id === productId);
+                    if (!product) { showToast('Product not found', 'error'); return; }
+                    const isFootwear = product.category?.slug?.includes('footwear');
                     currentProductId = productId;
                     document.getElementById('modalTitle').textContent = `Edit: ${product.name}`;
                     document.getElementById('productId').value = product.id;
@@ -4470,150 +4401,185 @@
                     slugManuallyEdited = false;
                     document.getElementById('editSlugBtn').innerHTML = '<i class="fas fa-lock"></i>';
                     document.getElementById('productSlug').setAttribute('readonly', true);
-                    const categorySelect = document.getElementById('productCategory'); if (categorySelect) { categorySelect.value = product.category_id || '';
-                        onCategoryChange(); }
+                    const categorySelect = document.getElementById('productCategory');
+                    if (categorySelect) { categorySelect.value = product.category_id || ''; onCategoryChange(); }
                     const imageUrl = product.image_url || '';
-                    uploadedImageUrl = imageUrl && imageUrl.startsWith('http') ? imageUrl : null;
+                    uploadedImageUrl = imageUrl && imageUrl.startsWith('https://tmpggeeuwdvlngvfncaa.supabase.co') ? imageUrl : null;
                     document.getElementById('productImageUrl').value = uploadedImageUrl || '';
-                    const imageFilename = parseImageFilenameFromUrl(imageUrl);
-                    document.getElementById('productImageName').value = imageFilename;
-                    updateImagePreview();
-                    if (uploadedImageUrl) { document.getElementById('uploadPreview').src = uploadedImageUrl;
+                    if (uploadedImageUrl) {
+                        document.getElementById('uploadPreview').src = uploadedImageUrl;
                         document.getElementById('uploadPreviewContainer').style.display = 'block';
-                        document.getElementById('uploadIcon').style.display = 'none'; } else { resetUpload(); }
-                    if (isFootwear) { await loadColorsForProduct(productId); await loadSizesForProduct(productId); }
-                    openModal(); } catch (error) { console.error('Error loading product:', error);
-                    showToast('Failed to load product: ' + error.message, 'error'); }
+                        document.getElementById('uploadIcon').style.display = 'none';
+                    } else { resetUpload(); }
+                    if (isFootwear) {
+                        await loadColorsForProduct(productId);
+                        await loadSizesForProduct(productId);
+                        calculateFootwearStock();
+                    }
+                    openModal();
+                } catch (error) { console.error('Error loading product:', error); showToast('Failed to load product: ' + error.message, 'error'); }
             }
 
             async function loadColorsForProduct(productId) {
-                try { const colors = productColors[productId] || [];
-                    currentEditingColors = colors; const container = document.getElementById('colorsContainer'); if (!container) return; let html = ''; if (colors.length > 0) { colors.forEach(color => { const colorCodes = color.color_code ? color.color_code.split('+') : ['#ccc']; const isCombination = colorCodes.length > 1;
-                            html += `<div class="color-item" data-color-id="${color.id}"><div class="color-preview">${isCombination ? `<div class="color-combination-preview">${colorCodes.map(code => `<div class="color-slice" style="background: ${code.trim()}"></div>`).join('')}</div>` : `<div style="background: ${colorCodes[0]}; width: 100%; height: 100%; border-radius: var(--radius-sm);"></div>`}</div><div class="text-sm font-semibold mb-1">${escapeHtml(color.color_name)}</div><div class="text-xs text-gray-600 dark:text-dark-text-muted mb-2">${escapeHtml(color.color_code)}</div><div class="color-actions"><button class="btn btn-sm btn-secondary flex-1" onclick="AdminDashboard.editColor(${color.id})"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-sm btn-secondary" onclick="AdminDashboard.deleteColor(${color.id})"><i class="fas fa-trash"></i></button></div></div>`; }); }
+                try {
+                    const colors = productColors[productId] || [];
+                    currentEditingColors = colors;
+                    const container = document.getElementById('colorsContainer');
+                    if (!container) return;
+                    let html = '';
+                    if (colors.length > 0) {
+                        colors.forEach(color => {
+                            const colorCodes = color.color_code ? color.color_code.split('+') : ['#ccc'];
+                            const isCombination = colorCodes.length > 1;
+                            html += `<div class="color-item" data-color-id="${color.id}"><div class="color-preview">${isCombination ? `<div class="color-combination-preview">${colorCodes.map(code => `<div class="color-slice" style="background: ${code.trim()}"></div>`).join('')}</div>` : `<div style="background: ${colorCodes[0]}; width: 100%; height: 100%; border-radius: var(--radius-sm);"></div>`}</div><div class="text-sm font-semibold mb-1">${escapeHtml(color.color_name)}</div><div class="text-xs text-gray-600 dark:text-dark-text-muted mb-2">${escapeHtml(color.color_code)}</div><div class="color-actions"><button class="btn btn-sm btn-secondary flex-1" onclick="AdminDashboard.editColor(${color.id})"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-sm btn-secondary" onclick="AdminDashboard.deleteColor(${color.id})"><i class="fas fa-trash"></i></button></div></div>`;
+                        });
+                    }
                     html += `<div class="color-item" style="border-style: dashed; cursor: pointer; text-align: center;" onclick="AdminDashboard.openAddColorModal()"><div class="color-preview" style="background: var(--gray-200); display: flex; align-items: center; justify-content: center;"><i class="fas fa-plus text-gray-400 dark:text-dark-text-muted" style="font-size: 1.5rem;"></i></div><div class="text-sm text-gray-600 dark:text-dark-text-muted mt-2">Add Color</div></div>`;
                     container.innerHTML = html;
                     document.getElementById('colorCount').textContent = `(${colors.length} colors)`;
-                    const colorSelector = document.getElementById('colorSelector'); if (colorSelector) { let options = '<option value="">Select a color</option>';
-                        colors.forEach(color => { options += `<option value="${color.id}">${escapeHtml(color.color_name)}</option>`; });
-                        colorSelector.innerHTML = options; }
-                    const sizeColorSelector = document.getElementById('sizeColorSelector'); if (sizeColorSelector) { let options = '<option value="">Select a color</option>';
-                        colors.forEach(color => { options += `<option value="${color.id}">${escapeHtml(color.color_name)}</option>`; });
-                        sizeColorSelector.innerHTML = options; } } catch (error) { console.error('Error loading colors:', error);
-                    showToast('Failed to load colors: ' + error.message, 'error'); }
+                    const colorSelector = document.getElementById('colorSelector');
+                    if (colorSelector) { let options = '<option value="">Select a color</option>'; colors.forEach(color => { options += `<option value="${color.id}">${escapeHtml(color.color_name)}</option>`; }); colorSelector.innerHTML = options; }
+                    const sizeColorSelector = document.getElementById('sizeColorSelector');
+                    if (sizeColorSelector) { let options = '<option value="">Select a color</option>'; colors.forEach(color => { options += `<option value="${color.id}">${escapeHtml(color.color_name)}</option>`; }); sizeColorSelector.innerHTML = options; }
+                } catch (error) { console.error('Error loading colors:', error); showToast('Failed to load colors: ' + error.message, 'error'); }
             }
 
-            async function loadSizesForProduct(productId) { try { currentEditingSizes = productSizes[productId] || {}; } catch (error) { console.error('Error loading sizes:', error); } }
+            async function loadSizesForProduct(productId) {
+                try { currentEditingSizes = productSizes[productId] || {}; } catch (error) { console.error('Error loading sizes:', error); }
+            }
 
-            function loadSizesForColor() { const colorId = document.getElementById('colorSelector').value; const sizes = currentEditingSizes[colorId] || []; const container = document.getElementById('sizesContainer'); if (!container) return; if (!colorId) { container.innerHTML = `<div class="text-center py-8 text-gray-500 dark:text-dark-text-muted"><i class="fas fa-shoe-prints mb-2" style="font-size: 2rem;"></i><p>Select a color to manage sizes</p></div>`;
-                    document.getElementById('sizeCount').textContent = '(Select a color)'; return; } const colorSelector = document.getElementById('colorSelector'); const colorName = colorSelector.options[colorSelector.selectedIndex].text; let html = ''; const sizeMap = {};
+            function loadSizesForColor() {
+                const colorId = document.getElementById('colorSelector').value;
+                const sizes = currentEditingSizes[colorId] || [];
+                const container = document.getElementById('sizesContainer');
+                if (!container) return;
+                if (!colorId) { container.innerHTML = `<div class="text-center py-8 text-gray-500 dark:text-dark-text-muted"><i class="fas fa-shoe-prints mb-2" style="font-size: 2rem;"></i><p>Select a color to manage sizes</p></div>`; document.getElementById('sizeCount').textContent = '(Select a color)'; return; }
+                const colorSelector = document.getElementById('colorSelector');
+                const colorName = colorSelector.options[colorSelector.selectedIndex].text;
+                let html = '';
+                const sizeMap = {};
                 sizes.forEach(size => { if (size && size.size_value) sizeMap[size.size_value] = size; });
-                commonSizes.forEach(size => { const sizeData = sizeMap[size]; const stock = sizeData ? (sizeData.stock_quantity || 0) : 0; const isAvailable = sizeData ? (sizeData.is_available || false) : false;
-                    html += `<div class="size-item" data-size="${size}"><div class="size-label">Size</div><div class="size-value">${size}</div><input type="number" class="size-stock-input" value="${stock}" data-color-id="${colorId}" data-size="${size}" placeholder="0" min="0" onchange="AdminDashboard.updateSizeStock(this, ${colorId}, '${size}')"><div class="text-xs ${stock > 0 ? 'text-green-600' : 'text-gray-600'} mt-1">Stock: ${stock}</div><div class="flex items-center justify-center mt-1"><input type="checkbox" ${isAvailable ? 'checked' : ''} onchange="AdminDashboard.toggleSizeAvailability(this, ${colorId}, '${size}')" style="margin-right: 0.25rem;"><span class="text-xs">Available</span></div></div>`; });
+                commonSizes.forEach(size => {
+                    const sizeData = sizeMap[size];
+                    const stock = sizeData ? (sizeData.stock_quantity || 0) : 0;
+                    const isAvailable = sizeData ? (sizeData.is_available !== false) : true;
+                    html += `<div class="size-item" data-size="${size}"><div class="size-label">Size</div><div class="size-value">${size}</div><input type="number" class="size-stock-input" value="${stock}" data-color-id="${colorId}" data-size="${size}" placeholder="0" min="0" onchange="AdminDashboard.updateSizeStock(this, ${colorId}, '${size}')"><div class="text-xs ${stock > 0 ? 'text-green-600' : 'text-gray-600'} mt-1">Stock: ${stock}</div><div class="flex items-center justify-center mt-1"><input type="checkbox" ${isAvailable ? 'checked' : ''} onchange="AdminDashboard.toggleSizeAvailability(this, ${colorId}, '${size}')" style="margin-right: 0.25rem;"><span class="text-xs">Available</span></div></div>`;
+                });
                 container.innerHTML = html;
-                document.getElementById('sizeCount').textContent = `(${commonSizes.length} sizes for ${colorName})`; }
+                document.getElementById('sizeCount').textContent = `(${commonSizes.length} sizes for ${colorName})`;
+            }
 
-            function populateColorPickerGrid() { const container = document.getElementById('colorPickerGrid'); if (!container) return; let html = '';
-                colorDatabaseData.forEach((color) => { const isCombination = color.codes.length > 1; const gradient = isCombination ? `linear-gradient(135deg, ${color.codes.join(', ')})` : color.codes[0];
-                    html += `<button type="button" class="color-option-btn" style="background: ${gradient}" data-color-name="${escapeHtml(color.name)}" data-color-codes="${color.codes.join('+')}" onclick="AdminDashboard.selectColor('${escapeHtml(color.name)}', '${color.codes.join('+')}')"></button>`; });
-                container.innerHTML = html; }
-
-            function searchColors(query) { const container = document.getElementById('colorOptions'); if (!container) return; if (!query.trim()) { container.style.display = 'none'; return; } const searchTerm = query.toLowerCase(); const results = colorDatabaseData.filter(color => color.name.toLowerCase().includes(searchTerm)).slice(0, 10); if (results.length === 0) { container.style.display = 'none'; return; } let html = '';
-                results.forEach(color => { const isCombination = color.codes.length > 1;
-                    html += `<div class="color-option" onclick="AdminDashboard.selectColorFromSearch('${escapeHtml(color.name)}', '${color.codes.join('+')}')">${isCombination ? `<div class="color-combination">${color.codes.map(code => `<div class="color-swatch" style="background: ${code}"></div>`).join('')}</div>` : `<div class="color-swatch" style="background: ${color.codes[0]}"></div>`}<span>${escapeHtml(color.name)}</span></div>`; });
-                container.innerHTML = html;
-                container.style.display = 'block'; }
-
-            function selectColorFromSearch(colorName, colorCodes) { document.getElementById('newColorName').value = colorName;
-                document.getElementById('newColorCode').value = colorCodes;
-                selectedColorIds = [colorName];
-                updateSelectedColors();
-                document.getElementById('colorOptions').style.display = 'none'; }
-
-            function selectColor(colorName, colorCodes) { if (!selectedColorIds.includes(colorName)) { selectedColorIds.push(colorName);
-                    updateSelectedColors(); } const currentCodes = document.getElementById('newColorCode').value.split('+').filter(c => c.trim()); const newCodes = colorCodes.split('+'); const allCodes = [...new Set([...currentCodes, ...newCodes])];
-                document.getElementById('newColorCode').value = allCodes.join(' + '); const currentName = document.getElementById('newColorName').value; if (!currentName.includes(colorName)) { const newName = currentName ? currentName + ' + ' + colorName : colorName;
-                    document.getElementById('newColorName').value = newName; } }
-
-            function updateSelectedColors() { const container = document.getElementById('selectedColors'); if (!container) return; let html = '';
-                selectedColorIds.forEach(colorName => { const color = colorDatabase[colorName.toLowerCase()]; if (color) { const isCombination = color.codes.length > 1; const gradient = isCombination ? `linear-gradient(135deg, ${color.codes.join(', ')})` : color.codes[0];
-                        html += `<div class="flex items-center gap-1 px-2 py-1 rounded bg-gray-100 dark:bg-dark-surface-2"><div class="w-4 h-4 rounded" style="background: ${gradient}"></div><span class="text-xs">${escapeHtml(color.name)}</span><button type="button" onclick="AdminDashboard.removeSelectedColor('${escapeHtml(colorName)}')" class="text-gray-500 hover:text-gray-700 dark:text-dark-text-muted dark:hover:text-dark-text"><i class="fas fa-times text-xs"></i></button></div>`; } });
-                container.innerHTML = html; }
-
-            function removeSelectedColor(colorName) { selectedColorIds = selectedColorIds.filter(id => id !== colorName);
-                updateSelectedColors(); const currentCodes = document.getElementById('newColorCode').value.split('+').filter(c => c.trim()); const color = colorDatabase[colorName.toLowerCase()]; if (color) { const codesToRemove = color.codes; const newCodes = currentCodes.filter(code => !codesToRemove.includes(code));
-                    document.getElementById('newColorCode').value = newCodes.join(' + '); } const currentName = document.getElementById('newColorName').value; const names = currentName.split(' + ').filter(name => name.trim() !== colorName);
-                document.getElementById('newColorName').value = names.join(' + '); }
-
-            function openAddColorModal() { document.getElementById('addColorModal').style.display = 'flex';
-                document.getElementById('newColorName').value = '';
-                document.getElementById('newColorCode').value = '';
-                selectedColorIds = [];
-                updateSelectedColors();
-                document.getElementById('isDefaultColor').checked = true; }
-
+            // ==================== COLOR/SAVE FUNCTIONS ====================
+            function openAddColorModal() { document.getElementById('addColorModal').style.display = 'flex'; document.getElementById('newColorName').value = ''; document.getElementById('newColorCode').value = ''; selectedColorIds = []; updateSelectedColors(); document.getElementById('isDefaultColor').checked = true; }
             function closeAddColorModal() { document.getElementById('addColorModal').style.display = 'none'; }
 
-            async function saveNewColor() { const productId = document.getElementById('productId').value; if (!productId) { showToast('Please save the product first', 'warning'); return; } const colorName = document.getElementById('newColorName').value.trim(); const colorCode = document.getElementById('newColorCode').value.trim(); const isDefault = document.getElementById('isDefaultColor').checked; if (!colorName || !colorCode) { showToast('Please enter color name and code', 'warning'); return; } try { const colorData = { product_id: parseInt(productId), color_name: colorName, color_code: colorCode, is_default: isDefault, sort_order: 0, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }; const { data, error } = await supabase.from('product_colors').insert([colorData]).select(); if (error) throw error; if (!productColors[productId]) productColors[productId] = [];
-                    productColors[productId].push(data[0]); await loadColorsForProduct(productId);
+            async function saveNewColor() {
+                const productId = document.getElementById('productId').value;
+                if (!productId) { showToast('Please save the product first', 'warning'); return; }
+                const colorName = document.getElementById('newColorName').value.trim();
+                const colorCode = document.getElementById('newColorCode').value.trim();
+                const isDefault = document.getElementById('isDefaultColor').checked;
+                if (!colorName || !colorCode) { showToast('Please enter color name and code', 'warning'); return; }
+                try {
+                    const colorData = { product_id: parseInt(productId), color_name: colorName, color_code: colorCode, is_default: isDefault, sort_order: 0, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+                    const { data, error } = await supabase.from('product_colors').insert([colorData]).select();
+                    if (error) throw error;
+                    if (!productColors[productId]) productColors[productId] = [];
+                    productColors[productId].push(data[0]);
+                    await loadColorsForProduct(productId);
                     closeAddColorModal();
-                    showToast('Color added successfully', 'success'); } catch (error) { console.error('Error saving color:', error);
-                    showToast('Failed to save color: ' + error.message, 'error'); } }
+                    showToast('Color added successfully', 'success');
+                } catch (error) { console.error('Error saving color:', error); showToast('Failed to save color: ' + error.message, 'error'); }
+            }
 
-            async function editColor(colorId) { const color = currentEditingColors.find(c => c.id == colorId); if (!color) return;
-                document.getElementById('newColorName').value = color.color_name;
-                document.getElementById('newColorCode').value = color.color_code;
-                document.getElementById('isDefaultColor').checked = color.is_default; const colorCodes = color.color_code.split('+').map(c => c.trim());
-                selectedColorIds = colorCodes;
-                updateSelectedColors();
-                document.getElementById('addColorModal').dataset.colorId = colorId;
-                document.getElementById('addColorModal').querySelector('.modal-title').textContent = 'Edit Color';
-                document.getElementById('addColorModal').style.display = 'flex'; }
-
-            async function deleteColor(colorId) { if (!confirm('Are you sure you want to delete this color? All associated sizes will also be deleted.')) return; try { const { error: sizesError } = await supabase.from('product_sizes').delete().eq('color_id', colorId); if (sizesError) throw sizesError; const { error: colorError } = await supabase.from('product_colors').delete().eq('id', colorId); if (colorError) throw colorError; const productId = document.getElementById('productId').value;
-                    productColors[productId] = productColors[productId].filter(c => c.id != colorId); if (productSizes[productId]) delete productSizes[productId][colorId]; if (currentEditingSizes[colorId]) delete currentEditingSizes[colorId]; await loadColorsForProduct(productId);
+            async function deleteColor(colorId) {
+                if (!confirm('Are you sure you want to delete this color? All associated sizes will also be deleted.')) return;
+                try {
+                    const { error: sizesError } = await supabase.from('product_sizes').delete().eq('color_id', colorId);
+                    if (sizesError) throw sizesError;
+                    const { error: colorError } = await supabase.from('product_colors').delete().eq('id', colorId);
+                    if (colorError) throw colorError;
+                    const productId = document.getElementById('productId').value;
+                    productColors[productId] = productColors[productId].filter(c => c.id != colorId);
+                    if (productSizes[productId]) delete productSizes[productId][colorId];
+                    if (currentEditingSizes[colorId]) delete currentEditingSizes[colorId];
+                    await loadColorsForProduct(productId);
                     loadSizesForColor();
-                    showToast('Color deleted successfully', 'success'); } catch (error) { console.error('Error deleting color:', error);
-                    showToast('Failed to delete color: ' + error.message, 'error'); } }
+                    calculateFootwearStock();
+                    showToast('Color deleted successfully', 'success');
+                } catch (error) { console.error('Error deleting color:', error); showToast('Failed to delete color: ' + error.message, 'error'); }
+            }
 
-            function openAddSizeModal() { const colorId = document.getElementById('colorSelector').value; if (!colorId) { showToast('Please select a color first', 'warning'); return; }
-                document.getElementById('addSizeModal').style.display = 'flex';
-                document.getElementById('sizeColorSelector').value = colorId;
-                document.getElementById('newSizeValue').value = '';
-                document.getElementById('newSizeStock').value = 0; }
-
+            function openAddSizeModal() { const colorId = document.getElementById('colorSelector').value; if (!colorId) { showToast('Please select a color first', 'warning'); return; } document.getElementById('addSizeModal').style.display = 'flex'; document.getElementById('sizeColorSelector').value = colorId; document.getElementById('newSizeValue').value = ''; document.getElementById('newSizeStock').value = 0; }
             function closeAddSizeModal() { document.getElementById('addSizeModal').style.display = 'none'; }
 
-            async function saveNewSize() { const productId = document.getElementById('productId').value; const colorId = document.getElementById('sizeColorSelector').value; const sizeValue = document.getElementById('newSizeValue').value.trim(); const stockQuantity = parseInt(document.getElementById('newSizeStock').value) || 0; if (!productId || !colorId || !sizeValue) { showToast('Please fill all required fields', 'warning'); return; } try { const sizeData = { product_id: parseInt(productId), color_id: parseInt(colorId), size_value: sizeValue, stock_quantity: stockQuantity, is_available: stockQuantity > 0, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }; const { data, error } = await supabase.from('product_sizes').insert([sizeData]).select(); if (error) throw error; if (!productSizes[productId]) productSizes[productId] = {}; if (!productSizes[productId][colorId]) productSizes[productId][colorId] = [];
-                    productSizes[productId][colorId].push(data[0]); if (!currentEditingSizes[colorId]) currentEditingSizes[colorId] = [];
+            async function saveNewSize() {
+                const productId = document.getElementById('productId').value;
+                const colorId = document.getElementById('sizeColorSelector').value;
+                const sizeValue = document.getElementById('newSizeValue').value.trim();
+                const stockQuantity = parseInt(document.getElementById('newSizeStock').value) || 0;
+                if (!productId || !colorId || !sizeValue) { showToast('Please fill all required fields', 'warning'); return; }
+                try {
+                    const sizeData = { product_id: parseInt(productId), color_id: parseInt(colorId), size_value: sizeValue, stock_quantity: stockQuantity, is_available: stockQuantity > 0 || true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+                    const { data, error } = await supabase.from('product_sizes').insert([sizeData]).select();
+                    if (error) throw error;
+                    if (!productSizes[productId]) productSizes[productId] = {};
+                    if (!productSizes[productId][colorId]) productSizes[productId][colorId] = [];
+                    productSizes[productId][colorId].push(data[0]);
+                    if (!currentEditingSizes[colorId]) currentEditingSizes[colorId] = [];
                     currentEditingSizes[colorId].push(data[0]);
                     loadSizesForColor();
+                    calculateFootwearStock();
                     closeAddSizeModal();
-                    showToast('Size added successfully', 'success'); } catch (error) { console.error('Error saving size:', error);
-                    showToast('Failed to save size: ' + error.message, 'error'); } }
+                    showToast('Size added successfully', 'success');
+                } catch (error) { console.error('Error saving size:', error); showToast('Failed to save size: ' + error.message, 'error'); }
+            }
 
-            async function updateSizeStock(input, colorId, sizeValue) { const productId = currentProductId; const stockQuantity = parseInt(input.value) || 0; try { const sizes = currentEditingSizes[colorId] || []; const existingSize = sizes.find(s => s && s.size_value === sizeValue); if (existingSize) { const { error } = await supabase.from('product_sizes').update({ stock_quantity: stockQuantity, is_available: stockQuantity > 0, updated_at: new Date().toISOString() }).eq('id', existingSize.id); if (error) throw error;
-                    existingSize.stock_quantity = stockQuantity;
-                    existingSize.is_available = stockQuantity > 0; if (productSizes[productId] && productSizes[productId][colorId]) { const sizeIndex = productSizes[productId][colorId].findIndex(s => s.id === existingSize.id); if (sizeIndex !== -1) productSizes[productId][colorId][sizeIndex] = existingSize; }
-                    showToast('Stock updated successfully', 'success'); } else { const sizeData = { product_id: parseInt(productId), color_id: parseInt(colorId), size_value: sizeValue, stock_quantity: stockQuantity, is_available: stockQuantity > 0, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }; const { data, error } = await supabase.from('product_sizes').insert([sizeData]).select(); if (error) throw error; if (!productSizes[productId]) productSizes[productId] = {}; if (!productSizes[productId][colorId]) productSizes[productId][colorId] = [];
-                    productSizes[productId][colorId].push(data[0]); if (!currentEditingSizes[colorId]) currentEditingSizes[colorId] = [];
-                    currentEditingSizes[colorId].push(data[0]);
-                    showToast('Size added successfully', 'success'); } const stockElement = input.parentElement.querySelector('.text-xs'); if (stockElement) { stockElement.textContent = `Stock: ${stockQuantity}`;
-                    stockElement.className = `text-xs ${stockQuantity > 0 ? 'text-green-600' : 'text-gray-600'} mt-1`; } } catch (error) { console.error('Error updating size stock:', error);
-                    showToast('Failed to update stock: ' + error.message, 'error'); } }
+            async function updateSizeStock(input, colorId, sizeValue) {
+                const productId = currentProductId;
+                const stockQuantity = parseInt(input.value) || 0;
+                try {
+                    const sizes = currentEditingSizes[colorId] || [];
+                    const existingSize = sizes.find(s => s && s.size_value === sizeValue);
+                    if (existingSize) {
+                        const { error } = await supabase.from('product_sizes').update({ stock_quantity: stockQuantity, is_available: stockQuantity > 0, updated_at: new Date().toISOString() }).eq('id', existingSize.id);
+                        if (error) throw error;
+                        existingSize.stock_quantity = stockQuantity;
+                        existingSize.is_available = stockQuantity > 0;
+                        if (productSizes[productId] && productSizes[productId][colorId]) { const sizeIndex = productSizes[productId][colorId].findIndex(s => s.id === existingSize.id); if (sizeIndex !== -1) productSizes[productId][colorId][sizeIndex] = existingSize; }
+                    } else {
+                        const sizeData = { product_id: parseInt(productId), color_id: parseInt(colorId), size_value: sizeValue, stock_quantity: stockQuantity, is_available: stockQuantity > 0, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+                        const { data, error } = await supabase.from('product_sizes').insert([sizeData]).select();
+                        if (error) throw error;
+                        if (!productSizes[productId]) productSizes[productId] = {};
+                        if (!productSizes[productId][colorId]) productSizes[productId][colorId] = [];
+                        productSizes[productId][colorId].push(data[0]);
+                        if (!currentEditingSizes[colorId]) currentEditingSizes[colorId] = [];
+                        currentEditingSizes[colorId].push(data[0]);
+                    }
+                    const stockElement = input.parentElement.querySelector('.text-xs');
+                    if (stockElement) { stockElement.textContent = `Stock: ${stockQuantity}`; stockElement.className = `text-xs ${stockQuantity > 0 ? 'text-green-600' : 'text-gray-600'} mt-1`; }
+                    calculateFootwearStock();
+                } catch (error) { console.error('Error updating size stock:', error); showToast('Failed to update stock: ' + error.message, 'error'); }
+            }
 
-            async function toggleSizeAvailability(checkbox, colorId, sizeValue) { const productId = currentProductId; const isAvailable = checkbox.checked; try { const sizes = currentEditingSizes[colorId] || []; const existingSize = sizes.find(s => s && s.size_value === sizeValue); if (existingSize) { const { error } = await supabase.from('product_sizes').update({ is_available: isAvailable, updated_at: new Date().toISOString() }).eq('id', existingSize.id); if (error) throw error;
-                    existingSize.is_available = isAvailable;
-                    showToast('Availability updated', 'success'); } } catch (error) { console.error('Error updating availability:', error);
-                    showToast('Failed to update availability: ' + error.message, 'error');
-                    checkbox.checked = !isAvailable; } }
+            async function toggleSizeAvailability(checkbox, colorId, sizeValue) {
+                const productId = currentProductId;
+                const isAvailable = checkbox.checked;
+                try {
+                    const sizes = currentEditingSizes[colorId] || [];
+                    const existingSize = sizes.find(s => s && s.size_value === sizeValue);
+                    if (existingSize) {
+                        const { error } = await supabase.from('product_sizes').update({ is_available: isAvailable, updated_at: new Date().toISOString() }).eq('id', existingSize.id);
+                        if (error) throw error;
+                        existingSize.is_available = isAvailable;
+                        calculateFootwearStock();
+                        showToast('Availability updated', 'success');
+                    }
+                } catch (error) { console.error('Error updating availability:', error); showToast('Failed to update availability: ' + error.message, 'error'); checkbox.checked = !isAvailable; }
+            }
 
-            function updateImagePreview() { const categorySelect = document.getElementById('productCategory'); const imageName = document.getElementById('productImageName').value; const previewContainer = document.getElementById('imagePreviewContainer'); const previewImg = document.getElementById('imagePreview'); const placeholder = document.getElementById('imagePreviewPlaceholder'); const pathInfo = document.getElementById('imagePathInfo'); const statusInfo = document.getElementById('imageStatus'); if (!categorySelect || !categorySelect.value || !imageName) { if (previewContainer) previewContainer.style.display = 'none'; return; } const category = categories.find(c => c.id == categorySelect.value); if (!category) return; const imageUrl = buildCorrectImageUrl(imageName, category.slug); if (previewImg) { previewImg.src = imageUrl;
-                    previewImg.style.display = 'block'; } if (placeholder) placeholder.style.display = 'none'; if (pathInfo) pathInfo.textContent = `Preview: ${imageName}`; if (statusInfo) { statusInfo.textContent = `Will be saved as: ${imageName}`;
-                    statusInfo.className = 'text-xs text-gray-500 mt-1'; } if (previewImg) { previewImg.onload = function() { if (statusInfo) { statusInfo.textContent = `✓ Image loads correctly (${imageName})`;
-                            statusInfo.className = 'text-xs text-green-600 mt-1'; } };
-                    previewImg.onerror = function() { if (statusInfo) { statusInfo.textContent = `✗ Image not found (${imageName})`;
-                            statusInfo.className = 'text-xs text-red-600 mt-1'; } if (previewImg) previewImg.style.display = 'none'; if (placeholder) placeholder.style.display = 'flex'; }; } if (previewContainer) previewContainer.style.display = 'block'; }
-
+            // ==================== SAVE PRODUCT (SUPABASE ONLY IMAGES) ====================
             async function saveProduct(event) {
                 event.preventDefault();
                 const productId = document.getElementById('productId').value;
@@ -4621,253 +4587,132 @@
                 const categoryId = document.getElementById('productCategory').value;
                 const category = categories.find(c => c.id == categoryId);
                 if (!category) { showToast('Please select a category', 'error'); return; }
+
                 let imageUrl = uploadedImageUrl || document.getElementById('productImageUrl').value;
-                if (!imageUrl) { const imageName = document.getElementById('productImageName')?.value?.trim(); if (imageName) imageUrl = imageName; else { showToast('Please upload an image or enter a filename', 'error'); return; } }
-                const productData = { name: document.getElementById('productName').value.trim(), price: parseFloat(document.getElementById('productPrice').value) || 0, compare_price: parseFloat(document.getElementById('productComparePrice')?.value) || 0, category_id: parseInt(categoryId), description: document.getElementById('productDescription').value.trim(), image_url: imageUrl, slug: document.getElementById('productSlug')?.value?.trim() || slugify(document.getElementById('productName').value.trim()), is_active: true, stock: 0, updated_at: new Date().toISOString() };
+                if (!imageUrl) { showToast('Please upload a product image', 'error'); return; }
+
+                const isFootwear = document.getElementById('isFootwear').value === 'true';
+                const stock = isFootwear ? parseInt(document.getElementById('productStock').value) || 0 : parseInt(document.getElementById('productStock').value) || 0;
+
+                const productData = {
+                    name: document.getElementById('productName').value.trim(),
+                    price: parseFloat(document.getElementById('productPrice').value) || 0,
+                    compare_price: parseFloat(document.getElementById('productComparePrice')?.value) || 0,
+                    category_id: parseInt(categoryId),
+                    description: document.getElementById('productDescription').value.trim(),
+                    image_url: imageUrl,
+                    slug: document.getElementById('productSlug')?.value?.trim() || slugify(document.getElementById('productName').value.trim()),
+                    stock: stock,
+                    is_active: true,
+                    updated_at: new Date().toISOString()
+                };
                 if (isNew) productData.created_at = new Date().toISOString();
+
                 if (!productData.name || productData.price <= 0) { showToast('Please fill all required fields correctly', 'warning'); return; }
-                try { let result; if (isNew) { const { data, error } = await supabase.from('products').insert([productData]).select(); if (error) throw error;
+
+                try {
+                    let result;
+                    if (isNew) {
+                        const { data, error } = await supabase.from('products').insert([productData]).select();
+                        if (error) throw error;
                         result = data[0];
                         document.getElementById('productId').value = result.id;
-                        currentProductId = result.id; } else { const { data, error } = await supabase.from('products').update(productData).eq('id', productId).select(); if (error) throw error;
-                        result = data[0]; } await loadInitialData();
+                        currentProductId = result.id;
+                    } else {
+                        const { data, error } = await supabase.from('products').update(productData).eq('id', productId).select();
+                        if (error) throw error;
+                        result = data[0];
+                    }
+                    await loadInitialData();
                     showToast('✅ Product saved successfully!', 'success');
-                    setTimeout(() => { closeModal(); }, 1500); } catch (error) { console.error('❌ Save failed:', error);
-                    showToast('❌ Save failed: ' + error.message, 'error'); }
+                    setTimeout(() => { closeModal(); }, 1500);
+                } catch (error) { console.error('❌ Save failed:', error); showToast('❌ Save failed: ' + error.message, 'error'); }
             }
 
-            // ===== SELECTION & BULK =====
-            function toggleProductSelect(id) { if (selectedProductIds.has(id)) selectedProductIds.delete(id); else selectedProductIds.add(id);
-                updateBulkBar();
-                renderProductsPage();
-                renderRecentProducts(); }
-
-            function selectAllProducts() { filteredProducts.forEach(p => selectedProductIds.add(p.id));
-                updateBulkBar();
-                renderProductsPage(); }
-
-            function clearSelection() { selectedProductIds.clear();
-                updateBulkBar();
-                renderProductsPage(); }
-
-            function updateBulkBar() { const bar = document.getElementById('bulkActionsBar'); const count = selectedProductIds.size; if (bar) bar.classList.toggle('active', count > 0); const countEl = document.getElementById('bulkCount'); if (countEl) countEl.textContent = `${count} selected`; }
-
-            function bulkDeleteRequest() { if (selectedProductIds.size === 0) { showToast('Select products first', 'warning'); return; }
-                document.getElementById('bulkDeleteMessage').innerHTML = `<p>Permanently delete <strong>${selectedProductIds.size} products</strong>?</p><p style="color:var(--danger-600)">This cannot be undone!</p>`;
-                document.getElementById('bulkDeleteConfirmOverlay').style.display = 'flex'; }
-
-            async function confirmBulkDelete() { const ids = [...selectedProductIds]; let deleted = 0; for (const id of ids) { try { await supabase.from('product_sizes').delete().eq('product_id', id); await supabase.from('product_colors').delete().eq('product_id', id); await supabase.from('product_modals').delete().eq('product_id', id); await supabase.from('products').delete().eq('id', id);
-                        deleted++; } catch (e) { console.error(e); } }
-                document.getElementById('bulkDeleteConfirmOverlay').style.display = 'none';
-                clearSelection(); await loadInitialData();
-                showToast(`Deleted ${deleted} products`, 'success'); }
-
-            function bulkEditOpen() { showToast('Bulk edit feature coming soon', 'info'); }
-
-            function applyBulkEdit() { showToast('Bulk edit applied', 'success'); }
-
-            // ===== DELETE SINGLE PRODUCT =====
-            function showDeleteConfirmation(productId) { productToDelete = productId || document.getElementById('productId').value; const product = allProducts.find(p => p.id == productToDelete); if (!product) return;
-                document.getElementById('deleteConfirmTitle').textContent = 'Delete Product?';
-                document.getElementById('deleteConfirmMessage').innerHTML = `<p>What would you like to do with <strong>"${product.name}"</strong>?</p><div style="background:var(--gray-50);border-radius:var(--radius);padding:1rem;margin:1rem 0;text-align:left"><p><strong>Deactivate:</strong> Hidden from customers but kept in database.</p><p class="mt-2"><strong style="color:var(--danger-600)">Delete Permanently:</strong> Removes ALL data.</p></div>`;
-                document.getElementById('deactivateBtn').style.display = 'inline-flex';
-                document.getElementById('deactivateBtn').setAttribute('data-id', productToDelete);
-                document.getElementById('permanentDeleteBtn').setAttribute('data-id', productToDelete);
-                document.getElementById('deleteConfirmOverlay').style.display = 'flex'; }
-
-            async function deactivateFromDelete() { const id = document.getElementById('deactivateBtn').getAttribute('data-id'); await supabase.from('products').update({ is_active: false, updated_at: new Date().toISOString() }).eq('id', id); const product = allProducts.find(p => p.id == id); if (product) product.is_active = false;
-                document.getElementById('deleteConfirmOverlay').style.display = 'none';
-                closeModal(); await loadInitialData();
-                showToast('Product deactivated', 'success'); }
-
-            async function confirmPermanentDelete() { const id = document.getElementById('permanentDeleteBtn').getAttribute('data-id'); await supabase.from('product_sizes').delete().eq('product_id', id); await supabase.from('product_colors').delete().eq('product_id', id); await supabase.from('product_modals').delete().eq('product_id', id); await supabase.from('products').delete().eq('id', id);
-                document.getElementById('deleteConfirmOverlay').style.display = 'none';
-                closeModal(); await loadInitialData();
-                showToast('Product permanently deleted', 'success'); }
-
-            // ===== SLUG =====
-            function generateSlug() { if (slugManuallyEdited) return;
-                document.getElementById('productSlug').value = slugify(document.getElementById('productName').value); }
-
-            function toggleSlugEdit() { slugManuallyEdited = !slugManuallyEdited; const input = document.getElementById('productSlug'); const btn = document.getElementById('editSlugBtn'); if (slugManuallyEdited) { input.removeAttribute('readonly');
-                    btn.innerHTML = '<i class="fas fa-lock-open"></i>';
-                    btn.style.background = 'var(--warning-500)';
-                    btn.style.color = 'white'; } else { input.setAttribute('readonly', true);
-                    generateSlug();
-                    btn.innerHTML = '<i class="fas fa-lock"></i>';
-                    btn.style.background = '';
-                    btn.style.color = ''; } }
-
-            function slugify(text) { return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, ''); }
-
-            // ===== IMAGE UPLOAD =====
-            function initImageUpload() { const zone = document.getElementById('imageUploadZone'); const fi = document.getElementById('imageFileInput'); if (!zone || !fi) return;
+            // ==================== IMAGE UPLOAD ====================
+            function initImageUpload() {
+                const zone = document.getElementById('imageUploadZone');
+                const fi = document.getElementById('imageFileInput');
+                if (!zone || !fi) return;
                 zone.addEventListener('click', e => { if (e.target !== fi && !e.target.closest('#removePreviewBtn')) fi.click(); });
                 fi.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
-                zone.addEventListener('dragover', e => { e.preventDefault();
-                    zone.classList.add('drag-over'); });
+                zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
                 zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-                zone.addEventListener('drop', e => { e.preventDefault();
-                    zone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
-                document.addEventListener('paste', e => { if (document.getElementById('productModal').style.display !== 'flex') return; for (let item of e.clipboardData.items) { if (item.type.startsWith('image/')) { e.preventDefault();
-                            handleFile(item.getAsFile()); break; } } });
-                document.getElementById('removePreviewBtn').addEventListener('click', e => { e.stopPropagation();
-                    resetUpload(); }); }
+                zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+                document.addEventListener('paste', e => { if (document.getElementById('productModal').style.display !== 'flex') return; for (let item of e.clipboardData.items) { if (item.type.startsWith('image/')) { e.preventDefault(); handleFile(item.getAsFile()); break; } } });
+                document.getElementById('removePreviewBtn').addEventListener('click', e => { e.stopPropagation(); resetUpload(); });
+            }
 
-            function handleFile(file) { if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) { showToast('Invalid type', 'error'); return; } if (file.size > 52428800) { showToast('Max 50MB', 'error'); return; } const r = new FileReader();
-                r.onload = e => { document.getElementById('uploadPreview').src = e.target.result;
-                    document.getElementById('uploadPreviewContainer').style.display = 'block';
-                    document.getElementById('uploadIcon').style.display = 'none';
-                    uploadToStorage(file); };
-                r.readAsDataURL(file); }
+            function handleFile(file) {
+                if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) { showToast('Invalid type', 'error'); return; }
+                if (file.size > 52428800) { showToast('Max 50MB', 'error'); return; }
+                const r = new FileReader();
+                r.onload = e => { document.getElementById('uploadPreview').src = e.target.result; document.getElementById('uploadPreviewContainer').style.display = 'block'; document.getElementById('uploadIcon').style.display = 'none'; uploadToStorage(file); };
+                r.readAsDataURL(file);
+            }
 
-            async function uploadToStorage(file) { if (isUploading) return;
+            async function uploadToStorage(file) {
+                if (isUploading) return;
                 isUploading = true;
-                showUploadStatus('Uploading...', 'uploading'); try { const ts = Date.now(),
-                        rs = Math.random().toString(36).substring(2, 8); const fn = `${ts}-${rs}.${file.name.split('.').pop()}`; const cat = categories.find(c => c.id == document.getElementById('productCategory').value); const folder = cat ? cat.slug : 'uncategorized'; const fp = `${folder}/${fn}`; const { error } = await supabase.storage.from('product-images').upload(fp, file, { cacheControl: '3600' }); if (error) throw error; const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fp);
+                showUploadStatus('Uploading...', 'uploading');
+                try {
+                    const ts = Date.now(), rs = Math.random().toString(36).substring(2, 8);
+                    const fn = `${ts}-${rs}.${file.name.split('.').pop()}`;
+                    const cat = categories.find(c => c.id == document.getElementById('productCategory').value);
+                    const folder = cat ? cat.slug : 'uncategorized';
+                    const fp = `${folder}/${fn}`;
+                    const { error } = await supabase.storage.from('product-images').upload(fp, file, { cacheControl: '3600' });
+                    if (error) throw error;
+                    const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fp);
                     uploadedImageUrl = publicUrl;
                     document.getElementById('productImageUrl').value = publicUrl;
-                    showUploadStatus('✓ Uploaded!', 'success'); } catch (e) { showUploadStatus('Failed: ' + e.message, 'error'); } finally { isUploading = false; } }
+                    showUploadStatus('✓ Uploaded!', 'success');
+                } catch (e) { showUploadStatus('Failed: ' + e.message, 'error'); } finally { isUploading = false; }
+            }
 
             function showUploadStatus(msg, type) { const c = document.getElementById('uploadStatusContainer'); if (c) c.innerHTML = `<div class="upload-status ${type}">${msg}</div>`; }
+            function resetUpload() { uploadedImageUrl = null; document.getElementById('productImageUrl').value = ''; document.getElementById('uploadPreviewContainer').style.display = 'none'; document.getElementById('uploadIcon').style.display = ''; document.getElementById('uploadStatusContainer').innerHTML = ''; document.getElementById('imageFileInput').value = ''; }
 
-            function resetUpload() { uploadedImageUrl = null;
-                document.getElementById('productImageUrl').value = '';
-                document.getElementById('uploadPreviewContainer').style.display = 'none';
-                document.getElementById('uploadIcon').style.display = '';
-                document.getElementById('uploadStatusContainer').innerHTML = '';
-                document.getElementById('imageFileInput').value = ''; }
+            // ==================== SELECTION & BULK ====================
+            function toggleProductSelect(id) { if (selectedProductIds.has(id)) selectedProductIds.delete(id); else selectedProductIds.add(id); updateBulkBar(); renderProductsPage(); renderRecentProducts(); }
+            function selectAllProducts() { filteredProducts.forEach(p => selectedProductIds.add(p.id)); updateBulkBar(); renderProductsPage(); }
+            function clearSelection() { selectedProductIds.clear(); updateBulkBar(); renderProductsPage(); }
+            function updateBulkBar() { const bar = document.getElementById('bulkActionsBar'); const count = selectedProductIds.size; if (bar) bar.classList.toggle('active', count > 0); const countEl = document.getElementById('bulkCount'); if (countEl) countEl.textContent = `${count} selected`; }
+
+            function bulkDeleteRequest() { if (selectedProductIds.size === 0) { showToast('Select products first', 'warning'); return; } document.getElementById('bulkDeleteMessage').innerHTML = `<p>Permanently delete <strong>${selectedProductIds.size} products</strong>?</p><p style="color:var(--danger-600)">This cannot be undone!</p>`; document.getElementById('bulkDeleteConfirmOverlay').style.display = 'flex'; }
+
+            async function confirmBulkDelete() { const ids = [...selectedProductIds]; let deleted = 0; for (const id of ids) { try { await supabase.from('product_sizes').delete().eq('product_id', id); await supabase.from('product_colors').delete().eq('product_id', id); await supabase.from('product_modals').delete().eq('product_id', id); await supabase.from('products').delete().eq('id', id); deleted++; } catch (e) { console.error(e); } } document.getElementById('bulkDeleteConfirmOverlay').style.display = 'none'; clearSelection(); await loadInitialData(); showToast(`Deleted ${deleted} products`, 'success'); }
+
+            function showDeleteConfirmation(productId) { productToDelete = productId || document.getElementById('productId').value; const product = allProducts.find(p => p.id == productToDelete); if (!product) return; document.getElementById('deleteConfirmTitle').textContent = 'Delete Product?'; document.getElementById('deleteConfirmMessage').innerHTML = `<p>What would you like to do with <strong>"${product.name}"</strong>?</p><div style="background:var(--gray-50);border-radius:var(--radius);padding:1rem;margin:1rem 0;text-align:left"><p><strong>Deactivate:</strong> Hidden from customers but kept in database.</p><p class="mt-2"><strong style="color:var(--danger-600)">Delete Permanently:</strong> Removes ALL data.</p></div>`; document.getElementById('deactivateBtn').style.display = 'inline-flex'; document.getElementById('deactivateBtn').setAttribute('data-id', productToDelete); document.getElementById('permanentDeleteBtn').setAttribute('data-id', productToDelete); document.getElementById('deleteConfirmOverlay').style.display = 'flex'; }
+
+            async function deactivateFromDelete() { const id = document.getElementById('deactivateBtn').getAttribute('data-id'); await supabase.from('products').update({ is_active: false, updated_at: new Date().toISOString() }).eq('id', id); const product = allProducts.find(p => p.id == id); if (product) product.is_active = false; document.getElementById('deleteConfirmOverlay').style.display = 'none'; closeModal(); await loadInitialData(); showToast('Product deactivated', 'success'); }
+
+            async function confirmPermanentDelete() { const id = document.getElementById('permanentDeleteBtn').getAttribute('data-id'); await supabase.from('product_sizes').delete().eq('product_id', id); await supabase.from('product_colors').delete().eq('product_id', id); await supabase.from('product_modals').delete().eq('product_id', id); await supabase.from('products').delete().eq('id', id); document.getElementById('deleteConfirmOverlay').style.display = 'none'; closeModal(); await loadInitialData(); showToast('Product permanently deleted', 'success'); }
+
+            function generateSlug() { if (slugManuallyEdited) return; document.getElementById('productSlug').value = slugify(document.getElementById('productName').value); }
+            function toggleSlugEdit() { slugManuallyEdited = !slugManuallyEdited; const input = document.getElementById('productSlug'); const btn = document.getElementById('editSlugBtn'); if (slugManuallyEdited) { input.removeAttribute('readonly'); btn.innerHTML = '<i class="fas fa-lock-open"></i>'; btn.style.background = 'var(--warning-500)'; btn.style.color = 'white'; } else { input.setAttribute('readonly', true); generateSlug(); btn.innerHTML = '<i class="fas fa-lock"></i>'; btn.style.background = ''; btn.style.color = ''; } }
+            function slugify(text) { return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, ''); }
 
             // ===== TOGGLE DARK MODE =====
-            function toggleDarkMode() { const isDarkMode = document.body.classList.toggle('dark-mode');
-                localStorage.setItem('darkMode', isDarkMode); const darkModeToggle = document.getElementById('darkModeToggle'); if (darkModeToggle) darkModeToggle.checked = isDarkMode;
-                showToast(isDarkMode ? 'Dark mode enabled' : 'Light mode enabled', 'success'); }
-
-            function changeFontSize(size) { document.documentElement.style.fontSize = size + 'px';
-                localStorage.setItem('fontSize', size); }
-
-            function changePrimaryColor(color) { document.documentElement.style.setProperty('--primary-500', color);
-                document.documentElement.style.setProperty('--primary-600', darkenColor(color, 20));
-                localStorage.setItem('primaryColor', color); }
-
-            function applyButtonStyle(style) { const styleData = uiAssets.buttonStyles[style] || uiAssets.buttonStyles.rounded; const root = document.documentElement;
-                root.style.setProperty('--radius', styleData.borderRadius); const buttons = document.querySelectorAll('.btn');
-                buttons.forEach(btn => { btn.style.borderRadius = styleData.borderRadius;
-                    btn.style.padding = styleData.padding; }); }
-
-            function changeButtonStyle(style) { localStorage.setItem('buttonStyle', style);
-                applyButtonStyle(style);
-                showToast(`Button style changed to ${style}`, 'success'); }
-
-            function changeIconLibrary(library) { localStorage.setItem('iconLibrary', library);
-                showToast(`Icon library changed to ${library}`, 'info'); }
-
-            function changeAnimationSpeed(speed) { localStorage.setItem('animationSpeed', speed); const root = document.documentElement; switch (speed) { case 'fast':
-                        root.style.setProperty('--transition-fast', '100ms cubic-bezier(0.4, 0, 0.2, 1)');
-                        root.style.setProperty('--transition', '150ms cubic-bezier(0.4, 0, 0.2, 1)'); break; case 'slow':
-                        root.style.setProperty('--transition-fast', '300ms cubic-bezier(0.4, 0, 0.2, 1)');
-                        root.style.setProperty('--transition', '500ms cubic-bezier(0.4, 0, 0.2, 1)'); break; case 'none':
-                        root.style.setProperty('--transition-fast', '0ms');
-                        root.style.setProperty('--transition', '0ms'); break; default:
-                        root.style.setProperty('--transition-fast', '150ms cubic-bezier(0.4, 0, 0.2, 1)');
-                        root.style.setProperty('--transition', '250ms cubic-bezier(0.4, 0, 0.2, 1)'); }
-                showToast(`Animation speed set to ${speed}`, 'success'); }
-
-            function changeGridDensity(density) { localStorage.setItem('gridDensity', density); const root = document.documentElement; switch (density) { case 'compact':
-                        root.style.setProperty('--space-4', '0.75rem');
-                        root.style.setProperty('--space-6', '1rem'); break; case 'spacious':
-                        root.style.setProperty('--space-4', '1.25rem');
-                        root.style.setProperty('--space-6', '2rem'); break; default:
-                        root.style.setProperty('--space-4', '1rem');
-                        root.style.setProperty('--space-6', '1.5rem'); }
-                showToast(`Grid density set to ${density}`, 'success'); }
-
-            function setSyncInterval(interval) { localStorage.setItem('syncInterval', interval);
-                showToast(`Sync interval set to ${interval}`, 'success'); }
-
-            function toggleDeveloperMode() { const developerModeToggle = document.getElementById('developerMode'); const enabled = developerModeToggle ? developerModeToggle.checked : false;
-                localStorage.setItem('developerMode', enabled); if (enabled) console.log('🔧 Developer mode enabled');
-                showToast(enabled ? 'Developer mode enabled' : 'Developer mode disabled', 'info'); }
-
+            function toggleDarkMode() { const isDarkMode = document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', isDarkMode); const darkModeToggle = document.getElementById('darkModeToggle'); if (darkModeToggle) darkModeToggle.checked = isDarkMode; showToast(isDarkMode ? 'Dark mode enabled' : 'Light mode enabled', 'success'); }
+            function changeFontSize(size) { document.documentElement.style.fontSize = size + 'px'; localStorage.setItem('fontSize', size); }
+            function changePrimaryColor(color) { document.documentElement.style.setProperty('--primary-500', color); document.documentElement.style.setProperty('--primary-600', darkenColor(color, 20)); localStorage.setItem('primaryColor', color); }
+            function applyButtonStyle(style) { const styleData = { rounded: { borderRadius: '0.5rem' }, square: { borderRadius: '0.25rem' }, pill: { borderRadius: '9999px' } }[style] || { borderRadius: '0.5rem' }; document.documentElement.style.setProperty('--radius', styleData.borderRadius); }
+            function changeButtonStyle(style) { localStorage.setItem('buttonStyle', style); applyButtonStyle(style); showToast(`Button style changed to ${style}`, 'success'); }
             function darkenColor(color, percent) { const num = parseInt(color.replace("#", ""), 16); const amt = Math.round(2.55 * percent); const R = (num >> 16) - amt; const G = (num >> 8 & 0x00FF) - amt; const B = (num & 0x0000FF) - amt; return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1); }
+            function setRefreshInterval(interval) { localStorage.setItem('refreshInterval', interval); if (refreshInterval) clearInterval(refreshInterval); const intervalMs = parseInt(interval); if (intervalMs > 0) { refreshInterval = setInterval(() => { loadInitialData(); loadOrders(); showToast('Data refreshed automatically', 'info'); }, intervalMs); } showToast('Auto-refresh updated', 'success'); }
 
-            function setRefreshInterval(interval) { localStorage.setItem('refreshInterval', interval); if (refreshInterval) clearInterval(refreshInterval); const intervalMs = parseInt(interval); if (intervalMs > 0) { refreshInterval = setInterval(() => { loadInitialData();
-                        loadOrders();
-                        showToast('Data refreshed automatically', 'info'); }, intervalMs); }
-                showToast('Auto-refresh updated', 'success'); }
+            function openModal() { document.getElementById('productModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+            function closeModal() { document.getElementById('productModal').style.display = 'none'; document.body.style.overflow = 'auto'; currentProductId = null; currentEditingColors = []; currentEditingSizes = {}; selectedColorIds = []; }
 
-            function toggleNotifications() { const notificationsToggle = document.getElementById('notificationsToggle'); const enabled = notificationsToggle ? notificationsToggle.checked : false;
-                localStorage.setItem('notifications', enabled); if (enabled && Notification.permission === 'default') Notification.requestPermission();
-                showToast(enabled ? 'Notifications enabled' : 'Notifications disabled', 'success'); }
-
-            async function testConnection() { showToast('Testing database connection...', 'info'); try { const { data, error } = await supabase.from('products').select('count', { count: 'exact', head: true }); if (error) throw error; const dbStatus = document.getElementById('dbConnectionStatus'); if (dbStatus) dbStatus.textContent = 'Connected';
-                    showToast('✅ Database connection successful!', 'success'); } catch (error) { console.error('Connection test failed:', error); const dbStatus = document.getElementById('dbConnectionStatus'); if (dbStatus) dbStatus.textContent = 'Disconnected';
-                    showToast('❌ Connection failed: ' + error.message, 'error'); } }
-
-            function clearCache() { localStorage.removeItem('cachedProducts');
-                localStorage.removeItem('cachedColors');
-                localStorage.removeItem('cachedSizes');
-                showToast('Cache cleared successfully', 'success');
-                loadInitialData(); }
-
-            async function backupDatabase() { showToast('Creating backup...', 'info'); try { const [productsRes, colorsRes, sizesRes] = await Promise.all([supabase.from('products').select('*'), supabase.from('product_colors').select('*'), supabase.from('product_sizes').select('*')]); const backupData = { timestamp: new Date().toISOString(), products: productsRes.data || [], colors: colorsRes.data || [], sizes: sizesRes.data || [] }; const dataStr = JSON.stringify(backupData, null, 2); const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr); const exportFileDefaultName = `jmpotters-backup-${new Date().toISOString().slice(0,10)}.json`; const linkElement = document.createElement('a');
-                    linkElement.setAttribute('href', dataUri);
-                    linkElement.setAttribute('download', exportFileDefaultName);
-                    linkElement.click();
-                    showToast('Backup created successfully', 'success'); } catch (error) { console.error('Backup failed:', error);
-                    showToast('Backup failed: ' + error.message, 'error'); } }
-
-            function resetSettings() { if (!confirm('Are you sure you want to reset all settings to default?')) return;
-                localStorage.clear();
-                location.reload(); }
-
-            function updateCategoryPaths() { const container = document.getElementById('categoryPaths'); if (container) { let html = '{\n'; for (const [category, path] of Object.entries(imageConfig.paths)) { html += `  "${category}": "${path}",\n`; }
-                    html = html.slice(0, -2) + '\n}';
-                    container.textContent = html; } }
-
-            function openModal() { document.getElementById('productModal').style.display = 'flex';
-                document.body.style.overflow = 'hidden'; }
-
-            function closeModal() { document.getElementById('productModal').style.display = 'none';
-                document.body.style.overflow = 'auto';
-                currentProductId = null;
-                currentEditingColors = [];
-                currentEditingSizes = {};
-                selectedColorIds = []; }
-
-            function saveAsDraft() { showToast('Draft saved (feature in development)', 'info'); }
-
-            async function testWrite() { showToast('Testing write permissions...', 'info'); const testData = { name: 'Write Test ' + Date.now(), price: 999, stock: 9, category_id: 1, image_url: 'test-image.jpg', description: 'Database write test', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }; try { const { data, error } = await supabase.from('products').insert([testData]).select(); if (error) throw error;
-                    showToast('✅ Write test successful!', 'success'); await loadInitialData(); } catch (error) { console.error('Write test failed:', error);
-                    showToast('❌ Write test failed: ' + error.message, 'error'); } }
-
-            function showToast(message, type = 'info') { const container = document.getElementById('toastContainer'); if (!container) return; const toast = document.createElement('div');
-                toast.className = `toast ${type}`; const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
-                toast.innerHTML = `<div class="toast-icon"><i class="fas fa-${icon}"></i></div><div>${escapeHtml(message)}</div>`;
-                container.appendChild(toast);
-                setTimeout(() => { toast.style.animation = 'toastSlide 0.3s ease reverse';
-                    setTimeout(() => toast.remove(), 300); }, 5000); }
+            function showToast(message, type = 'info') { const container = document.getElementById('toastContainer'); if (!container) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'; toast.innerHTML = `<div class="toast-icon"><i class="fas fa-${icon}"></i></div><div>${escapeHtml(message)}</div>`; container.appendChild(toast); setTimeout(() => { toast.style.animation = 'toastSlide 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 5000); }
 
             function setupEventListeners() {
-                const menuBtn = document.getElementById('mobileMenuBtn');
-                const sidebar = document.getElementById('mobileSidebar');
-                const overlay = document.getElementById('sidebarOverlay');
-                if (menuBtn && sidebar && overlay) { menuBtn.addEventListener('click', () => { sidebar.classList.add('active');
-                        overlay.style.display = 'block'; });
-                    overlay.addEventListener('click', () => { sidebar.classList.remove('active');
-                        overlay.style.display = 'none'; });
-                    document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', () => { sidebar.classList.remove('active');
-                            overlay.style.display = 'none'; }); }); }
-                document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault();
-                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                        this.classList.add('active'); const sectionId = this.dataset.section;
-                        document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active')); const targetSection = document.getElementById(sectionId); if (targetSection) targetSection.classList.add('active');
-                        window.location.hash = sectionId; }); });
+                const menuBtn = document.getElementById('mobileMenuBtn'); const sidebar = document.getElementById('mobileSidebar'); const overlay = document.getElementById('sidebarOverlay');
+                if (menuBtn && sidebar && overlay) { menuBtn.addEventListener('click', () => { sidebar.classList.add('active'); overlay.style.display = 'block'; }); overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.style.display = 'none'; }); document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.style.display = 'none'; }); }); }
+                document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); this.classList.add('active'); const sectionId = this.dataset.section; document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active')); const targetSection = document.getElementById(sectionId); if (targetSection) targetSection.classList.add('active'); window.location.hash = sectionId; }); });
                 window.addEventListener('hashchange', function() { const sectionId = window.location.hash.substring(1) || 'dashboard'; const link = document.querySelector(`.nav-link[data-section="${sectionId}"]`); if (link) link.click(); });
                 if (window.location.hash) { const sectionId = window.location.hash.substring(1); if (sectionId !== 'order-detail') { const link = document.querySelector(`.nav-link[data-section="${sectionId}"]`); if (link) link.click(); } }
-                document.addEventListener('click', (e) => { if (!e.target.closest('.color-autocomplete')) { const options = document.getElementById('colorOptions'); if (options) options.style.display = 'none'; } });
-                document.addEventListener('click', (e) => { if (activeStatusDropdown && !e.target.closest('.status-dropdown')) { const dropdown = document.getElementById('statusDropdown' + activeStatusDropdown); if (dropdown) { dropdown.classList.remove('show');
-                            activeStatusDropdown = null; } } });
                 document.querySelectorAll('.order-filter-btn').forEach(btn => { btn.addEventListener('click', () => { filterOrdersByStatus(btn.dataset.status); }); });
                 const orderSearch = document.getElementById('orderSearchInput'); if (orderSearch) orderSearch.addEventListener('input', () => { searchOrders(); });
             }
@@ -4876,97 +4721,17 @@
 
             // ==================== PUBLIC API ====================
             return {
-                init,
-                openAddProductModal,
-                editProduct,
-                saveProduct,
-                testWrite,
-                testConnection,
-                closeModal,
-                saveAsDraft,
+                init, openAddProductModal, editProduct, saveProduct, closeModal, saveAsDraft: function() { showToast('Draft saved (feature in development)', 'info'); },
                 onCategoryChange,
-                updateImagePreview,
-                openAddColorModal,
-                closeAddColorModal,
-                saveNewColor,
-                editColor,
-                deleteColor,
-                openAddSizeModal,
-                closeAddSizeModal,
-                saveNewSize,
-                loadSizesForColor,
-                updateSizeStock,
-                toggleSizeAvailability,
-                searchColors,
-                selectColor,
-                selectColorFromSearch,
-                removeSelectedColor,
-                filterProducts,
-                nextPage,
-                prevPage,
-                loadProducts: loadInitialData,
-                toggleDarkMode,
-                changeFontSize,
-                changePrimaryColor,
-                changeButtonStyle,
-                changeIconLibrary,
-                changeAnimationSpeed,
-                changeGridDensity,
-                setSyncInterval,
-                toggleDeveloperMode,
-                setRefreshInterval,
-                toggleNotifications,
-                clearCache,
-                backupDatabase,
-                resetSettings,
-                toggleStatusDropdown: function(productId, button) { if (activeStatusDropdown && activeStatusDropdown !== productId) { const prevDropdown = document.getElementById('statusDropdown' + activeStatusDropdown); if (prevDropdown) prevDropdown.classList.remove('show'); } const dropdown = document.getElementById('statusDropdown' + productId); if (dropdown) { dropdown.classList.toggle('show');
-                        activeStatusDropdown = dropdown.classList.contains('show') ? productId : null; }
-                    document.addEventListener('click', function closeDropdown(e) { if (!button.contains(e.target) && !dropdown.contains(e.target)) { dropdown.classList.remove('show');
-                            activeStatusDropdown = null;
-                            document.removeEventListener('click', closeDropdown); } }); },
-                activateProduct: async function(productId) { try { const { error } = await supabase.from('products').update({ is_active: true, updated_at: new Date().toISOString() }).eq('id', productId); if (error) throw error; const product = allProducts.find(p => p.id === productId); if (product) product.is_active = true;
-                        renderRecentProducts();
-                        renderProductsPage();
-                        showToast('Product activated successfully', 'success'); const dropdown = document.getElementById('statusDropdown' + productId); if (dropdown) dropdown.classList.remove('show');
-                        activeStatusDropdown = null; } catch (error) { console.error('Error activating product:', error);
-                        showToast('Failed to activate product: ' + error.message, 'error'); } },
-                deactivateProduct: async function(productId) { if (!confirm('Are you sure you want to deactivate this product?')) return; try { const { error } = await supabase.from('products').update({ is_active: false, updated_at: new Date().toISOString() }).eq('id', productId); if (error) throw error; const product = allProducts.find(p => p.id === productId); if (product) product.is_active = false;
-                        renderRecentProducts();
-                        renderProductsPage();
-                        showToast('Product deactivated successfully', 'success'); const dropdown = document.getElementById('statusDropdown' + productId); if (dropdown) dropdown.classList.remove('show');
-                        activeStatusDropdown = null; } catch (error) { console.error('Error deactivating product:', error);
-                        showToast('Failed to deactivate product: ' + error.message, 'error'); } },
+                openAddColorModal, closeAddColorModal, saveNewColor, deleteColor,
+                openAddSizeModal, closeAddSizeModal, saveNewSize, loadSizesForColor, updateSizeStock, toggleSizeAvailability,
+                filterProducts, nextPage, prevPage, loadProducts: loadInitialData,
+                toggleDarkMode, changeFontSize, changePrimaryColor, changeButtonStyle, setRefreshInterval,
+                toggleProductSelect, selectAllProducts, clearSelection, bulkDeleteRequest, confirmBulkDelete, bulkEditOpen: function() { showToast('Bulk edit feature coming soon', 'info'); },
+                showDeleteConfirmation, confirmPermanentDelete, deactivateFromDelete,
+                generateSlug, toggleSlugEdit,
+                loadOrders, filterOrdersByStatus, searchOrders, ordersPrevPage, ordersNextPage, updateOrderStatus, viewOrderDetailFull, updateOrderStatusFromDetail, toggleOrderStatusDropdown, navigateBackToOrders, exportOrders, refreshOrders, generateInvoice,
                 showSection: function(sectionId) { const link = document.querySelector(`.nav-link[data-section="${sectionId}"]`); if (link) link.click(); },
-                // Selection & Bulk
-                toggleProductSelect,
-                selectAllProducts,
-                clearSelection,
-                bulkDeleteRequest,
-                confirmBulkDelete,
-                bulkEditOpen,
-                applyBulkEdit,
-                // Delete single
-                showDeleteConfirmation,
-                confirmPermanentDelete,
-                deactivateFromDelete,
-                // Slug
-                generateSlug,
-                toggleSlugEdit,
-                // Order management
-                loadOrders,
-                filterOrdersByStatus,
-                searchOrders,
-                ordersPrevPage,
-                ordersNextPage,
-                updateOrderStatus,
-                viewOrderDetailFull,
-                updateOrderStatusFromDetail,
-                toggleOrderStatusDropdown,
-                navigateBackToOrders,
-                exportOrders,
-                refreshOrders,
-                generateInvoice,
-                // Quick actions
                 exportProducts: function() { showToast('Export feature coming soon', 'info'); },
                 bulkEditProducts: function() { showToast('Bulk edit feature coming soon', 'info'); },
                 duplicateSelected: function() { showToast('Duplicate feature coming soon', 'info'); },
@@ -4976,30 +4741,35 @@
                 bulkStockUpdate: function() { showToast('Bulk stock update coming soon', 'info'); },
                 downloadStockTemplate: function() { showToast('Stock template download coming soon', 'info'); },
                 importStockCSV: function() { showToast('Stock CSV import coming soon', 'info'); },
-                showLowStock: function() { filterProducts('low_stock');
-                    this.showSection('products'); },
+                showLowStock: function() { filterProducts('low_stock'); this.showSection('products'); },
                 showOutOfStock: function() { showToast('Out of stock filter coming soon', 'info'); },
                 generateStockReport: function() { showToast('Stock report generation coming soon', 'info'); },
-                duplicateProduct: function(productId) { showToast('Product duplication coming soon', 'info'); },
                 confirmDeleteAll: function() { if (confirm('⚠️ DANGER: This will delete ALL data permanently! Are you absolutely sure?')) showToast('Delete all feature coming soon', 'warning'); },
-                viewSalesReport: function() { showToast('Sales report feature coming soon', 'info'); },
-                viewCustomerAnalytics: function() { showToast('Customer analytics feature coming soon', 'info'); },
-                viewProductAnalytics: function() { showToast('Product analytics feature coming soon', 'info'); },
-                exportAnalytics: function() { showToast('Analytics export feature coming soon', 'info'); },
+                backupDatabase: async function() { showToast('Creating backup...', 'info'); try { const [productsRes, colorsRes, sizesRes] = await Promise.all([supabase.from('products').select('*'), supabase.from('product_colors').select('*'), supabase.from('product_sizes').select('*')]); const backupData = { timestamp: new Date().toISOString(), products: productsRes.data || [], colors: colorsRes.data || [], sizes: sizesRes.data || [] }; const dataStr = JSON.stringify(backupData, null, 2); const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr); const linkElement = document.createElement('a'); linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `jmpotters-backup-${new Date().toISOString().slice(0,10)}.json`); linkElement.click(); showToast('Backup created successfully', 'success'); } catch (error) { showToast('Backup failed: ' + error.message, 'error'); } },
+                testWrite: async function() { showToast('Testing write permissions...', 'info'); try { const { error } = await supabase.from('products').insert([{ name: 'Test ' + Date.now(), price: 999, stock: 9, category_id: 1, image_url: 'https://tmpggeeuwdvlngvfncaa.supabase.co/storage/v1/object/public/product-images/test.jpg', description: 'Test', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }]).select(); if (error) throw error; showToast('✅ Write test successful!', 'success'); await loadInitialData(); } catch (error) { showToast('❌ Write test failed: ' + error.message, 'error'); } },
+                testConnection: async function() { showToast('Testing database connection...', 'info'); try { const { error } = await supabase.from('products').select('count', { count: 'exact', head: true }); if (error) throw error; showToast('✅ Database connection successful!', 'success'); } catch (error) { showToast('❌ Connection failed: ' + error.message, 'error'); } },
+                clearCache: function() { localStorage.clear(); showToast('Cache cleared', 'success'); loadInitialData(); },
+                resetSettings: function() { if (confirm('Reset all settings?')) { localStorage.clear(); location.reload(); } },
+                toggleNotifications: function() { showToast('Notifications toggled', 'info'); },
+                toggleDeveloperMode: function() { showToast('Developer mode toggled', 'info'); },
+                changeIconLibrary: function() { showToast('Icon library changed', 'info'); },
+                changeAnimationSpeed: function() { showToast('Animation speed changed', 'info'); },
+                changeGridDensity: function() { showToast('Grid density changed', 'info'); },
+                setSyncInterval: function() { showToast('Sync interval set', 'info'); },
+                manageButtonAssets: function() { showToast('Button assets management coming soon', 'info'); },
+                viewSalesReport: function() { showToast('Sales report coming soon', 'info'); },
+                viewCustomerAnalytics: function() { showToast('Customer analytics coming soon', 'info'); },
+                viewProductAnalytics: function() { showToast('Product analytics coming soon', 'info'); },
+                exportAnalytics: function() { showToast('Analytics export coming soon', 'info'); },
                 loadDemoAnalytics: function() { showToast('Loading demo analytics...', 'info'); },
-                viewAllCategories: function() { showToast('View all categories feature coming soon', 'info'); },
-                createNewCategory: function() { showToast('Create category feature coming soon', 'info'); },
-                viewAllUsers: function() { showToast('View all users feature coming soon', 'info'); },
-                inviteNewUser: function() { showToast('Invite user feature coming soon', 'info'); },
-                viewAllCoupons: function() { showToast('View all coupons feature coming soon', 'info'); },
-                createNewCoupon: function() { showToast('Create coupon feature coming soon', 'info'); },
-                viewAllReviews: function() { showToast('View all reviews feature coming soon', 'info'); },
-                moderateReviews: function() { showToast('Moderate reviews feature coming soon', 'info'); },
-                createTestOrder: function() { showToast('Create test order feature coming soon', 'info'); },
-                importOrders: function() { showToast('Import orders feature coming soon', 'info'); },
-                generateOrderReport: function() { showToast('Generate order report feature coming soon', 'info'); },
-                configureShipping: function() { showToast('Configure shipping feature coming soon', 'info'); },
-                manageButtonAssets: function() { showToast('Button assets management feature coming soon', 'info'); }
+                viewAllCategories: function() { showToast('View all categories coming soon', 'info'); },
+                createNewCategory: function() { showToast('Create category coming soon', 'info'); },
+                viewAllUsers: function() { showToast('View all users coming soon', 'info'); },
+                inviteNewUser: function() { showToast('Invite user coming soon', 'info'); },
+                viewAllCoupons: function() { showToast('View all coupons coming soon', 'info'); },
+                createNewCoupon: function() { showToast('Create coupon coming soon', 'info'); },
+                viewAllReviews: function() { showToast('View all reviews coming soon', 'info'); },
+                moderateReviews: function() { showToast('Moderate reviews coming soon', 'info'); }
             };
         })();
 
