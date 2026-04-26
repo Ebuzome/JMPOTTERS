@@ -1093,7 +1093,32 @@
         }
 
         function calculateProductTotalStock() { allProducts.forEach(p => { let t = 0; const sz = productSizes[p.id]; if (sz) { Object.values(sz).forEach(cs => { if (Array.isArray(cs)) cs.forEach(s => { t += s.stock_quantity || 0; }); }); } p.total_stock = t; }); }
-
+function updateProductCounts() {
+    const t = allProducts.length;
+    const ls = allProducts.filter(p => {
+        if (p.total_stock !== undefined) return p.total_stock < 10 && p.total_stock > 0;
+        return (p.stock || 0) < 10 && (p.stock || 0) > 0;
+    }).length;
+    const oos = allProducts.filter(p => {
+        if (p.total_stock !== undefined) return p.total_stock === 0;
+        return (p.stock || 0) === 0;
+    }).length;
+    const ts = allProducts.reduce((s, p) => s + (p.total_stock !== undefined ? p.total_stock : (p.stock || 0)), 0);
+    const iv = allProducts.reduce((s, p) => s + ((p.price || 0) * (p.total_stock !== undefined ? p.total_stock : (p.stock || 0))), 0);
+    
+    const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    setEl('productsCount', t);
+    setEl('lowStockCount', ls);
+    setEl('productsCountDesktop', t);
+    setEl('lowStockCountDesktop', ls);
+    setEl('lowStockCountStat', ls);
+    setEl('outOfStockCount', oos);
+    setEl('totalProductsCount', t);
+    setEl('inventoryTotalStock', ts.toLocaleString());
+    setEl('inventoryLowStock', ls);
+    setEl('inventoryOutOfStock', oos);
+    setEl('inventoryValue', '₦' + Math.round(iv).toLocaleString());
+}
         async function loadInitialData() {
             try {
                 const { data: cats } = await supabase.from('categories').select('*').order('name'); categories = cats || [];
@@ -1365,6 +1390,10 @@
             c.appendChild(toast); setTimeout(() => { toast.style.animation = 'toastSlide 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 5000);
         }
 
+        function updateDashboardStats() {
+    updateOrderStats();
+    updateProductCounts();
+}
         function setupEventListeners() {
             const mb = document.getElementById('mobileMenuBtn'), sb = document.getElementById('mobileSidebar'), ov = document.getElementById('sidebarOverlay');
             if (mb && sb && ov) { mb.onclick = () => { sb.classList.add('active'); ov.style.display = 'block'; }; ov.onclick = () => { sb.classList.remove('active'); ov.style.display = 'none'; }; }
@@ -1374,37 +1403,99 @@
             document.onclick = e => { if (!e.target.closest('.color-autocomplete')) { const o = document.getElementById('colorOptions'); if (o) o.style.display = 'none'; } };
         }
 
-        async function init() {
-            console.log('🚀 Initializing...');
-            try {
-                supabase = window.supabase.createClient('https://tmpggeeuwdvlngvfncaa.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4');
-                loadUserPreferences(); setupEventListeners(); await loadInitialData(); await loadOrders(); await loadUsers(); await loadCoupons();
-                updateOrderStats(); populateColorPickerGrid(); console.log('✅ Ready');
-            } catch (e) { console.error(e); showToast('Init failed', 'error'); }
-        }
+    async function init() {
+    console.log('🚀 Initializing...');
+    try {
+        supabase = window.supabase.createClient(
+            'https://tmpggeeuwdvlngvfncaa.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+        );
+        loadUserPreferences();
+        setupEventListeners();
+        await loadInitialData();
+        await loadOrders();
+        await loadUsers();
+        await loadCoupons();
+        updateOrderStats();
+        updateDashboardStats();
+        populateColorPickerGrid();
+        console.log('✅ Ready - Products loaded:', allProducts.length, 'Orders loaded:', allOrders.length);
+        showToast(`Loaded ${allProducts.length} products & ${allOrders.length} orders`, 'success');
+    } catch (e) {
+        console.error('Init failed:', e);
+        showToast('Initialization failed: ' + e.message, 'error');
+    }
 
         function loadUserPreferences() {
             if (localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); document.getElementById('darkModeToggle').checked = true; }
             const fs = localStorage.getItem('fontSize') || '14'; document.documentElement.style.fontSize = fs + 'px'; document.getElementById('fontSizeSlider').value = fs;
         }
 
-        return {
-            init, openAddProductModal, editProduct, saveProduct, closeModal, onCategoryChange,
-            openAddColorModal, closeAddColorModal, saveNewColor, deleteColor,
-            openAddSizeModal, closeAddSizeModal, saveNewSize, loadSizesForColor, updateSizeStock, toggleSizeAvailability,
-            searchColors, selectColor, selectColorFromSearch, removeSelectedColor,
-            filterProducts, nextPage, prevPage, loadProducts: loadInitialData,
-            toggleDarkMode, changeFontSize, backupDatabase, importData, clearCache, resetSettings,
-            saveStoreSettings, saveShippingSettings, saveSocialSettings,
-            exportCSV, importCSV, loadOrders, filterOrdersByStatus, searchOrders, ordersPrevPage, ordersNextPage,
-            updateOrderStatus, viewOrderDetailFull, updateOrderStatusAndRefresh, toggleOrderStatusDropdown,
-            navigateBackToOrders, refreshOrders,
-            loadUsers, searchUsers, showCouponModal, saveCoupon, loadCoupons, toggleCouponStatus,
-            showCategoryModal, saveCategory, deleteCategory, loadCategories,
-            deleteCurrentProduct,
-            showSection: function(s) { const l = document.querySelector(`.nav-link[data-section="${s}"]`); if (l) l.click(); }
-        };
-    })();
+       return {
+    init,
+    openAddProductModal,
+    editProduct,
+    saveProduct,
+    closeModal,
+    onCategoryChange,
+    openAddColorModal,
+    closeAddColorModal,
+    saveNewColor,
+    deleteColor,
+    openAddSizeModal,
+    closeAddSizeModal,
+    saveNewSize,
+    loadSizesForColor,
+    updateSizeStock,
+    toggleSizeAvailability,
+    searchColors,
+    selectColor,
+    selectColorFromSearch,
+    removeSelectedColor,
+    filterProducts,
+    nextPage,
+    prevPage,
+    loadProducts: loadInitialData,
+    toggleDarkMode,
+    changeFontSize,
+    backupDatabase,
+    importData,
+    clearCache,
+    resetSettings,
+    saveStoreSettings,
+    saveShippingSettings,
+    saveSocialSettings,
+    exportCSV,
+    importCSV,
+    loadOrders,
+    filterOrdersByStatus,
+    searchOrders,
+    ordersPrevPage,
+    ordersNextPage,
+    updateOrderStatus,
+    viewOrderDetailFull,
+    updateOrderStatusAndRefresh,
+    toggleOrderStatusDropdown,
+    navigateBackToOrders,
+    refreshOrders,
+    loadUsers,
+    searchUsers,
+    showCouponModal,
+    saveCoupon,
+    loadCoupons,
+    toggleCouponStatus,
+    showCategoryModal,
+    saveCategory,
+    deleteCategory,
+    loadCategories,
+    deleteCurrentProduct,
+    updateProductCounts,
+    showSection: function(s) {
+        const l = document.querySelector(`.nav-link[data-section="${s}"]`);
+        if (l) l.click();
+    },
+    loadInitialData
+};
 
     document.addEventListener('DOMContentLoaded', () => AdminDashboard.init());
     window.AdminDashboard = AdminDashboard;
