@@ -2,11 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Order Invoice | JMPOTTERS</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Premium Icon Pack: Boxicons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <!-- Font Awesome for legacy icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="app.js"></script>
@@ -86,9 +90,13 @@
             
             --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
             --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Dark header specific */
+            --glass-dark: rgba(12, 15, 21, 0.92);
+            --glass-blur: blur(16px);
         }
         
-        /* Dark Mode */
+        /* Dark Mode (applies to invoice body, not the header) */
         .dark-mode {
             --primary-50: #1E293B;
             --primary-100: #1E293B;
@@ -118,7 +126,6 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: var(--space-4);
             transition: background-color var(--transition);
         }
         
@@ -126,11 +133,287 @@
             background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
         }
         
+        /* ========== HEADER – DARK GLASS, CENTERED LOGO, HAMBURGER LEFT ========== */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1050;
+            background: var(--glass-dark);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            position: relative;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .header-left {
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+        }
+        .mobile-toggle {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            font-size: 2rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 30px;
+            color: var(--primary-500);
+            cursor: pointer;
+            transition: var(--transition);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mobile-toggle:hover {
+            background: var(--primary-600);
+            color: #0c0f15;
+            transform: rotate(5deg);
+        }
+        
+        .header-center {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+        .logo-img {
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            transition: var(--transition);
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+        }
+        .logo-img:hover {
+            transform: scale(1.02);
+            filter: drop-shadow(0 6px 12px rgba(99,102,241,0.4));
+        }
+        
+        .header-right {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 1060;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 380px;
+            height: 100vh;
+            background: #0f1219f2;
+            backdrop-filter: blur(24px);
+            z-index: 1070;
+            transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            padding: 32px 24px;
+            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
+            border-radius: 0 28px 28px 0;
+            overflow-y: auto;
+        }
+        .mobile-nav.active {
+            left: 0;
+        }
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        .mobile-nav-header .logo-img {
+            height: 52px;
+        }
+        .close-nav {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            font-size: 1.8rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            color: var(--primary-500);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-nav:hover {
+            background: var(--primary-600);
+            color: #0c0f15;
+            transform: rotate(90deg);
+        }
+        .mobile-nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .mobile-nav-links li a {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50px;
+            font-weight: 500;
+            color: #f0f3f8;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+        .mobile-nav-links li a i {
+            font-size: 1.4rem;
+            color: var(--primary-500);
+        }
+        .mobile-nav-links li a:hover {
+            background: var(--primary-600);
+            color: #0c0f15;
+            transform: translateX(8px);
+        }
+        .mobile-nav-links li a:hover i {
+            color: #0c0f15;
+        }
+        
+        /* ========== FOOTER – DARK LUXURY ========== */
+        footer {
+            background: linear-gradient(145deg, #0a0d12 0%, #05070a 100%);
+            color: #eef2f5;
+            padding: 48px 0 24px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(99, 102, 241, 0.25);
+        }
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        @media (min-width: 640px) {
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 768px) {
+            .footer-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .footer-logo-img {
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+            transition: var(--transition);
+            margin-bottom: 16px;
+        }
+        .footer-logo-img:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+            filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(99,102,241,0.3));
+        }
+        .footer-column h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--primary-400);
+            font-weight: 600;
+            position: relative;
+        }
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+        .footer-links a {
+            color: #cfdee9;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .footer-links a:hover {
+            color: var(--primary-400);
+            transform: translateX(5px);
+        }
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .social-links a {
+            background: rgba(255,255,255,0.06);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        .social-links a:hover {
+            background: var(--primary-600);
+            transform: translateY(-3px);
+            color: #0a0d12;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 24px;
+            margin-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.7rem;
+            color: #9aaeb9;
+        }
+        
+        /* Adjust main content to not be hidden under fixed header */
         .invoice-wrapper {
             max-width: 1000px;
             margin: 0 auto;
+            padding-top: 90px;
         }
         
+        /* Invoice Container (original styles) */
         .invoice-container {
             background: white;
             border-radius: var(--radius-xl);
@@ -145,17 +428,11 @@
         }
         
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Header */
+        /* Header inside invoice (not the site header) */
         .invoice-header {
             background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
             padding: var(--space-8) var(--space-6);
@@ -208,12 +485,10 @@
             letter-spacing: 0.5px;
         }
         
-        /* Body */
         .invoice-body {
             padding: var(--space-8);
         }
         
-        /* Status Badge */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -234,7 +509,6 @@
             color: #FBBF24;
         }
         
-        /* Info Grid */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -277,16 +551,6 @@
             color: var(--dark-text);
         }
         
-        .info-section strong {
-            color: var(--gray-900);
-            font-weight: 600;
-        }
-        
-        .dark-mode .info-section strong {
-            color: var(--dark-text);
-        }
-        
-        /* Order Summary */
         .order-summary {
             margin-bottom: var(--space-8);
         }
@@ -305,11 +569,6 @@
             color: var(--dark-text);
         }
         
-        .order-summary h3 i {
-            color: var(--primary-500);
-        }
-        
-        /* Table */
         .table-wrapper {
             overflow-x: auto;
             border-radius: var(--radius-lg);
@@ -360,19 +619,6 @@
             color: var(--dark-text-muted);
         }
         
-        .invoice-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        @media (max-width: 640px) {
-            .invoice-table th,
-            .invoice-table td {
-                padding: var(--space-2);
-                font-size: 0.75rem;
-            }
-        }
-        
-        /* Totals */
         .totals {
             margin-top: var(--space-6);
             padding-top: var(--space-6);
@@ -430,7 +676,6 @@
             color: var(--primary-400);
         }
         
-        /* Payment Instruction */
         .payment-instruction {
             margin-top: var(--space-6);
             text-align: center;
@@ -451,21 +696,6 @@
             margin-bottom: var(--space-2);
         }
         
-        .payment-instruction p {
-            font-size: 0.85rem;
-            color: var(--gray-600);
-            line-height: 1.5;
-        }
-        
-        .dark-mode .payment-instruction p {
-            color: var(--dark-text-muted);
-        }
-        
-        .payment-instruction strong {
-            color: var(--primary-600);
-        }
-        
-        /* Footer */
         .invoice-footer {
             background: var(--gray-50);
             padding: var(--space-5);
@@ -478,22 +708,13 @@
             border-top-color: var(--dark-surface);
         }
         
-        .invoice-footer p {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-        }
-        
-        .dark-mode .invoice-footer p {
-            color: var(--dark-text-muted);
-        }
-        
-        /* Action Buttons */
         .action-buttons {
             display: flex;
             flex-wrap: wrap;
             gap: var(--space-3);
             justify-content: center;
             margin-top: var(--space-6);
+            margin-bottom: var(--space-6);
         }
         
         .btn {
@@ -510,10 +731,6 @@
             border: none;
             font-family: inherit;
             text-decoration: none;
-        }
-        
-        .btn:active {
-            transform: scale(0.98);
         }
         
         .btn-primary {
@@ -561,9 +778,7 @@
             transform: translateY(-2px);
         }
         
-        /* Loading & Error States */
-        .loading-state,
-        .error-state {
+        .loading-state, .error-state {
             text-align: center;
             padding: var(--space-12) var(--space-4);
         }
@@ -578,33 +793,10 @@
             margin: 0 auto var(--space-4);
         }
         
-        .dark-mode .loading-spinner {
-            border-color: var(--dark-surface-2);
-            border-top-color: var(--primary-500);
-        }
-        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        .loading-state p,
-        .error-state p {
-            color: var(--gray-600);
-            margin-top: var(--space-2);
-        }
-        
-        .dark-mode .loading-state p,
-        .dark-mode .error-state p {
-            color: var(--dark-text-muted);
-        }
-        
-        .error-state i {
-            font-size: 3rem;
-            color: var(--danger-500);
-            margin-bottom: var(--space-4);
-        }
-        
-        /* Dark Mode Toggle */
         .theme-toggle {
             position: fixed;
             bottom: var(--space-4);
@@ -629,12 +821,6 @@
             color: var(--dark-text);
         }
         
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: var(--shadow-xl);
-        }
-        
-        /* Print Styles */
         @media print {
             body {
                 background: white;
@@ -642,38 +828,29 @@
                 margin: 0;
             }
             .action-buttons,
-            .theme-toggle {
+            .theme-toggle,
+            .nav-bar,
+            footer,
+            .mobile-toggle,
+            .overlay,
+            .mobile-nav {
                 display: none !important;
+            }
+            .invoice-wrapper {
+                padding-top: 0;
             }
             .invoice-container {
                 box-shadow: none;
                 border-radius: 0;
             }
-            .invoice-header {
-                background: #0F172A;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
         }
         
-        /* Responsive */
         @media (max-width: 640px) {
-            body {
-                padding: var(--space-3);
-            }
             .invoice-body {
                 padding: var(--space-4);
             }
             .invoice-header {
                 padding: var(--space-5) var(--space-4);
-            }
-            .invoice-header h1 {
-                font-size: 1.35rem;
-            }
-            .invoice-logo {
-                width: 3.5rem;
-                height: 3.5rem;
-                font-size: 1.5rem;
             }
             .action-buttons {
                 flex-direction: column;
@@ -681,31 +858,54 @@
             .btn {
                 width: 100%;
             }
-            .totals-row {
-                gap: var(--space-4);
-                font-size: 0.8rem;
-            }
-            .totals-value {
-                min-width: 90px;
-            }
-        }
-        
-        @media (min-width: 768px) {
-            .invoice-body {
-                padding: var(--space-8) var(--space-10);
-            }
-            .invoice-header h1 {
-                font-size: 2rem;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Dark Mode Toggle -->
+    <!-- ========= HEADER (DARK GLASS, CENTERED LOGO) ========= -->
+    <nav class="nav-bar">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                    <i class='bx bx-menu-alt-left'></i>
+                </button>
+            </div>
+            <div class="header-center">
+                <a href="index.html">
+                    <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
+                </a>
+            </div>
+            <div class="header-right">
+                <!-- Empty for invoice page, no cart/wishlist needed -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========= MOBILE NAV (LEFT DRAWER) ========= -->
+    <div class="overlay" id="navOverlay"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
+            <button class="close-nav" id="closeNavBtn"><i class='bx bx-x'></i></button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html"><i class='bx bx-home'></i> Home</a></li>
+            <li><a href="mensfootwear.html"><i class='bx bx-footwear'></i> Men's Footwear</a></li>
+            <li><a href="womensfootwear.html"><i class='bx bx-female'></i> Women's Footwear</a></li>
+            <li><a href="bags.html"><i class='bx bx-briefcase'></i> Bags</a></li>
+            <li><a href="accessories.html"><i class='bx bx-diamond'></i> Accessories</a></li>
+            <li><a href="household.html"><i class='bx bx-home-smile'></i> Household</a></li>
+            <li><a href="kids.html"><i class='bx bx-baby-carriage'></i> Kids & Babies</a></li>
+            <li><a href="healthcare.html"><i class='bx bx-heart'></i> Healthcare</a></li>
+            <li><a href="contact.html"><i class='bx bx-phone-call'></i> Contact</a></li>
+        </ul>
+    </div>
+
+    <!-- Dark Mode Toggle (preserved) -->
     <button class="theme-toggle" onclick="toggleDarkMode()">
         <i class="fas fa-moon"></i>
     </button>
-    
+
     <div class="invoice-wrapper">
         <div id="invoiceContent" class="invoice-container">
             <div class="loading-state">
@@ -730,8 +930,51 @@
         </div>
     </div>
 
+    <!-- ========= FOOTER – DARK LUXURY ========= -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column">
+                <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
+                <p>Premium quality products designed for the modern individual.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-whatsapp'></i></a>
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                    <a href="#"><i class='bx bxl-pinterest'></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Shop</h3>
+                <ul class="footer-links">
+                    <li><a href="mensfootwear.html"><i class='bx bx-chevron-right'></i> Men's Footwear</a></li>
+                    <li><a href="womensfootwear.html"><i class='bx bx-chevron-right'></i> Women's Footwear</a></li>
+                    <li><a href="bags.html"><i class='bx bx-chevron-right'></i> Bags</a></li>
+                    <li><a href="accessories.html"><i class='bx bx-chevron-right'></i> Accessories</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Information</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> About Us</a></li>
+                    <li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact</a></li>
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> Shipping Policy</a></li>
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> Returns</a></li>
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Connect</h3>
+                <ul class="footer-links">
+                    <li><i class='bx bx-phone-call'></i> +234 813 958 3320</li>
+                    <li><i class='bx bx-envelope'></i> hello@jmpotters.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">&copy; 2025 JMPOTTERS. All rights reserved.</div>
+    </footer>
+
     <script>
-        // Dark mode management
+        // Dark mode management (applies to invoice body, not header)
         function initDarkMode() {
             const darkMode = localStorage.getItem('invoiceDarkMode') === 'true';
             if (darkMode) {
@@ -771,7 +1014,6 @@
         }
         
         async function loadInvoice() {
-            // Wait for JMPOTTERS to be available
             let attempts = 0;
             while (!window.JMPOTTERS && attempts < 50) {
                 await new Promise(r => setTimeout(r, 100));
@@ -805,33 +1047,26 @@
             
             try {
                 const order = await window.JMPOTTERS.getOrderByNumber(orderNumber);
-                
-                if (!order) {
-                    throw new Error('Order not found');
-                }
+                if (!order) throw new Error('Order not found');
                 
                 const items = order.items || [];
                 const subtotal = order.total_amount || 0;
                 const shippingFee = order.shipping_fee || 0;
                 const grandTotal = order.grand_total || subtotal + shippingFee;
                 const orderDate = new Date(order.created_at).toLocaleDateString('en-NG', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
+                    day: 'numeric', month: 'long', year: 'numeric'
                 });
-                
                 const statusText = order.status === 'pending' ? 'Pending' : 
                                   order.status === 'processing' ? 'Processing' :
                                   order.status === 'shipped' ? 'Shipped' :
                                   order.status === 'delivered' ? 'Delivered' : 'Cancelled';
-                
                 const paymentStatusText = order.payment_status === 'paid' ? 'Paid' : 'Pending Payment';
                 
                 let itemsHtml = '';
                 if (items.length > 0) {
                     items.forEach(item => {
                         itemsHtml += `
-                            <tr>
+                            <td>
                                 <td>${escapeHtml(item.name || 'Product')}</td>
                                 <td>${item.color_name ? escapeHtml(item.color_name) + (item.size_value ? ' / ' + escapeHtml(item.size_value) : '') : '-'}</td>
                                 <td style="text-align: center;">${item.quantity}</td>
@@ -846,14 +1081,11 @@
                 
                 document.getElementById('invoiceContent').innerHTML = `
                     <div class="invoice-header">
-                        <div class="invoice-logo">
-                            <i class="fas fa-store"></i>
-                        </div>
+                        <div class="invoice-logo"><i class="fas fa-store"></i></div>
                         <h1>JMPOTTERS</h1>
                         <p>Premium Quality Products</p>
                         <div class="invoice-number">${order.order_number}</div>
                     </div>
-                    
                     <div class="invoice-body">
                         <div class="info-grid">
                             <div class="info-section">
@@ -872,7 +1104,6 @@
                                 </p>
                             </div>
                         </div>
-                        
                         <div class="info-grid">
                             <div class="info-section">
                                 <h3><i class="far fa-calendar-alt"></i> Order Date</h3>
@@ -883,51 +1114,28 @@
                                 <p><span class="status-badge status-pending"><i class="fas fa-clock"></i> ${statusText}</span></p>
                             </div>
                         </div>
-                        
                         <div class="order-summary">
                             <h3><i class="fas fa-receipt"></i> Order Summary</h3>
                             <div class="table-wrapper">
                                 <table class="invoice-table">
                                     <thead>
-                                        <tr>
-                                            <th>Product</th>
-                                            <th>Variant</th>
-                                            <th style="text-align: center;">Qty</th>
-                                            <th style="text-align: right;">Price</th>
-                                            <th style="text-align: right;">Total</th>
-                                        </tr>
+                                        <tr><th>Product</th><th>Variant</th><th style="text-align: center;">Qty</th><th style="text-align: right;">Price</th><th style="text-align: right;">Total</th></tr>
                                     </thead>
-                                    <tbody>
-                                        ${itemsHtml}
-                                    </tbody>
+                                    <tbody>${itemsHtml}</tbody>
                                 </table>
                             </div>
-                            
                             <div class="totals">
-                                <div class="totals-row">
-                                    <span class="totals-label">Subtotal:</span>
-                                    <span class="totals-value">₦${subtotal.toLocaleString()}</span>
-                                </div>
-                                <div class="totals-row">
-                                    <span class="totals-label">Shipping Fee:</span>
-                                    <span class="totals-value">₦${shippingFee.toLocaleString()}</span>
-                                </div>
-                                <div class="totals-row grand-total">
-                                    <span class="totals-label">Grand Total:</span>
-                                    <span class="totals-value">₦${grandTotal.toLocaleString()}</span>
-                                </div>
+                                <div class="totals-row"><span class="totals-label">Subtotal:</span><span class="totals-value">₦${subtotal.toLocaleString()}</span></div>
+                                <div class="totals-row"><span class="totals-label">Shipping Fee:</span><span class="totals-value">₦${shippingFee.toLocaleString()}</span></div>
+                                <div class="totals-row grand-total"><span class="totals-label">Grand Total:</span><span class="totals-value">₦${grandTotal.toLocaleString()}</span></div>
                             </div>
                         </div>
-                        
                         <div class="payment-instruction">
                             <i class="fas fa-credit-card"></i>
                             <p>Payment Status: <strong>${paymentStatusText}</strong></p>
-                            <p style="font-size: 0.7rem; margin-top: var(--space-2);">
-                                Please complete payment within 24 hours to confirm your order.
-                            </p>
+                            <p style="font-size: 0.7rem; margin-top: var(--space-2);">Please complete payment within 24 hours to confirm your order.</p>
                         </div>
                     </div>
-                    
                     <div class="invoice-footer">
                         <p>Thank you for shopping with JMPOTTERS!</p>
                         <p style="font-size: 0.65rem; margin-top: var(--space-1);">
@@ -935,9 +1143,7 @@
                         </p>
                     </div>
                 `;
-                
                 document.getElementById('actionButtons').style.display = 'flex';
-                
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('invoiceContent').innerHTML = `
@@ -961,7 +1167,19 @@
             }).save();
         }
         
-        // Initialize
+        // Header mobile navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const navOverlay = document.getElementById('navOverlay');
+            const closeNav = document.querySelector('.close-nav');
+            function openNav() { mobileNav.classList.add('active'); navOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            function closeNavFunc() { mobileNav.classList.remove('active'); navOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+            if (mobileToggle) mobileToggle.addEventListener('click', openNav);
+            if (closeNav) closeNav.addEventListener('click', closeNavFunc);
+            if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
+        });
+        
         initDarkMode();
         loadInvoice();
     </script>
