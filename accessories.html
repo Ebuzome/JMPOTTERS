@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Accessorize with Elegance | JMPOTTERS</title>
     
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Stylesheets: Remix Icon (Commercial-Grade, Mature Icon Pack) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Configuration - NO SUPABASE INITIALIZATION HERE -->
@@ -37,7 +37,7 @@
             --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 20px 35px rgba(0, 0, 0, 0.12);
             --transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-bg: rgba(255, 255, 255, 0.94);
             --glass-blur: blur(14px);
         }
 
@@ -112,7 +112,7 @@
             box-shadow: 0 12px 22px rgba(255,111,97,0.25);
         }
 
-        /* ========== STUNNING HEADER (GLASS + PRECISE) ========== */
+        /* ========== HEADER – GLASS MORPHIC WITH LOGO IMAGE ========== */
         header {
             position: fixed;
             top: 0;
@@ -123,54 +123,37 @@
             background: var(--glass-bg);
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid rgba(26, 188, 156, 0.15);
+            border-bottom: 1px solid rgba(26, 188, 156, 0.2);
             transition: var(--transition);
             box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
         }
         
-        /* subtle scroll effect (no js, just smooth visual) */
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            transition: padding 0.25s ease;
+            padding: 10px 0;
         }
 
-        /* Logo premium style */
-        .logo {
-            font-family: 'Ubuntu', sans-serif;
-            font-size: 1.85rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-decoration: none;
-            letter-spacing: -0.5px;
+        /* Logo image styling – minified perfectly */
+        .logo-img {
+            height: 44px;
+            width: auto;
+            object-fit: contain;
+            display: block;
             transition: var(--transition);
-            position: relative;
         }
-        .logo:hover {
+        .logo-img:hover {
             transform: scale(1.02);
-            background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-        }
-        .logo span {
-            background: none;
-            -webkit-background-clip: unset;
-            background-clip: unset;
-            color: var(--accent-color);
-            font-weight: 800;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
         }
 
-        /* Mobile toggle refined */
+        /* Mobile toggle refined with Remix Icon */
         .mobile-toggle {
             display: block;
             background: rgba(26, 188, 156, 0.1);
             border: none;
-            font-size: 1.55rem;
+            font-size: 1.7rem;
             width: 48px;
             height: 48px;
             border-radius: 30px;
@@ -178,6 +161,9 @@
             cursor: pointer;
             transition: var(--transition);
             backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .mobile-toggle:hover {
             background: var(--primary-color);
@@ -193,7 +179,7 @@
         }
         .header-icon {
             position: relative;
-            font-size: 1.45rem;
+            font-size: 1.55rem;
             color: var(--dark-color);
             cursor: pointer;
             transition: var(--transition);
@@ -229,7 +215,7 @@
             font-family: monospace;
         }
 
-        /* Overlay + Mobile navigation - refined glassmorphic */
+        /* Overlay + Mobile Navigation – refined glass */
         .overlay {
             position: fixed;
             top: 0;
@@ -255,7 +241,7 @@
             max-width: 380px;
             height: 100vh;
             background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(18px);
+            backdrop-filter: blur(20px);
             z-index: 1070;
             transition: right 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             padding: 32px 24px;
@@ -274,16 +260,22 @@
             padding-bottom: 12px;
             border-bottom: 1px solid rgba(26, 188, 156, 0.2);
         }
+        .mobile-nav-header .logo-img {
+            height: 40px;
+        }
         .close-nav {
             background: rgba(0,0,0,0.04);
             border: none;
-            font-size: 1.6rem;
+            font-size: 1.7rem;
             width: 44px;
             height: 44px;
             border-radius: 50%;
             color: var(--dark-color);
             cursor: pointer;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .close-nav:hover {
             background: var(--accent-color);
@@ -309,9 +301,9 @@
             transition: var(--transition);
             font-size: 1rem;
         }
-        .mobile-nav-links li a i {
-            width: 28px;
-            font-size: 1.25rem;
+        .mobile-nav-links li a i, 
+        .mobile-nav-links li a .remix-icon {
+            font-size: 1.35rem;
             color: var(--primary-color);
         }
         .mobile-nav-links li a:hover {
@@ -319,11 +311,12 @@
             color: white;
             transform: translateX(6px);
         }
-        .mobile-nav-links li a:hover i {
+        .mobile-nav-links li a:hover i,
+        .mobile-nav-links li a:hover .remix-icon {
             color: white;
         }
 
-        /* ========== FOOTER – LUXURY DARK MODERN ========== */
+        /* ========== FOOTER – LUXURY DARK WITH LOGO ========== */
         footer {
             background: linear-gradient(145deg, #11181c 0%, #0f1419 100%);
             color: #eef2f5;
@@ -337,6 +330,21 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 48px 32px;
             margin-bottom: 48px;
+        }
+        .footer-column .footer-logo {
+            margin-bottom: 20px;
+        }
+        .footer-logo-img {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+            transition: var(--transition);
+        }
+        .footer-logo-img:hover {
+            opacity: 1;
+            transform: translateY(-2px);
         }
         .footer-column h3 {
             font-size: 1.35rem;
@@ -379,7 +387,7 @@
             gap: 8px;
         }
         .footer-links a i {
-            font-size: 0.8rem;
+            font-size: 1rem;
             opacity: 0.7;
             transition: var(--transition);
         }
@@ -392,7 +400,7 @@
             color: var(--accent-color);
         }
 
-        /* Social media icons */
+        /* Social icons using Remix Icon */
         .social-links {
             display: flex;
             gap: 18px;
@@ -408,7 +416,7 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             transition: var(--transition);
             text-decoration: none;
         }
@@ -443,34 +451,27 @@
         /* RESPONSIVE HEADER & FOOTER */
         @media (max-width: 768px) {
             .header-container {
-                padding: 10px 0;
+                padding: 8px 0;
             }
-            .logo {
-                font-size: 1.55rem;
+            .logo-img {
+                height: 38px;
             }
             .header-icon {
                 width: 40px;
                 height: 40px;
-                font-size: 1.25rem;
+                font-size: 1.4rem;
             }
             .mobile-toggle {
                 width: 44px;
                 height: 44px;
-                font-size: 1.4rem;
+                font-size: 1.5rem;
             }
             .footer-content {
                 gap: 38px;
                 text-align: left;
             }
-            .footer-column h3:after {
-                left: 0;
-            }
-            .social-links {
-                justify-content: flex-start;
-            }
-            .mobile-nav {
-                width: 80%;
-                border-radius: 24px 0 0 24px;
+            .footer-logo-img {
+                height: 42px;
             }
         }
         @media (max-width: 480px) {
@@ -481,8 +482,8 @@
                 width: 36px;
                 height: 36px;
             }
-            .logo {
-                font-size: 1.4rem;
+            .logo-img {
+                height: 34px;
             }
         }
 
@@ -541,7 +542,6 @@
         .cart-btn:hover {
             background: var(--accent-color);
         }
-        /* rest of existing styles for filters, pagination, panels etc unchanged */
         .filters-section {
             background: #fafafa;
             padding: 25px 0;
@@ -572,49 +572,58 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        /* Adjust icon sizes for remix */
+        i.ri-menu-line, i.ri-heart-line, i.ri-shopping-bag-line, i.ri-search-line, i.ri-close-line, i.ri-whatsapp-line, i.ri-facebook-fill, i.ri-instagram-line, i.ri-twitter-x-line, i.ri-pinterest-line {
+            font-size: inherit;
+        }
+        .search-icon {
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
 
-    <!-- ========= HEADER (GLASS-MORPHIC) ========= -->
+    <!-- ========= HEADER (GLASS-MORPHIC WITH LOGO IMAGE) ========= -->
     <header>
         <div class="container header-container">
-            <a href="index.html" class="logo">JMPOTTERS<span>.</span></a>
+            <a href="index.html" class="logo-link">
+                <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
+            </a>
 
             <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
-                <i class="fas fa-bars"></i>
+                <i class="ri-menu-line"></i>
             </button>
 
             <div class="header-icons">
                 <div class="header-icon" id="wishlistIcon" aria-label="Wishlist">
-                    <i class="fas fa-heart"></i>
+                    <i class="ri-heart-line"></i>
                     <span class="icon-badge" id="wishlistCount">0</span>
                 </div>
                 <div class="header-icon" id="cartIcon" aria-label="Cart">
-                    <i class="fas fa-shopping-bag"></i>
+                    <i class="ri-shopping-bag-line"></i>
                     <span class="icon-badge" id="cartCount">0</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- ========= MOBILE NAV (LUXURY SLIDE) ========= -->
+    <!-- ========= MOBILE NAV (UPDATED LINKS: MEN'S + WOMEN'S FOOTWEAR) ========= -->
     <div class="overlay" id="navOverlay"></div>
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <div class="logo" style="font-size:1.6rem;">JMPOTTERS<span>.</span></div>
-            <button class="close-nav" id="closeNavBtn"><i class="fas fa-times"></i></button>
+            <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img" style="height: 42px;">
+            <button class="close-nav" id="closeNavBtn"><i class="ri-close-line"></i></button>
         </div>
         <ul class="mobile-nav-links">
-            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="footwear.html"><i class="fas fa-shoe-prints"></i> Footwear</a></li>
-            <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
-            <li><a href="accessories.html"><i class="fas fa-gem"></i> Accessories</a></li>
-            <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-            <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
-            <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
-            <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
-            <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
+            <li><a href="index.html"><i class="ri-home-4-line"></i> Home</a></li>
+            <li><a href="mensfootwear.html"><i class="ri-men-line"></i> Men's Footwear</a></li>
+            <li><a href="womensfootwear.html"><i class="ri-women-line"></i> Women's Footwear</a></li>
+            <li><a href="bags.html"><i class="ri-briefcase-line"></i> Bags</a></li>
+            <li><a href="accessories.html"><i class="ri-gem-line"></i> Accessories</a></li>
+            <li><a href="household.html"><i class="ri-home-smile-line"></i> Household</a></li>
+            <li><a href="kids.html"><i class="ri-baby-line"></i> Kids & Babies</a></li>
+            <li><a href="healthcare.html"><i class="ri-heart-pulse-line"></i> Healthcare</a></li>
+            <li><a href="contact.html"><i class="ri-phone-line"></i> Contact</a></li>
         </ul>
     </div>
 
@@ -627,7 +636,7 @@
         </div>
     </section>
 
-    <!-- ========= FILTERS (unchanged) ========= -->
+    <!-- ========= FILTERS (icons updated) ========= -->
     <section class="filters-section">
         <div class="container">
             <div class="filters-container" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
@@ -648,8 +657,8 @@
                     </select>
                 </div>
                 <div class="search-container" style="flex:1; min-width:200px; position:relative;">
-                    <i class="fas fa-search search-icon" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--primary-color);"></i>
-                    <input type="text" id="searchBar" class="search-bar" placeholder="Search accessories..." style="padding-left: 40px;">
+                    <i class="ri-search-line search-icon" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--primary-color); font-size:1.2rem;"></i>
+                    <input type="text" id="searchBar" class="search-bar" placeholder="Search accessories..." style="padding-left: 42px;">
                 </div>
             </div>
         </div>
@@ -661,7 +670,7 @@
             <h2 class="section-title">Trendy Accessories</h2>
             <div class="products-grid" id="productsGrid">
                 <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
+                    <i class="ri-loader-4-line ri-spin"></i>
                     <p>Loading accessories from database...</p>
                 </div>
             </div>
@@ -674,11 +683,11 @@
     <div class="cart-panel" id="cartPanel" style="position: fixed; top:0; right:-100%; width:85%; max-width:400px; background:white; z-index:1100; transition:0.3s; padding:25px; overflow-y:auto; box-shadow:-5px 0 30px rgba(0,0,0,0.15);">
         <div class="cart-header" style="display:flex; justify-content:space-between; align-items:center;">
             <h3>Your Cart</h3>
-            <button class="close-cart" style="background:none; border:none; font-size:1.5rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+            <button class="close-cart" style="background:none; border:none; font-size:1.6rem; cursor:pointer;"><i class="ri-close-line"></i></button>
         </div>
         <div class="cart-items" id="cartItems"><div class="cart-empty">Your cart is empty</div></div>
         <div class="cart-total" style="margin-top:20px; font-weight:700; display:flex; justify-content:space-between;"><span>Total:</span><span id="cartTotal">₦0</span></div>
-        <a href="#" class="btn" id="whatsappCheckout" style="width:100%; margin-top:15px;"><i class="fab fa-whatsapp"></i> Checkout via WhatsApp</a>
+        <a href="#" class="btn" id="whatsappCheckout" style="width:100%; margin-top:15px;"><i class="ri-whatsapp-line"></i> Checkout via WhatsApp</a>
     </div>
 
     <!-- ========= WISHLIST PANEL ========= -->
@@ -686,51 +695,54 @@
     <div class="wishlist-panel" id="wishlistPanel" style="position: fixed; top:0; right:-100%; width:85%; max-width:400px; background:white; z-index:1100; transition:0.3s; padding:25px; overflow-y:auto;">
         <div class="wishlist-header" style="display:flex; justify-content:space-between; align-items:center;">
             <h3>Your Wishlist</h3>
-            <button class="close-wishlist" style="background:none; border:none; font-size:1.5rem;"><i class="fas fa-times"></i></button>
+            <button class="close-wishlist" style="background:none; border:none; font-size:1.6rem;"><i class="ri-close-line"></i></button>
         </div>
         <div class="wishlist-items" id="wishlistItems"><div class="wishlist-empty">Your wishlist is empty</div></div>
     </div>
 
-    <!-- ========= FOOTER – MODERN DARK ELEGANCE ========= -->
+    <!-- ========= FOOTER – LUXURY DARK WITH JMPOTTERS LOGO ========= -->
     <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
-                    <h3>JMPOTTERS</h3>
+                    <div class="footer-logo">
+                        <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
+                    </div>
                     <p>Elevate your style with premium accessories, bags & lifestyle essentials. Crafted for elegance and authenticity.</p>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="ri-facebook-fill"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="ri-instagram-line"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="ri-twitter-x-line"></i></a>
+                        <a href="#" aria-label="Pinterest"><i class="ri-pinterest-line"></i></a>
                     </div>
                 </div>
                 <div class="footer-column">
                     <h3>Shop</h3>
                     <ul class="footer-links">
-                        <li><a href="accessories.html"><i class="fas fa-chevron-right"></i> Accessories</a></li>
-                        <li><a href="bags.html"><i class="fas fa-chevron-right"></i> Bags</a></li>
-                        <li><a href="footwear.html"><i class="fas fa-chevron-right"></i> Footwear</a></li>
-                        <li><a href="household.html"><i class="fas fa-chevron-right"></i> Household</a></li>
-                        <li><a href="kids.html"><i class="fas fa-chevron-right"></i> Kids & Babies</a></li>
+                        <li><a href="mensfootwear.html"><i class="ri-arrow-right-s-line"></i> Men's Footwear</a></li>
+                        <li><a href="womensfootwear.html"><i class="ri-arrow-right-s-line"></i> Women's Footwear</a></li>
+                        <li><a href="bags.html"><i class="ri-arrow-right-s-line"></i> Bags</a></li>
+                        <li><a href="accessories.html"><i class="ri-arrow-right-s-line"></i> Accessories</a></li>
+                        <li><a href="household.html"><i class="ri-arrow-right-s-line"></i> Household</a></li>
+                        <li><a href="kids.html"><i class="ri-arrow-right-s-line"></i> Kids & Babies</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Support</h3>
                     <ul class="footer-links">
-                        <li><a href="#"><i class="fas fa-question-circle"></i> FAQs</a></li>
-                        <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact Us</a></li>
-                        <li><a href="#"><i class="fas fa-truck"></i> Shipping Policy</a></li>
-                        <li><a href="#"><i class="fas fa-undo-alt"></i> Returns</a></li>
-                        <li><a href="#"><i class="fas fa-shield-alt"></i> Privacy</a></li>
+                        <li><a href="#"><i class="ri-question-line"></i> FAQs</a></li>
+                        <li><a href="contact.html"><i class="ri-mail-line"></i> Contact Us</a></li>
+                        <li><a href="#"><i class="ri-truck-line"></i> Shipping Policy</a></li>
+                        <li><a href="#"><i class="ri-arrow-go-back-line"></i> Returns</a></li>
+                        <li><a href="#"><i class="ri-shield-line"></i> Privacy</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Connect</h3>
                     <div class="footer-contact-info">
-                        <span><i class="fas fa-phone-alt" style="color: var(--primary-color);"></i> +234 813 958 3320</span>
-                        <span><i class="fas fa-envelope" style="color: var(--primary-color);"></i> hello@jmpotters.com</span>
-                        <span><i class="fas fa-map-marker-alt" style="color: var(--primary-color);"></i> Lagos, Nigeria</span>
+                        <span><i class="ri-phone-line" style="color: var(--primary-color);"></i> +234 813 958 3320</span>
+                        <span><i class="ri-mail-line" style="color: var(--primary-color);"></i> hello@jmpotters.com</span>
+                        <span><i class="ri-map-pin-line" style="color: var(--primary-color);"></i> Lagos, Nigeria</span>
                     </div>
                     <div style="margin-top: 20px;">
                         <p style="font-size:0.8rem; opacity:0.7;">Mon - Sat: 9am - 6pm</p>
@@ -738,29 +750,28 @@
                 </div>
             </div>
             <div class="copyright">
-                &copy; 2025 JMPOTTERS. Crafted with <i class="fas fa-heart" style="color: var(--accent-color);"></i> in Nigeria. All rights reserved.
+                &copy; 2025 JMPOTTERS. Crafted with <i class="ri-heart-fill" style="color: var(--accent-color);"></i> in Nigeria. All rights reserved.
             </div>
         </div>
     </footer>
 
-    <!-- WhatsApp Float -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank" style="position:fixed; bottom:25px; right:25px; width:55px; height:55px; background:#25d366; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:1.8rem; box-shadow:0 6px 20px rgba(0,0,0,0.2); z-index:99; transition:0.2s;">
-        <i class="fab fa-whatsapp"></i>
+    <!-- WhatsApp Float (Remix Icon) -->
+    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank" style="position:fixed; bottom:25px; right:25px; width:55px; height:55px; background:#25d366; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:1.9rem; box-shadow:0 6px 20px rgba(0,0,0,0.2); z-index:99; transition:0.2s;">
+        <i class="ri-whatsapp-line"></i>
     </a>
 
     <!-- ========= SUPABASE INTEGRATION ========= -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     
-    <!-- UI Interactions (Enhanced headers/footers + panels) -->
+    <!-- UI Interactions (Enhanced headers/footers + panels + updated logic) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile nav enhancement
+            // Mobile navigation logic
             const mobileToggle = document.getElementById('mobileToggle');
             const mobileNav = document.getElementById('mobileNav');
             const navOverlay = document.getElementById('navOverlay');
-            const closeNav = document.querySelector('.close-nav');
-            const closeNavBtn = document.getElementById('closeNavBtn');
+            const closeNavBtns = document.querySelectorAll('.close-nav');
             
             function openMobileNav() {
                 mobileNav.classList.add('active');
@@ -773,16 +784,15 @@
                 document.body.style.overflow = '';
             }
             if(mobileToggle) mobileToggle.addEventListener('click', openMobileNav);
-            if(closeNav) closeNav.addEventListener('click', closeMobileNav);
-            if(closeNavBtn) closeNavBtn.addEventListener('click', closeMobileNav);
+            closeNavBtns.forEach(btn => btn.addEventListener('click', closeMobileNav));
             if(navOverlay) navOverlay.addEventListener('click', closeMobileNav);
             
-            // cart & wishlist panel interactive (keep original references)
+            // Cart panel handlers with Remix icons
             const cartIcon = document.getElementById('cartIcon');
             const cartPanel = document.getElementById('cartPanel');
             const cartOverlay = document.getElementById('cartOverlay');
             const closeCart = document.querySelector('.close-cart');
-            if(cartIcon && cartPanel && cartOverlay) {
+            if(cartIcon && cartPanel) {
                 cartIcon.addEventListener('click', () => {
                     cartPanel.style.right = '0';
                     cartOverlay.classList.add('active');
@@ -793,18 +803,19 @@
                     cartOverlay.classList.remove('active');
                     document.body.style.overflow = '';
                 });
-                cartOverlay.addEventListener('click', () => {
+                if(cartOverlay) cartOverlay.addEventListener('click', () => {
                     cartPanel.style.right = '-100%';
                     cartOverlay.classList.remove('active');
                     document.body.style.overflow = '';
                 });
             }
             
+            // Wishlist panel
             const wishlistIcon = document.getElementById('wishlistIcon');
             const wishlistPanel = document.getElementById('wishlistPanel');
             const wishlistOverlay = document.getElementById('wishlistOverlay');
             const closeWishlist = document.querySelector('.close-wishlist');
-            if(wishlistIcon && wishlistPanel && wishlistOverlay) {
+            if(wishlistIcon && wishlistPanel) {
                 wishlistIcon.addEventListener('click', () => {
                     wishlistPanel.style.right = '0';
                     wishlistOverlay.classList.add('active');
@@ -815,14 +826,14 @@
                     wishlistOverlay.classList.remove('active');
                     document.body.style.overflow = '';
                 });
-                wishlistOverlay.addEventListener('click', () => {
+                if(wishlistOverlay) wishlistOverlay.addEventListener('click', () => {
                     wishlistPanel.style.right = '-100%';
                     wishlistOverlay.classList.remove('active');
                     document.body.style.overflow = '';
                 });
             }
             
-            // Filter events (logging + propagation for app.js)
+            // Filter events (bridge to existing app.js filters)
             const searchBar = document.getElementById('searchBar');
             const minPrice = document.getElementById('minPrice');
             const maxPrice = document.getElementById('maxPrice');
@@ -833,7 +844,7 @@
                     if(window.applyFiltersAndRender) window.applyFiltersAndRender();
                 });
             });
-            console.log('✨ Header & Footer ultra-precise styling active — glass header + dark luxury footer');
+            console.log('✅ Header & Footer upgraded: Remix Icons, Logo image, split footwear nav');
         });
     </script>
 </body>
