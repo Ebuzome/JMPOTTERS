@@ -2,19 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Healthcare & Wellbeing | JMPOTTERS</title>
+    
+    <!-- Premium Icon Pack: Boxicons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <!-- Font Awesome (legacy) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase & App -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="app.js" defer></script>
+    
     <style>
+        /* ===== GLOBAL VARIABLES ===== */
         :root {
-            --primary-color: #2e7d32;      /* Health green */
-            --accent-color: #4caf50;       /* Lighter green */
-            --dark-color: #1b5e20;         /* Dark green */
+            --primary-color: #2e7d32;
+            --accent-color: #4caf50;
+            --dark-color: #1b5e20;
             --light-color: #ffffff;
             --light-green: #e8f5e9;
             --shadow-color: rgba(0, 0, 0, 0.1);
             --transition: .35s cubic-bezier(.4, 0, .2, 1);
+            
+            /* Dark header specific */
+            --glass-dark: rgba(12, 15, 21, 0.92);
+            --glass-blur: blur(16px);
         }
 
         * {
@@ -86,140 +101,327 @@
             box-shadow: 0 8px 20px var(--shadow-color);
         }
 
-        /* ===== HEADER ===== */
-        header {
+        /* ========== HEADER – DARK GLASS, CENTERED LOGO, HAMBURGER LEFT ========== */
+        .nav-bar {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            z-index: 1000;
-            padding: 6px 0;              /* Even shorter for sleek look */
-            background: var(--light-color);
-            box-shadow: 0 2px 8px var(--shadow-color);
+            z-index: 1050;
+            background: var(--glass-dark);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.3);
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
+        
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        .logo {
-            font-family: 'Ubuntu', sans-serif;
-            font-size: 1.4rem;           /* Slightly smaller */
-            font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        .logo span { color: var(--accent-color); }
-
-        .mobile-toggle {
-            display: block;              /* always visible */
-            background: none;
-            border: none;
-            font-size: 1.3rem;           /* Slightly smaller */
-            color: var(--dark-color);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .mobile-toggle:hover { color: var(--accent-color); }
-
-        .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 15px;                   /* Reduced gap */
-        }
-        .header-icon {
+            padding: 12px 0;
             position: relative;
-            font-size: 1.2rem;           /* Slightly smaller */
-            color: var(--dark-color);
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .header-left {
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+        }
+        .mobile-toggle {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            font-size: 2rem;
+            width: 52px;
+            height: 52px;
+            border-radius: 30px;
+            color: var(--accent-color);
             cursor: pointer;
             transition: var(--transition);
-        }
-        .header-icon:hover { color: var(--accent-color); }
-        .icon-badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: var(--accent-color);
-            color: var(--light-color);
-            font-size: .7rem;
-            width: 16px;                 /* Slightly smaller */
-            height: 16px;                /* Slightly smaller */
-            border-radius: 50%;
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
+        }
+        .mobile-toggle:hover {
+            background: var(--accent-color);
+            color: #0c0f15;
+            transform: rotate(5deg);
+        }
+        
+        .header-center {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+        .logo-img {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            transition: var(--transition);
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+        }
+        .logo-img:hover {
+            transform: scale(1.02);
+            filter: drop-shadow(0 6px 12px rgba(76,175,80,0.4));
+        }
+        
+        .header-right {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+        }
+        .header-icon {
+            position: relative;
+            font-size: 1.8rem;
+            color: #eef2f5;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(255,255,255,0.05);
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .header-icon:hover {
+            background: var(--accent-color);
+            color: #0c0f15;
+            transform: translateY(-3px);
+        }
+        .icon-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--accent-color);
+            color: #0c0f15;
+            font-size: 0.7rem;
+            font-weight: 800;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            font-family: monospace;
         }
 
-        /* ===== MOBILE NAV ===== */
+        /* Overlay & Mobile Navigation */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,.5);
-            z-index: 1050;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 1060;
             display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .overlay.active { display: block; }
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
         .mobile-nav {
             position: fixed;
             top: 0;
-            right: -100%;
+            left: -100%;
             width: 85%;
-            max-width: 320px;
+            max-width: 380px;
             height: 100vh;
-            background: var(--light-color);
-            z-index: 1100;
-            transition: var(--transition);
-            padding: 25px 20px;          /* Slightly less padding */
-            box-shadow: -4px 0 15px var(--shadow-color);
+            background: #0f1219f2;
+            backdrop-filter: blur(24px);
+            z-index: 1070;
+            transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            padding: 32px 24px;
+            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
+            border-radius: 0 28px 28px 0;
+            overflow-y: auto;
         }
-        .mobile-nav.active { right: 0; }
+        .mobile-nav.active {
+            left: 0;
+        }
         .mobile-nav-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 40px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        .mobile-nav-header .logo-img {
+            height: 56px;
         }
         .close-nav {
-            background: none;
+            background: rgba(255,255,255,0.08);
             border: none;
-            font-size: 1.3rem;           /* Slightly smaller */
-            color: var(--dark-color);
+            font-size: 1.9rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            color: var(--accent-color);
             cursor: pointer;
             transition: var(--transition);
-        }
-        .close-nav:hover { color: var(--accent-color); }
-        .mobile-nav-links {
-            list-style: none;
-        }
-        .mobile-nav-links li {
-            margin-bottom: 12px;         /* Slightly less spacing */
-        }
-        .mobile-nav-links a {
             display: flex;
             align-items: center;
-            gap: 12px;
-            color: var(--dark-color);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 10px;
-            border-radius: 8px;
-            transition: var(--transition);
+            justify-content: center;
         }
-        .mobile-nav-links a:hover {
-            background: var(--primary-color);
-            color: var(--light-color);
+        .close-nav:hover {
+            background: var(--accent-color);
+            color: #0c0f15;
+            transform: rotate(90deg);
+        }
+        .mobile-nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .mobile-nav-links li a {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50px;
+            font-weight: 500;
+            color: #f0f3f8;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+        .mobile-nav-links li a i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+        .mobile-nav-links li a:hover {
+            background: var(--accent-color);
+            color: #0c0f15;
+            transform: translateX(8px);
+        }
+        .mobile-nav-links li a:hover i {
+            color: #0c0f15;
         }
 
-        /* ===== HERO CAROUSEL ===== */
+        /* ========== FOOTER – DARK LUXURY ========== */
+        footer {
+            background: linear-gradient(145deg, #0a0d12 0%, #05070a 100%);
+            color: #eef2f5;
+            padding: 64px 0 32px;
+            margin-top: 80px;
+            border-top: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        @media (min-width: 640px) {
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 768px) {
+            .footer-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .footer-logo-img {
+            height: 72px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+        .footer-logo-img:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+            filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(76,175,80,0.3));
+        }
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            font-weight: 600;
+            position: relative;
+        }
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        .footer-links a {
+            color: #cfdee9;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .footer-links a:hover {
+            color: var(--accent-color);
+            transform: translateX(5px);
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .social-links a {
+            background: rgba(255,255,255,0.06);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        .social-links a:hover {
+            background: var(--accent-color);
+            transform: translateY(-3px);
+            color: #0a0d12;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 32px;
+            margin-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.75rem;
+            color: #9aaeb9;
+        }
+
+        /* Adjust hero carousel margin to account for fixed header */
+        .hero-carousel {
+            margin-top: 94px;
+        }
+
+        /* ===== ORIGINAL HEALTHCARE STYLES (preserved) ===== */
         .hero-carousel {
             position: relative;
             height: 70vh;
             overflow: hidden;
-            margin-top: 50px;
         }
         .carousel-slide {
             position: absolute;
@@ -291,7 +493,6 @@
             background: var(--light-color);
         }
 
-        /* ===== PRODUCT SECTIONS ===== */
         .product-section {
             margin-bottom: 60px;
         }
@@ -304,20 +505,13 @@
             color: var(--dark-color);
             margin-bottom: 10px;
         }
-        .product-header p {
-            color: #666;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        /* ANSA Product Display - GRID LAYOUT */
-        .ansa-products {
+        .ansa-products, .honey-products {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
             margin-bottom: 40px;
         }
-        .ansa-product {
+        .ansa-product, .honey-product {
             background: var(--light-color);
             border-radius: 12px;
             overflow: hidden;
@@ -325,26 +519,31 @@
             transition: var(--transition);
             text-align: center;
         }
-        .ansa-product:hover {
+        .ansa-product:hover, .honey-product:hover {
             transform: translateY(-8px);
             box-shadow: 0 12px 25px rgba(76, 175, 80, 0.25);
         }
-        .ansa-image {
+        .ansa-image, .honey-image {
             height: 250px;
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
             background-color: #f9f9f9;
         }
-        .ansa-info {
+        .ansa-info, .honey-info {
             padding: 20px;
         }
-        .ansa-info h3 {
+        .ansa-info h3, .honey-info h3 {
             font-size: 1.4rem;
             margin-bottom: 10px;
             color: var(--dark-color);
         }
-        
+        .honey-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
         .ansa-details {
             margin-top: 30px;
             background: var(--light-color);
@@ -362,11 +561,6 @@
         .quantity-selector {
             margin-bottom: 20px;
             text-align: center;
-        }
-        .quantity-selector label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
         }
         .quantity-selector select {
             padding: 10px 15px;
@@ -388,48 +582,6 @@
             min-width: 150px;
             text-align: center;
         }
-
-        /* Honey Products */
-        .honey-products {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
-        .honey-product {
-            background: var(--light-color);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            transition: var(--transition);
-            text-align: center;
-        }
-        .honey-product:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 25px rgba(76, 175, 80, 0.25);
-        }
-        .honey-image {
-            height: 250px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: #f9f9f9;
-        }
-        .honey-info {
-            padding: 20px;
-        }
-        .honey-info h3 {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-            color: var(--dark-color);
-        }
-        .honey-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-
-        /* ===== HEALTH BENEFITS ===== */
         .health-benefits {
             background-color: var(--light-green);
             padding: 40px;
@@ -460,11 +612,6 @@
             align-items: center;
             gap: 10px;
         }
-        .benefit-item h4 i {
-            font-size: 1.2rem;
-        }
-
-        /* ===== BULK INFO ===== */
         .bulk-info {
             background: var(--dark-color);
             color: var(--light-color);
@@ -478,12 +625,6 @@
             margin-bottom: 15px;
             color: var(--accent-color);
         }
-        .bulk-info p {
-            max-width: 700px;
-            margin: 0 auto 20px;
-        }
-
-        /* ===== PANELS ===== */
         .cart-panel, .wishlist-panel {
             position: fixed;
             top: 0;
@@ -512,52 +653,8 @@
             border: none;
             font-size: 1.4rem;
             cursor: pointer;
-            color: var(--dark-color);
             transition: var(--transition);
         }
-        .close-cart:hover, .close-wishlist:hover { color: var(--accent-color); }
-
-        /* ===== FOOTER ===== */
-        footer {
-            background: var(--dark-color);
-            padding: 60px 0 30px;
-            color: var(--light-color);
-        }
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        .footer-column h3 {
-            margin-bottom: 15px;
-            color: var(--accent-color);
-            font-size: 1.1rem;
-        }
-        .footer-links {
-            list-style: none;
-        }
-        .footer-links a {
-            display: block;
-            color: #ddd;
-            margin-bottom: 8px;
-            text-decoration: none;
-            font-size: .9rem;
-            transition: var(--transition);
-        }
-        .footer-links a:hover {
-            color: var(--accent-color);
-            transform: translateX(4px);
-        }
-        .copyright {
-            text-align: center;
-            font-size: .85rem;
-            color: #aaa;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
-        }
-
-        /* ===== FLOATING BUTTON ===== */
         .whatsapp-float {
             position: fixed;
             bottom: 25px;
@@ -577,87 +674,70 @@
         }
         .whatsapp-float:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 18px rgba(37, 211, 102, .4);
         }
-
-        /* ===== NOTIFICATION ===== */
+        @media (max-width: 768px) {
+            .hero-carousel { margin-top: 86px; }
+            .logo-img { height: 58px; }
+            .footer-logo-img { height: 62px; }
+            .carousel-content h1 { font-size: 2.3rem; }
+            .ansa-products, .honey-products { grid-template-columns: 1fr; }
+            .benefits-grid { grid-template-columns: 1fr; }
+            .action-buttons { flex-direction: column; }
+            .action-buttons .btn { width: 100%; }
+        }
         @keyframes fadeInOut {
             0% { opacity: 0; transform: translate(-50%, 20px); }
             10% { opacity: 1; transform: translate(-50%, 0); }
             90% { opacity: 1; transform: translate(-50%, 0); }
             100% { opacity: 0; transform: translate(-50%, 20px); }
         }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .carousel-content h1 { font-size: 2.3rem; }
-            .section-title { font-size: 1.8rem; }
-            .ansa-products, .honey-products {
-                grid-template-columns: 1fr;
-            }
-            .benefits-grid {
-                grid-template-columns: 1fr;
-            }
-            .hero-carousel {
-                margin-top: 48px; /* Adjusted for shorter header on mobile */
-            }
-            .health-benefits {
-                padding: 25px;
-            }
-            .bulk-info {
-                padding: 25px;
-            }
-            .action-buttons {
-                flex-direction: column;
-            }
-            .action-buttons .btn {
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <!-- ========= HEADER ========= -->
-    <header>
-        <div class="container header-container">
-            <a href="index.html" class="logo">JMPOTTERS<span>.</span></a>
-
-            <!-- Hamburger always visible -->
-            <button class="mobile-toggle" id="mobileToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-
-            <div class="header-icons">
+    <!-- ========= HEADER (UNIFIED DARK GLASS) ========= -->
+    <nav class="nav-bar">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                    <i class='bx bx-menu-alt-left'></i>
+                </button>
+            </div>
+            <div class="header-center">
+                <a href="index.html">
+                    <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
+                </a>
+            </div>
+            <div class="header-right">
                 <div class="header-icon" id="wishlistIcon">
-                    <i class="fas fa-heart"></i>
+                    <i class='bx bx-heart'></i>
                     <span class="icon-badge" id="wishlistCount">0</span>
                 </div>
                 <div class="header-icon" id="cartIcon">
-                    <i class="fas fa-shopping-bag"></i>
+                    <i class='bx bx-shopping-bag'></i>
                     <span class="icon-badge" id="cartCount">0</span>
                 </div>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- ========= MOBILE NAV ========= -->
+    <!-- ========= MOBILE NAV (LEFT DRAWER) ========= -->
     <div class="overlay" id="navOverlay"></div>
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <div class="logo">JMPOTTERS<span>.</span></div>
-            <button class="close-nav"><i class="fas fa-times"></i></button>
+            <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
+            <button class="close-nav" id="closeNavBtn"><i class='bx bx-x'></i></button>
         </div>
         <ul class="mobile-nav-links">
-            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="footwear.html"><i class="fas fa-shoe-prints"></i> Footwear</a></li>
-            <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
-            <li><a href="accessories.html"><i class="fas fa-gem"></i> Accessories</a></li>
-            <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-            <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
-            <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
-            <li><a href="blog/blog.html"><i class="fas fa-blog"></i> Blog</a></li>
-            <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
+            <li><a href="index.html"><i class='bx bx-home'></i> Home</a></li>
+            <li><a href="mensfootwear.html"><i class='bx bx-footwear'></i> Men's Footwear</a></li>
+            <li><a href="womensfootwear.html"><i class='bx bx-female'></i> Women's Footwear</a></li>
+            <li><a href="bags.html"><i class='bx bx-briefcase'></i> Bags</a></li>
+            <li><a href="accessories.html"><i class='bx bx-diamond'></i> Accessories</a></li>
+            <li><a href="household.html"><i class='bx bx-home-smile'></i> Household</a></li>
+            <li><a href="kids.html"><i class='bx bx-baby-carriage'></i> Kids & Babies</a></li>
+            <li><a href="healthcare.html"><i class='bx bx-heart'></i> Healthcare</a></li>
+            <li><a href="contact.html"><i class='bx bx-phone-call'></i> Contact</a></li>
         </ul>
     </div>
 
@@ -699,7 +779,7 @@
         </div>
     </div>
 
-    <!-- ========= PRODUCTS ========= -->
+    <!-- ========= PRODUCTS (Preserved original content) ========= -->
     <section id="products">
         <div class="container">
             <!-- ANSA Soursop Tea Section -->
@@ -709,38 +789,24 @@
                     <p>An accredited affiliate and marketer of ANSA Soursop Tea - 100% natural herbal tea for optimal health</p>
                 </div>
                 
-                <!-- ANSA Product Images in Grid -->
                 <div class="ansa-products">
                     <div class="ansa-product">
                         <div class="ansa-image" style="background-image: url('assets/images/ansa-1.png');"></div>
-                        <div class="ansa-info">
-                            <h3>ANSA Soursop Tea</h3>
-                            <p>Front view of packaging</p>
-                        </div>
+                        <div class="ansa-info"><h3>ANSA Soursop Tea</h3><p>Front view of packaging</p></div>
                     </div>
-                    
                     <div class="ansa-product">
                         <div class="ansa-image" style="background-image: url('assets/images/ansa-2.png');"></div>
-                        <div class="ansa-info">
-                            <h3>ANSA Soursop Tea</h3>
-                            <p>Side view of packaging</p>
-                        </div>
+                        <div class="ansa-info"><h3>ANSA Soursop Tea</h3><p>Side view of packaging</p></div>
                     </div>
-                    
                     <div class="ansa-product">
                         <div class="ansa-image" style="background-image: url('assets/images/ansa-3.png');"></div>
-                        <div class="ansa-info">
-                            <h3>ANSA Soursop Tea</h3>
-                            <p>Tea bags inside</p>
-                        </div>
+                        <div class="ansa-info"><h3>ANSA Soursop Tea</h3><p>Tea bags inside</p></div>
                     </div>
                 </div>
                 
-                <!-- ANSA Product Details -->
                 <div class="ansa-details">
                     <div class="ansa-price">₦25,000 per pack</div>
                     <p>Each packet contains 25 premium tea bags of 100% natural soursop leaves, spiced with ginger for enhanced flavor and health benefits.</p>
-                    
                     <div class="quantity-selector">
                         <label for="ansa-quantity">Select Quantity (Packs):</label>
                         <select id="ansa-quantity">
@@ -753,47 +819,25 @@
                             <option value="20">20 Packs (10% off)</option>
                         </select>
                     </div>
-                    
                     <div class="action-buttons">
                         <button class="btn" id="addAnsaToCart">Add to Cart</button>
-                        <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20ANSA%20Soursop%20Tea" class="btn whatsapp-btn" target="_blank">
+                        <a href="https://wa.me/2348139583320?text=I'm%20interested%20in%20ANSA%20Soursop%20Tea" class="btn" target="_blank">
                             <i class="fab fa-whatsapp"></i> Order via WhatsApp
                         </a>
                     </div>
                 </div>
                 
-                <!-- ANSA Health Benefits -->
                 <div class="health-benefits">
                     <h3 class="benefits-title">Health Benefits of ANSA Soursop Tea</h3>
                     <div class="benefits-grid">
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-heart"></i> Heart Health</h4>
-                            <p>Reduces blood pressure and supports cardiovascular function</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-shield-alt"></i> Immune Boost</h4>
-                            <p>Strengthens the immune system with rich antioxidants</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-bacteria"></i> Anti-inflammatory</h4>
-                            <p>Reduces inflammation throughout the body</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-dna"></i> Cancer Prevention</h4>
-                            <p>Contains compounds that may help prevent cancer growth</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-tint"></i> Blood Sugar Control</h4>
-                            <p>Helps regulate blood sugar levels naturally</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-male"></i> Prostate Health</h4>
-                            <p>Inhibits prostate enlargement and improves urine flow</p>
-                        </div>
+                        <div class="benefit-item"><h4><i class="fas fa-heart"></i> Heart Health</h4><p>Reduces blood pressure and supports cardiovascular function</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-shield-alt"></i> Immune Boost</h4><p>Strengthens the immune system with rich antioxidants</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-bacteria"></i> Anti-inflammatory</h4><p>Reduces inflammation throughout the body</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-dna"></i> Cancer Prevention</h4><p>Contains compounds that may help prevent cancer growth</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-tint"></i> Blood Sugar Control</h4><p>Helps regulate blood sugar levels naturally</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-male"></i> Prostate Health</h4><p>Inhibits prostate enlargement and improves urine flow</p></div>
                     </div>
-                    
-                    <div style="margin-top: 30px;">
-                        <h4>Product Details:</h4>
+                    <div style="margin-top:30px"><h4>Product Details:</h4>
                         <p><strong>Description:</strong> Each tea bag contains high-grade 100% natural soursop leaves, spiced with ginger, and blended to help you lead a healthy, happier life.</p>
                         <p><strong>Key Features:</strong> Dark green powdery granules, readily soluble in water</p>
                         <p><strong>Usage:</strong> Place one tea bag in a teacup and add freshly boiled water. Wait for 5–15 minutes, then take your natural drink for everyday usage.</p>
@@ -809,78 +853,39 @@
                     <h2>JMPOTTERS Pure Honey</h2>
                     <p>Natural, unprocessed honey with exceptional flavor and health benefits</p>
                 </div>
-                
                 <div class="honey-products">
                     <div class="honey-product">
                         <div class="honey-image" style="background-image: url('assets/images/honey-1-litre-1500.png');"></div>
-                        <div class="honey-info">
-                            <h3>Pure Honey - 1 Litre</h3>
-                            <div class="honey-price">₦15,000</div>
-                            <p>Premium quality, unprocessed honey in a 1-litre bottle</p>
-                            <div class="action-buttons" style="margin-top: 15px;">
-                                <button class="btn add-to-cart" data-product="Honey 1 Litre" data-price="15000">Add to Cart</button>
-                            </div>
+                        <div class="honey-info"><h3>Pure Honey - 1 Litre</h3><div class="honey-price">₦15,000</div><p>Premium quality, unprocessed honey in a 1-litre bottle</p>
+                            <div class="action-buttons" style="margin-top:15px"><button class="btn add-to-cart" data-product="Honey 1 Litre" data-price="15000">Add to Cart</button></div>
                         </div>
                     </div>
-                    
                     <div class="honey-product">
                         <div class="honey-image" style="background-image: url('assets/images/honey-750cl-8000.png');"></div>
-                        <div class="honey-info">
-                            <h3>Pure Honey - 750cl</h3>
-                            <div class="honey-price">₦8,000</div>
-                            <p>Natural honey in a convenient 750cl size</p>
-                            <div class="action-buttons" style="margin-top: 15px;">
-                                <button class="btn add-to-cart" data-product="Honey 750cl" data-price="8000">Add to Cart</button>
-                            </div>
+                        <div class="honey-info"><h3>Pure Honey - 750cl</h3><div class="honey-price">₦8,000</div><p>Natural honey in a convenient 750cl size</p>
+                            <div class="action-buttons" style="margin-top:15px"><button class="btn add-to-cart" data-product="Honey 750cl" data-price="8000">Add to Cart</button></div>
                         </div>
                     </div>
-                    
                     <div class="honey-product">
                         <div class="honey-image" style="background-image: url('assets/images/honey-combo-20000.png');"></div>
-                        <div class="honey-info">
-                            <h3>Honey Combo Pack</h3>
-                            <div class="honey-price">₦20,000</div>
-                            <p>Special combo including 1 litre and 750cl bottles</p>
-                            <div class="action-buttons" style="margin-top: 15px;">
-                                <button class="btn add-to-cart" data-product="Honey Combo" data-price="20000">Add to Cart</button>
-                            </div>
+                        <div class="honey-info"><h3>Honey Combo Pack</h3><div class="honey-price">₦20,000</div><p>Special combo including 1 litre and 750cl bottles</p>
+                            <div class="action-buttons" style="margin-top:15px"><button class="btn add-to-cart" data-product="Honey Combo" data-price="20000">Add to Cart</button></div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Honey Health Benefits -->
                 <div class="health-benefits">
                     <h3 class="benefits-title">Health Benefits of Pure Honey</h3>
                     <div class="benefits-grid">
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-bacteria"></i> Natural Antibacterial</h4>
-                            <p>Contains hydrogen peroxide and has low pH, inhibiting bacterial growth</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-lungs"></i> Soothes Coughs</h4>
-                            <p>Effective at reducing cough frequency and severity</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-heart"></i> Heart Health</h4>
-                            <p>May help lower blood pressure and improve cholesterol levels</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-brain"></i> Brain Function</h4>
-                            <p>Contains antioxidants that may support brain health and memory</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-allergies"></i> Allergy Relief</h4>
-                            <p>Local honey may help build immunity to pollen allergies</p>
-                        </div>
-                        <div class="benefit-item">
-                            <h4><i class="fas fa-burn"></i> Energy Boost</h4>
-                            <p>Natural source of carbohydrates for quick energy</p>
-                        </div>
+                        <div class="benefit-item"><h4><i class="fas fa-bacteria"></i> Natural Antibacterial</h4><p>Contains hydrogen peroxide and has low pH, inhibiting bacterial growth</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-lungs"></i> Soothes Coughs</h4><p>Effective at reducing cough frequency and severity</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-heart"></i> Heart Health</h4><p>May help lower blood pressure and improve cholesterol levels</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-brain"></i> Brain Function</h4><p>Contains antioxidants that may support brain health and memory</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-allergies"></i> Allergy Relief</h4><p>Local honey may help build immunity to pollen allergies</p></div>
+                        <div class="benefit-item"><h4><i class="fas fa-burn"></i> Energy Boost</h4><p>Natural source of carbohydrates for quick energy</p></div>
                     </div>
                 </div>
             </div>
             
-            <!-- Bulk Order Information -->
             <div class="bulk-info" id="bulk">
                 <h3>Bulk Orders & Wholesale</h3>
                 <p>We distribute both ANSA Soursop Tea and JMPOTTERS Honey products in large quantities at discounted prices to retailers and wholesalers looking to buy in bulk and resell.</p>
@@ -892,105 +897,39 @@
         </div>
     </section>
 
-    <!-- ========= CART PANEL ========= -->
+    <!-- Cart & Wishlist Panels -->
     <div class="overlay" id="cartOverlay"></div>
-    <div class="cart-panel" id="cartPanel">
-        <div class="cart-header">
-            <h3>Your Cart</h3>
-            <button class="close-cart"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <div class="cart-empty">Your cart is empty</div>
-        </div>
-        <div class="cart-total">
-            <span>Total:</span>
-            <span id="cartTotal">₦0</span>
-        </div>
-        <a href="#" class="btn" id="whatsappCheckout" style="width:100%;margin-top:15px;">
-            <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
-        </a>
-    </div>
-
-    <!-- ========= WISHLIST PANEL ========= -->
+    <div class="cart-panel" id="cartPanel"><div class="cart-header"><h3>Your Cart</h3><button class="close-cart"><i class="fas fa-times"></i></button></div><div class="cart-items" id="cartItems"><div class="cart-empty">Your cart is empty</div></div><div class="cart-total"><span>Total:</span><span id="cartTotal">₦0</span></div><a href="#" class="btn" id="whatsappCheckout" style="width:100%;margin-top:15px;"><i class="fab fa-whatsapp"></i> Checkout via WhatsApp</a></div>
     <div class="overlay" id="wishlistOverlay"></div>
-    <div class="wishlist-panel" id="wishlistPanel">
-        <div class="wishlist-header">
-            <h3>Your Wishlist</h3>
-            <button class="close-wishlist"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="wishlist-items" id="wishlistItems">
-            <div class="wishlist-empty">Your wishlist is empty</div>
-        </div>
-    </div>
+    <div class="wishlist-panel" id="wishlistPanel"><div class="wishlist-header"><h3>Your Wishlist</h3><button class="close-wishlist"><i class="fas fa-times"></i></button></div><div class="wishlist-items" id="wishlistItems"><div class="wishlist-empty">Your wishlist is empty</div></div></div>
 
-    <!-- ========= FOOTER ========= -->
+    <!-- ========= FOOTER (DARK LUXURY) ========= -->
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>JMPOTTERS Healthcare</h3>
-                    <p>Your trusted partner for health and wellbeing products. Quality healthcare solutions for everyone.</p>
-                </div>
-                <div class="footer-column">
-                    <h3>Our Products</h3>
-                    <ul class="footer-links">
-                        <li><a href="#ansa-tea">ANSA Soursop Tea</a></li>
-                        <li><a href="#honey">JMPOTTERS Honey</a></li>
-                        <li><a href="#bulk">Bulk Orders</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Support</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Healthcare Advice</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="#">Shipping Policy</a></li>
-                        <li><a href="#">Returns</a></li>
-                    </ul>
-                </div>
+        <div class="footer-container">
+            <div class="footer-column">
+                <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
+                <p>Your trusted partner for health and wellbeing products. Quality healthcare solutions for everyone.</p>
+                <div class="social-links"><a href="#"><i class='bx bxl-whatsapp'></i></a><a href="#"><i class='bx bxl-instagram'></i></a><a href="#"><i class='bx bxl-facebook'></i></a><a href="#"><i class='bx bxl-pinterest'></i></a></div>
             </div>
-            <div class="copyright">
-                &copy; 2023 JMPOTTERS Healthcare. All rights reserved.
-            </div>
+            <div class="footer-column"><h3>Our Products</h3><ul class="footer-links"><li><a href="#ansa-tea"><i class='bx bx-chevron-right'></i> ANSA Soursop Tea</a></li><li><a href="#honey"><i class='bx bx-chevron-right'></i> JMPOTTERS Honey</a></li><li><a href="#bulk"><i class='bx bx-chevron-right'></i> Bulk Orders</a></li></ul></div>
+            <div class="footer-column"><h3>Support</h3><ul class="footer-links"><li><a href="#"><i class='bx bx-chevron-right'></i> Healthcare Advice</a></li><li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact Us</a></li><li><a href="#"><i class='bx bx-chevron-right'></i> Shipping Policy</a></li><li><a href="#"><i class='bx bx-chevron-right'></i> Returns</a></li></ul></div>
+            <div class="footer-column"><h3>Connect</h3><ul class="footer-links"><li><i class='bx bx-phone-call'></i> +234 813 958 3320</li><li><i class='bx bx-envelope'></i> hello@jmpotters.com</li></ul></div>
         </div>
+        <div class="copyright">&copy; 2025 JMPOTTERS Healthcare. All rights reserved.</div>
     </footer>
 
     <!-- WhatsApp Float -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank"><i class='bx bxl-whatsapp'></i></a>
 
-    <!-- ========= SCRIPT ========= -->
     <script>
-        // Products data
+        // ========== CART & WISHLIST LOGIC (Preserved with enhancements) ==========
         const products = {
-            ansa: {
-                name: "ANSA Soursop Tea - 25 Tea Bags",
-                price: 25000,
-                images: [
-                    'assets/images/ansa-1.png',
-                    'assets/images/ansa-2.png',
-                    'assets/images/ansa-3.png'
-                ]
-            },
-            honey1L: {
-                name: "Pure Honey - 1 Litre",
-                price: 15000,
-                image: 'assets/images/honey-1-litre-1500.png'
-            },
-            honey750cl: {
-                name: "Pure Honey - 750cl",
-                price: 8000,
-                image: 'assets/images/honey-750cl-8000.png'
-            },
-            honeyCombo: {
-                name: "Honey Combo Pack",
-                price: 20000,
-                image: 'assets/images/honey-combo-20000.png'
-            }
+            ansa: { name: "ANSA Soursop Tea - 25 Tea Bags", price: 25000 },
+            honey1L: { name: "Pure Honey - 1 Litre", price: 15000 },
+            honey750cl: { name: "Pure Honey - 750cl", price: 8000 },
+            honeyCombo: { name: "Honey Combo Pack", price: 20000 }
         };
 
-        // Cart and wishlist
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
 
@@ -1016,154 +955,36 @@
         const addAnsaToCart = document.getElementById('addAnsaToCart');
         const ansaQuantity = document.getElementById('ansa-quantity');
 
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', () => {
-            updateWishlistCount();
-            updateCartCount();
-            updateCartTotal();
-            initCarousels();
-        });
-
-        // Initialize carousels
-        function initCarousels() {
-            // Hero carousel
-            const heroSlides = document.querySelectorAll('.hero-carousel .carousel-slide');
-            const heroDots = document.querySelectorAll('.hero-carousel .carousel-dot');
-            let heroCurrent = 0;
-            
-            function showHeroSlide(index) {
-                heroSlides.forEach(slide => slide.classList.remove('active'));
-                heroDots.forEach(dot => dot.classList.remove('active'));
-                
-                heroSlides[index].classList.add('active');
-                heroDots[index].classList.add('active');
-                heroCurrent = index;
-            }
-            
-            // Auto advance hero carousel
-            setInterval(() => {
-                let next = (heroCurrent + 1) % heroSlides.length;
-                showHeroSlide(next);
-            }, 5000);
-            
-            // Dot click events
-            heroDots.forEach((dot, index) => {
-                dot.addEventListener('click', () => showHeroSlide(index));
-            });
-        }
-
-        // Add ANSA tea to cart
-        addAnsaToCart.addEventListener('click', () => {
-            const quantity = parseInt(ansaQuantity.value);
-            let price = products.ansa.price * quantity;
-            
-            // Apply bulk discounts
-            if (quantity >= 10 && quantity < 20) {
-                price *= 0.95; // 5% off
-            } else if (quantity >= 20) {
-                price *= 0.90; // 10% off
-            }
-            
-            const product = {
-                id: 'ansa-tea',
-                name: products.ansa.name,
-                price: Math.round(price / quantity), // Price per unit
-                quantity: quantity,
-                total: Math.round(price)
-            };
-            
-            addToCart(product);
-        });
-
-        // Add honey products to cart
-        document.querySelectorAll('.add-to-cart').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const productName = this.dataset.product;
-                const price = parseInt(this.dataset.price);
-                
-                let product;
-                
-                if (productName === "Honey 1 Litre") {
-                    product = {
-                        id: 'honey-1L',
-                        name: products.honey1L.name,
-                        price: price,
-                        quantity: 1,
-                        total: price
-                    };
-                } else if (productName === "Honey 750cl") {
-                    product = {
-                        id: 'honey-750cl',
-                        name: products.honey750cl.name,
-                        price: price,
-                        quantity: 1,
-                        total: price
-                    };
-                } else if (productName === "Honey Combo") {
-                    product = {
-                        id: 'honey-combo',
-                        name: products.honeyCombo.name,
-                        price: price,
-                        quantity: 1,
-                        total: price
-                    };
-                }
-                
-                addToCart(product);
-            });
-        });
-
-        /* ===== CART / WISHLIST FUNCTIONS ===== */
-        function addToCart(product) {
-            const existing = cart.find(item => item.id === product.id);
-            if (existing) {
-                existing.quantity += product.quantity;
-                existing.total = existing.price * existing.quantity;
-            } else {
-                cart.push(product);
-            }
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            updateCartTotal();
-            renderCartItems();
-            showNotification(`${product.quantity} ${product.name} added to cart!`);
-        }
-
-        function updateCartCount() {
-            cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-        }
-
-        function updateWishlistCount() {
-            wishlistCount.textContent = wishlist.length;
-        }
-
+        function updateCartCount() { cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0); }
+        function updateWishlistCount() { wishlistCount.textContent = wishlist.length; }
+        
         function updateCartTotal() {
             const total = cart.reduce((sum, item) => sum + item.total, 0);
             cartTotal.textContent = `₦${Math.round(total).toLocaleString()}`;
             updateWhatsAppCheckoutLink();
         }
 
+        function updateWhatsAppCheckoutLink() {
+            if (cart.length === 0) { whatsappCheckout.href = "#"; return; }
+            let text = "I would like to purchase:\n";
+            cart.forEach(item => { text += `- ${item.name} (${item.quantity} × ₦${Math.round(item.price).toLocaleString()}) = ₦${Math.round(item.total).toLocaleString()}\n`; });
+            const total = cart.reduce((sum, item) => sum + item.total, 0);
+            text += `\n*Total: ₦${Math.round(total).toLocaleString()}*\n\nPlease confirm order & shipping details.`;
+            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
+        }
+
         function renderCartItems() {
             cartItems.innerHTML = '';
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
-                return;
-            }
-            cart.forEach(item => {
+            if (cart.length === 0) { cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>'; return; }
+            cart.forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = 'cart-item';
-                div.innerHTML = `
-                    <div style="flex:1;margin-left:10px;">
-                        <div style="font-weight:600">${item.name}</div>
-                        <div style="color:var(--primary-color)">₦${Math.round(item.price).toLocaleString()} × ${item.quantity}</div>
-                    </div>
-                    <button class="cart-item-remove" data-id="${item.id}"><i class="fas fa-trash"></i></button>
-                `;
+                div.innerHTML = `<div style="flex:1;margin-left:10px;"><div style="font-weight:600">${item.name}</div><div style="color:var(--primary-color)">₦${Math.round(item.price).toLocaleString()} × ${item.quantity}</div></div><button class="cart-item-remove" data-idx="${idx}"><i class="fas fa-trash"></i></button>`;
                 cartItems.appendChild(div);
             });
             document.querySelectorAll('.cart-item-remove').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    cart = cart.filter(item => item.id !== btn.dataset.id);
+                    cart.splice(parseInt(btn.dataset.idx), 1);
                     localStorage.setItem('cart', JSON.stringify(cart));
                     updateCartCount();
                     updateCartTotal();
@@ -1172,18 +993,26 @@
             });
         }
 
-        function updateWhatsAppCheckoutLink() {
-            if (cart.length === 0) {
-                whatsappCheckout.href = "#";
-                return;
+        function addToCart(product, quantity = 1, pricePerUnit = null) {
+            const finalPrice = pricePerUnit || product.price;
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.quantity += quantity;
+                existing.total = existing.price * existing.quantity;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: finalPrice,
+                    quantity: quantity,
+                    total: finalPrice * quantity
+                });
             }
-            let text = "I would like to purchase:\n";
-            cart.forEach(item => {
-                text += `- ${item.name} (${item.quantity} × ₦${Math.round(item.price).toLocaleString()}) = ₦${Math.round(item.total).toLocaleString()}\n`;
-            });
-            const total = cart.reduce((sum, item) => sum + item.total, 0);
-            text += `\n*Total: ₦${Math.round(total).toLocaleString()}*\n\nPlease confirm order & shipping details.`;
-            whatsappCheckout.href = `https://wa.me/2348139583320?text=${encodeURIComponent(text)}`;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartTotal();
+            renderCartItems();
+            showNotification(`${quantity} ${product.name} added to cart!`);
         }
 
         function showNotification(msg) {
@@ -1194,44 +1023,67 @@
             setTimeout(() => n.remove(), 3000);
         }
 
-        /* ===== EVENT LISTENERS ===== */
-        wishlistIcon.addEventListener('click', () => {
-            wishlistPanel.classList.add('active');
-            wishlistOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+        // ANSA tea
+        if (addAnsaToCart) {
+            addAnsaToCart.addEventListener('click', () => {
+                let qty = parseInt(ansaQuantity.value);
+                let price = products.ansa.price;
+                if (qty >= 10 && qty < 20) price = price * 0.95;
+                else if (qty >= 20) price = price * 0.90;
+                addToCart({ id: 'ansa-tea', name: products.ansa.name, price: price }, qty, price);
+            });
+        }
+
+        // Honey products
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const name = this.dataset.product;
+                const price = parseInt(this.dataset.price);
+                let product = null;
+                if (name === "Honey 1 Litre") product = { id: 'honey-1L', name: products.honey1L.name, price: price };
+                else if (name === "Honey 750cl") product = { id: 'honey-750cl', name: products.honey750cl.name, price: price };
+                else if (name === "Honey Combo") product = { id: 'honey-combo', name: products.honeyCombo.name, price: price };
+                if (product) addToCart(product, 1, price);
+            });
         });
-        cartIcon.addEventListener('click', () => {
-            cartPanel.classList.add('active');
-            cartOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            renderCartItems();
-        });
-        [closeWishlist, wishlistOverlay].forEach(el =>
-            el.addEventListener('click', () => {
-                wishlistPanel.classList.remove('active');
-                wishlistOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            })
-        );
-        [closeCart, cartOverlay].forEach(el =>
-            el.addEventListener('click', () => {
-                cartPanel.classList.remove('active');
-                cartOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            })
-        );
-        mobileToggle.addEventListener('click', () => {
-            mobileNav.classList.add('active');
-            navOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-        [closeNav, navOverlay].forEach(el =>
-            el.addEventListener('click', () => {
-                mobileNav.classList.remove('active');
-                navOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            })
-        );
+
+        // Carousel
+        const heroSlides = document.querySelectorAll('.hero-carousel .carousel-slide');
+        const heroDots = document.querySelectorAll('.hero-carousel .carousel-dot');
+        let heroCurrent = 0;
+        function showHeroSlide(index) {
+            heroSlides.forEach(s => s.classList.remove('active'));
+            heroDotes?.forEach(d => d.classList.remove('active'));
+            heroSlides[index]?.classList.add('active');
+            heroDots[index]?.classList.add('active');
+            heroCurrent = index;
+        }
+        if (heroSlides.length) {
+            setInterval(() => { let next = (heroCurrent + 1) % heroSlides.length; showHeroSlide(next); }, 5000);
+            heroDots.forEach((dot, i) => dot.addEventListener('click', () => showHeroSlide(i)));
+        }
+
+        // Mobile nav & panels
+        function openNav() { mobileNav?.classList.add('active'); navOverlay?.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeNavFunc() { mobileNav?.classList.remove('active'); navOverlay?.classList.remove('active'); document.body.style.overflow = ''; }
+        if (mobileToggle) mobileToggle.addEventListener('click', openNav);
+        if (closeNav) closeNav.addEventListener('click', closeNavFunc);
+        if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
+
+        if (cartIcon && cartPanel && cartOverlay) {
+            cartIcon.addEventListener('click', () => { cartPanel.classList.add('active'); cartOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; renderCartItems(); });
+            if (closeCart) closeCart.addEventListener('click', () => { cartPanel.classList.remove('active'); cartOverlay.classList.remove('active'); document.body.style.overflow = ''; });
+            if (cartOverlay) cartOverlay.addEventListener('click', () => { cartPanel.classList.remove('active'); cartOverlay.classList.remove('active'); document.body.style.overflow = ''; });
+        }
+        if (wishlistIcon && wishlistPanel && wishlistOverlay) {
+            wishlistIcon.addEventListener('click', () => { wishlistPanel.classList.add('active'); wishlistOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; });
+            if (closeWishlist) closeWishlist.addEventListener('click', () => { wishlistPanel.classList.remove('active'); wishlistOverlay.classList.remove('active'); document.body.style.overflow = ''; });
+            if (wishlistOverlay) wishlistOverlay.addEventListener('click', () => { wishlistPanel.classList.remove('active'); wishlistOverlay.classList.remove('active'); document.body.style.overflow = ''; });
+        }
+
+        updateWishlistCount();
+        updateCartCount();
+        updateCartTotal();
     </script>
 </body>
 </html>
