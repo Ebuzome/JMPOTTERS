@@ -2,11 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Women's Footwear | JMPOTTERS</title>
     
-    <!-- Stylesheets -->
+    <!-- Premium Icon Pack: Boxicons (commercial-grade) -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <!-- Font Awesome for legacy compatibility (carousel, etc.) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
@@ -23,7 +26,7 @@
     </script>
     
     <style>
-        /* === GLOBAL STYLES === */
+        /* ===== ORIGINAL GLOBAL STYLES (with modifications to accommodate new header/footer) ===== */
         :root {
             --primary: #9d174d;
             --primary-dark: #831843;
@@ -44,6 +47,10 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+            
+            /* Dark header specific */
+            --glass-dark: rgba(12, 15, 21, 0.92);
+            --glass-blur: blur(16px);
         }
 
         * {
@@ -119,281 +126,334 @@
             box-shadow: var(--glow);
         }
 
-        /* === HEADER === */
+        /* ========== HEADER – DARK GLASS, CENTERED LOGO, HAMBURGER LEFT ========== */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            z-index: 1000;
-            padding: 12px 0;
-            background: rgba(15, 23, 42, 0.98);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1050;
+            background: var(--glass-dark);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid rgba(157, 23, 77, 0.4);
             transition: var(--transition);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(236, 72, 153, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
-
-        header.scrolled {
-            background: rgba(157, 23, 77, 0.95);
-        }
-
+        
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 12px 0;
+            position: relative;
         }
 
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.6rem;
-            font-weight: 700;
+        /* Left side: hamburger button */
+        .header-left {
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+        }
+        .mobile-toggle {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            font-size: 2rem;
+            width: 52px;
+            height: 52px;
+            border-radius: 30px;
             color: var(--secondary);
-            text-decoration: none;
-            letter-spacing: 0.5px;
+            cursor: pointer;
             transition: var(--transition);
-        }
-
-        .logo:hover {
-            color: var(--accent-light);
-        }
-
-        /* Navigation */
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-left: 20px;
-            position: relative;
-        }
-
-        .nav-links a {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--gray-dark);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            position: relative;
-            transition: var(--transition);
-            padding: 6px 0;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent-light);
-        }
-
-        /* Dropdown styles */
-        .dropdown-content {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            min-width: 200px;
-            background: rgba(30, 41, 59, 0.98);
-            box-shadow: var(--shadow);
-            border-top: 2px solid var(--accent);
-            z-index: 100;
-            display: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: var(--transition);
-        }
-
-        .dropdown.active .dropdown-content {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .dropdown-content a {
-            padding: 10px 16px;
-            display: block;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--gray-dark);
-            transition: var(--transition);
-            font-size: 0.85rem;
-        }
-
-        .dropdown-content a:hover {
-            background: rgba(236, 72, 153, 0.1);
-            color: var(--secondary);
-            padding-left: 20px;
-        }
-
-        .dropdown > a .fa-chevron-down {
-            transition: transform 0.3s ease;
-            font-size: 0.8rem;
-        }
-
-        .dropdown.active > a .fa-chevron-down {
-            transform: rotate(180deg);
-        }
-
-        .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .header-icon {
-            position: relative;
-            font-size: 1.2rem;
-            color: var(--gray-dark);
-            transition: var(--transition);
-        }
-
-        .header-icon:hover {
-            color: var(--accent-light);
-        }
-
-        .icon-badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: var(--accent);
-            color: white;
-            font-size: 0.6rem;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
+        }
+        .mobile-toggle:hover {
+            background: var(--secondary);
+            color: #0c0f15;
+            transform: rotate(5deg);
         }
 
-        .mobile-toggle {
+        /* Center: Logo enlarged */
+        .header-center {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+        .logo-img {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            transition: var(--transition);
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+        }
+        .logo-img:hover {
+            transform: scale(1.02);
+            filter: drop-shadow(0 6px 12px rgba(157,23,77,0.4));
+        }
+
+        /* Right side: icons (cart + wishlist) */
+        .header-right {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+        }
+        .header-icon {
+            position: relative;
+            font-size: 1.8rem;
+            color: #eef2f5;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(255,255,255,0.05);
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .header-icon:hover {
+            background: var(--secondary);
+            color: #0c0f15;
+            transform: translateY(-3px);
+        }
+        .icon-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            font-family: monospace;
+        }
+
+        /* Desktop navigation (hidden on mobile, but we keep for structure) */
+        .nav-links {
             display: none;
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            color: var(--gray-dark);
-            transition: var(--transition);
-            padding: 5px;
         }
 
-        /* Mobile Navigation */
-        .mobile-nav {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 85%;
-            max-width: 300px;
-            height: 100vh;
-            background: rgba(157, 23, 77, 0.98);
-            backdrop-filter: blur(10px);
-            z-index: 1100;
-            transition: var(--transition);
-            overflow-y: auto;
-            padding: 20px;
-            border-left: 2px solid var(--accent);
-        }
-
-        .mobile-nav.active {
-            right: 0;
-        }
-
-        .mobile-nav-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .mobile-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            color: white;
-        }
-
-        .close-nav {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.3rem;
-            transition: var(--transition);
-            padding: 5px;
-        }
-
-        .mobile-nav-links {
-            list-style: none;
-        }
-
-        .mobile-nav-links li {
-            margin-bottom: 12px;
-        }
-
-        .mobile-nav-links a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            text-decoration: none;
-            font-size: 1rem;
-            padding: 10px 12px;
-            border-radius: 6px;
-            transition: var(--transition);
-        }
-
-        .mobile-nav-links a:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--gold);
-            padding-left: 16px;
-        }
-
-        /* Mobile dropdown */
-        .mobile-dropdown-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out;
-            padding-left: 16px;
-        }
-
-        .mobile-dropdown.active .mobile-dropdown-content {
-            max-height: 250px;
-        }
-
-        .mobile-dropdown > a .fa-chevron-down {
-            transition: transform 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .mobile-dropdown.active > a .fa-chevron-down {
-            transform: rotate(180deg);
-        }
-
+        /* Mobile Navigation (Left Drawer) */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1050;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 1060;
             display: none;
-            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-
         .overlay.active {
             display: block;
+            opacity: 1;
+        }
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 380px;
+            height: 100vh;
+            background: #0f1219f2;
+            backdrop-filter: blur(24px);
+            z-index: 1070;
+            transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            padding: 32px 24px;
+            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
+            border-radius: 0 28px 28px 0;
+            overflow-y: auto;
+        }
+        .mobile-nav.active {
+            left: 0;
+        }
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(157, 23, 77, 0.4);
+        }
+        .mobile-nav-header .logo-img {
+            height: 56px;
+        }
+        .close-nav {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            font-size: 1.9rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            color: var(--secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-nav:hover {
+            background: var(--secondary);
+            color: #0c0f15;
+            transform: rotate(90deg);
+        }
+        .mobile-nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .mobile-nav-links li a {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50px;
+            font-weight: 500;
+            color: #f0f3f8;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+        .mobile-nav-links li a i {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+        .mobile-nav-links li a:hover {
+            background: var(--secondary);
+            color: #0c0f15;
+            transform: translateX(8px);
+        }
+        .mobile-nav-links li a:hover i {
+            color: #0c0f15;
         }
 
-        /* === HERO SECTION WITH CAROUSEL === */
+        /* ========== FOOTER – DARK LUXURY WITH ENLARGED LOGO ========== */
+        footer {
+            background: linear-gradient(145deg, #0a0d12 0%, #05070a 100%);
+            color: #eef2f5;
+            padding: 64px 0 32px;
+            margin-top: 80px;
+            border-top: 1px solid rgba(157, 23, 77, 0.3);
+        }
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-5);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        @media (min-width: 640px) {
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 768px) {
+            .footer-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .footer-logo-img {
+            height: 72px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+        .footer-logo-img:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+            filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(157,23,77,0.3));
+        }
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+            font-weight: 600;
+            position: relative;
+        }
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        .footer-links a {
+            color: #cfdee9;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .footer-links a:hover {
+            color: var(--secondary);
+            transform: translateX(5px);
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .social-links a {
+            background: rgba(255,255,255,0.06);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        .social-links a:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            color: #0a0d12;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 32px;
+            margin-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.75rem;
+            color: #9aaeb9;
+        }
+
+        /* Adjust hero margin to account for fixed header */
+        .hero {
+            margin-top: 94px;
+        }
+
+        /* Preserve all original page styles (hero carousel, promo, product grid, cart, etc.) */
         .hero {
             height: 100vh;
             display: flex;
             align-items: center;
             position: relative;
             overflow: hidden;
-            margin-top: 60px;
         }
-
         .hero-carousel {
             position: absolute;
             top: 0;
@@ -402,7 +462,6 @@
             height: 100%;
             z-index: -1;
         }
-
         .hero-slide {
             position: absolute;
             top: 0;
@@ -414,11 +473,9 @@
             background-size: cover;
             background-position: center;
         }
-
         .hero-slide.active {
             opacity: 1;
         }
-
         .hero-content {
             max-width: 800px;
             color: white;
@@ -426,7 +483,6 @@
             text-align: center;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
         }
-
         .hero h1 {
             font-size: 4rem;
             margin-bottom: 15px;
@@ -436,26 +492,16 @@
             animation: fadeInUp 1s ease-out 0.5s forwards;
             opacity: 0;
         }
-
         .hero p {
             font-size: 1.2rem;
             margin-bottom: 30px;
             animation: fadeInUp 1s ease-out 0.7s forwards;
             opacity: 0;
         }
-
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        /* === PROMOTIONAL STRIP === */
         .promo-strip {
             background: linear-gradient(45deg, var(--primary) 25%, var(--accent) 25%, 
                         var(--accent) 50%, var(--primary) 50%, var(--primary) 75%, 
@@ -467,13 +513,11 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .promo-container {
             display: flex;
             white-space: nowrap;
             animation: scroll 40s linear infinite;
         }
-
         .promo-item {
             padding: 0 30px;
             display: flex;
@@ -486,31 +530,25 @@
             text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
             position: relative;
         }
-
         .promo-item:after {
             content: '•';
             position: absolute;
             right: -8px;
             color: var(--gold);
         }
-
         .promo-item:last-child:after {
             display: none;
         }
-
         @keyframes scroll {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-
-        /* === PRODUCT GALLERY === */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px;
             margin-top: 30px;
         }
-
         .product-card {
             background: var(--dark-card);
             border-radius: 12px;
@@ -522,31 +560,26 @@
             flex-direction: column;
             border: 1px solid rgba(236, 72, 153, 0.1);
         }
-
         .product-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
             border-color: rgba(236, 72, 153, 0.3);
         }
-
         .product-image {
             height: 250px;
             overflow: hidden;
             position: relative;
             background: #2d3748;
         }
-
         .product-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: var(--transition);
         }
-
         .product-card:hover .product-image img {
             transform: scale(1.05);
         }
-
         .wishlist-btn {
             position: absolute;
             top: 12px;
@@ -565,13 +598,11 @@
             cursor: pointer;
             z-index: 3;
         }
-
         .wishlist-btn:hover, .wishlist-btn.active {
             background: #ff4757;
             color: white;
             transform: scale(1.1);
         }
-
         .product-info {
             padding: 20px;
             flex-grow: 1;
@@ -579,27 +610,23 @@
             flex-direction: column;
             border-top: 1px solid rgba(236, 72, 153, 0.1);
         }
-
         .product-title {
             font-size: 1.1rem;
             margin-bottom: 8px;
             color: var(--secondary);
             font-weight: 600;
         }
-
         .product-price {
             display: flex;
             align-items: center;
             gap: 12px;
             margin: 8px 0;
         }
-
         .price-real {
             font-size: 1.3rem;
             font-weight: 700;
             color: var(--accent-light);
         }
-
         .availability {
             display: flex;
             align-items: center;
@@ -608,7 +635,6 @@
             font-size: 0.9rem;
             color: var(--success);
         }
-
         .btn-place-order-card {
             margin-top: 10px;
             padding: 10px;
@@ -622,14 +648,11 @@
             font-size: 0.9rem;
             border-radius: 8px;
         }
-
         .btn-place-order-card:hover {
             background: var(--accent);
             transform: translateY(-2px);
             box-shadow: var(--glow);
         }
-
-        /* === CART PANEL === */
         .cart-panel {
             position: fixed;
             top: 0;
@@ -645,11 +668,7 @@
             padding: 20px;
             border-left: 3px solid var(--primary);
         }
-
-        .cart-panel.active {
-            right: 0;
-        }
-
+        .cart-panel.active { right: 0; }
         .cart-header {
             display: flex;
             justify-content: space-between;
@@ -658,12 +677,10 @@
             margin-bottom: 15px;
             border-bottom: 1px solid var(--gray-light);
         }
-
         .cart-title {
             font-size: 1.3rem;
             color: var(--secondary);
         }
-
         .close-cart {
             background: none;
             border: none;
@@ -672,24 +689,20 @@
             transition: var(--transition);
             padding: 5px;
         }
-
         .cart-items {
             min-height: 250px;
         }
-
         .cart-empty {
             text-align: center;
             padding: 30px 0;
             color: var(--gray);
         }
-
         .cart-item {
             display: flex;
             align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid var(--gray-light);
         }
-
         .cart-item-image {
             width: 70px;
             height: 70px;
@@ -697,30 +710,25 @@
             overflow: hidden;
             margin-right: 12px;
         }
-
         .cart-item-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
         .cart-item-details {
             flex-grow: 1;
         }
-
         .cart-item-name {
             font-weight: 600;
             margin-bottom: 4px;
             font-size: 0.9rem;
         }
-
         .cart-item-price {
             color: var(--accent-light);
             font-weight: 600;
             margin-bottom: 4px;
             font-size: 0.9rem;
         }
-
         .cart-item-remove {
             color: var(--gray);
             background: none;
@@ -731,7 +739,6 @@
             transition: var(--transition);
             padding: 5px;
         }
-
         .cart-total {
             padding: 15px 0;
             border-top: 1px solid var(--gray-light);
@@ -741,19 +748,17 @@
             justify-content: space-between;
             color: var(--secondary);
         }
-
         .cart-actions {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-
         .checkout-btn {
             background: var(--primary);
             color: white;
             border: none;
             padding: 10px;
-            border-radius: 0;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
@@ -761,22 +766,17 @@
             display: block;
             text-decoration: none;
             font-size: 0.9rem;
-            border-radius: 8px;
         }
-
         .checkout-btn:hover {
             background: var(--accent);
             transform: translateY(-2px);
         }
-
-        /* === TOAST MESSAGES === */
         .toast-container {
             position: fixed;
             bottom: 25px;
             left: 25px;
             z-index: 1100;
         }
-
         .toast {
             padding: 12px 16px;
             background: var(--primary);
@@ -792,114 +792,15 @@
             max-width: 320px;
             border-left: 4px solid var(--accent);
         }
-
         .toast.show {
             transform: translateX(0);
             opacity: 1;
         }
-
         .toast-icon {
             font-size: 1.1rem;
             margin-right: 8px;
             color: var(--gold);
         }
-
-        /* === FOOTER === */
-        footer {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            padding: 50px 0 25px;
-            margin-top: 60px;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-            margin-bottom: 35px;
-        }
-
-        .footer-column h3 {
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-            color: var(--gold-light);
-            position: relative;
-            padding-bottom: 8px;
-        }
-
-        .footer-column h3:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 35px;
-            height: 2px;
-            background: var(--gold);
-        }
-
-        .footer-logo {
-            width: 90px;
-            margin-bottom: 15px;
-        }
-
-        .footer-logo .logo {
-            font-size: 1.6rem;
-            color: white;
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 0.9rem;
-        }
-
-        .footer-links a:hover {
-            color: var(--gold);
-            padding-left: 4px;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: var(--transition);
-            font-size: 1rem;
-        }
-
-        .social-links a:hover {
-            background: var(--gold);
-            color: var(--black);
-            transform: translateY(-3px);
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: 25px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* === WHATSAPP FLOATING BUTTON === */
         .whatsapp-float {
             position: fixed;
             bottom: 25px;
@@ -917,232 +818,108 @@
             z-index: 100;
             animation: float 3s ease-in-out infinite;
             transition: var(--transition);
-            cursor: pointer;
             text-decoration: none;
         }
-
         .whatsapp-float:hover {
             transform: scale(1.1) translateY(-3px);
             animation: none;
         }
-
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-8px); }
             100% { transform: translateY(0px); }
         }
-
-        /* === LOADING STATES === */
         .loading-spinner {
             grid-column: 1 / -1;
             text-align: center;
             padding: 50px;
             color: var(--gray);
         }
-        
         .loading-spinner i {
             font-size: 2rem;
             color: var(--primary);
             margin-bottom: 15px;
             animation: spin 1s linear infinite;
         }
-        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        .no-products {
+        .no-products, .error-message {
             grid-column: 1 / -1;
             text-align: center;
             padding: 50px;
         }
-        
-        .no-products i {
-            font-size: 2.5rem;
-            color: var(--gray-light);
-            margin-bottom: 15px;
-        }
-        
-        .error-message {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 50px;
-            background: rgba(239, 68, 68, 0.1);
-            border-radius: 8px;
-        }
-        
-        .error-message h3 {
-            color: var(--danger);
-            margin-bottom: 12px;
-        }
-
-        /* === RESPONSIVE DESIGN === */
         @media (max-width: 1200px) {
-            .footer-content {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .mobile-toggle {
-                display: block;
-            }
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
         }
-
         @media (max-width: 768px) {
-            section {
-                padding: 60px 0;
-            }
-            
-            .section-title {
-                font-size: 1.8rem;
-                margin-bottom: 30px;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero p {
-                font-size: 1rem;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                margin-bottom: 25px;
-            }
-            
-            .cart-panel {
-                width: 90%;
-                padding: 15px;
-            }
-            
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 20px;
-            }
-            
-            .whatsapp-float {
-                right: 80px;
-                bottom: 20px;
-            }
+            section { padding: 60px 0; }
+            .section-title { font-size: 1.8rem; }
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1rem; }
+            .hero { margin-top: 86px; }
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+            .logo-img { height: 58px; }
+            .footer-logo-img { height: 62px; }
         }
-
         @media (max-width: 576px) {
-            .section-title {
-                font-size: 1.6rem;
-            }
-            
-            .hero h1 {
-                font-size: 2rem;
-            }
-            
-            .products-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .toast-container {
-                bottom: 15px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 90%;
-            }
-            
-            .toast {
-                max-width: 100%;
-                font-size: 0.85rem;
-                padding: 10px 14px;
-            }
+            .section-title { font-size: 1.6rem; }
+            .hero h1 { font-size: 2rem; }
+            .products-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header id="header">
+    <!-- ========= HEADER (DARK GLASS, CENTERED LOGO, HAMBURGER LEFT) ========= -->
+    <header>
         <div class="container header-container">
-            <a href="index.html" class="logo">JMPOTTERS</a>
-            
-            <!-- Desktop Navigation -->
-            <ul class="nav-links">
-                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-                
-                <!-- Footwear dropdown -->
-                <li class="dropdown">
-                    <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
-                    <div class="dropdown-content">
-                        <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
-                        <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
-                    </div>
-                </li>
-                
-                <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
-                <li><a href="accessories.html"><i class="fas fa-gem"></i> Accessories</a></li>
-                <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-                <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
-                <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
-                <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
-            </ul>
-            
-            <button class="mobile-toggle" id="mobileToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <div class="header-icons">
+            <div class="header-left">
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                    <i class='bx bx-menu-alt-left'></i>
+                </button>
+            </div>
+            <div class="header-center">
+                <a href="index.html">
+                    <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
+                </a>
+            </div>
+            <div class="header-right">
                 <div class="header-icon" id="wishlistIcon">
-                    <i class="fas fa-heart"></i>
+                    <i class='bx bx-heart'></i>
                     <span class="icon-badge" id="wishlistCount">0</span>
                 </div>
                 <div class="header-icon" id="cartIcon">
-                    <i class="fas fa-shopping-bag"></i>
+                    <i class='bx bx-shopping-bag'></i>
                     <span class="icon-badge" id="cartCount">0</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Mobile Navigation -->
+    <!-- ========= MOBILE NAV (LEFT DRAWER) ========= -->
     <div class="overlay" id="navOverlay"></div>
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <a href="index.html" class="mobile-logo">JMPOTTERS</a>
-            <button class="close-nav">
-                <i class="fas fa-times"></i>
-            </button>
+            <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
+            <button class="close-nav" id="closeNavBtn"><i class='bx bx-x'></i></button>
         </div>
         <ul class="mobile-nav-links">
-            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-    
-            <!-- Mobile Footwear dropdown -->
-            <li class="mobile-dropdown" id="mobileFootwearDropdown">
-                <a href="#"><i class="fas fa-shoe-prints"></i> Footwear <i class="fas fa-chevron-down"></i></a>
-                <div class="mobile-dropdown-content">
-                    <a href="mensfootwear.html"><i class="fas fa-male"></i> Men's Footwear</a>
-                    <a href="womensfootwear.html"><i class="fas fa-female"></i> Women's Footwear</a>
-                </div>
-            </li>
-            
-            <li><a href="bags.html"><i class="fas fa-briefcase"></i> Bags</a></li>
-            <li><a href="accessories.html"><i class="fas fa-gem"></i> Accessories</a></li>
-            <li><a href="household.html"><i class="fas fa-home"></i> Household</a></li>
-            <li><a href="kids.html"><i class="fas fa-baby"></i> Kids & Babies</a></li>
-            <li><a href="healthcare.html"><i class="fas fa-heartbeat"></i> Healthcare</a></li>
-            <li><a href="contact.html"><i class="fas fa-phone-alt"></i> Contact</a></li>
+            <li><a href="index.html"><i class='bx bx-home'></i> Home</a></li>
+            <li><a href="mensfootwear.html"><i class='bx bx-footwear'></i> Men's Footwear</a></li>
+            <li><a href="womensfootwear.html"><i class='bx bx-female'></i> Women's Footwear</a></li>
+            <li><a href="bags.html"><i class='bx bx-briefcase'></i> Bags</a></li>
+            <li><a href="accessories.html"><i class='bx bx-diamond'></i> Accessories</a></li>
+            <li><a href="household.html"><i class='bx bx-home-smile'></i> Household</a></li>
+            <li><a href="kids.html"><i class='bx bx-baby-carriage'></i> Kids & Babies</a></li>
+            <li><a href="healthcare.html"><i class='bx bx-heart'></i> Healthcare</a></li>
+            <li><a href="contact.html"><i class='bx bx-phone-call'></i> Contact</a></li>
         </ul>
     </div>
 
-    <!-- Hero Section with Carousel -->
+    <!-- Hero Section with Carousel (unchanged) -->
     <section class="hero">
         <div class="hero-carousel">
-            <!-- 5 hero images for women's footwear -->
             <div class="hero-slide active" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/women1.jpg');"></div>
             <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/women2.jpg');"></div>
             <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/women3.jpg');"></div>
@@ -1158,7 +935,7 @@
         </div>
     </section>
 
-    <!-- Promotional Strip -->
+    <!-- Promotional Strip (unchanged) -->
     <section class="promo-strip">
         <div class="promo-container">
             <div class="promo-item">New Arrivals</div>
@@ -1174,12 +951,11 @@
         </div>
     </section>
 
-    <!-- Product Gallery -->
+    <!-- Product Gallery (unchanged) -->
     <section class="product-gallery" id="products">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Women's Footwear Collection</h2>
             <div class="products-grid" id="productsGrid">
-                <!-- Products will be loaded from Supabase -->
                 <div class="loading-spinner">
                     <i class="fas fa-spinner fa-spin"></i>
                     <p>Loading women's footwear from database...</p>
@@ -1188,14 +964,12 @@
         </div>
     </section>
 
-    <!-- Cart Panel -->
+    <!-- Cart Panel (unchanged) -->
     <div class="overlay" id="cartOverlay"></div>
     <div class="cart-panel" id="cartPanel">
         <div class="cart-header">
             <h3 class="cart-title">Your Shopping Cart</h3>
-            <button class="close-cart">
-                <i class="fas fa-times"></i>
-            </button>
+            <button class="close-cart"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-items" id="cartItems">
             <div class="cart-empty">Your cart is empty</div>
@@ -1205,112 +979,78 @@
             <span id="cartTotal">₦0</span>
         </div>
         <div class="cart-actions">
-            <button class="checkout-btn" id="checkoutButton">
-                <i class="fas fa-shopping-bag"></i> Proceed to Checkout
-            </button>
-            <a href="#" class="checkout-btn" id="whatsappCheckout">
-                <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
-            </a>
+            <button class="checkout-btn" id="checkoutButton"><i class="fas fa-shopping-bag"></i> Proceed to Checkout</button>
+            <a href="#" class="checkout-btn" id="whatsappCheckout"><i class="fab fa-whatsapp"></i> Checkout via WhatsApp</a>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer">
-        <!-- Toast messages will appear here -->
-    </div>
+    <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Footer -->
+    <!-- ========= FOOTER – DARK LUXURY WITH ENLARGED LOGO ========= -->
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <div class="footer-logo">
-                        <a href="index.html" class="logo">JMPOTTERS</a>
-                    </div>
-                    <p>Exquisite women's footwear designed for the modern woman who values style and comfort.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Shop</h3>
-                    <ul class="footer-links">
-                        <li><a href="mensfootwear.html">Men's Footwear</a></li>
-                        <li><a href="womensfootwear.html">Women's Footwear</a></li>
-                        <li><a href="bags.html">Bags</a></li>
-                        <li><a href="accessories.html">Accessories</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Information</h3>
-                    <ul class="footer-links">
-                        <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="#">Shipping Policy</a></li>
-                        <li><a href="#">Returns & Exchanges</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Other Categories</h3>
-                    <ul class="footer-links">
-                        <li><a href="household.html">Household</a></li>
-                        <li><a href="kids.html">Kids & Babies</a></li>
-                        <li><a href="healthcare.html">Healthcare</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
+        <div class="container footer-container">
+            <div class="footer-column">
+                <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
+                <p>Exquisite women's footwear designed for the modern woman who values style and comfort.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-whatsapp'></i></a>
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                    <a href="#"><i class='bx bxl-pinterest'></i></a>
                 </div>
             </div>
-            <div class="copyright">
-                &copy; 2023 JMPOTTERS. All rights reserved.
+            <div class="footer-column">
+                <h3>Shop</h3>
+                <ul class="footer-links">
+                    <li><a href="mensfootwear.html"><i class='bx bx-chevron-right'></i> Men's Footwear</a></li>
+                    <li><a href="womensfootwear.html"><i class='bx bx-chevron-right'></i> Women's Footwear</a></li>
+                    <li><a href="bags.html"><i class='bx bx-chevron-right'></i> Bags</a></li>
+                    <li><a href="accessories.html"><i class='bx bx-chevron-right'></i> Accessories</a></li>
+                </ul>
             </div>
+            <div class="footer-column">
+                <h3>Information</h3>
+                <ul class="footer-links">
+                    <li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact Us</a></li>
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> Shipping Policy</a></li>
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> Returns & Exchanges</a></li>
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Other Categories</h3>
+                <ul class="footer-links">
+                    <li><a href="household.html"><i class='bx bx-chevron-right'></i> Household</a></li>
+                    <li><a href="kids.html"><i class='bx bx-chevron-right'></i> Kids & Babies</a></li>
+                    <li><a href="healthcare.html"><i class='bx bx-chevron-right'></i> Healthcare</a></li>
+                    <li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 JMPOTTERS. All rights reserved.
         </div>
     </footer>
 
     <!-- WhatsApp Floating Button -->
     <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp"></i>
+        <i class='bx bxl-whatsapp'></i>
     </a>
 
     <!-- Libraries -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
-    <!-- Supabase Client Library -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    
-    <!-- Main app.js (Supabase logic) -->
     <script src="app.js"></script>
     
-    <!-- Page-specific UI interactions ONLY -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Women\'s Footwear page UI initialized');
-            
             // Initialize AOS
-            AOS.init({
-                duration: 800,
-                once: true
-            });
+            AOS.init({ duration: 800, once: true });
 
-            // ========== HEADER FUNCTIONS ========== //
-            function initializeHeader() {
-                const header = document.getElementById('header');
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 50) {
-                        header.classList.add('scrolled');
-                    } else {
-                        header.classList.remove('scrolled');
-                    }
-                });
-            }
-
-            // ========== HERO CAROUSEL FUNCTIONS ========== //
-            function initializeCarousel() {
-                const slides = document.querySelectorAll('.hero-slide');
-                let currentSlide = 0;
-                
+            // Hero carousel
+            const slides = document.querySelectorAll('.hero-slide');
+            let currentSlide = 0;
+            if (slides.length) {
                 setInterval(() => {
                     slides[currentSlide].classList.remove('active');
                     currentSlide = (currentSlide + 1) % slides.length;
@@ -1318,131 +1058,28 @@
                 }, 5000);
             }
 
-            // ========== TOAST MESSAGES ========== //
-            function showToast(message, type = 'info') {
-                const toastContainer = document.getElementById('toastContainer');
-                if (!toastContainer) return;
-                
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                
-                const icons = {
-                    success: 'fas fa-check-circle',
-                    error: 'fas fa-exclamation-circle',
-                    warning: 'fas fa-exclamation-triangle',
-                    info: 'fas fa-info-circle'
-                };
-                
-                toast.innerHTML = `
-                    <i class="${icons[type] || icons.info} toast-icon"></i>
-                    <span>${message}</span>
-                `;
-                
-                toastContainer.appendChild(toast);
-                
-                // Show toast
-                setTimeout(() => {
-                    toast.classList.add('show');
-                }, 100);
-                
-                // Hide and remove toast after 5 seconds
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 500);
-                }, 5000);
-            }
-
-            // ========== DROPDOWN TOGGLE ========== //
-            function setupDropdownToggle() {
-                // Desktop dropdown toggle
-                const desktopDropdown = document.querySelector('.nav-links .dropdown');
-                if (desktopDropdown) {
-                    const dropdownLink = desktopDropdown.querySelector('a');
-                    dropdownLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        desktopDropdown.classList.toggle('active');
-                    });
-                }
-                
-                // Mobile dropdown toggle
-                const mobileDropdown = document.querySelector('.mobile-nav .mobile-dropdown');
-                if (mobileDropdown) {
-                    const mobileDropdownLink = mobileDropdown.querySelector('a');
-                    mobileDropdownLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        mobileDropdown.classList.toggle('active');
-                    });
-                }
-            }
-
-            // ========== INITIALIZE ========== //
-            initializeHeader();
-            initializeCarousel();
-            setupDropdownToggle();
-            
-            // ========== MOBILE NAVIGATION ========== //
+            // Mobile navigation (left drawer)
             const mobileToggle = document.getElementById('mobileToggle');
             const mobileNav = document.getElementById('mobileNav');
             const navOverlay = document.getElementById('navOverlay');
-            const closeNav = document.querySelector('.close-nav');
+            const closeNavBtns = document.querySelectorAll('.close-nav');
+            function openNav() { mobileNav.classList.add('active'); navOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            function closeNav() { mobileNav.classList.remove('active'); navOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+            if(mobileToggle) mobileToggle.addEventListener('click', openNav);
+            closeNavBtns.forEach(btn => btn.addEventListener('click', closeNav));
+            if(navOverlay) navOverlay.addEventListener('click', closeNav);
             
-            if (mobileToggle) {
-                mobileToggle.addEventListener('click', () => {
-                    mobileNav.classList.add('active');
-                    navOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-            
-            if (closeNav) {
-                closeNav.addEventListener('click', () => {
-                    mobileNav.classList.remove('active');
-                    navOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
-            if (navOverlay) {
-                navOverlay.addEventListener('click', () => {
-                    mobileNav.classList.remove('active');
-                    navOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
-            // ========== CART PANEL ========== //
+            // Cart panel
             const cartIcon = document.getElementById('cartIcon');
             const cartPanel = document.getElementById('cartPanel');
             const cartOverlay = document.getElementById('cartOverlay');
             const closeCart = document.querySelector('.close-cart');
-            
-            if (cartIcon) {
-                cartIcon.addEventListener('click', () => {
-                    cartPanel.classList.add('active');
-                    cartOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
+            if(cartIcon && cartPanel) {
+                cartIcon.addEventListener('click', () => { cartPanel.classList.add('active'); cartOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; });
+                if(closeCart) closeCart.addEventListener('click', () => { cartPanel.classList.remove('active'); cartOverlay.classList.remove('active'); document.body.style.overflow = ''; });
+                if(cartOverlay) cartOverlay.addEventListener('click', () => { cartPanel.classList.remove('active'); cartOverlay.classList.remove('active'); document.body.style.overflow = ''; });
             }
-            
-            if (closeCart) {
-                closeCart.addEventListener('click', () => {
-                    cartPanel.classList.remove('active');
-                    cartOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
-            if (cartOverlay) {
-                cartOverlay.addEventListener('click', () => {
-                    cartPanel.classList.remove('active');
-                    cartOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
-            console.log('✅ UI components initialized for women\'s footwear');
+            document.addEventListener('keydown', (e) => { if(e.key === 'Escape') { cartPanel?.classList.remove('active'); cartOverlay?.classList.remove('active'); document.body.style.overflow = ''; } });
         });
     </script>
 </body>
