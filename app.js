@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE WITH RECOMMENDATION ENGINE
+// JMPOTTERS APP - COMPLETE WITH RECOMMENDATION ENGINE & FIXED CHECKOUT
 // ====================
 (function() {
     'use strict';
@@ -191,33 +191,36 @@
         return slug ? decodeURIComponent(slug) : null;
     }
     
-   function getImageUrl(categorySlug, imageFilename) {
-    if (!imageFilename) {
-        return window.JMPOTTERS_CONFIG.images.baseUrl + 'placeholder.jpg';
+    function getImageUrl(categorySlug, imageFilename) {
+        if (!imageFilename) {
+            return window.JMPOTTERS_CONFIG.images.baseUrl + 'placeholder.jpg';
+        }
+        
+        if (imageFilename.startsWith('https://tmpggeeuwdvlngvfncaa.supabase.co')) {
+            return imageFilename;
+        }
+        
+        if (imageFilename.startsWith('http://') || imageFilename.startsWith('https://')) {
+            return imageFilename;
+        }
+        
+        const config = window.JMPOTTERS_CONFIG.images;
+        const folder = config.paths[categorySlug] || '';
+        return config.baseUrl + folder + imageFilename;
     }
-    
-    // If it's already a full Supabase URL, return it directly
-    if (imageFilename.startsWith('https://tmpggeeuwdvlngvfncaa.supabase.co')) {
-        return imageFilename;
-    }
-    
-    // If it's any other full URL (http/https), return it directly
-    if (imageFilename.startsWith('http://') || imageFilename.startsWith('https://')) {
-        return imageFilename;
-    }
-    
-    // Otherwise, it's a filename - build the GitHub Pages URL (for legacy products)
-    const config = window.JMPOTTERS_CONFIG.images;
-    const folder = config.paths[categorySlug] || '';
-    return config.baseUrl + folder + imageFilename;
-}
     
     function formatPrice(price) {
         if (!price && price !== 0) {
-            console.warn('⚠️ Price is undefined or null:', price);
             return '₦0';
         }
         return `₦${parseInt(price).toLocaleString()}`;
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
     
     // ====================
@@ -242,7 +245,6 @@
     // ====================
     // RECOMMENDATION ENGINE
     // ====================
-    
     async function loadRecommendations(currentProduct) {
         try {
             const supabase = getSupabaseClient();
@@ -253,10 +255,8 @@
             const currentProductId = currentProduct.id;
             
             const nameWords = currentProductName.split(' ').filter(w => w.length > 2);
-            
             let recommendations = [];
             
-            // Step 1: Search by brand/keywords from name
             if (nameWords.length > 0) {
                 let nameQuery = supabase
                     .from('products')
@@ -265,28 +265,20 @@
                     .neq('id', currentProductId);
                 
                 if (nameWords.length > 1) {
-                    nameQuery = supabase
-                        .from('products')
-                        .select('id, name, price, image_url, slug, stock, category_id')
-                        .eq('is_active', true)
-                        .neq('id', currentProductId)
-                        .or(nameWords.map(w => `name.ilike.%${w}%`).join(','));
+                    nameQuery = nameQuery.or(nameWords.map(w => `name.ilike.%${w}%`).join(','));
                 } else {
                     nameQuery = nameQuery.ilike('name', `%${nameWords[0]}%`);
                 }
                 
                 const { data: keywordMatches } = await nameQuery.limit(10);
-                
                 if (keywordMatches && keywordMatches.length > 0) {
                     recommendations = keywordMatches;
                 }
             }
             
-            // Step 2: If not enough recommendations, get from same category
             if (recommendations.length < 15) {
                 const needed = 15 - recommendations.length;
                 const existingIds = recommendations.map(r => r.id);
-                
                 let categoryQuery = supabase
                     .from('products')
                     .select('id, name, price, image_url, slug, stock, category_id')
@@ -299,17 +291,14 @@
                 }
                 
                 const { data: categoryProducts } = await categoryQuery.limit(needed);
-                
                 if (categoryProducts && categoryProducts.length > 0) {
                     recommendations = [...recommendations, ...categoryProducts];
                 }
             }
             
-            // Step 3: If still not enough, get random products from any category
             if (recommendations.length < 15) {
                 const needed = 15 - recommendations.length;
                 const existingIds = recommendations.map(r => r.id);
-                
                 let randomQuery = supabase
                     .from('products')
                     .select('id, name, price, image_url, slug, stock, category_id')
@@ -321,18 +310,13 @@
                 }
                 
                 const { data: randomProducts } = await randomQuery.limit(needed);
-                
                 if (randomProducts && randomProducts.length > 0) {
                     recommendations = [...recommendations, ...randomProducts];
                 }
             }
             
-            // Remove duplicates
             recommendations = recommendations.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
-            
-            // Limit to 15
             recommendations = recommendations.slice(0, 15);
-            
             return recommendations;
             
         } catch (error) {
@@ -376,13 +360,6 @@
         
         container.innerHTML = html;
         section.style.display = 'block';
-    }
-    
-    function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
     
     // ====================
@@ -430,29 +407,17 @@
                 .eq('id', product.category_id)
                 .single();
             
-            if (catError) {
-                console.warn('⚠️ Category not found for product:', product.id);
-            }
-            
             const { data: colors, error: colorsError } = await supabase
                 .from('product_colors')
                 .select('*')
                 .eq('product_id', product.id)
                 .order('sort_order');
             
-            if (colorsError) {
-                console.warn('⚠️ Could not load colors:', colorsError);
-            }
-            
             const { data: sizes, error: sizesError } = await supabase
                 .from('product_sizes')
                 .select('*')
                 .eq('product_id', product.id)
                 .order('size_value');
-            
-            if (sizesError) {
-                console.warn('⚠️ Could not load sizes:', sizesError);
-            }
             
             document.title = `${product.name} - JMPOTTERS`;
             
@@ -467,30 +432,14 @@
             
             buildColorSizeMappings(currentProductColors, currentProductSizes);
             renderProductPage(currentProduct);
-            
-            // Load recommendations
             await renderRecommendations(currentProduct);
             
             if (loadingState) loadingState.style.display = 'none';
-            
-            // Setup image magnification if PhotoSwipe is available
-            if (typeof PhotoSwipeLightbox !== 'undefined') {
-                setupImageMagnification();
-            }
             
         } catch (error) {
             console.error('❌ Error loading product by slug:', error);
             showError(error.message || 'Failed to load product');
         }
-    }
-    
-    function setupImageMagnification() {
-        const lightbox = new PhotoSwipeLightbox({
-            gallery: '.product-image-section',
-            children: '.product-image-wrapper',
-            pswpModule: PhotoSwipe
-        });
-        lightbox.init();
     }
     
     function showError(message) {
@@ -633,13 +582,6 @@
                 sizeVariants.some(s => s.color_id === color.id)
             );
         });
-        
-        console.log('🗺️ Built color-size mappings:', {
-            colors: colors.length,
-            sizes: sizes.length,
-            colorSizeMapEntries: Object.keys(colorSizeMap).length,
-            sizeColorMapEntries: Object.keys(sizeColorMap).length
-        });
     }
     
     function setupProductPageInteractions() {
@@ -674,7 +616,7 @@
                 const currentValue = parseInt(quantityInput.value) || 1;
                 if (currentValue > 1) {
                     quantityInput.value = currentValue - 1;
-                    currentSelectedQuantity = quantityInput.value;
+                    currentSelectedQuantity = parseInt(quantityInput.value);
                 }
             });
             
@@ -683,7 +625,7 @@
                 const maxStock = currentSelectedSize?.stock || currentProduct?.stock || 100;
                 if (currentValue < maxStock) {
                     quantityInput.value = currentValue + 1;
-                    currentSelectedQuantity = quantityInput.value;
+                    currentSelectedQuantity = parseInt(quantityInput.value);
                 }
             });
             
@@ -691,7 +633,7 @@
                 const value = parseInt(quantityInput.value) || 1;
                 const maxStock = currentSelectedSize?.stock || currentProduct?.stock || 100;
                 quantityInput.value = Math.max(1, Math.min(value, maxStock));
-                currentSelectedQuantity = quantityInput.value;
+                currentSelectedQuantity = parseInt(quantityInput.value);
             });
         }
         
@@ -853,7 +795,7 @@
     }
     
     // ====================
-    // PRODUCT FUNCTIONS
+    // LOAD PRODUCTS BY CATEGORY
     // ====================
     async function loadProductsByCategory(categorySlug) {
         console.log(`📦 Loading products for: ${categorySlug}`);
@@ -864,17 +806,7 @@
             return;
         }
         
-        productsGrid.innerHTML = `
-            <div class="products-grid">
-                ${Array(6).fill().map(() => `
-                    <div class="product-card-skeleton">
-                        <div class="skeleton-image"></div>
-                        <div class="skeleton-title"></div>
-                        <div class="skeleton-price"></div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+        productsGrid.innerHTML = `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i><p>Loading products...</p></div>`;
         
         const supabase = getSupabaseClient();
         if (!supabase) {
@@ -904,7 +836,7 @@
             if (prodError) throw prodError;
             
             if (!products || products.length === 0) {
-                productsGrid.innerHTML = `<div class="no-products"><h3>No Products Found</h3></div>`;
+                productsGrid.innerHTML = `<div class="no-products"><i class="fas fa-box-open"></i><h3>No Products Found</h3></div>`;
                 return;
             }
             
@@ -943,7 +875,7 @@
                     </button>
                 </div>
                 <div class="product-info">
-                    <h3 class="product-title">${product.name}</h3>
+                    <h3 class="product-title">${escapeHtml(product.name)}</h3>
                     <div class="product-price">${formatPrice(product.price)}</div>
                     <div class="availability ${product.stock <= 0 ? 'out-of-stock' : ''}">
                         <i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i> 
@@ -1070,7 +1002,7 @@
                         <img src="${getImageUrl(item.category_slug, item.image_url)}" alt="${item.name}">
                     </div>
                     <div class="cart-item-details">
-                        <div class="cart-item-name">${itemDescription}</div>
+                        <div class="cart-item-name">${escapeHtml(itemDescription)}</div>
                         <div class="cart-item-price">${formatPrice(item.price)}</div>
                         <div class="cart-item-quantity-display">Quantity: ${item.quantity}</div>
                     </div>
@@ -1081,24 +1013,13 @@
             `;
         });
         
-        html += `
-            <div class="cart-total">
-                <span>Total:</span>
-                <span class="cart-total-amount">${formatPrice(total)}</span>
-            </div>
-            <button class="cart-checkout-btn" id="checkoutButton">
-                <i class="fas fa-shopping-bag"></i> Proceed to Checkout
-            </button>
-            <a href="#" class="cart-whatsapp-btn" id="whatsappCheckout" target="_blank">
-                <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
-            </a>
-        `;
+        // REMOVED: duplicate cart footer with checkout buttons - these are already in the panel footer
+        // The cart panel footer is defined in the HTML, so we don't add it here
         
         cartItems.innerHTML = html;
         cartTotal.textContent = formatPrice(total);
         
         setupCartInteractions();
-        setupCheckoutButtons();
     }
     
     function setupCartInteractions() {
@@ -1171,38 +1092,6 @@
         }
         
         document.body.style.overflow = '';
-    }
-    
-    // ====================
-    // HEADER FUNCTIONS
-    // ====================
-    function setupHeaderInteractions() {
-        const cartBtn = document.getElementById('cartBtn');
-        if (cartBtn && !cartBtn.hasAttribute('data-listener-added')) {
-            cartBtn.setAttribute('data-listener-added', 'true');
-            cartBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                openCart();
-            });
-        }
-        
-        const wishlistBtn = document.getElementById('wishlistBtn');
-        if (wishlistBtn) {
-            wishlistBtn.addEventListener('click', function() {
-                if (currentProduct) {
-                    toggleWishlist(currentProduct);
-                } else {
-                    showNotification('Wishlist feature coming soon!', 'info');
-                }
-            });
-        }
-        
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeCart();
-            }
-        });
     }
     
     // ====================
@@ -1320,24 +1209,24 @@
         const btnLoading = submitBtn.querySelector('.btn-loading');
         
         submitBtn.disabled = true;
-        btnText.style.display = 'none';
-        btnLoading.style.display = 'flex';
+        if (btnText) btnText.style.display = 'none';
+        if (btnLoading) btnLoading.style.display = 'flex';
         
         const userData = {
-            fullName: document.getElementById('checkoutFullName').value.trim(),
-            email: document.getElementById('checkoutEmail').value.trim(),
-            phone: document.getElementById('checkoutPhone').value.trim(),
-            address: document.getElementById('checkoutAddress').value.trim(),
-            city: document.getElementById('checkoutCity').value.trim(),
-            state: document.getElementById('checkoutState').value,
+            fullName: document.getElementById('checkoutFullName')?.value.trim() || '',
+            email: document.getElementById('checkoutEmail')?.value.trim() || '',
+            phone: document.getElementById('checkoutPhone')?.value.trim() || '',
+            address: document.getElementById('checkoutAddress')?.value.trim() || '',
+            city: document.getElementById('checkoutCity')?.value.trim() || '',
+            state: document.getElementById('checkoutState')?.value || '',
             newsletter: document.getElementById('checkoutNewsletter')?.checked || false
         };
         
         if (!userData.fullName || !userData.email || !userData.phone || !userData.address || !userData.city || !userData.state) {
             showNotification('Please fill in all required fields', 'warning');
             submitBtn.disabled = false;
-            btnText.style.display = 'flex';
-            btnLoading.style.display = 'none';
+            if (btnText) btnText.style.display = 'flex';
+            if (btnLoading) btnLoading.style.display = 'none';
             return;
         }
         
@@ -1345,8 +1234,8 @@
         if (!emailRegex.test(userData.email)) {
             showNotification('Please enter a valid email address', 'warning');
             submitBtn.disabled = false;
-            btnText.style.display = 'flex';
-            btnLoading.style.display = 'none';
+            if (btnText) btnText.style.display = 'flex';
+            if (btnLoading) btnLoading.style.display = 'none';
             return;
         }
         
@@ -1355,8 +1244,8 @@
         if (!phoneRegex.test(cleanPhone)) {
             showNotification('Please enter a valid phone number (10-11 digits)', 'warning');
             submitBtn.disabled = false;
-            btnText.style.display = 'flex';
-            btnLoading.style.display = 'none';
+            if (btnText) btnText.style.display = 'flex';
+            if (btnLoading) btnLoading.style.display = 'none';
             return;
         }
         userData.phone = cleanPhone;
@@ -1364,8 +1253,8 @@
         const savedUser = await saveCheckoutUser(userData);
         
         submitBtn.disabled = false;
-        btnText.style.display = 'flex';
-        btnLoading.style.display = 'none';
+        if (btnText) btnText.style.display = 'flex';
+        if (btnLoading) btnLoading.style.display = 'none';
         
         if (savedUser) {
             closeCheckoutSignupModal();
@@ -1420,17 +1309,9 @@
                 attempts++;
                 
                 try {
-                    const { data: orderNumberResult, error: seqError } = await supabase
-                        .rpc('generate_order_number');
-                    
-                    let tempOrderNumber;
-                    if (seqError || !orderNumberResult) {
-                        const timestamp = Date.now().toString().slice(-6);
-                        const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-                        tempOrderNumber = 'JMP-' + new Date().getFullYear().toString().slice(-2) + '-' + timestamp + randomNum;
-                    } else {
-                        tempOrderNumber = orderNumberResult;
-                    }
+                    const timestamp = Date.now().toString().slice(-6);
+                    const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                    const tempOrderNumber = 'JMP-' + new Date().getFullYear().toString().slice(-2) + '-' + timestamp + randomNum;
                     
                     const { data: existing } = await supabase
                         .from('orders')
@@ -1522,7 +1403,12 @@
         }
     }
     
+    // ====================
+    // PROCEED TO CHECKOUT - FIXED
+    // ====================
     async function proceedToCheckout() {
+        console.log('proceedToCheckout called');
+        
         const user = JSON.parse(localStorage.getItem('jmpotters_user'));
         const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
         
@@ -1553,6 +1439,7 @@
             }
         } else {
             showNotification('Please sign in to continue', 'warning');
+            showCheckoutSignupModal();
             return;
         }
         
@@ -1611,13 +1498,21 @@
         }
     }
     
+    // ====================
+    // SETUP CHECKOUT BUTTONS - FIXED
+    // ====================
     function setupCheckoutButtons() {
+        // Find the checkout button in the cart panel (only one)
         const checkoutBtn = document.getElementById('checkoutButton');
-        if (checkoutBtn && !checkoutBtn._modalListenerAttached) {
-            checkoutBtn._modalListenerAttached = true;
-            checkoutBtn.addEventListener('click', function(e) {
+        if (checkoutBtn && !checkoutBtn._checkoutListenerAttached) {
+            checkoutBtn._checkoutListenerAttached = true;
+            // Remove any existing listeners by cloning and replacing
+            const newCheckoutBtn = checkoutBtn.cloneNode(true);
+            checkoutBtn.parentNode.replaceChild(newCheckoutBtn, checkoutBtn);
+            newCheckoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('Checkout button clicked');
                 
                 const user = isUserLoggedIn();
                 
@@ -1629,22 +1524,45 @@
             });
         }
         
-        const whatsappBtn = document.getElementById('whatsappCheckout');
-        if (whatsappBtn && !whatsappBtn._modalListenerAttached) {
-            whatsappBtn._modalListenerAttached = true;
-            whatsappBtn.addEventListener('click', function(e) {
+        // Find and REMOVE any WhatsApp checkout buttons (they are duplicates)
+        const whatsappBtns = document.querySelectorAll('#whatsappCheckout');
+        whatsappBtns.forEach(btn => {
+            if (btn && btn.parentNode) {
+                btn.remove();
+            }
+        });
+    }
+    
+    // ====================
+    // HEADER FUNCTIONS
+    // ====================
+    function setupHeaderInteractions() {
+        const cartBtn = document.getElementById('cartBtn');
+        if (cartBtn && !cartBtn.hasAttribute('data-listener-added')) {
+            cartBtn.setAttribute('data-listener-added', 'true');
+            cartBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
-                const user = isUserLoggedIn();
-                
-                if (user) {
-                    proceedToCheckout();
+                openCart();
+            });
+        }
+        
+        const wishlistBtn = document.getElementById('wishlistBtn');
+        if (wishlistBtn) {
+            wishlistBtn.addEventListener('click', function() {
+                if (currentProduct) {
+                    toggleWishlist(currentProduct);
                 } else {
-                    showCheckoutSignupModal();
+                    showNotification('Wishlist feature coming soon!', 'info');
                 }
             });
         }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCart();
+            }
+        });
     }
     
     // ====================
@@ -1664,6 +1582,11 @@
         initCheckoutSignupModal();
         updateCartUI();
         updateUserUI();
+        
+        // Setup checkout buttons after cart is rendered
+        setTimeout(() => {
+            setupCheckoutButtons();
+        }, 500);
         
         if (isProductPage()) {
             const slug = getSlugFromURL();
@@ -1709,7 +1632,8 @@
             createOrder,
             getOrderByNumber,
             loadRecommendations,
-            renderRecommendations
+            renderRecommendations,
+            updateCartUI
         };
     }
     
