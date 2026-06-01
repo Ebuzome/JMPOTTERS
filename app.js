@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE WITH FIXED CHECKOUT
+// JMPOTTERS APP - COMPLETE WITH DEBUG CHECKOUT
 // ====================
 (function() {
     'use strict';
@@ -9,7 +9,7 @@
         return;
     }
     
-    console.log('🚀 JMPOTTERS app starting (Full Version with Fixed Checkout)...');
+    console.log('🚀 JMPOTTERS app starting (Full Version with Debug Checkout)...');
     window.JMPOTTERS_APP_INITIALIZED = true;
     
     // ====================
@@ -36,6 +36,8 @@
             'healthcare': ''
         }
     };
+    
+    console.log('🔧 Supabase config available:', !!window.JMPOTTERS_CONFIG.supabase);
     
     // Current product state
     let currentProduct = null;
@@ -258,7 +260,6 @@
             const nameWords = currentProductName.split(' ').filter(w => w.length > 2);
             let recommendations = [];
             
-            // Step 1: Search by brand/keywords from name
             if (nameWords.length > 0) {
                 let nameQuery = supabase
                     .from('products')
@@ -278,11 +279,9 @@
                 }
             }
             
-            // Step 2: If not enough recommendations, get from same category
             if (recommendations.length < 15) {
                 const needed = 15 - recommendations.length;
                 const existingIds = recommendations.map(r => r.id);
-                
                 let categoryQuery = supabase
                     .from('products')
                     .select('id, name, price, image_url, slug, stock, category_id')
@@ -300,11 +299,9 @@
                 }
             }
             
-            // Step 3: If still not enough, get random products from any category
             if (recommendations.length < 15) {
                 const needed = 15 - recommendations.length;
                 const existingIds = recommendations.map(r => r.id);
-                
                 let randomQuery = supabase
                     .from('products')
                     .select('id, name, price, image_url, slug, stock, category_id')
@@ -321,7 +318,6 @@
                 }
             }
             
-            // Remove duplicates
             recommendations = recommendations.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
             recommendations = recommendations.slice(0, 15);
             return recommendations;
@@ -451,13 +447,10 @@
             
             buildColorSizeMappings(currentProductColors, currentProductSizes);
             renderProductPage(currentProduct);
-            
-            // Load recommendations
             await renderRecommendations(currentProduct);
             
             if (loadingState) loadingState.style.display = 'none';
             
-            // Setup image magnification if PhotoSwipe is available
             if (typeof PhotoSwipeLightbox !== 'undefined') {
                 setupImageMagnification();
             }
@@ -1316,10 +1309,15 @@
     }
     
     // ====================
-    // ORDER CREATION FUNCTIONS
+    // ORDER CREATION - WITH TIMEOUT PROTECTION
     // ====================
     async function createOrder(orderData, cart) {
+        console.log('🔴 createOrder - STEP A: Function started');
+        console.log('🔴 createOrder - OrderData:', orderData);
+        console.log('🔴 createOrder - Cart items:', cart.length);
+        
         const supabase = getSupabaseClient();
+        console.log('🔴 createOrder - STEP B: Supabase client:', supabase ? 'exists' : 'NULL');
         
         if (!supabase) {
             showNotification('Database connection error', 'error');
@@ -1327,9 +1325,13 @@
         }
         
         try {
+            console.log('🔴 createOrder - STEP C: Calculating totals...');
             const subtotal = cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             const shippingFee = subtotal >= 50000 ? 0 : 2000;
             const grandTotal = subtotal + shippingFee;
+            const orderNumber = 'JMP-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+            
+            console.log(`🔴 createOrder - STEP D: Order number: ${orderNumber}, Total: ${grandTotal}`);
             
             const items = cart.map(item => ({
                 product_id: item.product_id,
@@ -1341,38 +1343,8 @@
                 image_url: item.image_url
             }));
             
-            let finalOrderNumber = null;
-            let attempts = 0;
-            const maxAttempts = 5;
-            
-            while (!finalOrderNumber && attempts < maxAttempts) {
-                attempts++;
-                
-                try {
-                    const timestamp = Date.now().toString().slice(-6);
-                    const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-                    const tempOrderNumber = 'JMP-' + new Date().getFullYear().toString().slice(-2) + '-' + timestamp + randomNum;
-                    
-                    const { data: existing } = await supabase
-                        .from('orders')
-                        .select('order_number')
-                        .eq('order_number', tempOrderNumber)
-                        .maybeSingle();
-                    
-                    if (!existing) {
-                        finalOrderNumber = tempOrderNumber;
-                    }
-                } catch (e) {
-                    console.warn('Order number generation error:', e);
-                }
-            }
-            
-            if (!finalOrderNumber) {
-                finalOrderNumber = 'JMP-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-            }
-            
             const orderInsert = {
-                order_number: finalOrderNumber,
+                order_number: orderNumber,
                 user_id: orderData.user_id || null,
                 user_name: orderData.full_name,
                 user_email: orderData.email,
@@ -1392,34 +1364,35 @@
                 created_at: new Date().toISOString()
             };
             
-            const { data: order, error: orderError } = await supabase
+            console.log('🔴 createOrder - STEP E: About to insert into Supabase...');
+            
+            // Create a timeout promise
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => {
+                    reject(new Error('Supabase request timeout after 15 seconds'));
+                }, 15000);
+            });
+            
+            // Create the insert promise
+            const insertPromise = supabase
                 .from('orders')
                 .insert(orderInsert)
                 .select()
                 .single();
             
+            // Race between insert and timeout
+            const { data: order, error: orderError } = await Promise.race([insertPromise, timeoutPromise]);
+            
             if (orderError) {
-                showNotification(`Order failed: ${orderError.message}`, 'error');
-                return null;
+                console.error('🔴 createOrder - STEP F: Supabase error:', orderError);
+                throw orderError;
             }
             
-            localStorage.removeItem('jmpotters_cart');
-            updateCartUI();
-            
-            showNotification(`Order #${finalOrderNumber} placed successfully!`, 'success');
-            
-            localStorage.setItem('jmpotters_last_order', JSON.stringify({
-                order: order,
-                items: items,
-                subtotal: subtotal,
-                shipping_fee: shippingFee,
-                grand_total: grandTotal
-            }));
-            
+            console.log('🔴 createOrder - STEP G: Order created successfully!', order);
             return order;
             
         } catch (error) {
-            console.error('Order creation error:', error);
+            console.error('🔴 createOrder - STEP H: Error:', error);
             showNotification(`Failed to place order: ${error.message || 'Unknown error'}`, 'error');
             return null;
         }
@@ -1445,32 +1418,37 @@
     }
     
     // ====================
-    // PROCEED TO CHECKOUT - REWRITTEN TO AVOID FREEZE
+    // PROCEED TO CHECKOUT - WITH DEBUG LOGS
     // ====================
     async function proceedToCheckout() {
-        // Prevent multiple simultaneous calls
+        console.log('🔴 STEP 1: proceedToCheckout started');
+        
         if (isProcessingCheckout) {
-            console.log('Checkout already in progress, ignoring duplicate call');
+            console.log('⚠️ Checkout already in progress');
             return;
         }
         
-        console.log('🔍 proceedToCheckout called');
-        
+        console.log('🔴 STEP 2: Getting cart...');
         const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+        console.log(`🔴 STEP 3: Cart has ${cart.length} items`);
         
         if (cart.length === 0) {
             showNotification('Your cart is empty', 'warning');
             return;
         }
         
+        console.log('🔴 STEP 4: Getting user...');
         const user = JSON.parse(localStorage.getItem('jmpotters_user'));
+        console.log('🔴 STEP 5: User exists?', !!user);
+        
         let checkoutData = null;
         
-        // Determine if we have user data with address
         if (window.pendingCheckoutData) {
+            console.log('🔴 STEP 6a: Using pendingCheckoutData');
             checkoutData = window.pendingCheckoutData;
             window.pendingCheckoutData = null;
         } else if (user && user.address && user.city && user.state) {
+            console.log('🔴 STEP 6b: Using existing user');
             checkoutData = {
                 user_id: user.id,
                 email: user.email,
@@ -1482,34 +1460,39 @@
                 notes: ''
             };
         } else if (user) {
-            // User exists but missing address - show modal to complete info
+            console.log('🔴 STEP 6c: User exists but missing address');
             showNotification('Please complete your shipping address', 'warning');
             showCheckoutSignupModal();
             return;
         } else {
-            // No user - show signup modal
+            console.log('🔴 STEP 6d: No user, showing signup');
             showCheckoutSignupModal();
             return;
         }
         
-        // Set processing flag
+        console.log('🔴 STEP 7: Setting processing flag');
         isProcessingCheckout = true;
         showNotification('Processing your order...', 'info');
         
+        console.log('🔴 STEP 8: About to call createOrder...');
+        
         try {
             const order = await createOrder(checkoutData, cart);
+            console.log('🔴 STEP 9: createOrder returned:', order);
+            
             if (order) {
-                // Clear cart after successful order
+                console.log('🔴 STEP 10: Clearing cart');
                 localStorage.removeItem('jmpotters_cart');
                 updateCartUI();
-                // Redirect to invoice
+                console.log('🔴 STEP 11: Redirecting to invoice');
                 window.location.href = `invoice.html?order=${order.order_number}`;
             }
         } catch (error) {
-            console.error('Checkout error:', error);
+            console.error('🔴 STEP 12: Checkout error:', error);
             showNotification('Checkout failed. Please try again.', 'error');
         } finally {
             isProcessingCheckout = false;
+            console.log('🔴 STEP 13: Checkout complete');
         }
     }
     
@@ -1705,5 +1688,5 @@
         initializePage();
     }
     
-    console.log('✅ JMPOTTERS app loaded with full features and fixed checkout');
+    console.log('✅ JMPOTTERS app loaded with full features and debug checkout');
 })();
