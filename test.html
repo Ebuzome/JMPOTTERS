@@ -1,46 +1,217 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Checkout</title>
+    <title>JMPOTTERS - Supabase Order Test</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4F46E5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #4338CA; }
+        .log-area {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .info { color: #60a5fa; }
+    </style>
+</head>
+<body>
+    <div class="test-card">
+        <h2>🔧 JMPOTTERS - Supabase Connection Test</h2>
+        <p>This test will attempt to insert a test order into Supabase to diagnose the checkout freeze.</p>
+        <button id="runTest">🚀 Run Test</button>
+        <button id="clearLogs" style="background:#6B7280; margin-left:10px;">🗑️ Clear Logs</button>
+    </div>
+    
+    <div class="test-card">
+        <h3>📋 Test Logs</h3>
+        <div class="log-area" id="logArea">Click "Run Test" to start...</div>
+    </div>
+
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        // Minimal app to test Supabase insert
-        const supabaseUrl = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // Supabase configuration (same as your app)
+        const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
         
-        async function testOrder() {
-            console.log('Test started');
-            const orderInsert = {
-                order_number: 'TEST-' + Date.now(),
-                user_email: 'test@example.com',
+        let supabaseClient = null;
+        let logArea = document.getElementById('logArea');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'success' ? 'success' : (type === 'error' ? 'error' : 'info');
+            const logLine = `<div class="${colorClass}">[${timestamp}] ${message}</div>`;
+            logArea.innerHTML += logLine;
+            logArea.scrollTop = logArea.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function clearLogs() {
+            logArea.innerHTML = '';
+            log('Logs cleared', 'info');
+        }
+        
+        async function runTest() {
+            clearLogs();
+            log('🚀 Starting Supabase connection test...', 'info');
+            
+            // Step 1: Initialize Supabase client
+            log('📡 Step 1: Initializing Supabase client...', 'info');
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                log('✅ Supabase client created successfully', 'success');
+            } catch (err) {
+                log(`❌ Failed to create Supabase client: ${err.message}`, 'error');
+                return;
+            }
+            
+            // Step 2: Test basic connection by fetching categories
+            log('📡 Step 2: Testing connection by fetching categories...', 'info');
+            try {
+                const startTime = Date.now();
+                const { data: categories, error: catError } = await supabaseClient
+                    .from('categories')
+                    .select('id, name')
+                    .limit(5);
+                
+                const duration = Date.now() - startTime;
+                
+                if (catError) {
+                    log(`❌ Categories fetch failed: ${catError.message}`, 'error');
+                } else {
+                    log(`✅ Categories fetch successful (${duration}ms) - Found ${categories.length} categories`, 'success');
+                    log(`   Sample: ${categories.map(c => c.name).join(', ')}`, 'info');
+                }
+            } catch (err) {
+                log(`❌ Categories fetch exception: ${err.message}`, 'error');
+            }
+            
+            // Step 3: Test inserting a test order (THIS IS THE CRITICAL TEST)
+            log('📡 Step 3: Attempting to insert a TEST order (will be deleted later)...', 'info');
+            log('⚠️ This test order will NOT affect your real data - it has a special prefix', 'warning');
+            
+            const testOrderNumber = 'TEST-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
+            const testOrderData = {
+                order_number: testOrderNumber,
+                user_email: 'test@jmpotters.com',
                 full_name: 'Test User',
+                user_phone: '08012345678',
+                shipping_address: '123 Test Street',
+                city: 'Lagos',
+                state: 'Lagos',
                 total_amount: 1000,
                 shipping_fee: 0,
                 grand_total: 1000,
                 status: 'pending',
                 payment_status: 'pending',
+                payment_method: 'test',
                 items: [{ name: 'Test Product', quantity: 1, price: 1000 }],
+                notes: 'This is a test order - please delete',
                 created_at: new Date().toISOString()
             };
-            console.log('Inserting:', orderInsert);
+            
+            log(`   Test Order Number: ${testOrderNumber}`, 'info');
+            log('   Attempting to insert... (this may take a few seconds)', 'info');
+            
+            // Create a timeout to detect freeze
+            let insertCompleted = false;
+            const timeoutId = setTimeout(() => {
+                if (!insertCompleted) {
+                    log('❌❌❌ TIMEOUT! Supabase insert is HANGING/FREEZING!', 'error');
+                    log('   This confirms the issue is with Supabase RLS or database constraints', 'error');
+                    log('   The request has been waiting for more than 10 seconds with no response', 'error');
+                }
+            }, 10000);
+            
+            const insertStartTime = Date.now();
+            
             try {
-                const { data, error } = await supabase
+                const { data: order, error: orderError } = await supabaseClient
                     .from('orders')
-                    .insert(orderInsert)
+                    .insert(testOrderData)
                     .select()
                     .single();
-                if (error) {
-                    console.error('Supabase error:', error);
+                
+                insertCompleted = true;
+                clearTimeout(timeoutId);
+                const insertDuration = Date.now() - insertStartTime;
+                
+                if (orderError) {
+                    log(`❌ Order insert FAILED with error: ${orderError.message}`, 'error');
+                    log(`   Error code: ${orderError.code || 'N/A'}`, 'error');
+                    log(`   Error details: ${orderError.details || 'None'}`, 'error');
+                    log(`   Hint: ${orderError.hint || 'None'}`, 'error');
+                    
+                    // This is likely an RLS issue
+                    if (orderError.message.includes('permission') || orderError.message.includes('policy')) {
+                        log('🔐 This appears to be a Row Level Security (RLS) issue!', 'error');
+                        log('   Solution: Add INSERT policy to orders table in Supabase dashboard', 'error');
+                    }
                 } else {
-                    console.log('Success:', data);
+                    log(`✅ Order inserted successfully! (${insertDuration}ms)`, 'success');
+                    log(`   Order ID: ${order.id}`, 'success');
+                    log(`   Order Number: ${order.order_number}`, 'success');
+                    
+                    // Step 4: Clean up - delete the test order
+                    log('📡 Step 4: Cleaning up - deleting test order...', 'info');
+                    try {
+                        const { error: deleteError } = await supabaseClient
+                            .from('orders')
+                            .delete()
+                            .eq('id', order.id);
+                        
+                        if (deleteError) {
+                            log(`⚠️ Could not delete test order: ${deleteError.message}`, 'warning');
+                            log(`   Please manually delete order ${order.order_number} from Supabase`, 'warning');
+                        } else {
+                            log('✅ Test order deleted successfully', 'success');
+                        }
+                    } catch (deleteErr) {
+                        log(`⚠️ Delete error: ${deleteErr.message}`, 'warning');
+                    }
                 }
+                
             } catch (err) {
-                console.error('Exception:', err);
+                insertCompleted = true;
+                clearTimeout(timeoutId);
+                log(`❌ Exception during insert: ${err.message}`, 'error');
+                log(`   Stack: ${err.stack?.substring(0, 200) || 'N/A'}`, 'error');
             }
+            
+            log('🏁 Test completed', 'info');
         }
-        testOrder();
+        
+        document.getElementById('runTest').addEventListener('click', runTest);
+        document.getElementById('clearLogs').addEventListener('click', clearLogs);
     </script>
-</head>
-<body>Check console</body>
+</body>
 </html>
