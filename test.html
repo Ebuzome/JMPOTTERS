@@ -1,20 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Test</title>
-</head>
-<body>
-    <h1>Invoice Page Test</h1>
-    <p>If you can see this, the HTML is loading.</p>
-    <p id="test">Waiting for JavaScript...</p>
-    
+    <title>Test Checkout</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        console.log("SCRIPT EXECUTED");
-        document.getElementById('test').innerHTML = "✅ JavaScript is working! The script executed successfully.";
-        document.getElementById('test').style.color = "green";
-        document.getElementById('test').style.fontWeight = "bold";
+        // Minimal app to test Supabase insert
+        const supabaseUrl = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        async function testOrder() {
+            console.log('Test started');
+            const orderInsert = {
+                order_number: 'TEST-' + Date.now(),
+                user_email: 'test@example.com',
+                full_name: 'Test User',
+                total_amount: 1000,
+                shipping_fee: 0,
+                grand_total: 1000,
+                status: 'pending',
+                payment_status: 'pending',
+                items: [{ name: 'Test Product', quantity: 1, price: 1000 }],
+                created_at: new Date().toISOString()
+            };
+            console.log('Inserting:', orderInsert);
+            try {
+                const { data, error } = await supabase
+                    .from('orders')
+                    .insert(orderInsert)
+                    .select()
+                    .single();
+                if (error) {
+                    console.error('Supabase error:', error);
+                } else {
+                    console.log('Success:', data);
+                }
+            } catch (err) {
+                console.error('Exception:', err);
+            }
+        }
+        testOrder();
     </script>
-</body>
+</head>
+<body>Check console</body>
 </html>
