@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Order Confirmation | JMPOTTERS</title>
+    <title>Order Invoice | JMPOTTERS</title>
     
     <!-- Premium Icon Pack: Boxicons -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -16,10 +16,38 @@
     <script src="app.js"></script>
     
     <style>
+        /* ===== ORIGINAL CSS VARIABLES - KEPT INTACT ===== */
         :root {
-            --primary-500: #22c55e;
-            --primary-600: #16a34a;
-            --primary-700: #15803d;
+            --primary-50: #EEF2FF;
+            --primary-100: #E0E7FF;
+            --primary-200: #C7D2FE;
+            --primary-300: #A5B4FC;
+            --primary-400: #818CF8;
+            --primary-500: #6366F1;
+            --primary-600: #4F46E5;
+            --primary-700: #4338CA;
+            --primary-800: #3730A3;
+            --primary-900: #312E81;
+            
+            --success-50: #F0FDF4;
+            --success-500: #22C55E;
+            --success-600: #16A34A;
+            --success-700: #15803D;
+            
+            --danger-50: #FEF2F2;
+            --danger-500: #EF4444;
+            --danger-600: #DC2626;
+            --danger-700: #B91C1C;
+            
+            --warning-50: #FEFCE8;
+            --warning-500: #EAB308;
+            --warning-600: #CA8A04;
+            --warning-700: #A16207;
+            
+            --info-50: #ECFEFF;
+            --info-500: #06B6D4;
+            --info-600: #0891B2;
+            
             --gray-50: #F9FAFB;
             --gray-100: #F3F4F6;
             --gray-200: #E5E7EB;
@@ -30,6 +58,13 @@
             --gray-700: #374151;
             --gray-800: #1F2937;
             --gray-900: #111827;
+            
+            --dark-bg: #0F172A;
+            --dark-surface: #1E293B;
+            --dark-surface-2: #334155;
+            --dark-text: #F1F5F9;
+            --dark-text-muted: #94A3B8;
+            
             --space-1: 0.25rem;
             --space-2: 0.5rem;
             --space-3: 0.75rem;
@@ -37,29 +72,68 @@
             --space-5: 1.25rem;
             --space-6: 1.5rem;
             --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            
+            --radius-sm: 0.375rem;
             --radius: 0.5rem;
+            --radius-md: 0.75rem;
             --radius-lg: 1rem;
             --radius-xl: 1.5rem;
-            --radius-2xl: 2rem;
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
             --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
             
+            /* Dark header specific */
             --glass-dark: rgba(12, 15, 21, 0.92);
             --glass-blur: blur(16px);
         }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: radial-gradient(1200px 800px at 80% -10%, rgba(34,197,94,0.15), transparent 60%),
-                        radial-gradient(1000px 600px at -10% 110%, rgba(59,130,246,0.12), transparent 60%),
-                        #0a0f0c;
-            min-height: 100vh;
+        /* Dark Mode (applies to invoice body, not the header) */
+        .dark-mode {
+            --primary-50: #1E293B;
+            --primary-100: #1E293B;
+            --primary-500: #818CF8;
+            --primary-600: #6366F1;
+            
+            --gray-50: #0F172A;
+            --gray-100: #1E293B;
+            --gray-200: #334155;
+            --gray-300: #475569;
+            --gray-400: #64748B;
+            --gray-500: #94A3B8;
+            --gray-600: #CBD5E1;
+            --gray-700: #E2E8F0;
+            --gray-800: #F1F5F9;
+            --gray-900: #F8FAFC;
         }
         
-        /* ========== HEADER – DARK GLASS ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            transition: background-color var(--transition);
+        }
+        
+        body.dark-mode {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+        }
+        
+        /* ========== HEADER – DARK GLASS, CENTERED LOGO, HAMBURGER LEFT ========== */
         .nav-bar {
             position: fixed;
             top: 0;
@@ -68,7 +142,8 @@
             z-index: 1050;
             background: var(--glass-dark);
             backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid rgba(34,197,94,0.3);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
             transition: var(--transition);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
@@ -78,15 +153,20 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
+            position: relative;
             max-width: 1280px;
             margin: 0 auto;
             padding-left: 1rem;
             padding-right: 1rem;
         }
         
-        .header-left { flex: 1; display: flex; justify-content: flex-start; }
+        .header-left {
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+        }
         .mobile-toggle {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
             border: none;
             font-size: 2rem;
             width: 48px;
@@ -95,17 +175,41 @@
             color: var(--primary-500);
             cursor: pointer;
             transition: var(--transition);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .mobile-toggle:hover { background: var(--primary-600); color: #0c0f15; transform: rotate(5deg); }
+        .mobile-toggle:hover {
+            background: var(--primary-600);
+            color: #0c0f15;
+            transform: rotate(5deg);
+        }
         
-        .header-center { flex: 0 0 auto; display: flex; justify-content: center; }
-        .logo-img { height: 64px; width: auto; object-fit: contain; display: block; transition: var(--transition); filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
-        .logo-img:hover { transform: scale(1.02); filter: drop-shadow(0 6px 12px rgba(34,197,94,0.4)); }
+        .header-center {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+        .logo-img {
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            transition: var(--transition);
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+        }
+        .logo-img:hover {
+            transform: scale(1.02);
+            filter: drop-shadow(0 6px 12px rgba(99,102,241,0.4));
+        }
         
-        .header-right { flex: 1; display: flex; justify-content: flex-end; gap: 12px; }
+        .header-right {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
         
         .overlay {
             position: fixed;
@@ -113,13 +217,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(6px);
             z-index: 1060;
             display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .overlay.active { display: block; }
-        
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
         .mobile-nav {
             position: fixed;
             top: 0;
@@ -130,21 +238,26 @@
             background: #0f1219f2;
             backdrop-filter: blur(24px);
             z-index: 1070;
-            transition: left 0.4s ease;
+            transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             padding: 32px 24px;
+            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
             border-radius: 0 28px 28px 0;
             overflow-y: auto;
         }
-        .mobile-nav.active { left: 0; }
+        .mobile-nav.active {
+            left: 0;
+        }
         .mobile-nav-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 40px;
             padding-bottom: 16px;
-            border-bottom: 1px solid rgba(34,197,94,0.3);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
         }
-        .mobile-nav-header .logo-img { height: 52px; }
+        .mobile-nav-header .logo-img {
+            height: 52px;
+        }
         .close-nav {
             background: rgba(255,255,255,0.08);
             border: none;
@@ -159,8 +272,17 @@
             align-items: center;
             justify-content: center;
         }
-        .close-nav:hover { background: var(--primary-600); color: #0c0f15; transform: rotate(90deg); }
-        .mobile-nav-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+        .close-nav:hover {
+            background: var(--primary-600);
+            color: #0c0f15;
+            transform: rotate(90deg);
+        }
+        .mobile-nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
         .mobile-nav-links li a {
             display: flex;
             align-items: center;
@@ -174,99 +296,26 @@
             transition: var(--transition);
             font-size: 1rem;
         }
-        .mobile-nav-links li a i { font-size: 1.4rem; color: var(--primary-500); }
-        .mobile-nav-links li a:hover { background: var(--primary-600); color: #0c0f15; transform: translateX(8px); }
-        .mobile-nav-links li a:hover i { color: #0c0f15; }
-        
-        /* ========== MAIN CONTENT ========== */
-        .invoice-wrapper {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding-top: 100px;
-            padding-bottom: 60px;
-            padding-left: 20px;
-            padding-right: 20px;
+        .mobile-nav-links li a i {
+            font-size: 1.4rem;
+            color: var(--primary-500);
+        }
+        .mobile-nav-links li a:hover {
+            background: var(--primary-600);
+            color: #0c0f15;
+            transform: translateX(8px);
+        }
+        .mobile-nav-links li a:hover i {
+            color: #0c0f15;
         }
         
-        /* Glass Card */
-        .glass-card {
-            background: rgba(255,255,255,0.06);
-            backdrop-filter: blur(20px) saturate(140%);
-            -webkit-backdrop-filter: blur(20px) saturate(140%);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 2rem;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Animated Checkmark Styles */
-        .success-circle {
-            stroke-dasharray: 339.292;
-            stroke-dashoffset: 339.292;
-            animation: draw-circle 0.8s cubic-bezier(0.65,0,0.35,1) forwards;
-        }
-        .success-check {
-            stroke-dasharray: 60;
-            stroke-dashoffset: 60;
-            animation: draw-check 0.5s cubic-bezier(0.65,0,0.35,1) 0.7s forwards;
-        }
-        .success-pop {
-            animation: pop-bounce 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
-        }
-        .glow-text {
-            animation: pulse-glow 2.2s ease-in-out infinite;
-        }
-        @keyframes draw-circle {
-            to { stroke-dashoffset: 0; }
-        }
-        @keyframes draw-check {
-            to { stroke-dashoffset: 0; }
-        }
-        @keyframes pop-bounce {
-            0% { transform: scale(0.6); opacity: 0; }
-            60% { transform: scale(1.08); opacity: 1; }
-            80% { transform: scale(0.96); }
-            100% { transform: scale(1); }
-        }
-        @keyframes pulse-glow {
-            0%,100% {
-                text-shadow: 0 0 0px rgba(34,197,94,0), 0 0 0px rgba(34,197,94,0);
-                opacity: 0.95;
-            }
-            50% {
-                text-shadow: 0 0 20px rgba(34,197,94,0.6), 0 0 40px rgba(34,197,94,0.35);
-                opacity: 1;
-            }
-        }
-        .confetti {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 2px;
-            opacity: 0;
-            animation: confetti-fall 1.2s ease-out forwards;
-        }
-        @keyframes confetti-fall {
-            0% { transform: translateY(-40px) rotate(0deg) scale(0.8); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translateY(120px) rotate(360deg) scale(1); opacity: 0; }
-        }
-        
-        .order-item-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            object-fit: cover;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        /* Footer */
+        /* ========== FOOTER – DARK LUXURY ========== */
         footer {
             background: linear-gradient(145deg, #0a0d12 0%, #05070a 100%);
             color: #eef2f5;
             padding: 48px 0 24px;
             margin-top: 60px;
-            border-top: 1px solid rgba(34,197,94,0.25);
+            border-top: 1px solid rgba(99, 102, 241, 0.25);
         }
         .footer-container {
             max-width: 1280px;
@@ -276,86 +325,603 @@
             grid-template-columns: 1fr;
             gap: 30px;
         }
-        @media (min-width: 640px) { .footer-container { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 768px) { .footer-container { grid-template-columns: repeat(4, 1fr); } }
-        .footer-logo-img { height: 64px; width: auto; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.95; transition: var(--transition); margin-bottom: 16px; }
-        .footer-logo-img:hover { opacity: 1; transform: translateY(-3px); filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(34,197,94,0.3)); }
-        .footer-column h3 { font-size: 1.1rem; margin-bottom: 16px; color: var(--primary-500); font-weight: 600; position: relative; }
-        .footer-links { list-style: none; }
-        .footer-links li { margin-bottom: 8px; }
-        .footer-links a { color: #cfdee9; text-decoration: none; font-size: 0.8rem; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px; }
-        .footer-links a:hover { color: var(--primary-500); transform: translateX(5px); }
-        .social-links { display: flex; gap: 12px; margin-top: 16px; }
-        .social-links a { background: rgba(255,255,255,0.06); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; transition: var(--transition); }
-        .social-links a:hover { background: var(--primary-600); transform: translateY(-3px); color: #0a0d12; }
-        .copyright { text-align: center; padding-top: 24px; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.7rem; color: #9aaeb9; }
+        @media (min-width: 640px) {
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 768px) {
+            .footer-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .footer-logo-img {
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+            transition: var(--transition);
+            margin-bottom: 16px;
+        }
+        .footer-logo-img:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+            filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(99,102,241,0.3));
+        }
+        .footer-column h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--primary-400);
+            font-weight: 600;
+            position: relative;
+        }
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+        .footer-links a {
+            color: #cfdee9;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .footer-links a:hover {
+            color: var(--primary-400);
+            transform: translateX(5px);
+        }
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .social-links a {
+            background: rgba(255,255,255,0.06);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        .social-links a:hover {
+            background: var(--primary-600);
+            transform: translateY(-3px);
+            color: #0a0d12;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 24px;
+            margin-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.7rem;
+            color: #9aaeb9;
+        }
+        
+        /* Adjust main content to not be hidden under fixed header */
+        .invoice-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-top: 90px;
+        }
+        
+        /* Invoice Container (original styles) */
+        .invoice-container {
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            transition: background-color var(--transition);
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .dark-mode .invoice-container {
+            background: var(--dark-surface);
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Header inside invoice (not the site header) */
+        .invoice-header {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            padding: var(--space-8) var(--space-6);
+            text-align: center;
+            position: relative;
+        }
+        
+        .dark-mode .invoice-header {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+        }
+        
+        .invoice-logo {
+            width: 5rem;
+            height: 5rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4);
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .invoice-header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-1);
+        }
+        
+        .invoice-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+        
+        .invoice-number {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(4px);
+            padding: var(--space-2) var(--space-5);
+            border-radius: var(--radius);
+            margin-top: var(--space-5);
+            font-family: 'SF Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        
+        .invoice-body {
+            padding: var(--space-8);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: var(--warning-50);
+            color: var(--warning-700);
+        }
+        
+        .dark-mode .status-pending {
+            background: rgba(234, 179, 8, 0.15);
+            color: #FBBF24;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+            padding-bottom: var(--space-6);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .dark-mode .info-grid {
+            border-bottom-color: var(--dark-surface-2);
+        }
+        
+        @media (min-width: 640px) {
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .info-section h3 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-500);
+            margin-bottom: var(--space-3);
+            font-weight: 600;
+        }
+        
+        .dark-mode .info-section h3 {
+            color: var(--dark-text-muted);
+        }
+        
+        .info-section p {
+            color: var(--gray-700);
+            line-height: 1.6;
+            font-size: 0.875rem;
+        }
+        
+        .dark-mode .info-section p {
+            color: var(--dark-text);
+        }
+        
+        .order-summary {
+            margin-bottom: var(--space-8);
+        }
+        
+        .order-summary h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-4);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .dark-mode .order-summary h3 {
+            color: var(--dark-text);
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .dark-mode .table-wrapper {
+            border-color: var(--dark-surface-2);
+        }
+        
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        .invoice-table th,
+        .invoice-table td {
+            padding: var(--space-3) var(--space-4);
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .dark-mode .invoice-table th,
+        .dark-mode .invoice-table td {
+            border-bottom-color: var(--dark-surface-2);
+        }
+        
+        .invoice-table th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .dark-mode .invoice-table th {
+            background: var(--dark-surface-2);
+            color: var(--dark-text-muted);
+        }
+        
+        .invoice-table td {
+            color: var(--gray-600);
+        }
+        
+        .dark-mode .invoice-table td {
+            color: var(--dark-text-muted);
+        }
+        
+        .totals {
+            margin-top: var(--space-6);
+            padding-top: var(--space-6);
+            border-top: 2px solid var(--gray-200);
+            text-align: right;
+        }
+        
+        .dark-mode .totals {
+            border-top-color: var(--dark-surface-2);
+        }
+        
+        .totals-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-8);
+            margin-bottom: var(--space-2);
+            font-size: 0.875rem;
+        }
+        
+        .totals-label {
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+        
+        .totals-value {
+            font-weight: 600;
+            color: var(--gray-800);
+            min-width: 120px;
+            text-align: right;
+        }
+        
+        .dark-mode .totals-value {
+            color: var(--dark-text);
+        }
+        
+        .grand-total {
+            margin-top: var(--space-3);
+            padding-top: var(--space-3);
+            border-top: 1px solid var(--gray-300);
+        }
+        
+        .dark-mode .grand-total {
+            border-top-color: var(--dark-surface);
+        }
+        
+        .grand-total .totals-label,
+        .grand-total .totals-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-600);
+        }
+        
+        .dark-mode .grand-total .totals-label,
+        .dark-mode .grand-total .totals-value {
+            color: var(--primary-400);
+        }
+        
+        .payment-instruction {
+            margin-top: var(--space-6);
+            text-align: center;
+            padding: var(--space-5);
+            background: linear-gradient(135deg, var(--primary-50), rgba(99, 102, 241, 0.03));
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+        
+        .dark-mode .payment-instruction {
+            background: linear-gradient(135deg, rgba(129, 140, 248, 0.08), rgba(129, 140, 248, 0.03));
+            border-color: rgba(129, 140, 248, 0.2);
+        }
+        
+        .payment-instruction i {
+            font-size: 1.75rem;
+            color: var(--primary-500);
+            margin-bottom: var(--space-2);
+        }
+        
+        .invoice-footer {
+            background: var(--gray-50);
+            padding: var(--space-5);
+            text-align: center;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .dark-mode .invoice-footer {
+            background: var(--dark-surface-2);
+            border-top-color: var(--dark-surface);
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-3);
+            justify-content: center;
+            margin-top: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
         
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border-radius: 1.5rem;
+            gap: var(--space-2);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
             font-size: 0.875rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all var(--transition-fast);
             border: none;
+            font-family: inherit;
             text-decoration: none;
         }
+        
         .btn-primary {
-            background: var(--primary-500);
-            color: black;
-            box-shadow: 0 0 20px rgba(34,197,94,0.3);
-        }
-        .btn-primary:hover {
-            background: var(--primary-600);
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(34,197,94,0.5);
-        }
-        .btn-secondary {
-            background: rgba(255,255,255,0.05);
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
             color: white;
-            border: 1px solid rgba(255,255,255,0.1);
         }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        
+        .dark-mode .btn-secondary {
+            background: var(--dark-surface);
+            border-color: var(--dark-surface-2);
+            color: var(--dark-text);
+        }
+        
         .btn-secondary:hover {
-            background: rgba(255,255,255,0.1);
+            border-color: var(--primary-500);
+            color: var(--primary-600);
             transform: translateY(-2px);
         }
         
-        @media print {
-            .action-buttons, .nav-bar, footer, .mobile-toggle, .overlay, .mobile-nav { display: none !important; }
-            .invoice-wrapper { padding-top: 0; }
-            .glass-card { box-shadow: none; background: white; color: black; }
-            body { background: white; }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary-500);
+            color: var(--primary-600);
         }
-        @media (max-width: 640px) {
-            .invoice-wrapper { padding-left: 16px; padding-right: 16px; }
-            .order-item-image { width: 48px; height: 48px; }
-            .btn { padding: 10px 16px; font-size: 0.8rem; }
+        
+        .dark-mode .btn-outline {
+            color: var(--primary-400);
+            border-color: var(--primary-400);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .loading-state, .error-state {
+            text-align: center;
+            padding: var(--space-12) var(--space-4);
+        }
+        
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary-500);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--space-4);
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        .theme-toggle {
+            position: fixed;
+            bottom: var(--space-4);
+            right: var(--space-4);
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            z-index: 100;
+        }
+        
+        .dark-mode .theme-toggle {
+            background: var(--dark-surface);
+            border-color: var(--dark-surface-2);
+            color: var(--dark-text);
+        }
+        
+        /* ===== NEW: CHECKMARK ANIMATION STYLES (minimal, non-intrusive) ===== */
+        .checkmark-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .checkmark-svg {
+            width: 48px;
+            height: 48px;
+        }
+        .checkmark-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke: #22c55e;
+            fill: none;
+            animation: stroke-circle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+        .checkmark-check {
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            stroke-width: 2;
+            stroke: #22c55e;
+            fill: none;
+            animation: stroke-check 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards;
+        }
+        @keyframes stroke-circle {
+            100% { stroke-dashoffset: 0; }
+        }
+        @keyframes stroke-check {
+            100% { stroke-dashoffset: 0; }
+        }
+        .success-message {
+            color: #22c55e;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .action-buttons,
+            .theme-toggle,
+            .nav-bar,
+            footer,
+            .mobile-toggle,
+            .overlay,
+            .mobile-nav {
+                display: none !important;
+            }
+            .invoice-wrapper {
+                padding-top: 0;
+            }
+            .invoice-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .invoice-body {
+                padding: var(--space-4);
+            }
+            .invoice-header {
+                padding: var(--space-5) var(--space-4);
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- ========= HEADER ========= -->
+    <!-- ========= HEADER (DARK GLASS, CENTERED LOGO) ========= -->
     <nav class="nav-bar">
         <div class="header-container">
             <div class="header-left">
-                <button class="mobile-toggle" id="mobileToggle"><i class='bx bx-menu-alt-left'></i></button>
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                    <i class='bx bx-menu-alt-left'></i>
+                </button>
             </div>
             <div class="header-center">
-                <a href="index.html"><img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img"></a>
+                <a href="index.html">
+                    <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
+                </a>
             </div>
-            <div class="header-right"></div>
+            <div class="header-right">
+                <!-- Empty for invoice page, no cart/wishlist needed -->
+            </div>
         </div>
     </nav>
 
-    <!-- Mobile Navigation -->
+    <!-- ========= MOBILE NAV (LEFT DRAWER) ========= -->
     <div class="overlay" id="navOverlay"></div>
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
@@ -375,16 +941,36 @@
         </ul>
     </div>
 
+    <!-- Dark Mode Toggle (preserved) -->
+    <button class="theme-toggle" onclick="toggleDarkMode()">
+        <i class="fas fa-moon"></i>
+    </button>
+
     <div class="invoice-wrapper">
-        <div id="invoiceContent" class="glass-card">
-            <div style="text-align: center; padding: 60px;">
-                <div style="width: 48px; height: 48px; border: 3px solid rgba(34,197,94,0.2); border-top-color: #22c55e; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                <p style="color: #94a3b8;">Loading invoice...</p>
+        <div id="invoiceContent" class="invoice-container">
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading invoice...</p>
             </div>
+        </div>
+        
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <button class="btn btn-secondary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Invoice
+            </button>
+            <button class="btn btn-secondary" onclick="downloadPDF()">
+                <i class="fas fa-download"></i> Download PDF
+            </button>
+            <button class="btn btn-outline" onclick="shareViaWhatsApp()">
+                <i class="fab fa-whatsapp"></i> Share via WhatsApp
+            </button>
+            <a href="index.html" class="btn btn-primary">
+                <i class="fas fa-home"></i> Continue Shopping
+            </a>
         </div>
     </div>
 
-    <!-- Footer -->
+    <!-- ========= FOOTER – DARK LUXURY ========= -->
     <footer>
         <div class="footer-container">
             <div class="footer-column">
@@ -428,45 +1014,24 @@
     </footer>
 
     <script>
-        // Confetti animation
-        function launchConfetti(containerId) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            container.innerHTML = '';
-            const colors = ['#22c55e', '#10b981', '#34d399', '#6ee7b7', '#a7f3d0'];
-            const count = 24;
-            for(let i = 0; i < count; i++) {
-                const el = document.createElement('span');
-                el.className = 'confetti';
-                el.style.left = (10 + Math.random() * 80) + '%';
-                el.style.top = '10px';
-                el.style.background = colors[i % colors.length];
-                el.style.animationDelay = (Math.random() * 0.4) + 's';
-                el.style.transform = `rotate(${Math.random() * 360}deg)`;
-                container.appendChild(el);
+        // Dark mode management (applies to invoice body, not header)
+        function initDarkMode() {
+            const darkMode = localStorage.getItem('invoiceDarkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const icon = document.querySelector('.theme-toggle i');
+                if (icon) icon.classList.replace('fa-moon', 'fa-sun');
             }
         }
         
-        function getImageUrl(categorySlug, imageFilename) {
-            if (!imageFilename) return '';
-            if (imageFilename.startsWith('http')) return imageFilename;
-            const baseUrl = 'https://ebuzome.github.io/JMPOTTERS/assets/images/';
-            const paths = {
-                'mensfootwear': 'mensfootwear/',
-                'womensfootwear': '',
-                'bags': '',
-                'household': 'household2/',
-                'kids': 'kids/',
-                'accessories': 'accessories/',
-                'healthcare': ''
-            };
-            const folder = paths[categorySlug] || '';
-            return baseUrl + folder + imageFilename;
-        }
-        
-        function formatPrice(price) {
-            if (!price && price !== 0) return '₦0';
-            return `₦${parseInt(price).toLocaleString()}`;
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('invoiceDarkMode', isDark);
+            const icon = document.querySelector('.theme-toggle i');
+            if (icon) {
+                if (isDark) icon.classList.replace('fa-moon', 'fa-sun');
+                else icon.classList.replace('fa-sun', 'fa-moon');
+            }
         }
         
         function escapeHtml(text) {
@@ -477,19 +1042,173 @@
         }
         
         function shareViaWhatsApp() {
-            const orderNumberElem = document.getElementById('displayOrderNumber');
-            const orderNumber = orderNumberElem ? orderNumberElem.innerText : '';
-            const grandTotalElem = document.getElementById('grandTotalValue');
-            const grandTotal = grandTotalElem ? grandTotalElem.innerText : '₦0';
-            const message = encodeURIComponent(`*JMPOTTERS Order Confirmation*\n\nOrder Number: ${orderNumber}\nTotal Amount: ${grandTotal}\n\nThank you for shopping with JMPOTTERS!`);
+            const orderNumber = document.querySelector('.invoice-number')?.innerText || '';
+            const grandTotal = document.querySelector('.grand-total .totals-value')?.innerText || '₦0';
+            const message = encodeURIComponent(
+                `*JMPOTTERS Order Confirmation*\n\n` +
+                `Order Number: ${orderNumber}\n` +
+                `Total Amount: ${grandTotal}\n\n` +
+                `Thank you for shopping with JMPOTTERS!`
+            );
             window.open(`https://wa.me/2348139583320?text=${message}`, '_blank');
         }
         
+        async function loadInvoice() {
+            let attempts = 0;
+            while (!window.JMPOTTERS && attempts < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                attempts++;
+            }
+            
+            if (!window.JMPOTTERS) {
+                document.getElementById('invoiceContent').innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>App not loaded. Please refresh.</p>
+                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderNumber = urlParams.get('order');
+            
+            if (!orderNumber) {
+                document.getElementById('invoiceContent').innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>No order specified</p>
+                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            try {
+                const order = await window.JMPOTTERS.getOrderByNumber(orderNumber);
+                if (!order) throw new Error('Order not found');
+                
+                const items = order.items || [];
+                const subtotal = order.total_amount || 0;
+                const shippingFee = order.shipping_fee || 0;
+                const grandTotal = order.grand_total || subtotal + shippingFee;
+                const orderDate = new Date(order.created_at).toLocaleDateString('en-NG', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                });
+                const statusText = order.status === 'pending' ? 'Pending' : 
+                                  order.status === 'processing' ? 'Processing' :
+                                  order.status === 'shipped' ? 'Shipped' :
+                                  order.status === 'delivered' ? 'Delivered' : 'Cancelled';
+                const paymentStatusText = order.payment_status === 'paid' ? 'Paid' : 'Pending Payment';
+                
+                let itemsHtml = '';
+                if (items.length > 0) {
+                    items.forEach(item => {
+                        itemsHtml += `
+                            <tr>
+                                <td>${escapeHtml(item.name || 'Product')}</td>
+                                <td>${item.color_name ? escapeHtml(item.color_name) + (item.size_value ? ' / ' + escapeHtml(item.size_value) : '') : '-'}</td>
+                                <td style="text-align: center;">${item.quantity}</td>
+                                <td style="text-align: right;">₦${(item.price || 0).toLocaleString()}</td>
+                                <td style="text-align: right;">₦${((item.price || 0) * item.quantity).toLocaleString()}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    itemsHtml = `<tr><td colspan="5" style="text-align: center;">No items found</td></tr>`;
+                }
+                
+                document.getElementById('invoiceContent').innerHTML = `
+                    <div class="invoice-header">
+                        <div class="invoice-logo"><i class="fas fa-store"></i></div>
+                        <h1>JMPOTTERS</h1>
+                        <p>Premium Quality Products</p>
+                        <div class="invoice-number">Order Number: ${order.order_number}</div>
+                    </div>
+                    <div class="invoice-body">
+                        <!-- ===== CHECKMARK ANIMATION ADDED HERE (Kept small, non-intrusive) ===== -->
+                        <div class="checkmark-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                            <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                            </svg>
+                            <div class="success-message">✓ Order placed successfully!</div>
+                        </div>
+                        <!-- ===== END CHECKMARK ANIMATION ===== -->
+                        
+                        <div class="info-grid">
+                            <div class="info-section">
+                                <h3><i class="fas fa-user"></i> Billing Details</h3>
+                                <p>
+                                    <strong>${escapeHtml(order.full_name || order.user_name || 'N/A')}</strong><br>
+                                    ${escapeHtml(order.user_email || 'No email provided')}<br>
+                                    ${escapeHtml(order.user_phone || 'No phone provided')}
+                                </p>
+                            </div>
+                            <div class="info-section">
+                                <h3><i class="fas fa-truck"></i> Shipping Address</h3>
+                                <p>
+                                    ${escapeHtml(order.shipping_address || 'No address provided')}<br>
+                                    ${order.city ? escapeHtml(order.city) + ', ' : ''}${order.state ? escapeHtml(order.state) : ''}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-section">
+                                <h3><i class="far fa-calendar-alt"></i> Order Date</h3>
+                                <p>${orderDate}</p>
+                            </div>
+                            <div class="info-section">
+                                <h3><i class="fas fa-chart-line"></i> Order Status</h3>
+                                <p><span class="status-badge status-pending"><i class="fas fa-clock"></i> ${statusText}</span></p>
+                            </div>
+                        </div>
+                        <div class="order-summary">
+                            <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+                            <div class="table-wrapper">
+                                <table class="invoice-table">
+                                    <thead>
+                                        <tr><th>Product</th><th>Variant</th><th style="text-align: center;">Qty</th><th style="text-align: right;">Price</th><th style="text-align: right;">Total</th></tr>
+                                    </thead>
+                                    <tbody>${itemsHtml}</tbody>
+                                </table>
+                            </div>
+                            <div class="totals">
+                                <div class="totals-row"><span class="totals-label">Subtotal:</span><span class="totals-value">₦${subtotal.toLocaleString()}</span></div>
+                                <div class="totals-row"><span class="totals-label">Shipping Fee:</span><span class="totals-value">₦${shippingFee.toLocaleString()}</span></div>
+                                <div class="totals-row grand-total"><span class="totals-label">Grand Total:</span><span class="totals-value">₦${grandTotal.toLocaleString()}</span></div>
+                            </div>
+                        </div>
+                        <div class="payment-instruction">
+                            <i class="fas fa-credit-card"></i>
+                            <p>Payment Status: <strong>${paymentStatusText}</strong></p>
+                            <p style="font-size: 0.7rem; margin-top: var(--space-2);">Please complete payment within 24 hours to confirm your order.</p>
+                        </div>
+                    </div>
+                    <div class="invoice-footer">
+                        <p>Thank you for shopping with JMPOTTERS!</p>
+                        <p style="font-size: 0.65rem; margin-top: var(--space-1);">
+                            For inquiries, contact us on WhatsApp: <strong>+234 813 958 3320</strong> | Email: hello@jmpotters.com
+                        </p>
+                    </div>
+                `;
+                document.getElementById('actionButtons').style.display = 'flex';
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('invoiceContent').innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error: ${error.message}</p>
+                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Go Home</a>
+                    </div>
+                `;
+            }
+        }
+        
         function downloadPDF() {
-            const element = document.getElementById('invoicePrintable');
-            if (!element) return;
-            const orderNumberElem = document.getElementById('displayOrderNumber');
-            const orderNumber = orderNumberElem ? orderNumberElem.innerText : 'invoice';
+            const element = document.getElementById('invoiceContent');
+            const orderNumber = document.querySelector('.invoice-number')?.innerText || 'invoice';
             html2pdf().from(element).set({
                 margin: 0.5,
                 filename: `JMPOTTERS_${orderNumber}.pdf`,
@@ -498,181 +1217,7 @@
             }).save();
         }
         
-        async function loadInvoice() {
-            console.log('Loading invoice...');
-            
-            let attempts = 0;
-            while (!window.JMPOTTERS && attempts < 50) {
-                await new Promise(r => setTimeout(r, 100));
-                attempts++;
-            }
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const orderNumber = urlParams.get('order');
-            console.log('Order number from URL:', orderNumber);
-            
-            const invoiceContent = document.getElementById('invoiceContent');
-            
-            if (!orderNumber) {
-                invoiceContent.innerHTML = `
-                    <div style="text-align: center; padding: 60px 24px;">
-                        <div style="width: 64px; height: 64px; background: rgba(239,68,68,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 32px; color: #ef4444;"></i>
-                        </div>
-                        <h2 style="color: white; margin-bottom: 12px;">No Order Specified</h2>
-                        <p style="color: #94a3b8; margin-bottom: 24px;">No order number was provided in the URL.</p>
-                        <a href="index.html" class="btn btn-primary" style="display: inline-block;">Return to Home</a>
-                    </div>
-                `;
-                return;
-            }
-            
-            if (!window.JMPOTTERS || !window.JMPOTTERS.getOrderByNumber) {
-                invoiceContent.innerHTML = `
-                    <div style="text-align: center; padding: 60px 24px;">
-                        <div style="width: 64px; height: 64px; background: rgba(239,68,68,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 32px; color: #ef4444;"></i>
-                        </div>
-                        <h2 style="color: white; margin-bottom: 12px;">App Not Ready</h2>
-                        <p style="color: #94a3b8; margin-bottom: 24px;">Please refresh the page.</p>
-                        <a href="index.html" class="btn btn-primary" style="display: inline-block;">Return to Home</a>
-                    </div>
-                `;
-                return;
-            }
-            
-            try {
-                const order = await window.JMPOTTERS.getOrderByNumber(orderNumber);
-                console.log('Order fetched:', order);
-                
-                if (!order) {
-                    invoiceContent.innerHTML = `
-                        <div style="text-align: center; padding: 60px 24px;">
-                            <div style="width: 64px; height: 64px; background: rgba(239,68,68,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                                <i class="fas fa-exclamation-triangle" style="font-size: 32px; color: #ef4444;"></i>
-                            </div>
-                            <h2 style="color: white; margin-bottom: 12px;">Order Not Found</h2>
-                            <p style="color: #94a3b8; margin-bottom: 24px;">Order ${orderNumber} could not be found.</p>
-                            <a href="index.html" class="btn btn-primary" style="display: inline-block;">Return to Home</a>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const items = order.items || [];
-                const subtotal = order.total_amount || 0;
-                const shippingFee = order.shipping_fee || 0;
-                const grandTotal = order.grand_total || subtotal + shippingFee;
-                const orderDate = new Date(order.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' });
-                const orderTime = new Date(order.created_at).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
-                const paymentStatusText = order.payment_status === 'paid' ? 'Paid' : 'Pending Payment';
-                
-                let itemsHtml = '';
-                if (items.length > 0) {
-                    items.forEach((item, idx) => {
-                        const imageUrl = getImageUrl(order.category_slug || 'mensfootwear', item.image_url);
-                        itemsHtml += `
-                            <div class="flex items-center gap-4 py-3 ${idx > 0 ? 'border-t border-white/10' : ''}">
-                                ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(item.name)}" class="order-item-image" onerror="this.style.display='none'">` : `<div class="order-item-image bg-white/5 flex items-center justify-center"><i class="fas fa-box" style="color: #64748b;"></i></div>`}
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-medium text-white truncate">${escapeHtml(item.name)}</p>
-                                    <p class="text-sm text-white/50">${item.color_name ? escapeHtml(item.color_name) : ''} ${item.size_value ? '/ Size ' + escapeHtml(item.size_value) : ''}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-medium text-white">${formatPrice(item.price)}</p>
-                                    <p class="text-xs text-white/50">Qty: ${item.quantity}</p>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    itemsHtml = '<p class="text-white/50 text-center py-4">No items found</p>';
-                }
-                
-                invoiceContent.innerHTML = `
-                    <div id="invoicePrintable">
-                        <div class="relative px-6 sm:px-8 pt-10 pb-8 text-center">
-                            <div id="confettiContainer" class="absolute inset-0 pointer-events-none"></div>
-                            
-                            <div class="success-pop mx-auto w-24 h-24 sm:w-28 sm:h-28 relative flex items-center justify-center">
-                                <div class="absolute inset-0 rounded-full bg-emerald-500/10 blur-2xl"></div>
-                                <svg class="relative w-full h-full" viewBox="0 0 120 120" fill="none">
-                                    <circle cx="60" cy="60" r="54" stroke="rgba(34,197,94,0.15)" stroke-width="8"/>
-                                    <circle cx="60" cy="60" r="54" stroke="#22c55e" stroke-width="8" stroke-linecap="round" class="success-circle" transform="rotate(-90 60 60)"/>
-                                    <path d="M42 62 L56 76 L80 48" stroke="#22c55e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" class="success-check"/>
-                                </svg>
-                            </div>
-                            
-                            <h1 class="glow-text mt-5 text-[1.5rem] sm:text-[1.75rem] font-semibold tracking-tight text-emerald-300">
-                                Your order has been placed successfully
-                            </h1>
-                            <p class="mt-2 text-sm text-white/60">
-                                A confirmation has been sent to <span class="text-white/90 font-medium">${escapeHtml(order.user_email || 'your email')}</span>
-                            </p>
-                            
-                            <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
-                                <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/80">
-                                    Order Number: <span id="displayOrderNumber" class="text-white font-mono">${order.order_number}</span>
-                                </span>
-                                <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/80">
-                                    ${orderDate} • ${orderTime}
-                                </span>
-                                <span class="px-3 py-1.5 rounded-full ${paymentStatusText === 'Paid' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' : 'bg-yellow-500/15 border-yellow-500/30 text-yellow-300'} border text-xs font-medium">
-                                    Payment Status: ${paymentStatusText}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="border-t border-white/10 bg-black/20 px-6 sm:px-8 py-6">
-                            <h2 class="text-xs uppercase tracking-widest text-white/40 font-semibold mb-4">Order Summary</h2>
-                            <div class="space-y-3">
-                                ${itemsHtml}
-                            </div>
-                            
-                            <div class="pt-4 mt-4 border-t border-dashed border-white/10 space-y-2 text-sm">
-                                <div class="flex justify-between text-white/60">
-                                    <span>Subtotal</span>
-                                    <span class="text-white/80">${formatPrice(subtotal)}</span>
-                                </div>
-                                <div class="flex justify-between text-white/60">
-                                    <span>Shipping</span>
-                                    <span class="text-white/80">${shippingFee === 0 ? 'Free' : formatPrice(shippingFee)}</span>
-                                </div>
-                                <div class="flex justify-between pt-2 text-base font-semibold border-t border-white/10 mt-2">
-                                    <span class="text-white">Total Paid</span>
-                                    <span id="grandTotalValue" class="text-emerald-300">${formatPrice(grandTotal)}</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex flex-wrap gap-3 justify-center px-6 pb-6 pt-2">
-                            <button class="btn btn-secondary" onclick="window.print()"><i class="fas fa-print"></i> Print Invoice</button>
-                            <button class="btn btn-secondary" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
-                            <button class="btn btn-secondary" onclick="shareViaWhatsApp()"><i class="fab fa-whatsapp"></i> Share via WhatsApp</button>
-                            <a href="index.html" class="btn btn-primary"><i class="fas fa-home"></i> Continue Shopping</a>
-                        </div>
-                    </div>
-                `;
-                
-                setTimeout(() => {
-                    launchConfetti('confettiContainer');
-                }, 300);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                invoiceContent.innerHTML = `
-                    <div style="text-align: center; padding: 60px 24px;">
-                        <div style="width: 64px; height: 64px; background: rgba(239,68,68,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 32px; color: #ef4444;"></i>
-                        </div>
-                        <h2 style="color: white; margin-bottom: 12px;">Error Loading Order</h2>
-                        <p style="color: #94a3b8; margin-bottom: 24px;">${error.message || 'Please try again.'}</p>
-                        <a href="index.html" class="btn btn-primary" style="display: inline-block;">Return to Home</a>
-                    </div>
-                `;
-            }
-        }
-        
+        // Header mobile navigation
         document.addEventListener('DOMContentLoaded', function() {
             const mobileToggle = document.getElementById('mobileToggle');
             const mobileNav = document.getElementById('mobileNav');
@@ -685,6 +1230,7 @@
             if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
         });
         
+        initDarkMode();
         loadInvoice();
     </script>
 </body>
