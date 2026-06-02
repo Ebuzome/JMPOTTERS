@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE WITH WORKING CHECKOUT & FIXED ORDER NUMBERS
+// JMPOTTERS APP - COMPLETE WITH WORKING CHECKOUT & PLAIN ORDER NUMBERS
 // ====================
 (function() {
     'use strict';
@@ -174,7 +174,7 @@
     }
     
     // ====================
-    // GET NEXT SEQUENTIAL ORDER NUMBER (NO # SYMBOL)
+    // GET NEXT SEQUENTIAL ORDER NUMBER (PLAIN DIGITS ONLY)
     // ====================
     async function getNextOrderNumber() {
         const supabase = getSupabaseClient();
@@ -193,8 +193,8 @@
             let highestNumber = 0;
             
             if (data && data.length > 0 && data[0].order_number) {
-                // Extract numeric part from order number (remove any non-numeric characters)
-                const numericPart = data[0].order_number.replace(/\D/g, '');
+                // Extract numeric part (remove any non-numeric characters just in case)
+                const numericPart = String(data[0].order_number).replace(/\D/g, '');
                 if (numericPart) {
                     highestNumber = parseInt(numericPart, 10);
                 }
@@ -204,20 +204,12 @@
             const nextNumber = highestNumber + 1;
             // Pad with zeros to 4 digits (0001, 0002, etc.)
             const paddedNumber = nextNumber.toString().padStart(4, '0');
-            return paddedNumber;  // Return just the number, no # symbol
+            return paddedNumber;
             
         } catch (error) {
             console.error('Error getting next order number:', error);
-            // Fallback to timestamp-based number
             return Date.now().toString().slice(-4);
         }
-    }
-    
-    // Format order number for display (adds # prefix)
-    function formatOrderNumber(orderNumber) {
-        if (!orderNumber) return 'N/A';
-        if (orderNumber.startsWith('#')) return orderNumber;
-        return `#${orderNumber}`;
     }
     
     // ====================
@@ -812,7 +804,6 @@
             `;
         });
         
-        // SINGLE CHECKOUT BUTTON - ONLY ONE
         html += `
             <div class="cart-footer">
                 <div class="cart-total"><span>Total:</span><span>${formatPrice(total)}</span></div>
@@ -823,7 +814,6 @@
         cartItems.innerHTML = html;
         cartTotal.textContent = formatPrice(total);
         
-        // Setup remove handlers
         document.querySelectorAll('.cart-item-remove').forEach(btn => {
             btn.addEventListener('click', function() {
                 let cart = getCart();
@@ -833,10 +823,8 @@
             });
         });
         
-        // Setup checkout button - ONLY ONE, FRESH LISTENER
         const checkoutBtn = document.getElementById('checkoutButton');
         if (checkoutBtn) {
-            // Remove any existing listeners by cloning
             const newBtn = checkoutBtn.cloneNode(true);
             checkoutBtn.parentNode.replaceChild(newBtn, checkoutBtn);
             newBtn.addEventListener('click', function(e) {
@@ -880,7 +868,7 @@
     }
     
     // ====================
-    // ORDER CREATION WITH SEQUENTIAL ORDER NUMBERS (NO # SYMBOL)
+    // ORDER CREATION WITH SEQUENTIAL ORDER NUMBERS (PLAIN DIGITS)
     // ====================
     async function createOrder(orderData, cart) {
         console.log('Creating order with data:', orderData);
@@ -896,7 +884,6 @@
             const shippingFee = subtotal >= 50000 ? 0 : 2000;
             const grandTotal = subtotal + shippingFee;
             
-            // Get sequential order number (plain number, no # symbol)
             const orderNumber = await getNextOrderNumber();
             console.log('Generated order number:', orderNumber);
             
@@ -911,7 +898,7 @@
             }));
             
             const orderInsert = {
-                order_number: orderNumber,  // Store as plain number (e.g., "0003")
+                order_number: orderNumber,
                 user_id: orderData.user_id,
                 user_name: orderData.full_name,
                 user_email: orderData.email,
@@ -946,10 +933,7 @@
             
             localStorage.removeItem('jmpotters_cart');
             updateCartUI();
-            
-            // Display formatted order number with # prefix
-            const displayOrderNumber = formatOrderNumber(orderNumber);
-            showNotification(`Order ${displayOrderNumber} placed successfully!`, 'success');
+            showNotification(`Order ${orderNumber} placed successfully!`, 'success');
             return order;
             
         } catch (error) {
@@ -962,22 +946,16 @@
     async function getOrderByNumber(orderNumber) {
         const supabase = getSupabaseClient();
         try {
-            // Remove # prefix if present for database lookup
-            const cleanOrderNumber = orderNumber.replace(/^#/, '');
-            console.log('Looking up order:', cleanOrderNumber);
+            // orderNumber is already plain (e.g., "0003")
+            console.log('Looking up order:', orderNumber);
             
             const { data: order, error } = await supabase
                 .from('orders')
                 .select('*')
-                .eq('order_number', cleanOrderNumber)
+                .eq('order_number', orderNumber)
                 .maybeSingle();
             
             if (error) throw error;
-            
-            // Add formatted order number for display
-            if (order) {
-                order.display_order_number = formatOrderNumber(order.order_number);
-            }
             return order;
         } catch (error) {
             console.error('Order fetch error:', error);
@@ -986,7 +964,7 @@
     }
     
     // ====================
-    // PROCEED TO CHECKOUT - PRESERVED WORKING LOGIC
+    // PROCEED TO CHECKOUT
     // ====================
     async function proceedToCheckout() {
         if (isProcessingCheckout) {
@@ -1022,9 +1000,7 @@
                 
                 const order = await createOrder(checkoutData, cart);
                 if (order) {
-                    // Use display_order_number or format the raw order_number
-                    const displayNumber = formatOrderNumber(order.order_number);
-                    window.location.href = `invoice.html?order=${displayNumber}`;
+                    window.location.href = `invoice.html?order=${order.order_number}`;
                 }
             } catch (error) {
                 console.error('Checkout error:', error);
@@ -1076,7 +1052,6 @@
         setupHeaderInteractions();
         updateCartUI();
         
-        // Remove any WhatsApp checkout buttons
         document.querySelectorAll('#whatsappCheckout').forEach(btn => btn.remove());
         
         if (isProductPage()) {
@@ -1105,8 +1080,7 @@
         loadSingleProductBySlug,
         updateCartUI,
         getOrderByNumber,
-        createOrder,
-        formatOrderNumber
+        createOrder
     };
     
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializePage);
