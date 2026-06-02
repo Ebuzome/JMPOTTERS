@@ -1,719 +1,1091 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Order Invoice | JMPOTTERS</title>
+// ====================
+// JMPOTTERS APP - COMPLETE WITH WORKING CHECKOUT & SEQUENTIAL ORDERS
+// ====================
+(function() {
+    'use strict';
     
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    if (window.JMPOTTERS_APP_INITIALIZED) {
+        console.warn('⚠️ JMPOTTERS app already initialized, skipping...');
+        return;
+    }
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="app.js"></script>
+    console.log('🚀 JMPOTTERS app starting...');
+    window.JMPOTTERS_APP_INITIALIZED = true;
     
-    <style>
-        :root {
-            --primary-500: #6366F1;
-            --primary-600: #4F46E5;
-            --success-500: #22C55E;
-            --danger-500: #EF4444;
-            --warning-500: #EAB308;
-            --gray-50: #F9FAFB;
-            --gray-100: #F3F4F6;
-            --gray-200: #E5E7EB;
-            --gray-300: #D1D5DB;
-            --gray-400: #9CA3AF;
-            --gray-500: #6B7280;
-            --gray-600: #4B5563;
-            --gray-700: #374151;
-            --gray-800: #1F2937;
-            --gray-900: #111827;
-            --dark-bg: #0F172A;
-            --dark-surface: #1E293B;
-            --dark-text: #F1F5F9;
-            --space-1: 0.25rem;
-            --space-2: 0.5rem;
-            --space-3: 0.75rem;
-            --space-4: 1rem;
-            --space-5: 1.25rem;
-            --space-6: 1.5rem;
-            --space-8: 2rem;
-            --radius: 0.5rem;
-            --radius-lg: 1rem;
-            --radius-xl: 1.5rem;
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-            
-            --glass-dark: rgba(12, 15, 21, 0.92);
-            --glass-blur: blur(16px);
+    // ====================
+    // CONFIGURATION
+    // ====================
+    if (!window.JMPOTTERS_CONFIG) {
+        window.JMPOTTERS_CONFIG = {};
+    }
+    
+    window.JMPOTTERS_CONFIG.supabase = {
+        url: 'https://tmpggeeuwdvlngvfncaa.supabase.co',
+        key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4'
+    };
+    
+    window.JMPOTTERS_CONFIG.images = {
+        baseUrl: 'https://ebuzome.github.io/JMPOTTERS/assets/images/',
+        paths: {
+            'mensfootwear': 'mensfootwear/',
+            'womensfootwear': '',
+            'bags': '',
+            'household': 'household2/',
+            'kids': 'kids/',
+            'accessories': 'accessories/',
+            'healthcare': ''
+        }
+    };
+    
+    // Counter for sequential order numbers
+    let lastOrderNumber = 0;
+    
+    // Current product state
+    let currentProduct = null;
+    let currentSelectedQuantity = 1;
+    let currentSelectedColor = null;
+    let currentSelectedSize = null;
+    let currentSelectedVariant = null;
+    let currentProductColors = [];
+    let currentProductSizes = [];
+    let colorSizeMap = {};
+    let sizeColorMap = {};
+    
+    // Checkout processing flag
+    let isProcessingCheckout = false;
+    
+    // ====================
+    // NOTIFICATION SYSTEM
+    // ====================
+    function showNotification(message, type = 'success') {
+        console.log(`${type.toUpperCase()}: ${message}`);
+        
+        let container = document.getElementById('jmpottersNotificationContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'jmpottersNotificationContainer';
+            container.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                z-index: 10000;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                pointer-events: none;
+            `;
+            document.body.appendChild(container);
         }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        body.dark-mode {
-            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-        }
-        
-        .nav-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1050;
-            background: var(--glass-dark);
-            backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
-            transition: var(--transition);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-        
-        .header-left { flex: 1; display: flex; justify-content: flex-start; }
-        .mobile-toggle {
-            background: rgba(255,255,255,0.08);
-            border: none;
-            font-size: 2rem;
-            width: 48px;
-            height: 48px;
-            border-radius: 30px;
-            color: var(--primary-500);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .mobile-toggle:hover { background: var(--primary-600); color: #0c0f15; transform: rotate(5deg); }
-        
-        .header-center { flex: 0 0 auto; display: flex; justify-content: center; }
-        .logo-img { height: 64px; width: auto; object-fit: contain; display: block; transition: var(--transition); filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
-        .logo-img:hover { transform: scale(1.02); filter: drop-shadow(0 6px 12px rgba(99,102,241,0.4)); }
-        
-        .header-right { flex: 1; display: flex; justify-content: flex-end; gap: 12px; }
-        
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(6px);
-            z-index: 1060;
-            display: none;
-        }
-        .overlay.active { display: block; }
-        
-        .mobile-nav {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 85%;
+        const notification = document.createElement('div');
+        const colors = {
+            success: { bg: '#f0fdf4', border: '#22c55e', text: '#166534' },
+            error: { bg: '#fef2f2', border: '#ef4444', text: '#991b1b' },
+            warning: { bg: '#fffbeb', border: '#f59e0b', text: '#92400e' },
+            info: { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af' }
+        };
+        const color = colors[type];
+        notification.style.cssText = `
+            background: ${color.bg};
+            border-left: 4px solid ${color.border};
+            border-radius: 12px;
+            padding: 14px 18px;
+            min-width: 280px;
             max-width: 380px;
-            height: 100vh;
-            background: #0f1219f2;
-            backdrop-filter: blur(24px);
-            z-index: 1070;
-            transition: left 0.4s ease;
-            padding: 32px 24px;
-            border-radius: 0 28px 28px 0;
-            overflow-y: auto;
-        }
-        .mobile-nav.active { left: 0; }
-        .mobile-nav-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(99,102,241,0.3);
-        }
-        .mobile-nav-header .logo-img { height: 52px; }
-        .close-nav {
-            background: rgba(255,255,255,0.08);
-            border: none;
-            font-size: 1.8rem;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            color: var(--primary-500);
-            cursor: pointer;
-            transition: var(--transition);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
-            justify-content: center;
-        }
-        .close-nav:hover { background: var(--primary-600); color: #0c0f15; transform: rotate(90deg); }
-        .mobile-nav-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
-        .mobile-nav-links li a {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 14px 20px;
-            background: rgba(255,255,255,0.04);
-            border-radius: 50px;
-            font-weight: 500;
-            color: #f0f3f8;
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 1rem;
-        }
-        .mobile-nav-links li a i { font-size: 1.4rem; color: var(--primary-500); }
-        .mobile-nav-links li a:hover { background: var(--primary-600); color: #0c0f15; transform: translateX(8px); }
-        .mobile-nav-links li a:hover i { color: #0c0f15; }
-        
-        footer {
-            background: linear-gradient(145deg, #0a0d12 0%, #05070a 100%);
-            color: #eef2f5;
-            padding: 48px 0 24px;
-            margin-top: 60px;
-            border-top: 1px solid rgba(99,102,241,0.25);
-        }
-        .footer-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 1rem;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-        @media (min-width: 640px) { .footer-container { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 768px) { .footer-container { grid-template-columns: repeat(4, 1fr); } }
-        .footer-logo-img { height: 64px; width: auto; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.95; transition: var(--transition); margin-bottom: 16px; }
-        .footer-logo-img:hover { opacity: 1; transform: translateY(-3px); filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(99,102,241,0.3)); }
-        .footer-column h3 { font-size: 1.1rem; margin-bottom: 16px; color: var(--primary-400); font-weight: 600; position: relative; }
-        .footer-links { list-style: none; }
-        .footer-links li { margin-bottom: 8px; }
-        .footer-links a { color: #cfdee9; text-decoration: none; font-size: 0.8rem; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px; }
-        .footer-links a:hover { color: var(--primary-400); transform: translateX(5px); }
-        .social-links { display: flex; gap: 12px; margin-top: 16px; }
-        .social-links a { background: rgba(255,255,255,0.06); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; transition: var(--transition); }
-        .social-links a:hover { background: var(--primary-600); transform: translateY(-3px); color: #0a0d12; }
-        .copyright { text-align: center; padding-top: 24px; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.7rem; color: #9aaeb9; }
-        
-        .invoice-wrapper { max-width: 1000px; margin: 0 auto; padding-top: 90px; }
-        
-        .invoice-container {
-            background: white;
-            border-radius: var(--radius-xl);
-            overflow: hidden;
-            box-shadow: var(--shadow-xl);
-            transition: background-color var(--transition);
-            animation: fadeInUp 0.5s ease;
-        }
-        
-        .dark-mode .invoice-container { background: var(--dark-surface); }
-        
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .invoice-header {
-            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
-            padding: var(--space-8) var(--space-6);
-            text-align: center;
-        }
-        .dark-mode .invoice-header { background: linear-gradient(135deg, var(--primary-600), var(--primary-800)); }
-        
-        .invoice-logo {
-            width: 5rem;
-            height: 5rem;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(4px);
-            border-radius: var(--radius-xl);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto var(--space-4);
-            font-size: 2rem;
-            color: white;
-        }
-        .invoice-header h1 { font-size: 1.75rem; font-weight: 800; color: white; margin-bottom: var(--space-1); }
-        .invoice-header p { color: rgba(255,255,255,0.8); font-size: 0.875rem; }
-        .invoice-number {
-            display: inline-block;
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(4px);
-            padding: var(--space-2) var(--space-5);
-            border-radius: var(--radius);
-            margin-top: var(--space-5);
-            font-family: monospace;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: white;
-        }
-        
-        .invoice-body { padding: var(--space-8); }
-        
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-2);
-            padding: var(--space-2) var(--space-3);
-            border-radius: var(--radius);
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .status-pending { background: var(--warning-500); color: white; }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: var(--space-6);
-            margin-bottom: var(--space-8);
-            padding-bottom: var(--space-6);
-            border-bottom: 1px solid var(--gray-200);
-        }
-        .dark-mode .info-grid { border-bottom-color: #334155; }
-        @media (min-width: 640px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
-        
-        .info-section h3 {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--gray-500);
-            margin-bottom: var(--space-3);
-            font-weight: 600;
-        }
-        .info-section p { color: var(--gray-700); line-height: 1.6; font-size: 0.875rem; }
-        .dark-mode .info-section p { color: var(--dark-text); }
-        
-        .order-summary { margin-bottom: var(--space-8); }
-        .order-summary h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: var(--space-4);
-            display: flex;
-            align-items: center;
-            gap: var(--space-2);
-        }
-        .dark-mode .order-summary h3 { color: var(--dark-text); }
-        
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--gray-200);
-        }
-        .dark-mode .table-wrapper { border-color: #334155; }
-        
-        .invoice-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-        .invoice-table th, .invoice-table td { padding: var(--space-3) var(--space-4); text-align: left; border-bottom: 1px solid var(--gray-200); }
-        .dark-mode .invoice-table th, .dark-mode .invoice-table td { border-bottom-color: #334155; }
-        .invoice-table th { background: var(--gray-50); font-weight: 600; color: var(--gray-700); font-size: 0.75rem; text-transform: uppercase; }
-        .dark-mode .invoice-table th { background: #1E293B; color: #94A3B8; }
-        .invoice-table td { color: var(--gray-600); }
-        .dark-mode .invoice-table td { color: #94A3B8; }
-        
-        .totals { margin-top: var(--space-6); padding-top: var(--space-6); border-top: 2px solid var(--gray-200); text-align: right; }
-        .dark-mode .totals { border-top-color: #334155; }
-        .totals-row { display: flex; justify-content: flex-end; gap: var(--space-8); margin-bottom: var(--space-2); font-size: 0.875rem; }
-        .totals-label { color: var(--gray-600); font-weight: 500; }
-        .totals-value { font-weight: 600; color: var(--gray-800); min-width: 120px; text-align: right; }
-        .dark-mode .totals-value { color: var(--dark-text); }
-        .grand-total { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--gray-300); }
-        .grand-total .totals-label, .grand-total .totals-value { font-size: 1.1rem; font-weight: 700; color: var(--primary-600); }
-        
-        .payment-instruction {
-            margin-top: var(--space-6);
-            text-align: center;
-            padding: var(--space-5);
-            background: linear-gradient(135deg, #EEF2FF, rgba(99,102,241,0.03));
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(99,102,241,0.15);
-        }
-        .dark-mode .payment-instruction { background: linear-gradient(135deg, rgba(129,140,248,0.08), rgba(129,140,248,0.03)); border-color: rgba(129,140,248,0.2); }
-        .payment-instruction i { font-size: 1.75rem; color: var(--primary-500); margin-bottom: var(--space-2); }
-        .payment-instruction p { font-size: 0.85rem; color: var(--gray-600); }
-        .dark-mode .payment-instruction p { color: #94A3B8; }
-        
-        .invoice-footer {
-            background: var(--gray-50);
-            padding: var(--space-5);
-            text-align: center;
-            border-top: 1px solid var(--gray-200);
-        }
-        .dark-mode .invoice-footer { background: #1E293B; border-top-color: #334155; }
-        .invoice-footer p { font-size: 0.75rem; color: var(--gray-500); }
-        
-        .action-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--space-3);
-            justify-content: center;
-            margin-top: var(--space-6);
-            margin-bottom: var(--space-6);
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-2);
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius);
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+            pointer-events: auto;
+            color: ${color.text};
             font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            border: none;
-            text-decoration: none;
+            font-weight: 500;
+        `;
+        notification.innerHTML = `<span>${message}</span><button style="background:none;border:none;margin-left:auto;cursor:pointer;opacity:0.6" onclick="this.parentElement.remove()">✕</button>`;
+        container.appendChild(notification);
+        setTimeout(() => notification.remove(), 4000);
+    }
+    
+    const style = document.createElement('style');
+    style.textContent = `@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }`;
+    document.head.appendChild(style);
+    
+    // ====================
+    // UTILITY FUNCTIONS
+    // ====================
+    function getCurrentCategory() {
+        if (window.JMPOTTERS_CONFIG && window.JMPOTTERS_CONFIG.currentCategory) {
+            return window.JMPOTTERS_CONFIG.currentCategory;
         }
-        .btn-primary { background: linear-gradient(135deg, var(--primary-500), var(--primary-600)); color: white; }
-        .btn-primary:hover { background: linear-gradient(135deg, var(--primary-600), var(--primary-700)); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        .btn-secondary { background: white; border: 1px solid var(--gray-300); color: var(--gray-700); }
-        .dark-mode .btn-secondary { background: #1E293B; border-color: #334155; color: #F1F5F9; }
-        .btn-secondary:hover { border-color: var(--primary-500); color: var(--primary-600); transform: translateY(-2px); }
-        .btn-outline { background: transparent; border: 1px solid var(--primary-500); color: var(--primary-600); }
-        .dark-mode .btn-outline { color: var(--primary-400); border-color: var(--primary-400); }
-        .btn-outline:hover { background: rgba(99,102,241,0.1); transform: translateY(-2px); }
-        
-        .loading-state, .error-state { text-align: center; padding: var(--space-12) var(--space-4); }
-        .loading-spinner { width: 3rem; height: 3rem; border: 3px solid var(--gray-200); border-top-color: var(--primary-500); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto var(--space-4); }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .theme-toggle {
-            position: fixed;
-            bottom: var(--space-4);
-            right: var(--space-4);
-            width: 3rem;
-            height: 3rem;
-            border-radius: 50%;
-            background: white;
-            border: 1px solid var(--gray-200);
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            z-index: 100;
+        const path = window.location.pathname;
+        const page = path.split('/').pop().replace('.html', '');
+        const pageToCategory = {
+            'mensfootwear': 'mensfootwear',
+            'womensfootwear': 'womensfootwear',
+            'bags': 'bags',
+            'household': 'household',
+            'kids': 'kids',
+            'accessories': 'accessories',
+            'healthcare': 'healthcare',
+            'product': 'mensfootwear'
+        };
+        return pageToCategory[page] || 'mensfootwear';
+    }
+    
+    function isProductPage() {
+        return window.location.pathname.includes('product.html');
+    }
+    
+    function getSlugFromURL() {
+        if (!isProductPage()) return null;
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('slug') ? decodeURIComponent(urlParams.get('slug')) : null;
+    }
+    
+    function getImageUrl(categorySlug, imageFilename) {
+        if (!imageFilename) return window.JMPOTTERS_CONFIG.images.baseUrl + 'placeholder.jpg';
+        if (imageFilename.startsWith('https://tmpggeeuwdvlngvfncaa.supabase.co')) return imageFilename;
+        if (imageFilename.startsWith('http')) return imageFilename;
+        const config = window.JMPOTTERS_CONFIG.images;
+        const folder = config.paths[categorySlug] || '';
+        return config.baseUrl + folder + imageFilename;
+    }
+    
+    function formatPrice(price) {
+        if (!price && price !== 0) return '₦0';
+        return `₦${parseInt(price).toLocaleString()}`;
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function getSupabaseClient() {
+        if (window.JMPOTTERS_SUPABASE_CLIENT) return window.JMPOTTERS_SUPABASE_CLIENT;
+        if (window.supabase && window.supabase.createClient) {
+            const config = window.JMPOTTERS_CONFIG.supabase;
+            window.JMPOTTERS_SUPABASE_CLIENT = window.supabase.createClient(config.url, config.key);
+            console.log('✅ Supabase client ready');
+            return window.JMPOTTERS_SUPABASE_CLIENT;
         }
-        .dark-mode .theme-toggle { background: #1E293B; border-color: #334155; color: #F1F5F9; }
+        console.error('❌ Supabase not loaded');
+        return null;
+    }
+    
+    // ====================
+    // GET NEXT SEQUENTIAL ORDER NUMBER
+    // ====================
+    async function getNextOrderNumber() {
+        const supabase = getSupabaseClient();
+        if (!supabase) return '0001';
         
-        @media print {
-            .action-buttons, .theme-toggle, .nav-bar, footer, .mobile-toggle, .overlay, .mobile-nav { display: none !important; }
-            .invoice-wrapper { padding-top: 0; }
-            .invoice-container { box-shadow: none; border-radius: 0; }
+        try {
+            // Get the highest order number from existing orders
+            const { data, error } = await supabase
+                .from('orders')
+                .select('order_number')
+                .order('created_at', { ascending: false })
+                .limit(1);
+            
+            if (error) throw error;
+            
+            let highestNumber = 0;
+            
+            if (data && data.length > 0 && data[0].order_number) {
+                // Extract numeric part from order number (e.g., "0001" from "#0001")
+                const match = data[0].order_number.match(/#(\d+)/);
+                if (match) {
+                    highestNumber = parseInt(match[1], 10);
+                }
+            }
+            
+            // Increment by 1
+            const nextNumber = highestNumber + 1;
+            // Pad with zeros to 4 digits (0001, 0002, etc.)
+            const paddedNumber = nextNumber.toString().padStart(4, '0');
+            return `#${paddedNumber}`;
+            
+        } catch (error) {
+            console.error('Error getting next order number:', error);
+            // Fallback to timestamp-based number
+            return `#${Date.now().toString().slice(-4)}`;
         }
-        @media (max-width: 640px) {
-            .invoice-body { padding: var(--space-4); }
-            .invoice-header { padding: var(--space-5) var(--space-4); }
-            .action-buttons { flex-direction: column; }
-            .btn { width: 100%; }
+    }
+    
+    // ====================
+    // RECOMMENDATION ENGINE
+    // ====================
+    async function loadRecommendations(currentProduct) {
+        try {
+            const supabase = getSupabaseClient();
+            if (!supabase) return [];
+            
+            const currentCategoryId = currentProduct.category_id;
+            const currentProductName = currentProduct.name.toLowerCase();
+            const currentProductId = currentProduct.id;
+            
+            const nameWords = currentProductName.split(' ').filter(w => w.length > 2);
+            let recommendations = [];
+            
+            if (nameWords.length > 0) {
+                let nameQuery = supabase
+                    .from('products')
+                    .select('id, name, price, image_url, slug, stock, category_id')
+                    .eq('is_active', true)
+                    .neq('id', currentProductId);
+                
+                if (nameWords.length > 1) {
+                    nameQuery = nameQuery.or(nameWords.map(w => `name.ilike.%${w}%`).join(','));
+                } else {
+                    nameQuery = nameQuery.ilike('name', `%${nameWords[0]}%`);
+                }
+                
+                const { data: keywordMatches } = await nameQuery.limit(10);
+                if (keywordMatches && keywordMatches.length > 0) {
+                    recommendations = keywordMatches;
+                }
+            }
+            
+            if (recommendations.length < 15) {
+                const needed = 15 - recommendations.length;
+                const existingIds = recommendations.map(r => r.id);
+                let categoryQuery = supabase
+                    .from('products')
+                    .select('id, name, price, image_url, slug, stock, category_id')
+                    .eq('category_id', currentCategoryId)
+                    .eq('is_active', true)
+                    .neq('id', currentProductId);
+                
+                if (existingIds.length > 0) {
+                    categoryQuery = categoryQuery.not('id', 'in', `(${existingIds.join(',')})`);
+                }
+                
+                const { data: categoryProducts } = await categoryQuery.limit(needed);
+                if (categoryProducts && categoryProducts.length > 0) {
+                    recommendations = [...recommendations, ...categoryProducts];
+                }
+            }
+            
+            if (recommendations.length < 15) {
+                const needed = 15 - recommendations.length;
+                const existingIds = recommendations.map(r => r.id);
+                let randomQuery = supabase
+                    .from('products')
+                    .select('id, name, price, image_url, slug, stock, category_id')
+                    .eq('is_active', true)
+                    .neq('id', currentProductId);
+                
+                if (existingIds.length > 0) {
+                    randomQuery = randomQuery.not('id', 'in', `(${existingIds.join(',')})`);
+                }
+                
+                const { data: randomProducts } = await randomQuery.limit(needed);
+                if (randomProducts && randomProducts.length > 0) {
+                    recommendations = [...recommendations, ...randomProducts];
+                }
+            }
+            
+            recommendations = recommendations.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+            recommendations = recommendations.slice(0, 15);
+            return recommendations;
+            
+        } catch (error) {
+            console.error('Error loading recommendations:', error);
+            return [];
         }
-    </style>
-</head>
-<body>
-    <nav class="nav-bar">
-        <div class="header-container">
-            <div class="header-left">
-                <button class="mobile-toggle" id="mobileToggle"><i class='bx bx-menu-alt-left'></i></button>
-            </div>
-            <div class="header-center">
-                <a href="index.html"><img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img"></a>
-            </div>
-            <div class="header-right"></div>
-        </div>
-    </nav>
-
-    <div class="overlay" id="navOverlay"></div>
-    <div class="mobile-nav" id="mobileNav">
-        <div class="mobile-nav-header">
-            <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
-            <button class="close-nav" id="closeNavBtn"><i class='bx bx-x'></i></button>
-        </div>
-        <ul class="mobile-nav-links">
-            <li><a href="index.html"><i class='bx bx-home'></i> Home</a></li>
-            <li><a href="mensfootwear.html"><i class='bx bx-footwear'></i> Men's Footwear</a></li>
-            <li><a href="womensfootwear.html"><i class='bx bx-female'></i> Women's Footwear</a></li>
-            <li><a href="bags.html"><i class='bx bx-briefcase'></i> Bags</a></li>
-            <li><a href="accessories.html"><i class='bx bx-diamond'></i> Accessories</a></li>
-            <li><a href="household.html"><i class='bx bx-home-smile'></i> Household</a></li>
-            <li><a href="kids.html"><i class='bx bx-baby-carriage'></i> Kids & Babies</a></li>
-            <li><a href="healthcare.html"><i class='bx bx-heart'></i> Healthcare</a></li>
-            <li><a href="contact.html"><i class='bx bx-phone-call'></i> Contact</a></li>
-        </ul>
-    </div>
-
-    <button class="theme-toggle" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
-
-    <div class="invoice-wrapper">
-        <div id="invoiceContent" class="invoice-container">
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-                <p>Loading invoice...</p>
-            </div>
-        </div>
+    }
+    
+    async function renderRecommendations(currentProduct) {
+        const section = document.getElementById('recommendationsSection');
+        const container = document.getElementById('recommendationsContainer');
+        if (!section || !container) return;
         
-        <div class="action-buttons" id="actionButtons" style="display: none;">
-            <button class="btn btn-secondary" onclick="window.print()"><i class="fas fa-print"></i> Print Invoice</button>
-            <button class="btn btn-secondary" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
-            <button class="btn btn-outline" onclick="shareViaWhatsApp()"><i class="fab fa-whatsapp"></i> Share via WhatsApp</button>
-            <a href="index.html" class="btn btn-primary"><i class="fas fa-home"></i> Continue Shopping</a>
-        </div>
-    </div>
-
-    <footer>
-        <div class="footer-container">
-            <div class="footer-column">
-                <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
-                <p>Premium quality products designed for the modern individual.</p>
-                <div class="social-links">
-                    <a href="#"><i class='bx bxl-whatsapp'></i></a>
-                    <a href="#"><i class='bx bxl-instagram'></i></a>
-                    <a href="#"><i class='bx bxl-facebook'></i></a>
-                    <a href="#"><i class='bx bxl-pinterest'></i></a>
+        const recommendations = await loadRecommendations(currentProduct);
+        if (recommendations.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+        
+        let html = '';
+        for (const product of recommendations) {
+            const categorySlug = currentProduct.category_slug || getCurrentCategory();
+            const imageUrl = getImageUrl(categorySlug, product.image_url);
+            html += `
+                <a href="product.html?slug=${product.slug}" class="recommendation-card">
+                    <img src="${imageUrl}" alt="${product.name}" class="rec-image"
+                         onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                    <div class="rec-info">
+                        <div class="rec-name">${escapeHtml(product.name)}</div>
+                        <div class="rec-price">${formatPrice(product.price)}</div>
+                        <div class="text-xs ${product.stock > 0 ? 'text-green-600' : 'text-red-600'} mt-1">
+                            ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                        </div>
+                    </div>
+                </a>
+            `;
+        }
+        container.innerHTML = html;
+        section.style.display = 'block';
+    }
+    
+    // ====================
+    // LOAD SINGLE PRODUCT
+    // ====================
+    async function loadSingleProductBySlug(slug) {
+        console.log(`📦 Loading single product by slug: ${slug}`);
+        
+        const productViewer = document.getElementById('productViewer');
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        
+        if (!productViewer) return;
+        if (errorState) errorState.style.display = 'none';
+        if (loadingState) loadingState.style.display = 'block';
+        
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showError('Database connection error');
+            return;
+        }
+        
+        try {
+            const { data: product, error: productError } = await supabase
+                .from('products')
+                .select('*')
+                .eq('slug', slug)
+                .eq('is_active', true)
+                .single();
+            
+            if (productError || !product) throw new Error('Product not found');
+            
+            console.log('✅ Loaded product:', product.name);
+            
+            const { data: category } = await supabase
+                .from('categories')
+                .select('id, name, slug')
+                .eq('id', product.category_id)
+                .single();
+            
+            const { data: colors } = await supabase
+                .from('product_colors')
+                .select('*')
+                .eq('product_id', product.id)
+                .order('sort_order');
+            
+            const { data: sizes } = await supabase
+                .from('product_sizes')
+                .select('*')
+                .eq('product_id', product.id)
+                .order('size_value');
+            
+            document.title = `${product.name} - JMPOTTERS`;
+            
+            currentProduct = product;
+            currentProduct.category_slug = category?.slug || getCurrentCategory();
+            currentProduct.category_name = category?.name || 'Category';
+            currentProductColors = colors || [];
+            currentProductSizes = sizes || [];
+            currentSelectedQuantity = 1;
+            currentSelectedColor = null;
+            currentSelectedSize = null;
+            
+            buildColorSizeMappings(currentProductColors, currentProductSizes);
+            renderProductPage(currentProduct);
+            await renderRecommendations(currentProduct);
+            
+            if (loadingState) loadingState.style.display = 'none';
+            
+        } catch (error) {
+            console.error('Error:', error);
+            showError(error.message || 'Failed to load product');
+        }
+    }
+    
+    function showError(message) {
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        const errorMessage = document.getElementById('errorMessage');
+        if (loadingState) loadingState.style.display = 'none';
+        if (errorState) {
+            errorState.style.display = 'block';
+            if (errorMessage) errorMessage.textContent = message;
+        }
+    }
+    
+    function renderProductPage(product) {
+        const productViewer = document.getElementById('productViewer');
+        if (!productViewer) return;
+        
+        const categorySlug = product.category_slug || getCurrentCategory();
+        const imageUrl = getImageUrl(categorySlug, product.image_url);
+        const isFootwear = ['mensfootwear', 'womensfootwear'].includes(categorySlug);
+        const hasComparePrice = product.compare_price && product.compare_price > product.price;
+        const discountPercent = hasComparePrice ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
+        
+        const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        const isInWishlist = wishlist.some(item => item.id === product.id);
+        
+        const stockStatus = product.stock > 10 ? 'in-stock' : (product.stock > 0 ? 'low-stock' : 'out-of-stock');
+        const stockText = product.stock > 10 ? 'In Stock' : (product.stock > 0 ? `Only ${product.stock} left` : 'Out of Stock');
+        
+        productViewer.innerHTML = `
+            <div class="product-container">
+                <div class="product-image-section" id="productImageSection">
+                    <div class="product-image-wrapper">
+                        <img src="${imageUrl}" alt="${product.name}" class="product-image"
+                             onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                        <div class="magnify-icon"><i class="fas fa-search-plus"></i></div>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <h1 class="product-title">${escapeHtml(product.name)}</h1>
+                    <div class="price-section">
+                        <span class="current-price">${formatPrice(product.price)}</span>
+                        ${hasComparePrice ? `<span class="original-price">${formatPrice(product.compare_price)}</span>` : ''}
+                        ${hasComparePrice ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
+                    </div>
+                    <div class="stock-tile">
+                        <div class="stock-status ${stockStatus}">
+                            <i class="fas ${product.stock > 0 ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                            <span>${stockText}</span>
+                        </div>
+                    </div>
+                    <div class="description-tile">
+                        <div class="tile-label"><i class="fas fa-info-circle"></i> Description</div>
+                        <div class="product-description">${product.description ? product.description.replace(/\n/g, '<br>') : 'Premium quality product from JMPOTTERS.'}</div>
+                    </div>
+                    ${isFootwear && currentProductColors.length > 0 ? `
+                        <div class="variant-tile">
+                            <div class="tile-label"><i class="fas fa-palette"></i> Select Color</div>
+                            <div class="color-options" id="colorOptions">
+                                ${currentProductColors.map(color => `<div class="color-option" data-color-id="${color.id}" data-color-name="${color.color_name}" style="background: ${color.color_code ? `linear-gradient(135deg, ${color.color_code.split('+').join(', ')})` : '#f3f4f6'};">${color.color_name}</div>`).join('')}
+                            </div>
+                        </div>
+                        <div class="variant-tile">
+                            <div class="tile-label"><i class="fas fa-ruler"></i> Select Size</div>
+                            <div class="size-options" id="sizeOptions"><div class="text-gray-400 text-sm">Please select a color first</div></div>
+                        </div>
+                        <div class="selection-summary" id="selectionSummary" style="display: none;">
+                            <div class="selected-variant"><span id="selectedColorName"></span> - <span id="selectedSizeValue"></span></div>
+                            <div class="stock-info"><i class="fas fa-box"></i> Available Stock: <strong id="availableStock">0</strong></div>
+                        </div>
+                    ` : ''}
+                    <div class="quantity-tile">
+                        <div class="tile-label"><i class="fas fa-calculator"></i> Quantity</div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus">-</button>
+                            <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}">
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                        <div class="bulk-options">
+                            ${[2, 3, 5, 10].map(qty => `<button class="bulk-option" data-qty="${qty}">${qty} Units</button>`).join('')}
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn btn-add-cart" id="pageAddToCart"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                        <button class="action-btn btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist"><i class="fas fa-heart"></i> ${isInWishlist ? 'Saved' : 'Wishlist'}</button>
+                    </div>
                 </div>
             </div>
-            <div class="footer-column">
-                <h3>Shop</h3>
-                <ul class="footer-links">
-                    <li><a href="mensfootwear.html"><i class='bx bx-chevron-right'></i> Men's Footwear</a></li>
-                    <li><a href="womensfootwear.html"><i class='bx bx-chevron-right'></i> Women's Footwear</a></li>
-                    <li><a href="bags.html"><i class='bx bx-chevron-right'></i> Bags</a></li>
-                    <li><a href="accessories.html"><i class='bx bx-chevron-right'></i> Accessories</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Information</h3>
-                <ul class="footer-links">
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> About Us</a></li>
-                    <li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact</a></li>
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> Shipping Policy</a></li>
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> Returns</a></li>
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> FAQ</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Connect</h3>
-                <ul class="footer-links">
-                    <li><i class='bx bx-phone-call'></i> +234 813 958 3320</li>
-                    <li><i class='bx bx-envelope'></i> hello@jmpotters.com</li>
-                </ul>
-            </div>
-        </div>
-        <div class="copyright">&copy; 2025 JMPOTTERS. All rights reserved.</div>
-    </footer>
-
-    <script>
-        function initDarkMode() {
-            const darkMode = localStorage.getItem('invoiceDarkMode') === 'true';
-            if (darkMode) {
-                document.body.classList.add('dark-mode');
-                const icon = document.querySelector('.theme-toggle i');
-                if (icon) icon.classList.replace('fa-moon', 'fa-sun');
-            }
+        `;
+        
+        setupProductPageInteractions();
+    }
+    
+    function buildColorSizeMappings(colors, sizes) {
+        colorSizeMap = {};
+        sizeColorMap = {};
+        colors.forEach(color => { colorSizeMap[color.id] = sizes.filter(size => size.color_id === color.id); });
+        const uniqueSizes = [...new Set(sizes.map(s => s.size_value))];
+        uniqueSizes.forEach(sizeValue => {
+            const sizeVariants = sizes.filter(s => s.size_value === sizeValue);
+            sizeColorMap[sizeValue] = colors.filter(color => sizeVariants.some(s => s.color_id === color.id));
+        });
+    }
+    
+    function setupProductPageInteractions() {
+        if (!isProductPage()) return;
+        
+        const colorOptions = document.getElementById('colorOptions');
+        if (colorOptions) {
+            colorOptions.addEventListener('click', (e) => {
+                const colorOption = e.target.closest('.color-option');
+                if (!colorOption) return;
+                colorOptions.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+                colorOption.classList.add('selected');
+                currentSelectedColor = { id: parseInt(colorOption.dataset.colorId), name: colorOption.dataset.colorName };
+                updateSizeOptionsForColor(currentSelectedColor.id);
+            });
         }
         
-        function toggleDarkMode() {
-            const isDark = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('invoiceDarkMode', isDark);
-            const icon = document.querySelector('.theme-toggle i');
-            if (icon) {
-                if (isDark) icon.classList.replace('fa-moon', 'fa-sun');
-                else icon.classList.replace('fa-sun', 'fa-moon');
-            }
+        const quantityInput = document.getElementById('productQuantity');
+        const minusBtn = document.querySelector('.quantity-btn.minus');
+        const plusBtn = document.querySelector('.quantity-btn.plus');
+        
+        if (quantityInput && minusBtn && plusBtn) {
+            minusBtn.addEventListener('click', () => {
+                let val = parseInt(quantityInput.value) || 1;
+                if (val > 1) quantityInput.value = val - 1;
+                currentSelectedQuantity = parseInt(quantityInput.value);
+            });
+            plusBtn.addEventListener('click', () => {
+                let val = parseInt(quantityInput.value) || 1;
+                const max = currentSelectedSize?.stock || currentProduct?.stock || 100;
+                if (val < max) quantityInput.value = val + 1;
+                currentSelectedQuantity = parseInt(quantityInput.value);
+            });
+            quantityInput.addEventListener('change', () => {
+                let val = parseInt(quantityInput.value) || 1;
+                const max = currentSelectedSize?.stock || currentProduct?.stock || 100;
+                quantityInput.value = Math.max(1, Math.min(val, max));
+                currentSelectedQuantity = parseInt(quantityInput.value);
+            });
         }
         
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function shareViaWhatsApp() {
-            const orderNumber = document.querySelector('.invoice-number')?.innerText || '';
-            const grandTotal = document.querySelector('.grand-total .totals-value')?.innerText || '₦0';
-            const message = encodeURIComponent(`*JMPOTTERS Order Confirmation*\n\nOrder Number: ${orderNumber}\nTotal Amount: ${grandTotal}\n\nThank you for shopping with JMPOTTERS!`);
-            window.open(`https://wa.me/2348139583320?text=${message}`, '_blank');
-        }
-        
-        async function loadInvoice() {
-            console.log('Loading invoice...');
-            
-            // Wait for app.js to load
-            let attempts = 0;
-            while (!window.JMPOTTERS && attempts < 50) {
-                await new Promise(r => setTimeout(r, 100));
-                attempts++;
-            }
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const orderNumber = urlParams.get('order');
-            
-            console.log('Order number from URL:', orderNumber);
-            
-            if (!orderNumber) {
-                document.getElementById('invoiceContent').innerHTML = `
-                    <div class="error-state">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;"></i>
-                        <h2>No Order Specified</h2>
-                        <p style="margin-top: 0.5rem;">No order number was provided in the URL.</p>
-                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Return to Home</a>
-                    </div>
-                `;
-                return;
-            }
-            
-            if (!window.JMPOTTERS || !window.JMPOTTERS.getOrderByNumber) {
-                document.getElementById('invoiceContent').innerHTML = `
-                    <div class="error-state">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;"></i>
-                        <h2>App Not Ready</h2>
-                        <p style="margin-top: 0.5rem;">Please refresh the page.</p>
-                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Return to Home</a>
-                    </div>
-                `;
-                return;
-            }
-            
-            try {
-                const order = await window.JMPOTTERS.getOrderByNumber(orderNumber);
-                console.log('Order fetched:', order);
-                
-                if (!order) {
-                    document.getElementById('invoiceContent').innerHTML = `
-                        <div class="error-state">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;"></i>
-                            <h2>Order Not Found</h2>
-                            <p style="margin-top: 0.5rem;">Order ${orderNumber} could not be found.</p>
-                            <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Return to Home</a>
-                        </div>
-                    `;
-                    return;
+        document.querySelectorAll('.bulk-option').forEach(opt => {
+            opt.addEventListener('click', function() {
+                document.querySelectorAll('.bulk-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                const qty = parseInt(this.dataset.qty);
+                if (quantityInput) {
+                    quantityInput.value = qty;
+                    currentSelectedQuantity = qty;
                 }
-                
-                const items = order.items || [];
-                const subtotal = order.total_amount || 0;
-                const shippingFee = order.shipping_fee || 0;
-                const grandTotal = order.grand_total || subtotal + shippingFee;
-                const orderDate = new Date(order.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' });
-                const statusText = order.status === 'pending' ? 'Pending' : order.status === 'processing' ? 'Processing' : order.status === 'shipped' ? 'Shipped' : order.status === 'delivered' ? 'Delivered' : 'Cancelled';
-                const paymentStatusText = order.payment_status === 'paid' ? 'Paid' : 'Pending Payment';
-                
-                let itemsHtml = '';
-                if (items.length > 0) {
-                    items.forEach(item => {
-                        itemsHtml += `
-                            <tr>
-                                <td>${escapeHtml(item.name || 'Product')}</td>
-                                <td>${item.color_name ? escapeHtml(item.color_name) + (item.size_value ? ' / ' + escapeHtml(item.size_value) : '') : '-'}</td>
-                                <td style="text-align: center;">${item.quantity}</td>
-                                <td style="text-align: right;">₦${(item.price || 0).toLocaleString()}</td>
-                                <td style="text-align: right;">₦${((item.price || 0) * item.quantity).toLocaleString()}</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    itemsHtml = '<tr><td colspan="5" style="text-align: center;">No items found</td></tr>';
-                }
-                
-                document.getElementById('invoiceContent').innerHTML = `
-                    <div class="invoice-header">
-                        <div class="invoice-logo"><i class="fas fa-store"></i></div>
-                        <h1>JMPOTTERS</h1>
-                        <p>Premium Quality Products</p>
-                        <div class="invoice-number">${order.order_number}</div>
-                    </div>
-                    <div class="invoice-body">
-                        <div class="info-grid">
-                            <div class="info-section">
-                                <h3><i class="fas fa-user"></i> Billing Details</h3>
-                                <p><strong>${escapeHtml(order.full_name || order.user_name || 'N/A')}</strong><br>${escapeHtml(order.user_email || 'No email provided')}<br>${escapeHtml(order.user_phone || 'No phone provided')}</p>
-                            </div>
-                            <div class="info-section">
-                                <h3><i class="fas fa-truck"></i> Shipping Address</h3>
-                                <p>${escapeHtml(order.shipping_address || 'No address provided')}<br>${order.city ? escapeHtml(order.city) + ', ' : ''}${order.state ? escapeHtml(order.state) : ''}</p>
-                            </div>
-                        </div>
-                        <div class="info-grid">
-                            <div class="info-section">
-                                <h3><i class="far fa-calendar-alt"></i> Order Date</h3>
-                                <p>${orderDate}</p>
-                            </div>
-                            <div class="info-section">
-                                <h3><i class="fas fa-chart-line"></i> Order Status</h3>
-                                <p><span class="status-badge status-pending"><i class="fas fa-clock"></i> ${statusText}</span></p>
-                            </div>
-                        </div>
-                        <div class="order-summary">
-                            <h3><i class="fas fa-receipt"></i> Order Summary</h3>
-                            <div class="table-wrapper">
-                                <table class="invoice-table">
-                                    <thead><tr><th>Product</th><th>Variant</th><th style="text-align: center;">Qty</th><th style="text-align: right;">Price</th><th style="text-align: right;">Total</th></tr></thead>
-                                    <tbody>${itemsHtml}</tbody>
-                                </table>
-                            </div>
-                            <div class="totals">
-                                <div class="totals-row"><span class="totals-label">Subtotal:</span><span class="totals-value">₦${subtotal.toLocaleString()}</span></div>
-                                <div class="totals-row"><span class="totals-label">Shipping Fee:</span><span class="totals-value">₦${shippingFee.toLocaleString()}</span></div>
-                                <div class="totals-row grand-total"><span class="totals-label">Grand Total:</span><span class="totals-value">₦${grandTotal.toLocaleString()}</span></div>
-                            </div>
-                        </div>
-                        <div class="payment-instruction">
-                            <i class="fas fa-credit-card"></i>
-                            <p>Payment Status: <strong>${paymentStatusText}</strong></p>
-                            <p style="font-size: 0.7rem; margin-top: var(--space-2);">Please complete payment within 24 hours to confirm your order.</p>
-                        </div>
-                    </div>
-                    <div class="invoice-footer">
-                        <p>Thank you for shopping with JMPOTTERS!</p>
-                        <p style="font-size: 0.65rem; margin-top: var(--space-1);">For inquiries, contact us on WhatsApp: <strong>+234 813 958 3320</strong> | Email: hello@jmpotters.com</p>
-                    </div>
-                `;
-                document.getElementById('actionButtons').style.display = 'flex';
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('invoiceContent').innerHTML = `
-                    <div class="error-state">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;"></i>
-                        <h2>Error Loading Order</h2>
-                        <p style="margin-top: 0.5rem;">${error.message || 'Please try again.'}</p>
-                        <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;">Return to Home</a>
-                    </div>
-                `;
-            }
-        }
-        
-        function downloadPDF() {
-            const element = document.getElementById('invoiceContent');
-            const orderNumber = document.querySelector('.invoice-number')?.innerText || 'invoice';
-            html2pdf().from(element).set({ margin: 0.5, filename: `JMPOTTERS_${orderNumber}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).save();
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileToggle = document.getElementById('mobileToggle');
-            const mobileNav = document.getElementById('mobileNav');
-            const navOverlay = document.getElementById('navOverlay');
-            const closeNav = document.querySelector('.close-nav');
-            function openNav() { mobileNav.classList.add('active'); navOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
-            function closeNavFunc() { mobileNav.classList.remove('active'); navOverlay.classList.remove('active'); document.body.style.overflow = ''; }
-            if (mobileToggle) mobileToggle.addEventListener('click', openNav);
-            if (closeNav) closeNav.addEventListener('click', closeNavFunc);
-            if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
+            });
         });
         
-        initDarkMode();
-        loadInvoice();
-    </script>
-</body>
-</html>
+        const pageAddToCart = document.getElementById('pageAddToCart');
+        if (pageAddToCart && currentProduct) {
+            pageAddToCart.addEventListener('click', () => {
+                const isFootwear = ['mensfootwear', 'womensfootwear'].includes(currentProduct.category_slug || getCurrentCategory());
+                if (isFootwear && currentProductColors.length > 0) {
+                    if (!currentSelectedColor) { showNotification('Please select a color', 'warning'); return; }
+                    if (!currentSelectedSize) { showNotification('Please select a size', 'warning'); return; }
+                    if (currentSelectedSize.stock === 0) { showNotification('This size is out of stock', 'error'); return; }
+                    if (currentSelectedQuantity > currentSelectedSize.stock) { showNotification(`Only ${currentSelectedSize.stock} units available`, 'error'); return; }
+                    addToCart(currentProduct, currentSelectedQuantity, {
+                        color_id: currentSelectedColor.id, color_name: currentSelectedColor.name,
+                        size_id: currentSelectedSize.id, size_value: currentSelectedSize.value,
+                        variant_id: currentSelectedVariant?.id
+                    });
+                } else {
+                    if (currentSelectedQuantity > currentProduct.stock) { showNotification(`Only ${currentProduct.stock} units available`, 'error'); return; }
+                    addToCart(currentProduct, currentSelectedQuantity);
+                }
+            });
+        }
+        
+        const pageWishlist = document.getElementById('pageWishlist');
+        if (pageWishlist && currentProduct) {
+            pageWishlist.addEventListener('click', () => {
+                toggleWishlist(currentProduct);
+                const isActive = pageWishlist.classList.contains('active');
+                pageWishlist.classList.toggle('active');
+                pageWishlist.innerHTML = `<i class="fas fa-heart"></i> ${isActive ? 'Wishlist' : 'Saved'}`;
+            });
+        }
+    }
+    
+    function updateSizeOptionsForColor(colorId) {
+        const sizeOptions = document.getElementById('sizeOptions');
+        const selectionSummary = document.getElementById('selectionSummary');
+        if (!sizeOptions) return;
+        
+        const availableSizes = colorSizeMap[colorId] || [];
+        if (availableSizes.length === 0) {
+            sizeOptions.innerHTML = '<div class="text-gray-400 text-sm">No sizes available for this color</div>';
+            if (selectionSummary) selectionSummary.style.display = 'none';
+            currentSelectedSize = null;
+            currentSelectedVariant = null;
+            return;
+        }
+        
+        sizeOptions.innerHTML = availableSizes.map(size => {
+            const stock = size.stock_quantity || 0;
+            const disabledClass = stock === 0 ? 'disabled' : '';
+            return `<div class="size-option ${disabledClass}" data-size-id="${size.id}" data-size-value="${size.size_value}" data-stock="${stock}" ${stock === 0 ? 'disabled' : ''}>${size.size_value}</div>`;
+        }).join('');
+        
+        sizeOptions.querySelectorAll('.size-option:not(.disabled)').forEach(option => {
+            option.addEventListener('click', function() {
+                sizeOptions.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                currentSelectedSize = { id: parseInt(this.dataset.sizeId), value: this.dataset.sizeValue, stock: parseInt(this.dataset.stock) };
+                currentSelectedVariant = currentProductSizes.find(s => s.id === currentSelectedSize.id && s.color_id === currentSelectedColor?.id);
+                if (selectionSummary) selectionSummary.style.display = 'block';
+                document.getElementById('selectedColorName').textContent = currentSelectedColor.name;
+                document.getElementById('selectedSizeValue').textContent = currentSelectedSize.value;
+                document.getElementById('availableStock').textContent = currentSelectedSize.stock;
+                const qtyInput = document.getElementById('productQuantity');
+                if (qtyInput) {
+                    qtyInput.max = currentSelectedSize.stock;
+                    if (currentSelectedQuantity > currentSelectedSize.stock) {
+                        currentSelectedQuantity = currentSelectedSize.stock;
+                        qtyInput.value = currentSelectedSize.stock;
+                    }
+                }
+            });
+        });
+    }
+    
+    // ====================
+    // LOAD PRODUCTS BY CATEGORY
+    // ====================
+    async function loadProductsByCategory(categorySlug) {
+        const productsGrid = document.getElementById('productsGrid');
+        if (!productsGrid) return;
+        
+        productsGrid.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i><p>Loading products...</p></div>';
+        
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            productsGrid.innerHTML = '<div class="error-message">Database connection error</div>';
+            return;
+        }
+        
+        try {
+            const { data: category } = await supabase.from('categories').select('id').eq('slug', categorySlug).single();
+            if (!category) throw new Error('Category not found');
+            
+            const { data: products } = await supabase
+                .from('products')
+                .select('id, name, price, image_url, stock, slug')
+                .eq('category_id', category.id)
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+            
+            if (!products || products.length === 0) {
+                productsGrid.innerHTML = '<div class="no-products">No products found</div>';
+                return;
+            }
+            
+            window.JMPOTTERS_PRODUCTS_CACHE = products;
+            renderProducts(products, categorySlug);
+            
+        } catch (error) {
+            console.error(error);
+            productsGrid.innerHTML = '<div class="error-message">Error loading products</div>';
+        }
+    }
+    
+    function renderProducts(products, categorySlug) {
+        const productsGrid = document.getElementById('productsGrid');
+        if (!productsGrid) return;
+        productsGrid.innerHTML = '';
+        
+        products.forEach(product => {
+            const imageUrl = getImageUrl(categorySlug, product.image_url);
+            const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+            const isInWishlist = wishlist.some(item => item.id === product.id);
+            
+            const productLink = document.createElement('a');
+            productLink.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
+            productLink.className = 'product-card-wrapper';
+            productLink.innerHTML = `
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.name}" onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}" data-action="wishlist"><i class="fas fa-heart"></i></button>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${escapeHtml(product.name)}</h3>
+                        <div class="product-price">${formatPrice(product.price)}</div>
+                        <div class="availability ${product.stock <= 0 ? 'out-of-stock' : ''}"><i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</div>
+                    </div>
+                </div>
+            `;
+            productsGrid.appendChild(productLink);
+        });
+        
+        setupProductInteractions();
+    }
+    
+    function setupProductInteractions() {
+        document.addEventListener('click', function(event) {
+            const wishlistBtn = event.target.closest('[data-action="wishlist"]');
+            if (wishlistBtn) {
+                event.preventDefault();
+                event.stopPropagation();
+                const productId = parseInt(wishlistBtn.getAttribute('data-id'));
+                const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
+                if (product) {
+                    toggleWishlist(product);
+                    wishlistBtn.classList.toggle('active');
+                }
+            }
+        });
+    }
+    
+    // ====================
+    // CART FUNCTIONS
+    // ====================
+    function getCart() { return JSON.parse(localStorage.getItem('jmpotters_cart')) || []; }
+    
+    function saveCart(cart) {
+        localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
+        updateCartUI();
+    }
+    
+    function addToCart(product, quantity = 1, options = {}) {
+        let cart = getCart();
+        const cartItem = {
+            product_id: product.id, quantity, name: product.name, price: product.price || 0,
+            image_url: product.image_url, category_slug: options.category_slug || getCurrentCategory(),
+            color_name: options.color_name || null, size_value: options.size_value || null,
+            added_at: new Date().toISOString()
+        };
+        
+        const existingIndex = cart.findIndex(item => item.product_id === cartItem.product_id && item.color_name === cartItem.color_name && item.size_value === cartItem.size_value);
+        if (existingIndex !== -1) {
+            cart[existingIndex].quantity += quantity;
+            showNotification(`Updated ${product.name} quantity`, 'info');
+        } else {
+            cart.push(cartItem);
+            let text = product.name;
+            if (options.color_name) text += ` (${options.color_name})`;
+            if (options.size_value) text += ` - ${options.size_value}`;
+            showNotification(`${text} added to cart!`, 'success');
+        }
+        saveCart(cart);
+        openCart();
+    }
+    
+    function updateCartUI() {
+        const cart = getCart();
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        
+        const cartCount = document.getElementById('cartCount');
+        if (cartCount) {
+            cartCount.textContent = totalItems;
+            cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+        }
+        
+        const wishlistCount = document.getElementById('wishlistCount');
+        if (wishlistCount) {
+            wishlistCount.textContent = wishlist.length;
+            wishlistCount.style.display = wishlist.length > 0 ? 'flex' : 'none';
+        }
+        
+        updateCartPanel();
+    }
+    
+    function updateCartPanel() {
+        const cart = getCart();
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        
+        if (!cartItems || !cartTotal) return;
+        
+        if (cart.length === 0) {
+            cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+            cartTotal.textContent = '₦0';
+            return;
+        }
+        
+        let html = '';
+        let total = 0;
+        cart.forEach((item, index) => {
+            const itemTotal = (item.price || 0) * item.quantity;
+            total += itemTotal;
+            let itemDesc = item.name;
+            if (item.color_name) itemDesc += ` (${item.color_name})`;
+            if (item.size_value) itemDesc += ` - ${item.size_value}`;
+            html += `
+                <div class="cart-item">
+                    <div class="cart-item-image"><img src="${getImageUrl(item.category_slug, item.image_url)}" alt="${item.name}"></div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${escapeHtml(itemDesc)}</div>
+                        <div class="cart-item-price">${formatPrice(item.price)}</div>
+                        <div>Qty: ${item.quantity}</div>
+                    </div>
+                    <button class="cart-item-remove" data-index="${index}"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+        });
+        
+        // SINGLE CHECKOUT BUTTON - NO DUPLICATES
+        html += `
+            <div class="cart-footer">
+                <div class="cart-total"><span>Total:</span><span>${formatPrice(total)}</span></div>
+                <button class="cart-checkout-btn" id="checkoutButton"><i class="fas fa-shopping-bag"></i> Proceed to Checkout</button>
+            </div>
+        `;
+        
+        cartItems.innerHTML = html;
+        cartTotal.textContent = formatPrice(total);
+        
+        // Setup remove handlers
+        document.querySelectorAll('.cart-item-remove').forEach(btn => {
+            btn.addEventListener('click', function() {
+                let cart = getCart();
+                cart.splice(parseInt(this.dataset.index), 1);
+                saveCart(cart);
+                showNotification('Item removed', 'info');
+            });
+        });
+        
+        // Setup checkout button - ONLY ONE, FRESH LISTENER
+        const checkoutBtn = document.getElementById('checkoutButton');
+        if (checkoutBtn) {
+            const newBtn = checkoutBtn.cloneNode(true);
+            checkoutBtn.parentNode.replaceChild(newBtn, checkoutBtn);
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Checkout button clicked');
+                proceedToCheckout();
+            });
+        }
+    }
+    
+    function openCart() {
+        const cartPanel = document.getElementById('cartPanel');
+        const cartOverlay = document.getElementById('cartOverlay');
+        if (cartPanel) cartPanel.classList.add('active');
+        if (cartOverlay) cartOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        updateCartPanel();
+    }
+    
+    function closeCart() {
+        const cartPanel = document.getElementById('cartPanel');
+        const cartOverlay = document.getElementById('cartOverlay');
+        if (cartPanel) cartPanel.classList.remove('active');
+        if (cartOverlay) cartOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    function toggleWishlist(product) {
+        let wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        const exists = wishlist.some(item => item.id === product.id);
+        if (exists) {
+            wishlist = wishlist.filter(item => item.id !== product.id);
+            showNotification(`${product.name} removed from wishlist`, 'info');
+        } else {
+            wishlist.push({ id: product.id, name: product.name, price: product.price, image_url: product.image_url, slug: product.slug });
+            showNotification(`${product.name} added to wishlist!`, 'success');
+        }
+        localStorage.setItem('jmpotters_wishlist', JSON.stringify(wishlist));
+        updateCartUI();
+    }
+    
+    // ====================
+    // ORDER CREATION WITH SEQUENTIAL ORDER NUMBERS
+    // ====================
+    async function createOrder(orderData, cart) {
+        console.log('Creating order with data:', orderData);
+        
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showNotification('Database connection error', 'error');
+            return null;
+        }
+        
+        try {
+            const subtotal = cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
+            const shippingFee = subtotal >= 50000 ? 0 : 2000;
+            const grandTotal = subtotal + shippingFee;
+            
+            // Get sequential order number
+            const orderNumber = await getNextOrderNumber();
+            console.log('Generated order number:', orderNumber);
+            
+            const items = cart.map(item => ({
+                product_id: item.product_id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                color_name: item.color_name,
+                size_value: item.size_value,
+                image_url: item.image_url
+            }));
+            
+            const orderInsert = {
+                order_number: orderNumber,
+                user_id: orderData.user_id,
+                user_name: orderData.full_name,
+                user_email: orderData.email,
+                user_phone: orderData.phone,
+                full_name: orderData.full_name,
+                shipping_address: orderData.address,
+                city: orderData.city,
+                state: orderData.state,
+                total_amount: subtotal,
+                shipping_fee: shippingFee,
+                grand_total: grandTotal,
+                status: 'pending',
+                payment_status: 'pending',
+                payment_method: 'card',
+                items: items,
+                created_at: new Date().toISOString()
+            };
+            
+            console.log('Inserting order:', orderInsert);
+            
+            const { data: order, error: orderError } = await supabase
+                .from('orders')
+                .insert(orderInsert)
+                .select()
+                .single();
+            
+            if (orderError) {
+                console.error('Order error:', orderError);
+                showNotification(`Order failed: ${orderError.message}`, 'error');
+                return null;
+            }
+            
+            localStorage.removeItem('jmpotters_cart');
+            updateCartUI();
+            showNotification(`Order ${orderNumber} placed successfully!`, 'success');
+            return order;
+            
+        } catch (error) {
+            console.error('Order creation error:', error);
+            showNotification(`Failed to place order: ${error.message}`, 'error');
+            return null;
+        }
+    }
+    
+    async function getOrderByNumber(orderNumber) {
+        const supabase = getSupabaseClient();
+        try {
+            const { data: order, error } = await supabase.from('orders').select('*').eq('order_number', orderNumber).maybeSingle();
+            if (error) throw error;
+            return order;
+        } catch (error) {
+            console.error('Order fetch error:', error);
+            return null;
+        }
+    }
+    
+    // ====================
+    // PROCEED TO CHECKOUT - PRESERVED WORKING LOGIC
+    // ====================
+    async function proceedToCheckout() {
+        if (isProcessingCheckout) {
+            console.log('Checkout already in progress');
+            return;
+        }
+        
+        console.log('proceedToCheckout called');
+        
+        const cart = getCart();
+        if (cart.length === 0) {
+            showNotification('Your cart is empty', 'warning');
+            return;
+        }
+        
+        const user = JSON.parse(localStorage.getItem('jmpotters_user'));
+        
+        if (user && user.address && user.city && user.state) {
+            isProcessingCheckout = true;
+            showNotification('Processing your order...', 'info');
+            
+            try {
+                const checkoutData = {
+                    user_id: user.id,
+                    email: user.email,
+                    full_name: user.full_name,
+                    phone: user.phone,
+                    address: user.address,
+                    city: user.city,
+                    state: user.state,
+                    notes: ''
+                };
+                
+                const order = await createOrder(checkoutData, cart);
+                if (order) {
+                    window.location.href = `invoice.html?order=${order.order_number}`;
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                showNotification('Checkout failed. Please try again.', 'error');
+            } finally {
+                isProcessingCheckout = false;
+            }
+            return;
+        }
+        
+        if (user && (!user.address || !user.city || !user.state)) {
+            showNotification('Please complete your profile before checkout', 'warning');
+            sessionStorage.setItem('checkoutRedirect', window.location.href);
+            window.location.href = 'register.html';
+            return;
+        }
+        
+        sessionStorage.setItem('checkoutRedirect', window.location.href);
+        showNotification('Please create an account to complete your purchase', 'info');
+        window.location.href = 'register.html';
+    }
+    
+    // ====================
+    // HEADER FUNCTIONS
+    // ====================
+    function setupHeaderInteractions() {
+        const cartIcon = document.getElementById('cartIcon');
+        if (cartIcon && !cartIcon._cartListener) {
+            cartIcon._cartListener = true;
+            cartIcon.addEventListener('click', (e) => { e.preventDefault(); openCart(); });
+        }
+        
+        const wishlistIcon = document.getElementById('wishlistIcon');
+        if (wishlistIcon && !wishlistIcon._wishlistListener) {
+            wishlistIcon._wishlistListener = true;
+            wishlistIcon.addEventListener('click', () => showNotification('Wishlist coming soon', 'info'));
+        }
+        
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCart(); });
+    }
+    
+    // ====================
+    // INITIALIZATION
+    // ====================
+    async function initializePage() {
+        console.log('🚀 Initializing JMPOTTERS...');
+        
+        getSupabaseClient();
+        setupHeaderInteractions();
+        updateCartUI();
+        
+        // Remove any WhatsApp checkout buttons
+        document.querySelectorAll('#whatsappCheckout').forEach(btn => btn.remove());
+        
+        if (isProductPage()) {
+            const slug = getSlugFromURL();
+            if (slug) await loadSingleProductBySlug(slug);
+            else window.location.href = 'index.html';
+        } else {
+            const category = getCurrentCategory();
+            if (document.getElementById('productsGrid')) await loadProductsByCategory(category);
+        }
+        
+        console.log('✅ JMPOTTERS ready');
+    }
+    
+    // ====================
+    // EXPOSE TO WINDOW
+    // ====================
+    window.JMPOTTERS = {
+        addToCart,
+        proceedToCheckout,
+        openCart,
+        closeCart,
+        formatPrice,
+        getImageUrl,
+        loadProductsByCategory,
+        loadSingleProductBySlug,
+        updateCartUI,
+        getOrderByNumber,
+        createOrder
+    };
+    
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializePage);
+    else initializePage();
+    
+    console.log('✅ JMPOTTERS app loaded');
+})();
