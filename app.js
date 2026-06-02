@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE WITH WORKING CHECKOUT
+// JMPOTTERS APP - COMPLETE WITH WORKING CHECKOUT & SEQUENTIAL ORDERS
 // ====================
 (function() {
     'use strict';
@@ -36,6 +36,9 @@
             'healthcare': ''
         }
     };
+    
+    // Counter for sequential order numbers
+    let lastOrderNumber = 0;
     
     // Current product state
     let currentProduct = null;
@@ -171,6 +174,46 @@
         }
         console.error('❌ Supabase not loaded');
         return null;
+    }
+    
+    // ====================
+    // GET NEXT SEQUENTIAL ORDER NUMBER
+    // ====================
+    async function getNextOrderNumber() {
+        const supabase = getSupabaseClient();
+        if (!supabase) return '0001';
+        
+        try {
+            // Get the highest order number from existing orders
+            const { data, error } = await supabase
+                .from('orders')
+                .select('order_number')
+                .order('created_at', { ascending: false })
+                .limit(1);
+            
+            if (error) throw error;
+            
+            let highestNumber = 0;
+            
+            if (data && data.length > 0 && data[0].order_number) {
+                // Extract numeric part from order number (e.g., "0001" from "#0001")
+                const match = data[0].order_number.match(/#(\d+)/);
+                if (match) {
+                    highestNumber = parseInt(match[1], 10);
+                }
+            }
+            
+            // Increment by 1
+            const nextNumber = highestNumber + 1;
+            // Pad with zeros to 4 digits (0001, 0002, etc.)
+            const paddedNumber = nextNumber.toString().padStart(4, '0');
+            return `#${paddedNumber}`;
+            
+        } catch (error) {
+            console.error('Error getting next order number:', error);
+            // Fallback to timestamp-based number
+            return `#${Date.now().toString().slice(-4)}`;
+        }
     }
     
     // ====================
@@ -765,7 +808,7 @@
             `;
         });
         
-        // IMPORTANT: Only add the footer with ONE checkout button (no WhatsApp button)
+        // SINGLE CHECKOUT BUTTON - NO DUPLICATES
         html += `
             <div class="cart-footer">
                 <div class="cart-total"><span>Total:</span><span>${formatPrice(total)}</span></div>
@@ -786,10 +829,9 @@
             });
         });
         
-        // Setup checkout button - IMPORTANT: Use a fresh listener each time
+        // Setup checkout button - ONLY ONE, FRESH LISTENER
         const checkoutBtn = document.getElementById('checkoutButton');
         if (checkoutBtn) {
-            // Remove any existing listeners by cloning
             const newBtn = checkoutBtn.cloneNode(true);
             checkoutBtn.parentNode.replaceChild(newBtn, checkoutBtn);
             newBtn.addEventListener('click', function(e) {
@@ -833,7 +875,7 @@
     }
     
     // ====================
-    // ORDER CREATION
+    // ORDER CREATION WITH SEQUENTIAL ORDER NUMBERS
     // ====================
     async function createOrder(orderData, cart) {
         console.log('Creating order with data:', orderData);
@@ -848,7 +890,10 @@
             const subtotal = cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             const shippingFee = subtotal >= 50000 ? 0 : 2000;
             const grandTotal = subtotal + shippingFee;
-            const orderNumber = 'JMP-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+            
+            // Get sequential order number
+            const orderNumber = await getNextOrderNumber();
+            console.log('Generated order number:', orderNumber);
             
             const items = cart.map(item => ({
                 product_id: item.product_id,
@@ -896,7 +941,7 @@
             
             localStorage.removeItem('jmpotters_cart');
             updateCartUI();
-            showNotification(`Order #${orderNumber} placed successfully!`, 'success');
+            showNotification(`Order ${orderNumber} placed successfully!`, 'success');
             return order;
             
         } catch (error) {
@@ -919,7 +964,7 @@
     }
     
     // ====================
-    // PROCEED TO CHECKOUT - FIXED
+    // PROCEED TO CHECKOUT - PRESERVED WORKING LOGIC
     // ====================
     async function proceedToCheckout() {
         if (isProcessingCheckout) {
@@ -937,7 +982,6 @@
         
         const user = JSON.parse(localStorage.getItem('jmpotters_user'));
         
-        // If user is logged in and has complete address, proceed directly
         if (user && user.address && user.city && user.state) {
             isProcessingCheckout = true;
             showNotification('Processing your order...', 'info');
@@ -967,7 +1011,6 @@
             return;
         }
         
-        // If user is logged in but missing address info
         if (user && (!user.address || !user.city || !user.state)) {
             showNotification('Please complete your profile before checkout', 'warning');
             sessionStorage.setItem('checkoutRedirect', window.location.href);
@@ -975,7 +1018,6 @@
             return;
         }
         
-        // Guest user - save cart and redirect to registration
         sessionStorage.setItem('checkoutRedirect', window.location.href);
         showNotification('Please create an account to complete your purchase', 'info');
         window.location.href = 'register.html';
@@ -1012,14 +1054,6 @@
         
         // Remove any WhatsApp checkout buttons
         document.querySelectorAll('#whatsappCheckout').forEach(btn => btn.remove());
-        
-        // Check if returning from registration with pending order
-        const pendingCart = sessionStorage.getItem('pendingCart');
-        if (pendingCart && !getCart().length) {
-            localStorage.setItem('jmpotters_cart', pendingCart);
-            sessionStorage.removeItem('pendingCart');
-            updateCartUI();
-        }
         
         if (isProductPage()) {
             const slug = getSlugFromURL();
