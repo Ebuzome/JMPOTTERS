@@ -679,23 +679,22 @@
         }
         .page-btn:hover, .page-btn.active { background: var(--gold-primary); color: white; border-color: var(--gold-primary); transform: scale(1.1); }
 
-        /* Cart & Wishlist Panels (original) */
-        .cart-panel, .wishlist-panel {
+        /* REMOVED: .cart-panel, .wishlist-panel, .cart-header, .wishlist-header, .cart-items, .wishlist-items, .cart-total, .cart-actions styles */
+        /* Only keeping wishlist panel since that's separate functionality */
+
+        /* Wishlist Panel Only (preserved) */
+        .wishlist-panel {
             position: fixed; top: 0; right: -100%; width: 85%; max-width: 400px; height: 100vh;
             background: white; box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1); z-index: 1100;
             transition: var(--transition); overflow-y: auto; padding: 30px; border-left: 3px solid var(--gold-primary);
         }
-        .cart-panel.active, .wishlist-panel.active { right: 0; }
-        .cart-header, .wishlist-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--gold-light); }
-        .cart-title, .wishlist-title { font-size: 1.5rem; color: var(--gold-dark); }
-        .close-cart, .close-wishlist { background: none; border: none; color: var(--charcoal); font-size: 1.5rem; transition: var(--transition); }
-        .close-cart:hover, .close-wishlist:hover { color: var(--gold-primary); transform: rotate(90deg); }
-        .cart-items, .wishlist-items { min-height: 300px; }
-        .cart-empty, .wishlist-empty { text-align: center; padding: 40px 0; color: #888; }
-        .cart-total { padding: 20px 0; border-top: 1px solid #eee; font-size: 1.2rem; font-weight: 600; display: flex; justify-content: space-between; }
-        .cart-actions { display: flex; flex-direction: column; gap: 10px; }
-        .checkout-btn { background: var(--gold-primary); color: white; border: none; padding: 12px; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center; display: block; text-decoration: none; }
-        .checkout-btn:hover { background: var(--gold-dark); transform: translateY(-3px); }
+        .wishlist-panel.active { right: 0; }
+        .wishlist-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--gold-light); }
+        .wishlist-title { font-size: 1.5rem; color: var(--gold-dark); }
+        .close-wishlist { background: none; border: none; color: var(--charcoal); font-size: 1.5rem; transition: var(--transition); cursor: pointer; }
+        .close-wishlist:hover { color: var(--gold-primary); transform: rotate(90deg); }
+        .wishlist-items { min-height: 300px; }
+        .wishlist-empty { text-align: center; padding: 40px 0; color: #888; }
 
         .whatsapp-float {
             position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: #25d366;
@@ -816,9 +815,8 @@
         </div>
     </section>
 
-    <!-- Cart & Wishlist Panels -->
-    <div class="overlay" id="cartOverlay"></div>
-    <div class="cart-panel" id="cartPanel"><div class="cart-header"><h3 class="cart-title">Your Cart</h3><button class="close-cart"><i class="fas fa-times"></i></button></div><div class="cart-items" id="cartItems"><div class="cart-empty">Your cart is empty</div></div><div class="cart-total"><span>Total:</span><span id="cartTotal">₦0</span></div><div class="cart-actions"><a href="#" class="checkout-btn" id="whatsappCheckout">Proceed to Checkout</a></div></div>
+    <!-- REMOVED: Cart Panel HTML (cartOverlay and cartPanel divs) -->
+    <!-- Wishlist Panel Only (preserved) -->
     <div class="overlay" id="wishlistOverlay"></div>
     <div class="wishlist-panel" id="wishlistPanel"><div class="wishlist-header"><h3 class="wishlist-title">Your Wishlist</h3><button class="close-wishlist"><i class="fas fa-times"></i></button></div><div class="wishlist-items" id="wishlistItems"><div class="wishlist-empty">Your wishlist is empty</div></div></div>
 
@@ -873,16 +871,19 @@
             if (closeNav) closeNav.addEventListener('click', closeNavFunc);
             if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
 
-            // Cart & Wishlist panel toggles (using app.js methods if available)
+            // UPDATED: Cart icon redirects to cart.html (NO PANEL CODE)
             const cartIcon = document.getElementById('cartIcon');
-            const cartPanel = document.getElementById('cartPanel');
-            const cartOverlay = document.getElementById('cartOverlay');
-            const closeCart = document.querySelector('.close-cart');
-            if (cartIcon && cartPanel && cartOverlay) {
-                cartIcon.addEventListener('click', () => { cartPanel.classList.add('active'); cartOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; });
-                if (closeCart) closeCart.addEventListener('click', () => { cartPanel.classList.remove('active'); cartOverlay.classList.remove('active'); document.body.style.overflow = ''; });
-                if (cartOverlay) cartOverlay.addEventListener('click', () => { cartPanel.classList.remove('active'); cartOverlay.classList.remove('active'); document.body.style.overflow = ''; });
+            if (cartIcon) {
+                const newCartIcon = cartIcon.cloneNode(true);
+                cartIcon.parentNode.replaceChild(newCartIcon, cartIcon);
+                
+                newCartIcon.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'cart.html';
+                });
             }
+
+            // Wishlist panel toggles (preserved)
             const wishlistIcon = document.getElementById('wishlistIcon');
             const wishlistPanel = document.getElementById('wishlistPanel');
             const wishlistOverlay = document.getElementById('wishlistOverlay');
