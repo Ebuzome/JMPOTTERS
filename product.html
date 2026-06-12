@@ -687,165 +687,7 @@
             color: var(--primary-600);
         }
         
-        /* ===== FIXED CART PANEL ===== */
-        .cart-panel {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 100%;
-            max-width: 420px;
-            height: 100vh;
-            background: white;
-            z-index: 1100;
-            transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-        }
-        .dark-mode .cart-panel {
-            background: var(--dark-surface);
-        }
-        .cart-panel.active {
-            right: 0;
-        }
-        .cart-header {
-            padding: var(--space-5);
-            border-bottom: 1px solid var(--gray-200);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .dark-mode .cart-header {
-            border-bottom-color: var(--dark-surface-2);
-        }
-        .cart-header h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-        .dark-mode .cart-header h3 {
-            color: var(--dark-text);
-        }
-        .close-cart {
-            width: 2rem;
-            height: 2rem;
-            background: var(--gray-100);
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-        }
-        .dark-mode .close-cart {
-            background: var(--dark-surface-2);
-            color: var(--dark-text);
-        }
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: var(--space-4);
-        }
-        .cart-item {
-            display: flex;
-            gap: var(--space-3);
-            padding: var(--space-3);
-            background: var(--gray-50);
-            border-radius: var(--radius-lg);
-            margin-bottom: var(--space-3);
-        }
-        .dark-mode .cart-item {
-            background: var(--dark-surface-2);
-        }
-        .cart-item-image {
-            width: 4rem;
-            height: 4rem;
-            border-radius: var(--radius);
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        .cart-item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .cart-item-details {
-            flex: 1;
-        }
-        .cart-item-name {
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: var(--gray-800);
-        }
-        .dark-mode .cart-item-name {
-            color: var(--dark-text);
-        }
-        .cart-item-price {
-            color: var(--primary-600);
-            font-weight: 600;
-            font-size: 0.8rem;
-            margin-top: 4px;
-        }
-        .cart-item-quantity {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-            margin-top: 4px;
-        }
-        .dark-mode .cart-item-quantity {
-            color: var(--dark-text-muted);
-        }
-        .cart-item-remove {
-            width: 2rem;
-            height: 2rem;
-            background: #FEE2E2;
-            border: none;
-            border-radius: var(--radius);
-            color: var(--danger-500);
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .dark-mode .cart-item-remove {
-            background: rgba(239, 68, 68, 0.2);
-        }
-        .cart-footer {
-            padding: var(--space-5);
-            border-top: 1px solid var(--gray-200);
-            background: white;
-        }
-        .dark-mode .cart-footer {
-            background: var(--dark-surface);
-            border-top-color: var(--dark-surface-2);
-        }
-        .cart-total {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: var(--space-4);
-            font-weight: 600;
-            font-size: 1rem;
-        }
-        .cart-checkout-btn {
-            width: 100%;
-            padding: 0.875rem;
-            background: var(--gray-900);
-            color: white;
-            border: none;
-            border-radius: var(--radius-lg);
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-        .cart-checkout-btn:hover {
-            background: var(--primary-600);
-            transform: translateY(-2px);
-        }
-        .dark-mode .cart-checkout-btn {
-            background: var(--primary-600);
-        }
-        .cart-empty {
-            text-align: center;
-            padding: 2rem;
-            color: var(--gray-500);
-        }
+        /* REMOVED: All .cart-panel, .cart-header, .cart-items, .cart-footer styles */
         
         .notification-container {
             position: fixed;
@@ -1090,28 +932,10 @@
         </div>
     </main>
 
-    <!-- ========= FIXED CART PANEL (Complete Structure) ========= -->
-    <div class="overlay" id="cartOverlay"></div>
-    <div class="cart-panel" id="cartPanel">
-        <div class="cart-header">
-            <h3>Shopping Cart</h3>
-            <button class="close-cart"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <div class="cart-empty">Your cart is empty</div>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total:</span>
-                <span id="cartTotal">₦0</span>
-            </div>
-            <button class="cart-checkout-btn" id="checkoutButton">
-                <i class="fas fa-shopping-bag"></i> Proceed to Checkout
-            </button>
-        </div>
-    </div>
+    <!-- REMOVED: Cart Panel HTML (cartOverlay and cartPanel divs) -->
+    <!-- REMOVED: Cart Overlay and Cart Panel - Now redirects to cart.html -->
 
-    <!-- Wishlist Panel (empty but kept for structure) -->
+    <!-- Wishlist Panel (kept as is) -->
     <div class="overlay" id="wishlistOverlay"></div>
     <div class="wishlist-panel" id="wishlistPanel" style="position: fixed; top: 0; right: -100%; width: 100%; max-width: 420px; height: 100vh; background: white; z-index: 1100; transition: right 0.3s; display: flex; flex-direction: column; overflow-y: auto;">
         <div class="cart-header" style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
@@ -1202,8 +1026,8 @@
                 <ul class="footer-links">
                     <li><a href="mensfootwear.html"><i class='bx bx-chevron-right'></i> Men's Footwear</a></li>
                     <li><a href="womensfootwear.html"><i class='bx bx-chevron-right'></i> Women's Footwear</a></li>
-                    <li><a href="bags.html"><i class='bx bx-chevron-right'></i> Bags</a></li>
-                    <li><a href="accessories.html"><i class='bx bx-chevron-right'></i> Accessories</a></li>
+                    <li><a href="bags.html"><i class='bx bx-briefcase'></i> Bags</a></li>
+                    <li><a href="accessories.html"><i class='bx bx-diamond'></i> Accessories</a></li>
                 </ul>
             </div>
             <div class="footer-column">
@@ -1246,34 +1070,17 @@
             if (closeNav) closeNav.addEventListener('click', closeNavFunc);
             if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
             
-            // Cart panel
+            // UPDATED: Cart icon redirects to cart.html (NO PANEL CODE)
             const cartIcon = document.getElementById('cartIcon');
-            const cartPanel = document.getElementById('cartPanel');
-            const cartOverlay = document.getElementById('cartOverlay');
-            const closeCart = document.querySelector('.close-cart');
-            if (cartIcon && cartPanel && cartOverlay) {
-                cartIcon.addEventListener('click', function() {
-                    cartPanel.classList.add('active');
-                    cartOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                    if (window.JMPOTTERS && window.JMPOTTERS.updateCartUI) {
-                        window.JMPOTTERS.updateCartUI();
-                    }
+            if (cartIcon) {
+                // Remove any existing event listeners by cloning
+                const newCartIcon = cartIcon.cloneNode(true);
+                cartIcon.parentNode.replaceChild(newCartIcon, cartIcon);
+                
+                newCartIcon.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'cart.html';
                 });
-                if (closeCart) {
-                    closeCart.addEventListener('click', function() {
-                        cartPanel.classList.remove('active');
-                        cartOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                }
-                if (cartOverlay) {
-                    cartOverlay.addEventListener('click', function() {
-                        cartPanel.classList.remove('active');
-                        cartOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                }
             }
             
             // Wishlist panel
@@ -1327,17 +1134,27 @@
                 });
             }
             
-            // ESC key to close panels
+            // ESC key to close panels (removed cart panel reference)
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    cartPanel?.classList.remove('active');
-                    cartOverlay?.classList.remove('active');
                     wishlistPanel?.classList.remove('active');
                     wishlistOverlay?.classList.remove('active');
                     checkoutModal?.style.display = 'none';
                     document.body.style.overflow = '';
                 }
             });
+            
+            // Update cart count on page load
+            function updateCartCount() {
+                const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                const cartCountSpan = document.getElementById('cartCount');
+                if (cartCountSpan) {
+                    cartCountSpan.innerText = totalItems;
+                    cartCountSpan.style.display = totalItems > 0 ? 'flex' : 'none';
+                }
+            }
+            updateCartCount();
             
             // Check for app.js and load product
             if (!window.JMPOTTERS) {
