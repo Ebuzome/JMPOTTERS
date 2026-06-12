@@ -326,7 +326,6 @@
         .mobile-nav-links li a:hover i {
             color: #0c0f15;
         }
-        /* Mobile dropdown style for footwear (if needed) - simple links already split */
         
         /* ========== FOOTER – DARK LUXURY WITH ENLARGED LOGO ========== */
         .footer {
@@ -425,7 +424,7 @@
             color: #9aaeb9;
         }
         
-        /* Preserve all original page styles (hero, promo, products, cart) */
+        /* Preserve all original page styles (hero, promo, products) */
         .hero {
             height: 70vh;
             min-height: 500px;
@@ -599,82 +598,9 @@
         }
         .availability.in-stock { color: var(--success-500); }
         .availability.out-of-stock { color: var(--danger-500); }
-        .cart-panel {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 100%;
-            max-width: 400px;
-            height: 100vh;
-            background: white;
-            z-index: 1100;
-            transition: right 0.3s ease;
-            box-shadow: var(--shadow-xl);
-            display: flex;
-            flex-direction: column;
-        }
-        .cart-panel.active { right: 0; }
-        .cart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--space-4);
-            border-bottom: 1px solid var(--gray-200);
-        }
-        .close-cart {
-            width: 2rem;
-            height: 2rem;
-            border-radius: var(--radius);
-            background: var(--gray-100);
-            border: none;
-            cursor: pointer;
-        }
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: var(--space-3);
-        }
-        .cart-empty {
-            text-align: center;
-            padding: var(--space-8);
-            color: var(--gray-500);
-        }
-        .cart-footer {
-            padding: var(--space-4);
-            border-top: 1px solid var(--gray-200);
-        }
-        .cart-total {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 600;
-            margin-bottom: var(--space-3);
-        }
-        .cart-checkout-btn {
-            width: 100%;
-            padding: 0.875rem;
-            background: var(--gray-900);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: var(--space-2);
-        }
-        .cart-whatsapp-btn {
-            width: 100%;
-            padding: 0.875rem;
-            background: #25D366;
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-2);
-        }
+        
+        /* REMOVED: All .cart-panel, .cart-header, .cart-items, .cart-footer, .cart-total, .cart-checkout-btn, .cart-whatsapp-btn styles */
+        
         .whatsapp-float {
             position: fixed;
             bottom: var(--space-4);
@@ -785,6 +711,8 @@
         </ul>
     </div>
 
+    <!-- REMOVED: Cart Panel HTML (cartOverlay and cartPanel divs) -->
+
     <!-- Hero Section (unchanged) -->
     <section class="hero">
         <div class="hero-content">
@@ -892,17 +820,28 @@
             closeNavBtns.forEach(btn => btn.addEventListener('click', closeNav));
             if(navOverlay) navOverlay.addEventListener('click', closeNav);
             
-            // Cart panel logic
+            // UPDATED: Cart icon redirects to cart.html (NO PANEL CODE)
             const cartIcon = document.getElementById('cartIcon');
-            const cartPanel = document.getElementById('cartPanel');
-            const cartOverlay = document.getElementById('cartOverlay');
-            const closeCart = document.querySelector('.close-cart');
-            if(cartIcon && cartPanel) {
-                cartIcon.addEventListener('click', () => { cartPanel.classList.add('active'); cartOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; });
-                if(closeCart) closeCart.addEventListener('click', () => { cartPanel.classList.remove('active'); cartOverlay.classList.remove('active'); document.body.style.overflow = ''; });
-                if(cartOverlay) cartOverlay.addEventListener('click', () => { cartPanel.classList.remove('active'); cartOverlay.classList.remove('active'); document.body.style.overflow = ''; });
+            if (cartIcon) {
+                // Remove any existing event listeners by cloning
+                const newCartIcon = cartIcon.cloneNode(true);
+                cartIcon.parentNode.replaceChild(newCartIcon, cartIcon);
+                
+                newCartIcon.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'cart.html';
+                });
             }
-            document.addEventListener('keydown', (e) => { if(e.key === 'Escape') { cartPanel?.classList.remove('active'); cartOverlay?.classList.remove('active'); document.body.style.overflow = ''; } });
+            
+            // ESC key no longer needed for cart panel, but keep for mobile nav
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'Escape') {
+                    // Close mobile nav if open
+                    if(mobileNav.classList.contains('active')) {
+                        closeNav();
+                    }
+                }
+            });
         });
     </script>
 </body>
