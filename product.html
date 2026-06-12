@@ -686,6 +686,8 @@
             font-weight: 700;
             color: var(--primary-600);
         }
+        
+        /* ===== FIXED CART PANEL ===== */
         .cart-panel {
             position: fixed;
             top: 0;
@@ -700,6 +702,9 @@
             display: flex;
             flex-direction: column;
         }
+        .dark-mode .cart-panel {
+            background: var(--dark-surface);
+        }
         .cart-panel.active {
             right: 0;
         }
@@ -710,6 +715,17 @@
             justify-content: space-between;
             align-items: center;
         }
+        .dark-mode .cart-header {
+            border-bottom-color: var(--dark-surface-2);
+        }
+        .cart-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        .dark-mode .cart-header h3 {
+            color: var(--dark-text);
+        }
         .close-cart {
             width: 2rem;
             height: 2rem;
@@ -717,6 +733,10 @@
             border: none;
             border-radius: var(--radius);
             cursor: pointer;
+        }
+        .dark-mode .close-cart {
+            background: var(--dark-surface-2);
+            color: var(--dark-text);
         }
         .cart-items {
             flex: 1;
@@ -731,11 +751,15 @@
             border-radius: var(--radius-lg);
             margin-bottom: var(--space-3);
         }
+        .dark-mode .cart-item {
+            background: var(--dark-surface-2);
+        }
         .cart-item-image {
             width: 4rem;
             height: 4rem;
             border-radius: var(--radius);
             overflow: hidden;
+            flex-shrink: 0;
         }
         .cart-item-image img {
             width: 100%;
@@ -748,10 +772,24 @@
         .cart-item-name {
             font-weight: 600;
             font-size: 0.875rem;
+            color: var(--gray-800);
+        }
+        .dark-mode .cart-item-name {
+            color: var(--dark-text);
         }
         .cart-item-price {
             color: var(--primary-600);
             font-weight: 600;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+        .cart-item-quantity {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+        .dark-mode .cart-item-quantity {
+            color: var(--dark-text-muted);
         }
         .cart-item-remove {
             width: 2rem;
@@ -761,36 +799,54 @@
             border-radius: var(--radius);
             color: var(--danger-500);
             cursor: pointer;
+            flex-shrink: 0;
+        }
+        .dark-mode .cart-item-remove {
+            background: rgba(239, 68, 68, 0.2);
         }
         .cart-footer {
             padding: var(--space-5);
             border-top: 1px solid var(--gray-200);
+            background: white;
+        }
+        .dark-mode .cart-footer {
+            background: var(--dark-surface);
+            border-top-color: var(--dark-surface-2);
         }
         .cart-total {
             display: flex;
             justify-content: space-between;
             margin-bottom: var(--space-4);
             font-weight: 600;
+            font-size: 1rem;
         }
-        .cart-checkout-btn, .cart-whatsapp-btn {
+        .cart-checkout-btn {
             width: 100%;
             padding: 0.875rem;
+            background: var(--gray-900);
+            color: white;
+            border: none;
             border-radius: var(--radius-lg);
             font-weight: 600;
             cursor: pointer;
             text-align: center;
             display: block;
             text-decoration: none;
-            margin-bottom: var(--space-3);
+            transition: var(--transition);
         }
-        .cart-checkout-btn {
-            background: var(--gray-900);
-            color: white;
+        .cart-checkout-btn:hover {
+            background: var(--primary-600);
+            transform: translateY(-2px);
         }
-        .cart-whatsapp-btn {
-            background: #25D366;
-            color: white;
+        .dark-mode .cart-checkout-btn {
+            background: var(--primary-600);
         }
+        .cart-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-500);
+        }
+        
         .notification-container {
             position: fixed;
             top: 5rem;
@@ -811,6 +867,9 @@
             animation: slideIn 0.3s ease;
             border-left: 3px solid;
         }
+        .dark-mode .notification {
+            background: var(--dark-surface);
+        }
         @keyframes slideIn {
             from { opacity: 0; transform: translateX(100%); }
             to { opacity: 1; transform: translateX(0); }
@@ -829,6 +888,7 @@
             .recommendation-card { flex: 0 0 160px; }
             .rec-image { height: 140px; }
         }
+        
         /* Modal styles (from original) */
         .checkout-modal {
             position: fixed;
@@ -860,6 +920,9 @@
             border-radius: 24px;
             padding: 2rem;
             animation: modalFadeIn 0.3s ease;
+        }
+        .dark-mode .checkout-modal-container {
+            background: var(--dark-surface);
         }
         @keyframes modalFadeIn {
             from { opacity: 0; transform: scale(0.95); }
@@ -909,6 +972,27 @@
             font-weight: 600;
             cursor: pointer;
             border: none;
+        }
+        .whatsapp-float {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            background: #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            z-index: 99;
+            transition: transform 0.2s;
+            text-decoration: none;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
         }
         @media (max-width: 640px) {
             .form-row { grid-template-columns: 1fr; }
@@ -963,7 +1047,7 @@
         </ul>
     </div>
 
-    <!-- Main Content (same as original product.html) -->
+    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <!-- Loading State -->
         <div id="loadingState" class="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -1005,21 +1089,100 @@
             </a>
         </div>
     </main>
-  <!-- Cart Panel (same as original) -->
+
+    <!-- ========= FIXED CART PANEL (Complete Structure) ========= -->
     <div class="overlay" id="cartOverlay"></div>
     <div class="cart-panel" id="cartPanel">
         <div class="cart-header">
             <h3>Shopping Cart</h3>
             <button class="close-cart"><i class="fas fa-times"></i></button>
         </div>
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty">Your cart is empty</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">₦0</span>
+            </div>
+            <button class="cart-checkout-btn" id="checkoutButton">
+                <i class="fas fa-shopping-bag"></i> Proceed to Checkout
+            </button>
+        </div>
     </div>
 
-  
+    <!-- Wishlist Panel (empty but kept for structure) -->
+    <div class="overlay" id="wishlistOverlay"></div>
+    <div class="wishlist-panel" id="wishlistPanel" style="position: fixed; top: 0; right: -100%; width: 100%; max-width: 420px; height: 100vh; background: white; z-index: 1100; transition: right 0.3s; display: flex; flex-direction: column; overflow-y: auto;">
+        <div class="cart-header" style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+            <h3>Your Wishlist</h3>
+            <button class="close-wishlist" style="width: 2rem; height: 2rem; background: #f3f4f6; border: none; border-radius: 0.5rem; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="wishlist-items" id="wishlistItems" style="padding: 1rem;">
+            <div class="cart-empty" style="text-align: center; padding: 2rem; color: #6b7280;">Your wishlist is empty</div>
+        </div>
+    </div>
+
     <!-- Notification Container -->
     <div class="notification-container" id="notificationContainer"></div>
 
-    <!-- Signup Modal (same as original) -->
-    <div id="checkoutSignupModal" class="checkout-modal" style="display: none;">...</div>
+    <!-- Signup Modal -->
+    <div id="checkoutSignupModal" class="checkout-modal" style="display: none;">
+        <div class="checkout-modal-overlay"></div>
+        <div class="checkout-modal-container">
+            <button class="checkout-modal-close" id="closeModalBtn">&times;</button>
+            <div class="checkout-modal-header" style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #d4af37, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Complete Your Order</h2>
+                <p style="color: #64748b; font-size: 0.875rem;">Please provide your details to continue</p>
+            </div>
+            <form id="checkoutSignupForm">
+                <div class="form-group">
+                    <label>Full Name <span style="color: #dc2626;">*</span></label>
+                    <input type="text" id="checkoutFullName" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email <span style="color: #dc2626;">*</span></label>
+                    <input type="email" id="checkoutEmail" required placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone <span style="color: #dc2626;">*</span></label>
+                    <input type="tel" id="checkoutPhone" required placeholder="08012345678">
+                </div>
+                <div class="form-group">
+                    <label>Address <span style="color: #dc2626;">*</span></label>
+                    <textarea id="checkoutAddress" rows="2" required placeholder="Your delivery address"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City <span style="color: #dc2626;">*</span></label>
+                        <input type="text" id="checkoutCity" required placeholder="Lagos">
+                    </div>
+                    <div class="form-group">
+                        <label>State <span style="color: #dc2626;">*</span></label>
+                        <select id="checkoutState" required>
+                            <option value="">Select</option>
+                            <option value="Lagos">Lagos</option>
+                            <option value="Abuja">Abuja</option>
+                            <option value="Rivers">Rivers</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" id="cancelCheckoutBtn" style="flex: 1; padding: 0.75rem; border-radius: 12px; font-weight: 600; background: #f1f5f9; border: none; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="btn-submit" id="checkoutSubmitBtn" style="flex: 1;">
+                        <span class="btn-text">Continue</span>
+                        <span class="btn-loading" style="display: none;"><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+                    </button>
+                </div>
+            </form>
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.75rem; color: #94a3b8;">
+                <p>By continuing, you agree to our <a href="#">Terms</a></p>
+            </div>
+        </div>
+    </div>
 
     <!-- ========= FOOTER – DARK LUXURY ========= -->
     <footer>
@@ -1064,49 +1227,114 @@
         <div class="copyright">&copy; 2025 JMPOTTERS. All rights reserved.</div>
     </footer>
 
-    <!-- WhatsApp Floating Button (optional but consistent) -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank" style="position:fixed; bottom:25px; right:25px; width:55px; height:55px; background:#25d366; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:1.8rem; box-shadow:0 6px 20px rgba(0,0,0,0.2); z-index:99;">
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
         <i class='bx bxl-whatsapp'></i>
     </a>
 
-    <!-- Original product page script (kept intact) -->
+    <!-- Scripts -->
     <script>
-        // (All original product page JavaScript – preserving full functionality)
         document.addEventListener('DOMContentLoaded', function() {
-            // Close button navigation
-            const closeBtn = document.getElementById('closeBtn');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', function() {
-                    if (document.referrer && document.referrer.includes(window.location.hostname)) {
-                        window.history.back();
-                    } else {
-                        window.location.href = 'index.html';
+            // Mobile navigation
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const navOverlay = document.getElementById('navOverlay');
+            const closeNav = document.querySelector('.close-nav');
+            function openNav() { mobileNav.classList.add('active'); navOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            function closeNavFunc() { mobileNav.classList.remove('active'); navOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+            if (mobileToggle) mobileToggle.addEventListener('click', openNav);
+            if (closeNav) closeNav.addEventListener('click', closeNavFunc);
+            if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
+            
+            // Cart panel
+            const cartIcon = document.getElementById('cartIcon');
+            const cartPanel = document.getElementById('cartPanel');
+            const cartOverlay = document.getElementById('cartOverlay');
+            const closeCart = document.querySelector('.close-cart');
+            if (cartIcon && cartPanel && cartOverlay) {
+                cartIcon.addEventListener('click', function() {
+                    cartPanel.classList.add('active');
+                    cartOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    if (window.JMPOTTERS && window.JMPOTTERS.updateCartUI) {
+                        window.JMPOTTERS.updateCartUI();
                     }
+                });
+                if (closeCart) {
+                    closeCart.addEventListener('click', function() {
+                        cartPanel.classList.remove('active');
+                        cartOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                }
+                if (cartOverlay) {
+                    cartOverlay.addEventListener('click', function() {
+                        cartPanel.classList.remove('active');
+                        cartOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                }
+            }
+            
+            // Wishlist panel
+            const wishlistIcon = document.getElementById('wishlistIcon');
+            const wishlistPanel = document.getElementById('wishlistPanel');
+            const wishlistOverlay = document.getElementById('wishlistOverlay');
+            const closeWishlist = document.querySelector('.close-wishlist');
+            if (wishlistIcon && wishlistPanel && wishlistOverlay) {
+                wishlistIcon.addEventListener('click', function() {
+                    wishlistPanel.classList.add('active');
+                    wishlistOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+                if (closeWishlist) {
+                    closeWishlist.addEventListener('click', function() {
+                        wishlistPanel.classList.remove('active');
+                        wishlistOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                }
+                if (wishlistOverlay) {
+                    wishlistOverlay.addEventListener('click', function() {
+                        wishlistPanel.classList.remove('active');
+                        wishlistOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                }
+            }
+            
+            // Checkout modal
+            const checkoutModal = document.getElementById('checkoutSignupModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelBtn = document.getElementById('cancelCheckoutBtn');
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', function() {
+                    checkoutModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                });
+            }
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    checkoutModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                });
+            }
+            const modalOverlay = document.querySelector('.checkout-modal-overlay');
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', function() {
+                    checkoutModal.style.display = 'none';
+                    document.body.style.overflow = '';
                 });
             }
             
-            // Cart panel close handlers
-            const closeCartBtn = document.querySelector('.close-cart');
-            const cartOverlay = document.getElementById('cartOverlay');
-            const cartPanel = document.getElementById('cartPanel');
-            if (closeCartBtn) {
-                closeCartBtn.addEventListener('click', function() {
-                    cartPanel.classList.remove('active');
-                    cartOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            if (cartOverlay) {
-                cartOverlay.addEventListener('click', function() {
-                    cartPanel.classList.remove('active');
-                    cartOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
+            // ESC key to close panels
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     cartPanel?.classList.remove('active');
                     cartOverlay?.classList.remove('active');
+                    wishlistPanel?.classList.remove('active');
+                    wishlistOverlay?.classList.remove('active');
+                    checkoutModal?.style.display = 'none';
                     document.body.style.overflow = '';
                 }
             });
@@ -1118,7 +1346,8 @@
                 const error = document.getElementById('errorState');
                 if (loading) loading.style.display = 'none';
                 if (error) error.style.display = 'block';
-                document.getElementById('errorMessage').textContent = 'Application failed to load. Please refresh the page.';
+                const errorMsg = document.getElementById('errorMessage');
+                if (errorMsg) errorMsg.textContent = 'Application failed to load. Please refresh the page.';
                 return;
             }
             
@@ -1128,47 +1357,17 @@
                 showError('No product specified in URL.');
                 return;
             }
-            
-            // The product viewer is handled by app.js – we just need to ensure it works
-            // Also integrate header/footer toggles with existing cart/wishlist panels
-            const mobileToggle = document.getElementById('mobileToggle');
-            const mobileNav = document.getElementById('mobileNav');
-            const navOverlay = document.getElementById('navOverlay');
-            const closeNav = document.querySelector('.close-nav');
-            function openNav() { mobileNav.classList.add('active'); navOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
-            function closeNavFunc() { mobileNav.classList.remove('active'); navOverlay.classList.remove('active'); document.body.style.overflow = ''; }
-            if (mobileToggle) mobileToggle.addEventListener('click', openNav);
-            if (closeNav) closeNav.addEventListener('click', closeNavFunc);
-            if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
-            
-            // Connect header cart/wishlist icons to existing panels if app.js uses them
-            const cartIconHeader = document.getElementById('cartIcon');
-            const wishlistIconHeader = document.getElementById('wishlistIcon');
-            if (cartIconHeader && cartPanel && cartOverlay) {
-                cartIconHeader.addEventListener('click', function() {
-                    cartPanel.classList.add('active');
-                    cartOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-            if (wishlistIconHeader) {
-                wishlistIconHeader.addEventListener('click', function() {
-                    // If app.js has wishlist panel, trigger it; otherwise alert
-                    const wishlistPanel = document.getElementById('wishlistPanel');
-                    const wishlistOverlay = document.getElementById('wishlistOverlay');
-                    if (wishlistPanel && wishlistOverlay) {
-                        wishlistPanel.classList.add('active');
-                        wishlistOverlay.classList.add('active');
-                        document.body.style.overflow = 'hidden';
-                    }
-                });
-            }
         });
         
         function showError(message) {
-            document.getElementById('loadingState').style.display = 'none';
-            document.getElementById('errorState').style.display = 'block';
-            document.getElementById('errorMessage').textContent = message;
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const errorMessage = document.getElementById('errorMessage');
+            if (loadingState) loadingState.style.display = 'none';
+            if (errorState) {
+                errorState.style.display = 'block';
+                if (errorMessage) errorMessage.textContent = message;
+            }
         }
         
         window.updateProductBreadcrumb = function(product) {
