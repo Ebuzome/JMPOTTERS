@@ -537,6 +537,9 @@
         .cart-btn:hover {
             background: var(--accent-color);
         }
+        
+        /* REMOVED: All .cart-panel styles - now redirects to cart.html */
+        
         .filters-section {
             background: #fafafa;
             padding: 25px 0;
@@ -551,10 +554,6 @@
             height: 70vh;
             background: linear-gradient(105deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 100%), url('assets/images/accessories/banner-accessories.jpg') center/cover;
             margin-top: 82px;
-        }
-        .cart-panel, .wishlist-panel {
-            background: white;
-            border-radius: 28px 0 0 28px;
         }
         .whatsapp-float {
             background: #25d366;
@@ -667,23 +666,15 @@
         </div>
     </section>
 
-    <!-- ========= CART & WISHLIST PANELS ========= -->
-    <div class="overlay" id="cartOverlay"></div>
-    <div class="cart-panel" id="cartPanel" style="position: fixed; top:0; right:-100%; width:85%; max-width:400px; background:white; z-index:1100; transition:0.3s; padding:25px; overflow-y:auto; box-shadow:-5px 0 30px rgba(0,0,0,0.15);">
-        <div class="cart-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Your Cart</h3>
-            <button class="close-cart" style="background:none; border:none; font-size:1.6rem; cursor:pointer;"><i class='bx bx-x'></i></button>
-        </div>
-        <div class="cart-items" id="cartItems"><div class="cart-empty">Your cart is empty</div></div>
-        <div class="cart-total" style="margin-top:20px; font-weight:700; display:flex; justify-content:space-between;"><span>Total:</span><span id="cartTotal">₦0</span></div>
-        <a href="#" class="btn" id="whatsappCheckout" style="width:100%; margin-top:15px;"><i class='bx bxl-whatsapp'></i> Checkout via WhatsApp</a>
-    </div>
+    <!-- REMOVED: Cart Panel HTML (cartOverlay and cartPanel divs) -->
+    <!-- REMOVED: Cart panel now redirects to cart.html -->
 
+    <!-- Wishlist Panel (kept as is) -->
     <div class="overlay" id="wishlistOverlay"></div>
-    <div class="wishlist-panel" id="wishlistPanel" style="position: fixed; top:0; right:-100%; width:85%; max-width:400px; background:white; z-index:1100; transition:0.3s; padding:25px; overflow-y:auto;">
+    <div class="wishlist-panel" id="wishlistPanel" style="position: fixed; top:0; right:-100%; width:85%; max-width:400px; background:white; z-index:1100; transition:0.3s; padding:25px; overflow-y:auto; box-shadow:-5px 0 30px rgba(0,0,0,0.15);">
         <div class="wishlist-header" style="display:flex; justify-content:space-between; align-items:center;">
             <h3>Your Wishlist</h3>
-            <button class="close-wishlist" style="background:none; border:none; font-size:1.6rem;"><i class='bx bx-x'></i></button>
+            <button class="close-wishlist" style="background:none; border:none; font-size:1.6rem; cursor:pointer;"><i class='bx bx-x'></i></button>
         </div>
         <div class="wishlist-items" id="wishlistItems"><div class="wishlist-empty">Your wishlist is empty</div></div>
     </div>
@@ -744,7 +735,7 @@
     </footer>
 
     <!-- WhatsApp Float (Boxicon) -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank" style="position:fixed; bottom:25px; right:25px; width:58px; height:58px; background:#25d366; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:2rem; box-shadow:0 6px 20px rgba(0,0,0,0.25); z-index:99; transition:0.2s;">
+    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank" style="position:fixed; bottom:25px; right:25px; width:58px; height:58px; background:#25d366; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:2rem; box-shadow:0 6px 20px rgba(0,0,0,0.25); z-index:99; transition:0.2s; text-decoration:none;">
         <i class='bx bxl-whatsapp'></i>
     </a>
 
@@ -774,29 +765,31 @@
             closeNavBtns.forEach(btn => btn.addEventListener('click', closeNav));
             if(navOverlay) navOverlay.addEventListener('click', closeNav);
             
-            // Cart panel
+            // UPDATED: Cart icon redirects to cart.html (NO PANEL CODE)
             const cartIcon = document.getElementById('cartIcon');
-            const cartPanel = document.getElementById('cartPanel');
-            const cartOverlay = document.getElementById('cartOverlay');
-            const closeCart = document.querySelector('.close-cart');
-            if(cartIcon && cartPanel) {
-                cartIcon.addEventListener('click', () => {
-                    cartPanel.style.right = '0';
-                    cartOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-                if(closeCart) closeCart.addEventListener('click', () => {
-                    cartPanel.style.right = '-100%';
-                    cartOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-                if(cartOverlay) cartOverlay.addEventListener('click', () => {
-                    cartPanel.style.right = '-100%';
-                    cartOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
+            if (cartIcon) {
+                const newCartIcon = cartIcon.cloneNode(true);
+                cartIcon.parentNode.replaceChild(newCartIcon, cartIcon);
+                
+                newCartIcon.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'cart.html';
                 });
             }
-            // Wishlist
+            
+            // Update cart count on page load
+            function updateCartCount() {
+                const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                const cartCountSpan = document.getElementById('cartCount');
+                if (cartCountSpan) {
+                    cartCountSpan.innerText = totalItems;
+                    cartCountSpan.style.display = totalItems > 0 ? 'flex' : 'none';
+                }
+            }
+            updateCartCount();
+            
+            // Wishlist panel (preserved)
             const wishlistIcon = document.getElementById('wishlistIcon');
             const wishlistPanel = document.getElementById('wishlistPanel');
             const wishlistOverlay = document.getElementById('wishlistOverlay');
@@ -818,6 +811,21 @@
                     document.body.style.overflow = '';
                 });
             }
+            
+            // ESC key to close panels (cart panel removed)
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'Escape') {
+                    if(wishlistPanel && wishlistPanel.style.right === '0px') {
+                        wishlistPanel.style.right = '-100%';
+                        if(wishlistOverlay) wishlistOverlay.classList.remove('active');
+                    }
+                    if(mobileNav.classList.contains('active')) {
+                        closeNav();
+                    }
+                    document.body.style.overflow = '';
+                }
+            });
+            
             // Filters event placeholder
             const searchBar = document.getElementById('searchBar');
             const minPrice = document.getElementById('minPrice');
