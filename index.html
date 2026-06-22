@@ -3,138 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>JM POTTERS | Luxury Lifestyle & Homeware</title>
+    <title>JMPOTTERS | Premium Fashion & Lifestyle</title>
     
-    <!-- Premium Icon Pack: Boxicons (commercial-grade) -->
+    <!-- Boxicons -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <!-- Font Awesome (fallback for any legacy icons, but we'll mainly use Boxicons) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="app.js" defer></script>
     
     <style>
-        /* ===== UPDATED VARIABLES & RESET ===== */
+        /* ===== ROOT VARIABLES ===== */
         :root {
-            --cream-light: #fefaf0;
-            --cream-medium: #fffaf3;
-            --cream-dark: #f7f0e1;
-            --gold-primary: #d4af37;
-            --gold-secondary: #e8c170;
+            --gold: #d4af37;
             --gold-light: #f5e6b8;
             --gold-dark: #b8860b;
-            --charcoal: #333333;
-            --shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.4);
+            --gold-glow: 0 0 30px rgba(212, 175, 55, 0.3);
+            --primary-500: #6366F1;
+            --primary-600: #4F46E5;
+            --danger-500: #EF4444;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.12);
             
-            /* Dark header specific */
-            --dark-bg: #0c0f15;
-            --dark-surface: #14181f;
             --glass-dark: rgba(12, 15, 21, 0.92);
             --glass-blur: blur(16px);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--charcoal);
-            background-color: var(--cream-light);
+            font-family: 'Inter', sans-serif;
+            color: var(--gray-800);
+            background: #faf8f5;
             overflow-x: hidden;
-            line-height: 1.6;
         }
-
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
         h1, h2, h3, h4 {
             font-family: 'Playfair Display', serif;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-            color: var(--gold-dark);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            letter-spacing: -0.02em;
         }
-
-        .container {
-            width: 92%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        section {
-            padding: 80px 0;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-            font-size: 2.2rem;
-            position: relative;
-        }
-
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: var(--gold-primary);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 28px;
-            background: var(--gold-primary);
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            letter-spacing: 1px;
-            border-radius: 0;
-            transition: var(--transition);
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            border: 2px solid transparent;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background: transparent;
-            border-color: var(--gold-primary);
-            color: var(--gold-dark);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-gold);
-        }
-
-        .explore-link {
-            display: inline-flex;
-            align-items: center;
-            color: var(--gold-primary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: var(--transition);
-            margin-top: 10px;
-        }
-
-        .explore-link:hover {
-            color: var(--gold-dark);
-            gap: 8px;
-        }
-
-        .explore-link i {
-            transition: var(--transition);
-            font-size: 0.9rem;
-        }
-
-        .explore-link:hover i {
-            transform: translateX(5px);
-        }
-
-        /* ========== HEADER – DARK GLASS THEME, CENTERED LOGO ========== */
-        header {
+        
+        /* ===== HEADER ===== */
+        .nav-bar {
             position: fixed;
             top: 0;
             left: 0;
@@ -142,8 +71,7 @@
             z-index: 1050;
             background: var(--glass-dark);
             backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
             transition: var(--transition);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
@@ -153,118 +81,86 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            position: relative;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
         }
-
-        /* Left side: hamburger button */
-        .header-left {
-            flex: 1;
-            display: flex;
-            justify-content: flex-start;
-        }
+        
+        .header-left { flex: 1; display: flex; justify-content: flex-start; }
         .mobile-toggle {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255,255,255,0.08);
             border: none;
             font-size: 2rem;
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             border-radius: 30px;
-            color: var(--gold-primary);
+            color: var(--gold);
             cursor: pointer;
             transition: var(--transition);
-            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .mobile-toggle:hover {
-            background: var(--gold-primary);
-            color: #0c0f15;
-            transform: rotate(5deg);
-        }
-
-        /* Center: Logo enlarged */
-        .header-center {
-            flex: 0 0 auto;
-            display: flex;
-            justify-content: center;
-        }
-        .logo-img {
-            height: 70px;   /* enlarged ~60% from typical */
-            width: auto;
-            object-fit: contain;
-            display: block;
-            transition: var(--transition);
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
-        }
-        .logo-img:hover {
-            transform: scale(1.02);
-            filter: drop-shadow(0 6px 12px rgba(212,175,55,0.4));
-        }
-
-        /* Right side: icons (cart + wishlist) */
+        .mobile-toggle:hover { background: var(--gold); color: #0c0f15; }
+        
+        .header-center { flex: 0 0 auto; display: flex; justify-content: center; }
+        .logo-img { height: 64px; width: auto; object-fit: contain; display: block; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
+        
         .header-right {
             flex: 1;
             display: flex;
             justify-content: flex-end;
-            gap: 20px;
+            gap: 12px;
         }
         .header-icon {
             position: relative;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: #eef2f5;
             cursor: pointer;
             transition: var(--transition);
             background: rgba(255,255,255,0.05);
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
         }
-        .header-icon:hover {
-            background: var(--gold-primary);
-            color: #0c0f15;
-            transform: translateY(-3px);
-        }
+        .header-icon:hover { background: var(--gold); color: #0c0f15; }
         .icon-badge {
             position: absolute;
             top: -4px;
             right: -4px;
-            background: var(--gold-primary);
+            background: var(--gold);
             color: #0c0f15;
             font-size: 0.7rem;
             font-weight: 800;
-            min-width: 22px;
-            height: 22px;
+            min-width: 20px;
+            height: 20px;
             border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 6px;
+            padding: 0 5px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             font-family: monospace;
         }
-
-        /* Overlay + Mobile Nav (Dark theme) */
+        
+        /* Mobile Nav */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(6px);
             z-index: 1060;
             display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
-        .overlay.active {
-            display: block;
-            opacity: 1;
-        }
+        .overlay.active { display: block; }
+        
         .mobile-nav {
             position: fixed;
             top: 0;
@@ -275,15 +171,12 @@
             background: #0f1219f2;
             backdrop-filter: blur(24px);
             z-index: 1070;
-            transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            transition: left 0.4s ease;
             padding: 32px 24px;
-            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
             border-radius: 0 28px 28px 0;
             overflow-y: auto;
         }
-        .mobile-nav.active {
-            left: 0;
-        }
+        .mobile-nav.active { left: 0; }
         .mobile-nav-header {
             display: flex;
             justify-content: space-between;
@@ -292,34 +185,23 @@
             padding-bottom: 16px;
             border-bottom: 1px solid rgba(212, 175, 55, 0.3);
         }
-        .mobile-nav-header .logo-img {
-            height: 56px;
-        }
+        .mobile-nav-header .logo-img { height: 52px; }
         .close-nav {
             background: rgba(255,255,255,0.08);
             border: none;
-            font-size: 1.9rem;
-            width: 48px;
-            height: 48px;
+            font-size: 1.8rem;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            color: var(--gold-primary);
+            color: var(--gold);
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .close-nav:hover {
-            background: var(--gold-primary);
-            color: #0c0f15;
-            transform: rotate(90deg);
-        }
-        .mobile-nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        .close-nav:hover { background: var(--gold); color: #0c0f15; transform: rotate(90deg); }
+        .mobile-nav-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
         .mobile-nav-links li a {
             display: flex;
             align-items: center;
@@ -333,430 +215,659 @@
             transition: var(--transition);
             font-size: 1rem;
         }
-        .mobile-nav-links li a i {
-            font-size: 1.5rem;
-            color: var(--gold-primary);
-        }
-        .mobile-nav-links li a:hover {
-            background: var(--gold-primary);
-            color: #0c0f15;
-            transform: translateX(8px);
-        }
-        .mobile-nav-links li a:hover i {
-            color: #0c0f15;
-        }
-        /* Mobile dropdown styles */
-        .mobile-dropdown-content {
-            display: none;
-            padding-left: 15px;
-            margin-top: 5px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 5px;
-            transition: var(--transition);
-            max-height: 0;
+        .mobile-nav-links li a i { font-size: 1.4rem; color: var(--gold); }
+        .mobile-nav-links li a:hover { background: var(--gold); color: #0c0f15; transform: translateX(8px); }
+        .mobile-nav-links li a:hover i { color: #0c0f15; }
+        
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, #0a0d12 0%, #14181f 50%, #0a0d12 100%);
             overflow: hidden;
         }
-        .mobile-dropdown.active .mobile-dropdown-content {
-            display: block;
-            max-height: 300px;
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
         }
-        .mobile-dropdown-content a {
+        
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-content {
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .hero-badge i { font-size: 0.9rem; }
+        
+        .hero h1 {
+            font-size: clamp(2.8rem, 5vw, 4.2rem);
+            font-weight: 700;
+            color: white;
+            line-height: 1.08;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--gold), #f5d97a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 500px;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.9rem 2.2rem;
+            background: linear-gradient(135deg, var(--gold), #c4a030);
+            color: #0c0f15;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
             font-size: 0.95rem;
-            padding: 8px 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
         }
-        .mobile-dropdown > a .bx-chevron-down {
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--gold-glow);
+        }
+        
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.9rem 2.2rem;
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        
+        .hero-stat h4 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: white;
+        }
+        
+        .hero-stat p {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.1rem;
+        }
+        
+        .hero-image {
+            position: relative;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .hero-image .floating-badge {
+            position: absolute;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .hero-image .floating-badge:nth-child(2) {
+            bottom: 20px;
+            left: -20px;
+            animation-delay: 1s;
+        }
+        
+        .hero-image .floating-badge:nth-child(3) {
+            top: 30px;
+            right: -20px;
+            animation-delay: 2s;
+        }
+        
+        .floating-badge i {
+            font-size: 1.5rem;
+            color: var(--gold);
+        }
+        
+        .floating-badge span {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .floating-badge small {
+            display: block;
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* ===== SECTION STYLES ===== */
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-header h2 {
+            font-size: clamp(2rem, 3vw, 2.8rem);
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-header p {
+            color: var(--gray-500);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* ===== CATEGORIES ===== */
+        .categories-section {
+            background: white;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .category-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .category-card:hover img {
+            transform: scale(1.05);
+        }
+        
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+        }
+        
+        .category-overlay h3 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .category-overlay p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        /* ===== FEATURED PRODUCTS ===== */
+        .featured-section {
+            background: #faf8f5;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .product-image {
+            height: 220px;
+            overflow: hidden;
+            background: var(--gray-100);
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+        
+        .product-info {
+            padding: 1rem 1.2rem;
+        }
+        
+        .product-info h3 {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .product-price {
+            font-weight: 700;
+            color: var(--gold-dark);
+            font-size: 1.1rem;
+        }
+        
+        /* ===== BRAND STORY ===== */
+        .brand-story {
+            background: linear-gradient(135deg, #0a0d12 0%, #1a1f2e 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        
+        .brand-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .brand-content h2 {
+            font-size: clamp(2rem, 3vw, 2.8rem);
+            margin-bottom: 1.5rem;
+        }
+        
+        .brand-content h2 .highlight {
+            background: linear-gradient(135deg, var(--gold), #f5d97a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .brand-content p {
+            color: #94a3b8;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .brand-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .brand-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .brand-feature i {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+        
+        .brand-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* ===== TESTIMONIALS ===== */
+        .testimonials-section {
+            background: white;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .testimonial-card {
+            background: var(--gray-50);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--gray-200);
             transition: var(--transition);
         }
-        .mobile-dropdown.active > a .bx-chevron-down {
-            transform: rotate(180deg);
+        
+        .testimonial-card:hover {
+            border-color: var(--gold-light);
+            transform: translateY(-4px);
         }
-
-        /* ========== FOOTER – DARK LUXURY WITH ENLARGED LOGO ========== */
+        
+        .testimonial-card .stars {
+            color: var(--gold);
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .testimonial-card p {
+            color: var(--gray-700);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .testimonial-author .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gold-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--gold-dark);
+        }
+        
+        .testimonial-author .name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .testimonial-author .role {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        
+        /* ===== NEWSLETTER ===== */
+        .newsletter-section {
+            background: linear-gradient(135deg, var(--gold), #c4a030);
+            padding: 80px 0;
+        }
+        
+        .newsletter-container {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-container h2 {
+            color: white;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .newsletter-container p {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 1.5rem;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-form input {
+            flex: 1;
+            padding: 0.9rem 1.2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        
+        .newsletter-form button {
+            padding: 0.9rem 2rem;
+            background: #0c0f15;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        
+        .newsletter-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        /* ===== FOOTER ===== */
         footer {
             background: linear-gradient(145deg, #0a0d12 0%, #05070a 100%);
             color: #eef2f5;
-            padding: 70px 0 32px;
-            margin-top: 80px;
-            border-top: 1px solid rgba(212, 175, 55, 0.25);
+            padding: 64px 0 32px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
         }
-        .footer-content {
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 48px 32px;
-            margin-bottom: 48px;
+            grid-template-columns: 1fr;
+            gap: 30px;
         }
-        .footer-column .footer-logo {
-            margin-bottom: 24px;
-        }
+        @media (min-width: 640px) { .footer-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 768px) { .footer-container { grid-template-columns: repeat(4, 1fr); } }
         .footer-logo-img {
-            height: 72px;   /* increased by 60% */
+            height: 68px;
             width: auto;
             object-fit: contain;
             filter: brightness(0) invert(1);
             opacity: 0.95;
             transition: var(--transition);
+            margin-bottom: 20px;
         }
-        .footer-logo-img:hover {
-            opacity: 1;
-            transform: translateY(-3px);
-            filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(212,175,55,0.3));
-        }
+        .footer-logo-img:hover { opacity: 1; transform: translateY(-3px); }
         .footer-column h3 {
-            font-size: 1.4rem;
-            margin-bottom: 24px;
-            color: var(--gold-primary);
-            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: var(--gold);
+            font-weight: 600;
             position: relative;
-            display: inline-block;
         }
-        .footer-column h3:after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 42px;
-            height: 3px;
-            background: var(--gold-primary);
-            border-radius: 3px;
-        }
-        .footer-column p {
-            line-height: 1.6;
-            margin-top: 12px;
-            font-size: 0.9rem;
-            opacity: 0.85;
-        }
-        .footer-links {
-            list-style: none;
-        }
-        .footer-links li {
-            margin-bottom: 12px;
-        }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 10px; }
         .footer-links a {
             color: #cfdee9;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
-        .footer-links a i {
-            font-size: 1.1rem;
-            opacity: 0.7;
-        }
-        .footer-links a:hover {
-            color: var(--gold-primary);
-            transform: translateX(6px);
-        }
-        .social-links {
-            display: flex;
-            gap: 18px;
-            margin-top: 24px;
-            flex-wrap: wrap;
-        }
+        .footer-links a:hover { color: var(--gold); transform: translateX(5px); }
+        .social-links { display: flex; gap: 15px; margin-top: 20px; }
         .social-links a {
             background: rgba(255,255,255,0.06);
-            width: 44px;
-            height: 44px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             transition: var(--transition);
-            text-decoration: none;
         }
-        .social-links a:hover {
-            background: var(--gold-primary);
-            transform: translateY(-5px);
-            color: #0a0d12;
-        }
-        .footer-contact-info {
-            margin-top: 20px;
-            font-size: 0.85rem;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .footer-contact-info span {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            opacity: 0.85;
-        }
+        .social-links a:hover { background: var(--gold); transform: translateY(-3px); color: #0a0d12; }
         .copyright {
             text-align: center;
             padding-top: 32px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            font-size: 0.8rem;
+            margin-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.75rem;
             color: #9aaeb9;
         }
-
-        /* Preserve all original index styles (values, hero, categories, products, etc.) */
-        .values {
-            background: white;
-            padding: 50px 0;
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+            .hero p { margin: 0 auto 2rem; }
+            .hero-buttons { justify-content: center; }
+            .hero-stats { justify-content: center; }
+            .hero-image img { max-width: 400px; }
+            .brand-grid { grid-template-columns: 1fr; text-align: center; }
+            .brand-features { justify-content: center; }
         }
-        .values-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-        .value-card {
-            text-align: center;
-            padding: 25px 20px;
-            border-radius: 5px;
-            transition: var(--transition);
-        }
-        .value-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-        .value-card i {
-            font-size: 2.2rem;
-            color: var(--gold-primary);
-            margin-bottom: 15px;
-        }
-        .value-card h4 {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            color: var(--charcoal);
-        }
-        .hero {
-            height: 90vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
-                        url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
-            background-size: cover;
-            background-position: center;
-            animation: zoomIn 20s ease-in-out forwards;
-            margin-top: 0; /* will add padding dynamically via js */
-        }
-        @keyframes zoomIn {
-            from { transform: scale(1.1); }
-            to { transform: scale(1); }
-        }
-        .hero-content {
-            max-width: 700px;
-            color: white;
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 0.5s forwards;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .hero h1 {
-            font-size: 3.2rem;
-            margin-bottom: 15px;
-            line-height: 1.1;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            color: var(--gold-light);
-        }
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-        }
-        .category-card {
-            position: relative;
-            height: 280px;
-            overflow: hidden;
-            border-radius: 5px;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            transform: translateY(30px);
-            transition: var(--transition);
-        }
-        .category-card.appear, .product-card.appear, .moment-card.appear {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .category-card img, .moment-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-        .category-card:hover img, .moment-card:hover img {
-            transform: scale(1.05);
-        }
-        .category-overlay, .moment-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-            color: white;
-            transition: var(--transition);
-        }
-        .category-overlay h3 {
-            font-size: 1.3rem;
-            margin-bottom: 5px;
-            color: var(--gold-light);
-        }
-        .top-products {
-            background-color: var(--cream-medium);
-        }
-        .products-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            padding: 20px 0;
-        }
-        .product-card {
-            background: white;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            position: relative;
-        }
-        .product-card:hover {
-            transform: translateY(-10px);
-        }
-        .product-img {
-            height: 250px;
-            overflow: hidden;
-        }
-        .product-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-        .product-card:hover .product-img img {
-            transform: scale(1.05);
-        }
-        .product-info {
-            padding: 20px;
-        }
-        .quick-add-btn {
-            position: absolute;
-            bottom: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background: var(--gold-primary);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-        .product-card:hover .quick-add-btn {
-            bottom: 15px;
-        }
-        .limited-offers {
-            background-color: var(--cream-dark);
-            padding: 60px 0;
-        }
-        .offer-banner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            gap: 15px;
-            border: 1px solid var(--gold-light);
-        }
-        .offer-icon {
-            font-size: 1.8rem;
-            color: var(--gold-primary);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        .press {
-            padding: 60px 0;
-            background: white;
-        }
-        .press-title {
-            text-align: center;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #888;
-            margin-bottom: 30px;
-        }
-        .press-logos {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 40px;
-            opacity: 0.6;
-        }
-        .moments-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-        .moment-card {
-            position: relative;
-            height: 350px;
-            border-radius: 5px;
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: var(--transition);
-        }
-        .whatsapp-float {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: #25D366;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-            transition: var(--transition);
-        }
-        .whatsapp-float:hover {
-            transform: scale(1.1);
-        }
-        .skeleton-loader {
-            background-color: var(--cream-medium);
-            border-radius: 4px;
-        }
-        @media (max-width: 1200px) {
+        
+        @media (max-width: 768px) {
+            .hero { min-height: auto; padding: 100px 0 60px; }
+            .hero h1 { font-size: 2.2rem; }
+            .hero-image .floating-badge { display: none; }
+            .hero-stats { gap: 1.5rem; flex-wrap: wrap; }
+            .newsletter-form { flex-direction: column; }
+            .products-grid { grid-template-columns: repeat(2, 1fr); }
             .categories-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        @media (max-width: 992px) {
-            .categories-grid, .moments-grid { grid-template-columns: 1fr; }
-            .hero h1 { font-size: 2.8rem; }
-        }
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.2rem; }
-            .section-title { font-size: 1.8rem; }
-            .logo-img { height: 58px; }
-            .footer-logo-img { height: 62px; }
-            .header-icon { width: 44px; height: 44px; font-size: 1.6rem; }
+        
+        @media (max-width: 480px) {
+            .products-grid { grid-template-columns: 1fr; }
+            .categories-grid { grid-template-columns: 1fr 1fr; }
+            .hero h1 { font-size: 1.8rem; }
+            .hero-stats { flex-direction: column; align-items: center; gap: 1rem; }
         }
     </style>
 </head>
 <body>
-
-    <!-- ========= HEADER (DARK GLASS, CENTERED LOGO, HAMBURGER LEFT) ========= -->
-    <header>
-        <div class="container header-container">
+    <!-- ===== HEADER ===== -->
+    <nav class="nav-bar">
+        <div class="header-container">
             <div class="header-left">
                 <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
                     <i class='bx bx-menu-alt-left'></i>
@@ -768,19 +879,19 @@
                 </a>
             </div>
             <div class="header-right">
-                <div class="header-icon" id="wishlistIcon" aria-label="Wishlist">
+                <div class="header-icon" id="wishlistIcon">
                     <i class='bx bx-heart'></i>
                     <span class="icon-badge" id="wishlistCount">0</span>
                 </div>
-                <div class="header-icon" id="cartIcon" aria-label="Cart">
+                <div class="header-icon" id="cartIcon">
                     <i class='bx bx-shopping-bag'></i>
                     <span class="icon-badge" id="cartCount">0</span>
                 </div>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- ========= MOBILE NAV (LEFT DRAWER) ========= -->
+    <!-- Mobile Navigation -->
     <div class="overlay" id="navOverlay"></div>
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
@@ -789,241 +900,337 @@
         </div>
         <ul class="mobile-nav-links">
             <li><a href="index.html"><i class='bx bx-home'></i> Home</a></li>
-            <!-- Mobile Footwear dropdown with split -->
-            <li class="mobile-dropdown" id="mobileFootwearDropdown">
-                <a href="#"><i class='bx bx-footwear'></i> Footwear <i class='bx bx-chevron-down'></i></a>
-                <div class="mobile-dropdown-content">
-                    <a href="mensfootwear.html"><i class='bx bx-male'></i> Men's Footwear</a>
-                    <a href="womensfootwear.html"><i class='bx bx-female'></i> Women's Footwear</a>
-                </div>
-            </li>
+            <li><a href="mensfootwear.html"><i class='bx bx-footwear'></i> Men's Footwear</a></li>
+            <li><a href="womensfootwear.html"><i class='bx bx-female'></i> Women's Footwear</a></li>
             <li><a href="bags.html"><i class='bx bx-briefcase'></i> Bags</a></li>
             <li><a href="accessories.html"><i class='bx bx-diamond'></i> Accessories</a></li>
             <li><a href="household.html"><i class='bx bx-home-smile'></i> Household</a></li>
             <li><a href="kids.html"><i class='bx bx-baby-carriage'></i> Kids & Babies</a></li>
             <li><a href="healthcare.html"><i class='bx bx-heart'></i> Healthcare</a></li>
-            <li><a href="blog/blog.html"><i class='bx bx-blog'></i> Blog</a></li>
             <li><a href="contact.html"><i class='bx bx-phone-call'></i> Contact</a></li>
         </ul>
     </div>
 
-    <!-- ========= VALUE PROPOSITIONS (unchanged) ========= -->
-    <section class="values">
+    <!-- ===== HERO ===== -->
+    <section class="hero">
         <div class="container">
-            <div class="values-container">
-                <div class="value-card"><i class="fas fa-truck"></i><h4>Free Shipping</h4><p>On all orders over ₦50,000</p></div>
-                <div class="value-card"><i class="fas fa-shield-alt"></i><h4>Secure Payment</h4><p>100% secure payment gateway</p></div>
-                <div class="value-card"><i class="fas fa-undo"></i><h4>Easy Returns</h4><p>30-day money-back guarantee</p></div>
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class='bx bx-rocket'></i> New Collection Drop
+                    </div>
+                    <h1>Premium Fashion <br><span class="highlight">For The Modern You</span></h1>
+                    <p>Discover curated collections of premium footwear, bags, accessories, and household essentials — designed for those who appreciate quality and style.</p>
+                    <div class="hero-buttons">
+                        <a href="#featured" class="btn-primary">
+                            <i class='bx bx-shopping-bag'></i> Shop Now
+                        </a>
+                        <a href="#categories" class="btn-secondary">
+                            Explore Collections <i class='bx bx-chevron-right'></i>
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <h4>500+</h4>
+                            <p>Happy Customers</p>
+                        </div>
+                        <div class="hero-stat">
+                            <h4>50+</h4>
+                            <p>Premium Products</p>
+                        </div>
+                        <div class="hero-stat">
+                            <h4>4.9★</h4>
+                            <p>Average Rating</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&h=800&fit=crop&crop=center" alt="JMPOTTERS Collection" onerror="this.src='https://via.placeholder.com/500x500?text=JMPOTTERS'">
+                    <div class="floating-badge" style="bottom: 20px; left: -20px;">
+                        <i class='bx bx-star'></i>
+                        <div>
+                            <span>4.9 ★</span>
+                            <small>Customer Rating</small>
+                        </div>
+                    </div>
+                    <div class="floating-badge" style="top: 30px; right: -20px;">
+                        <i class='bx bx-trending-up'></i>
+                        <div>
+                            <span>Premium</span>
+                            <small>Quality Guaranteed</small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- ========= HERO SECTION ========= -->
-    <section class="hero" id="heroSection">
+    <!-- ===== CATEGORIES ===== -->
+    <section class="section categories-section" id="categories">
         <div class="container">
-            <div class="hero-content">
-                <h1>Where Style Meets Simplicity</h1>
-                <p>Explore fashion-forward collections for every space and season</p>
-                <a href="#products" class="btn">Browse Collection</a>
+            <div class="section-header">
+                <h2>Shop by Category</h2>
+                <p>Explore our curated collections</p>
+            </div>
+            <div class="categories-grid">
+                <a href="mensfootwear.html" class="category-card">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop" alt="Men's Footwear">
+                    <div class="category-overlay">
+                        <h3>Men's Footwear</h3>
+                        <p>Step into elegance</p>
+                    </div>
+                </a>
+                <a href="womensfootwear.html" class="category-card">
+                    <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400&h=400&fit=crop" alt="Women's Footwear">
+                    <div class="category-overlay">
+                        <h3>Women's Footwear</h3>
+                        <p>Style meets comfort</p>
+                    </div>
+                </a>
+                <a href="bags.html" class="category-card">
+                    <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=400&fit=crop" alt="Bags">
+                    <div class="category-overlay">
+                        <h3>Bags</h3>
+                        <p>Carry your world</p>
+                    </div>
+                </a>
+                <a href="accessories.html" class="category-card">
+                    <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=400&fit=crop" alt="Accessories">
+                    <div class="category-overlay">
+                        <h3>Accessories</h3>
+                        <p>Complete the look</p>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- ========= CATEGORIES, TOP PRODUCTS, OFFERS, MOMENTS (all original content) ========= -->
-    <section class="categories"><div class="container"><h2 class="section-title">Shop by Category</h2><div class="categories-grid">
-        <div class="category-card"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Footwear"><div class="category-overlay"><h3>Footwear</h3><p>Step into elegance</p></div></div>
-        <div class="category-card"><img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=600&q=80" alt="Fashion"><div class="category-overlay"><h3>Fashion</h3><p>Timeless pieces</p></div></div>
-        <div class="category-card"><img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=600&q=80" alt="Home Essentials"><div class="category-overlay"><h3>Home Essentials</h3><p>Elevate your space</p></div></div>
-        <div class="category-card"><img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=600&q=80" alt="Accessories"><div class="category-overlay"><h3>Accessories</h3><p>Finishing touches</p></div></div>
-    </div></div></section>
+    <!-- ===== FEATURED PRODUCTS ===== -->
+    <section class="section featured-section" id="featured">
+        <div class="container">
+            <div class="section-header">
+                <h2>Featured Picks</h2>
+                <p>Our most loved products this season</p>
+            </div>
+            <div class="products-grid" id="featuredProducts">
+                <!-- Will be loaded by app.js -->
+                <div style="text-align:center;padding:40px;color:var(--gray-500);">Loading featured products...</div>
+            </div>
+        </div>
+    </section>
 
-    <section class="top-products" id="products"><div class="container"><h2 class="section-title">Top Picks</h2><div class="products-container">
-        <div class="product-card"><div class="product-img"><img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=600&q=80" alt="Product"></div><button class="quick-add-btn">Quick Add +</button><div class="product-info"><h3>Minimalist Leather Sandals</h3><p>Handcrafted premium leather</p><a href="womensfootwear.html" class="explore-link">Explore Collection <i class="fas fa-arrow-right"></i></a></div></div>
-        <div class="product-card"><div class="product-img"><img src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=600&q=80" alt="Product"></div><button class="quick-add-btn">Quick Add +</button><div class="product-info"><h3>Cashmere Blend Sweater</h3><p>Luxurious softness</p><a href="womensfootwear.html" class="explore-link">Explore Collection <i class="fas fa-arrow-right"></i></a></div></div>
-        <div class="product-card"><div class="product-img"><img src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?auto=format&fit=crop&w=600&q=80" alt="Product"></div><button class="quick-add-btn">Quick Add +</button><div class="product-info"><h3>Ceramic Tableware Set</h3><p>Minimalist design</p><a href="household.html" class="explore-link">Explore Collection <i class="fas fa-arrow-right"></i></a></div></div>
-        <div class="product-card"><div class="product-img"><img src="https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6?auto=format&fit=crop&w=600&q=80" alt="Product"></div><button class="quick-add-btn">Quick Add +</button><div class="product-info"><h3>Gold Accent Watch</h3><p>Elegant timepiece</p><a href="accessories.html" class="explore-link">Explore Collection <i class="fas fa-arrow-right"></i></a></div></div>
-    </div></div></section>
+    <!-- ===== BRAND STORY ===== -->
+    <section class="brand-story">
+        <div class="container">
+            <div class="brand-grid">
+                <div class="brand-content">
+                    <h2>Crafted With <span class="highlight">Purpose</span></h2>
+                    <p>JMPOTTERS was born from a simple idea: quality products shouldn't be complicated to find. We curate premium fashion and lifestyle pieces that blend timeless elegance with modern functionality.</p>
+                    <p>From our handpicked footwear collections to our carefully designed accessories, every product is selected with one goal in mind — to help you express your unique style with confidence.</p>
+                    <div class="brand-features">
+                        <div class="brand-feature">
+                            <i class='bx bx-check-shield'></i>
+                            <span>Premium Quality</span>
+                        </div>
+                        <div class="brand-feature">
+                            <i class='bx bx-leaf'></i>
+                            <span>Sustainable Materials</span>
+                        </div>
+                        <div class="brand-feature">
+                            <i class='bx bx-truck'></i>
+                            <span>Fast Delivery</span>
+                        </div>
+                        <div class="brand-feature">
+                            <i class='bx bx-support'></i>
+                            <span>24/7 Support</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="brand-image">
+                    <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=600&h=500&fit=crop" alt="About JMPOTTERS" onerror="this.src='https://via.placeholder.com/600x500?text=JMPOTTERS'">
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <section class="limited-offers"><div class="container"><div class="offer-banner"><div class="offer-icon"><i class="fas fa-clock"></i></div><div class="offer-text"><strong>Limited Stock:</strong> <span>Exclusive Dish Rack</span>, <span>Granite Pot Set</span>, <span>Chafing Dish</span>, and <span>Ladders</span>.</div></div></div></section>
+    <!-- ===== TESTIMONIALS ===== -->
+    <section class="section testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>What Our Customers Say</h2>
+                <p>Real reviews from real people</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="stars"><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i></div>
+                    <p>"Absolutely love my new sneakers! The quality is amazing and they look even better in person. Will definitely be ordering again."</p>
+                    <div class="testimonial-author">
+                        <div class="avatar">TO</div>
+                        <div>
+                            <div class="name">Tunde O.</div>
+                            <div class="role">Lagos, Nigeria</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars"><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i></div>
+                    <p>"The handbag I ordered exceeded my expectations. The craftsmanship is top-tier and it arrived faster than I expected. Highly recommend!"</p>
+                    <div class="testimonial-author">
+                        <div class="avatar">AA</div>
+                        <div>
+                            <div class="name">Amina A.</div>
+                            <div class="role">Abuja, Nigeria</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars"><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i></div>
+                    <p>"Finally found a store that understands quality. The household collection is beautiful and adds such elegance to my home. Love it!"</p>
+                    <div class="testimonial-author">
+                        <div class="avatar">CO</div>
+                        <div>
+                            <div class="name">Chioma O.</div>
+                            <div class="role">Port Harcourt, Nigeria</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <section class="press"><div class="container"><h4 class="press-title">As Featured In</h4><div class="press-logos"><div class="skeleton-loader skeleton-pattern-stripe" style="width: 120px; height: 30px; border-radius: 2px;"></div><div class="skeleton-loader skeleton-pattern-stripe" style="width: 100px; height: 30px;"></div><div class="skeleton-loader skeleton-pattern-stripe" style="width: 110px; height: 30px;"></div><div class="skeleton-loader skeleton-pattern-stripe" style="width: 90px; height: 30px;"></div></div></div></section>
+    <!-- ===== NEWSLETTER ===== -->
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-container">
+                <h2>Join the JMPOTTERS Community</h2>
+                <p>Subscribe to get exclusive offers, new collection alerts, and style inspiration delivered to your inbox.</p>
+                <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
 
-    <section class="style-moments"><div class="container"><h2 class="section-title">Style Moments</h2><div class="moments-grid">
-        <div class="moment-card"><img src="https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=600&q=80" alt="Style Moment"><div class="moment-overlay"><p>Loved by 100+ happy customers</p></div></div>
-        <div class="moment-card"><img src="https://images.unsplash.com/photo-1505842381624-c6b0579625a5?auto=format&fit=crop&w=600&q=80" alt="Style Moment"><div class="moment-overlay"><p>Styled to fit your space</p></div></div>
-        <div class="moment-card"><img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=600&q=80" alt="Style Moment"><div class="moment-overlay"><p>Featured in top lifestyle magazines</p></div></div>
-    </div></div></section>
-
-    <!-- ========= FOOTER – DARK LUXURY WITH ENLARGED LOGO ========= -->
+    <!-- ===== FOOTER ===== -->
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <div class="footer-logo">
-                        <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
-                    </div>
-                    <p>Where Style Meets Simplicity. We curate elegant, minimalist pieces for the modern lifestyle.</p>
-                    <div class="social-links">
-                        <a href="#"><i class='bx bxl-whatsapp'></i></a>
-                        <a href="#"><i class='bx bxl-instagram'></i></a>
-                        <a href="#"><i class='bx bxl-facebook'></i></a>
-                        <a href="#"><i class='bx bxl-pinterest'></i></a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Shop</h3>
-                    <ul class="footer-links">
-                        <li><a href="#"><i class='bx bx-chevron-right'></i> New Arrivals</a></li>
-                        <li><a href="#"><i class='bx bx-chevron-right'></i> Best Sellers</a></li>
-                        <li><a href="#"><i class='bx bx-chevron-right'></i> Sale</a></li>
-                        <li><a href="mensfootwear.html"><i class='bx bx-chevron-right'></i> Men's Footwear</a></li>
-                        <li><a href="womensfootwear.html"><i class='bx bx-chevron-right'></i> Women's Footwear</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Information</h3>
-                    <ul class="footer-links">
-                        <li><a href="#"><i class='bx bx-chevron-right'></i> About Us</a></li>
-                        <li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact</a></li>
-                        <li><a href="#"><i class='bx bx-chevron-right'></i> Shipping Policy</a></li>
-                        <li><a href="#"><i class='bx bx-chevron-right'></i> Returns</a></li>
-                        <li><a href="#"><i class='bx bx-chevron-right'></i> FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Newsletter</h3>
-                    <p>Subscribe to receive updates and exclusive deals.</p>
-                    <form class="newsletter-form" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                        <input type="email" placeholder="Your email address" style="padding: 10px; border-radius: 4px; border: none;">
-                        <button type="submit" class="btn" style="background: var(--gold-primary);">Subscribe</button>
-                    </form>
+        <div class="footer-container">
+            <div class="footer-column">
+                <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
+                <p>Premium fashion and lifestyle products for the modern individual.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-whatsapp'></i></a>
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                    <a href="#"><i class='bx bxl-pinterest'></i></a>
                 </div>
             </div>
-            <div class="copyright">
-                &copy; 2025 JMPOTTERS. All rights reserved.
+            <div class="footer-column">
+                <h3>Shop</h3>
+                <ul class="footer-links">
+                    <li><a href="mensfootwear.html"><i class='bx bx-chevron-right'></i> Men's Footwear</a></li>
+                    <li><a href="womensfootwear.html"><i class='bx bx-chevron-right'></i> Women's Footwear</a></li>
+                    <li><a href="bags.html"><i class='bx bx-chevron-right'></i> Bags</a></li>
+                    <li><a href="accessories.html"><i class='bx bx-chevron-right'></i> Accessories</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Information</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> About Us</a></li>
+                    <li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact</a></li>
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> Shipping Policy</a></li>
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> Returns</a></li>
+                    <li><a href="#"><i class='bx bx-chevron-right'></i> FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Connect</h3>
+                <ul class="footer-links">
+                    <li><i class='bx bx-phone-call'></i> +234 813 958 3320</li>
+                    <li><i class='bx bx-envelope'></i> hello@jmpotters.com</li>
+                </ul>
             </div>
         </div>
+        <div class="copyright">&copy; 2025 JMPOTTERS. All rights reserved.</div>
     </footer>
 
-    <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
-        <i class='bx bxl-whatsapp'></i>
-    </a>
-
-    <!-- ========= SCRIPTS: HEADER/FOOTER INTERACTIONS & ORIGINAL FUNCTIONALITY ========= -->
+    <!-- ===== SCRIPTS ===== -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Header scroll padding (adjust hero margin-top)
-            const header = document.querySelector('header');
-            const hero = document.getElementById('heroSection');
-            if (header && hero) {
-                hero.style.paddingTop = header.offsetHeight + 'px';
-            }
-            
             // Mobile navigation
             const mobileToggle = document.getElementById('mobileToggle');
             const mobileNav = document.getElementById('mobileNav');
             const navOverlay = document.getElementById('navOverlay');
-            const closeNavBtns = document.querySelectorAll('.close-nav');
+            const closeNav = document.querySelector('.close-nav');
             function openNav() { mobileNav.classList.add('active'); navOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
-            function closeNav() { mobileNav.classList.remove('active'); navOverlay.classList.remove('active'); document.body.style.overflow = ''; }
-            if(mobileToggle) mobileToggle.addEventListener('click', openNav);
-            closeNavBtns.forEach(btn => btn.addEventListener('click', closeNav));
-            if(navOverlay) navOverlay.addEventListener('click', closeNav);
+            function closeNavFunc() { mobileNav.classList.remove('active'); navOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+            if (mobileToggle) mobileToggle.addEventListener('click', openNav);
+            if (closeNav) closeNav.addEventListener('click', closeNavFunc);
+            if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
             
-            // Mobile dropdown toggle
-            const mobileDropdowns = document.querySelectorAll('.mobile-dropdown');
-            mobileDropdowns.forEach(dropdown => {
-                const link = dropdown.querySelector('a');
-                if(link) link.addEventListener('click', function(e) { e.preventDefault(); dropdown.classList.toggle('active'); });
-            });
-            
-            // UPDATED: Cart icon redirects to cart.html (replaces alert)
+            // Cart icon redirects to cart page
             const cartIcon = document.getElementById('cartIcon');
-            const cartCountSpan = document.getElementById('cartCount');
-            
-            if(cartIcon) {
-                // Remove any existing event listeners by cloning
-                const newCartIcon = cartIcon.cloneNode(true);
-                cartIcon.parentNode.replaceChild(newCartIcon, cartIcon);
-                
-                newCartIcon.addEventListener('click', function(e) {
-                    e.preventDefault();
+            if (cartIcon) {
+                cartIcon.addEventListener('click', function() {
                     window.location.href = 'cart.html';
                 });
             }
             
-            // Wishlist icon (keep existing behavior or update as needed)
+            // Wishlist icon
             const wishlistIcon = document.getElementById('wishlistIcon');
-            const wishlistCountSpan = document.getElementById('wishlistCount');
-            if(wishlistIcon) {
-                wishlistIcon.addEventListener('click', () => {
-                    alert('Wishlist feature coming soon! Your items will be saved here.');
+            if (wishlistIcon) {
+                wishlistIcon.addEventListener('click', function() {
+                    alert('Wishlist feature coming soon!');
                 });
             }
             
-            // Quick add buttons - update cart count demo and save to localStorage
-            const quickAddBtns = document.querySelectorAll('.quick-add-btn');
-            quickAddBtns.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    
-                    // Get product info
-                    const productCard = this.closest('.product-card');
-                    const productTitle = productCard.querySelector('.product-info h3')?.innerText || 'Product';
-                    const productPrice = productCard.querySelector('.product-info p')?.innerText || '';
-                    
-                    // Create cart item
-                    let cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                    const existingItem = cart.find(item => item.name === productTitle);
-                    
-                    if (existingItem) {
-                        existingItem.quantity += 1;
-                    } else {
-                        cart.push({
-                            product_id: Date.now(),
-                            name: productTitle,
-                            price: 0, // You may want to extract actual price
-                            category_slug: 'general',
-                            image_url: '',
-                            quantity: 1
-                        });
+            // Load featured products if JMPOTTERS is available
+            if (window.JMPOTTERS && window.JMPOTTERS.loadProductsByCategory) {
+                window.JMPOTTERS_CONFIG = window.JMPOTTERS_CONFIG || {};
+                window.JMPOTTERS_CONFIG.currentCategory = 'mensfootwear';
+                window.JMPOTTERS.loadProductsByCategory('mensfootwear').then(() => {
+                    const products = window.JMPOTTERS_PRODUCTS_CACHE || [];
+                    const container = document.getElementById('featuredProducts');
+                    if (products.length > 0 && container) {
+                        const featured = products.slice(0, 4);
+                        container.innerHTML = featured.map(product => `
+                            <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" class="product-card">
+                                <div class="product-image">
+                                    <img src="${window.JMPOTTERS.getImageUrl ? window.JMPOTTERS.getImageUrl('mensfootwear', product.image_url) : '#'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/240x220?text=JMPOTTERS'">
+                                </div>
+                                <div class="product-info">
+                                    <h3>${product.name}</h3>
+                                    <div class="product-price">${window.JMPOTTERS.formatPrice ? window.JMPOTTERS.formatPrice(product.price) : '₦' + product.price}</div>
+                                </div>
+                            </a>
+                        `).join('');
                     }
-                    
-                    localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
-                    
-                    // Update cart count display
-                    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-                    if (cartCountSpan) {
-                        cartCountSpan.innerText = totalItems;
-                        cartCountSpan.style.display = totalItems > 0 ? 'flex' : 'none';
-                    }
-                    
-                    // Visual feedback
-                    btn.textContent = 'Added!';
-                    setTimeout(() => { btn.textContent = 'Quick Add +'; }, 1000);
-                    
-                    // Optional: Show notification
-                    alert(`${productTitle} added to cart!`);
                 });
-            });
+            }
             
-            // Function to update cart count on page load
+            // Update cart count
             function updateCartCount() {
                 const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
                 const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-                if (cartCountSpan) {
-                    cartCountSpan.innerText = totalItems;
-                    cartCountSpan.style.display = totalItems > 0 ? 'flex' : 'none';
+                const cartCount = document.getElementById('cartCount');
+                if (cartCount) {
+                    cartCount.textContent = totalItems;
+                    cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
                 }
             }
             updateCartCount();
             
-            // Intersection observer for animations
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('appear'); });
-            }, { threshold: 0.1 });
-            document.querySelectorAll('.category-card, .product-card, .moment-card').forEach(el => observer.observe(el));
+            // Update wishlist count
+            function updateWishlistCount() {
+                const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+                const wishlistCount = document.getElementById('wishlistCount');
+                if (wishlistCount) {
+                    wishlistCount.textContent = wishlist.length;
+                    wishlistCount.style.display = wishlist.length > 0 ? 'flex' : 'none';
+                }
+            }
+            updateWishlistCount();
         });
     </script>
 </body>
