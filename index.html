@@ -263,90 +263,76 @@
             color: #0c0f15;
         }
 
-        /* ===== HERO ===== */
-        .hero {
-            position: relative;
-            min-height: 90vh;
+        /* ===== SCROLL HERO (ContainerScroll) ===== */
+        .scroll-hero-wrapper {
+            min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 120px 0 80px;
-            background: linear-gradient(135deg, #0a0d12 0%, #14181f 50%, #0a0d12 100%);
+            justify-content: center;
+            padding: 1rem;
+            padding-top: 80px;
+            background: #0a0d12;
             overflow: hidden;
         }
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -10%;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+
+        .scroll-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem 0;
+            perspective: 1000px;
         }
 
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-            position: relative;
-            z-index: 2;
+        .hero-header {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            will-change: transform;
+            transition: transform 0.1s ease-out;
         }
-        .hero-content {
-            animation: fadeInUp 1s ease-out;
-        }
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+
+        .hero-header .badge {
+            display: inline-block;
             background: rgba(212, 175, 55, 0.15);
             border: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 0.4rem 1rem;
+            padding: 0.4rem 1.2rem;
             border-radius: 50px;
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--gold);
-            margin-bottom: 1.5rem;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-        }
-        .hero h1 {
-            font-size: clamp(2.8rem, 5vw, 4.2rem);
-            font-weight: 700;
-            color: white;
-            line-height: 1.08;
             margin-bottom: 1.5rem;
         }
-        .hero h1 .highlight {
+
+        .hero-header h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            color: white;
+            line-height: 1.08;
+            margin-bottom: 1rem;
+        }
+
+        .hero-header h1 .highlight {
             background: linear-gradient(135deg, var(--gold), #f5d97a);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .hero p {
+
+        .hero-header p {
             font-size: 1.1rem;
             color: #94a3b8;
-            max-width: 500px;
-            margin-bottom: 2rem;
-            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
         }
-        .hero-buttons {
+
+        .hero-header .btn-group {
             display: flex;
             gap: 1rem;
+            justify-content: center;
             flex-wrap: wrap;
         }
+
         .btn-primary {
             display: inline-flex;
             align-items: center;
@@ -366,6 +352,7 @@
             transform: translateY(-3px);
             box-shadow: var(--gold-glow);
         }
+
         .btn-secondary {
             display: inline-flex;
             align-items: center;
@@ -387,93 +374,72 @@
             color: var(--gold);
         }
 
-        .hero-stats {
-            display: flex;
-            gap: 3rem;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .hero-stat h4 {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: white;
-        }
-        .hero-stat p {
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-top: 0.1rem;
+        /* The 3D Card */
+        .hero-card {
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 4px solid #3a3a3a;
+            padding: 0.5rem;
+            border-radius: 30px;
+            background: #1a1a1a;
+            box-shadow: 0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003;
+            will-change: transform;
+            transition: transform 0.1s ease-out;
         }
 
-        .hero-image {
-            position: relative;
-            animation: fadeInUp 1s ease-out 0.3s both;
-        }
-        .hero-image img {
-            width: 100%;
-            max-width: 500px;
-            border-radius: 20px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
-            display: block;
-            margin: 0 auto;
-        }
-        .floating-badge {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 0.8rem 1.2rem;
+        .hero-card-inner {
+            background: #0c0f15;
+            border-radius: 22px;
+            overflow: hidden;
+            padding: 1rem;
+            min-height: 400px;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            animation: float 4s ease-in-out infinite;
-        }
-        .floating-badge:nth-child(2) {
-            bottom: 20px;
-            left: -20px;
-            animation-delay: 1s;
-        }
-        .floating-badge:nth-child(3) {
-            top: 30px;
-            right: -20px;
-            animation-delay: 2s;
-        }
-        .floating-badge i {
-            font-size: 1.5rem;
-            color: var(--gold);
-        }
-        .floating-badge span {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: white;
-        }
-        .floating-badge small {
-            display: block;
-            font-size: 0.65rem;
-            color: #94a3b8;
-            font-weight: 400;
+            justify-content: center;
+            position: relative;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .hero-card-inner img {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 16px;
         }
-        @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
+
+        .hero-card-inner .card-overlay {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            right: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-overlay .stat-item {
+            color: white;
+        }
+        .card-overlay .stat-item .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        .card-overlay .stat-item .label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        /* Stats row inside card */
+        .card-stats {
+            display: flex;
+            gap: 2.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         /* ===== SECTIONS ===== */
@@ -862,23 +828,6 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .hero-grid {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 2rem;
-            }
-            .hero p {
-                margin: 0 auto 2rem;
-            }
-            .hero-buttons {
-                justify-content: center;
-            }
-            .hero-stats {
-                justify-content: center;
-            }
-            .hero-image img {
-                max-width: 400px;
-            }
             .brand-grid {
                 grid-template-columns: 1fr;
                 text-align: center;
@@ -886,31 +835,57 @@
             .brand-features {
                 justify-content: center;
             }
+            .scroll-hero-wrapper {
+                padding: 1rem;
+                padding-top: 80px;
+            }
+            .hero-header h1 {
+                font-size: 2.8rem;
+            }
+            .card-stats {
+                gap: 1.5rem;
+                padding: 0.8rem 1.2rem;
+                flex-wrap: wrap;
+            }
         }
 
         @media (max-width: 768px) {
-            .hero {
-                min-height: auto;
-                padding: 100px 0 60px;
-            }
-            .hero h1 {
+            .hero-header h1 {
                 font-size: 2.2rem;
             }
-            .hero-image .floating-badge {
-                display: none;
+            .hero-header .btn-group {
+                flex-direction: column;
+                align-items: center;
             }
-            .hero-stats {
-                gap: 1.5rem;
+            .hero-card-inner {
+                min-height: 250px;
+                padding: 0.5rem;
+            }
+            .hero-card-inner img {
+                max-height: 300px;
+            }
+            .card-overlay {
+                bottom: 1rem;
+                left: 1rem;
+                right: 1rem;
+            }
+            .card-stats {
+                gap: 1rem;
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
                 flex-wrap: wrap;
             }
-            .newsletter-form {
-                flex-direction: column;
+            .card-overlay .stat-item .number {
+                font-size: 1.2rem;
             }
             .products-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
             .categories-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .newsletter-form {
+                flex-direction: column;
             }
         }
 
@@ -921,13 +896,26 @@
             .categories-grid {
                 grid-template-columns: 1fr 1fr;
             }
-            .hero h1 {
+            .hero-header h1 {
                 font-size: 1.8rem;
             }
-            .hero-stats {
+            .scroll-hero-wrapper {
+                padding: 0.5rem;
+                padding-top: 70px;
+            }
+            .hero-card {
+                padding: 0.3rem;
+                border-width: 2px;
+            }
+            .hero-card-inner {
+                min-height: 200px;
+                border-radius: 14px;
+            }
+            .card-stats {
                 flex-direction: column;
+                gap: 0.5rem;
                 align-items: center;
-                gap: 1rem;
+                width: 100%;
             }
         }
 
@@ -1008,53 +996,46 @@
         </ul>
     </div>
 
-    <!-- ===== HERO ===== -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-grid">
-                <div class="hero-content">
-                    <div class="hero-badge">
-                        <i class='bx bx-rocket'></i> New Collection Drop
-                    </div>
-                    <h1>Premium Fashion <br><span class="highlight">For The Modern You</span></h1>
-                    <p>Discover curated collections of premium footwear, bags, accessories, and household essentials — designed for those who appreciate quality and style.</p>
-                    <div class="hero-buttons">
-                        <a href="#featured" class="btn-primary">
-                            <i class='bx bx-shopping-bag'></i> Shop Now
-                        </a>
-                        <a href="#categories" class="btn-secondary">
-                            Explore Collections <i class='bx bx-chevron-right'></i>
-                        </a>
-                    </div>
-                    <div class="hero-stats">
-                        <div class="hero-stat">
-                            <h4>500+</h4>
-                            <p>Happy Customers</p>
-                        </div>
-                        <div class="hero-stat">
-                            <h4>50+</h4>
-                            <p>Premium Products</p>
-                        </div>
-                        <div class="hero-stat">
-                            <h4>4.9★</h4>
-                            <p>Average Rating</p>
-                        </div>
-                    </div>
+    <!-- ===== SCROLL HERO (ContainerScroll style) ===== -->
+    <section class="scroll-hero-wrapper" id="heroSection">
+        <div class="scroll-hero-inner" id="heroInner">
+            <!-- Header that moves with scroll -->
+            <div class="hero-header" id="heroHeader">
+                <div class="badge"><i class='bx bx-rocket'></i> New Collection Drop</div>
+                <h1>Premium Fashion <br><span class="highlight">For The Modern You</span></h1>
+                <p>Discover curated collections of premium footwear, bags, accessories, and household essentials — designed for those who appreciate quality and style.</p>
+                <div class="btn-group">
+                    <a href="#featured" class="btn-primary">
+                        <i class='bx bx-shopping-bag'></i> Shop Now
+                    </a>
+                    <a href="#categories" class="btn-secondary">
+                        Explore Collections <i class='bx bx-chevron-right'></i>
+                    </a>
                 </div>
-                <div class="hero-image">
-                    <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&h=800&fit=crop&crop=center" alt="JMPOTTERS Collection" onerror="this.src='https://via.placeholder.com/500x500?text=JMPOTTERS'">
-                    <div class="floating-badge" style="bottom: 20px; left: -20px;">
-                        <i class='bx bx-star'></i>
-                        <div>
-                            <span>4.9 ★</span>
-                            <small>Customer Rating</small>
-                        </div>
-                    </div>
-                    <div class="floating-badge" style="top: 30px; right: -20px;">
-                        <i class='bx bx-trending-up'></i>
-                        <div>
-                            <span>Premium</span>
-                            <small>Quality Guaranteed</small>
+            </div>
+
+            <!-- 3D Card -->
+            <div class="hero-card" id="heroCard">
+                <div class="hero-card-inner">
+                    <img
+                    src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&h=800&fit=crop&crop=center"
+                    alt="JMPOTTERS Collection"
+                    onerror="this.src='https://via.placeholder.com/1200x800?text=JMPOTTERS'"
+                    />
+                    <div class="card-overlay">
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <div class="number">500+</div>
+                                <div class="label">Happy Customers</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="number">50+</div>
+                                <div class="label">Premium Products</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="number">4.9★</div>
+                                <div class="label">Average Rating</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1227,12 +1208,70 @@
     <!-- ===== SCRIPTS ===== -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ===== SCROLL ANIMATION (ContainerScroll style) =====
+            const heroSection = document.getElementById('heroSection');
+            const heroInner = document.getElementById('heroInner');
+            const heroHeader = document.getElementById('heroHeader');
+            const heroCard = document.getElementById('heroCard');
+            let isMobile = window.innerWidth <= 768;
+
+            // Update isMobile on resize
+            window.addEventListener('resize', function() {
+                isMobile = window.innerWidth <= 768;
+            });
+
+            function updateScrollAnimation() {
+                const rect = heroSection.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                // Progress from 0 (top of section enters) to 1 (bottom of section exits)
+                const startOffset = 0;
+                const endOffset = viewportHeight * 0.6;
+                let progress = (viewportHeight - rect.top) / (viewportHeight + rect.height - endOffset);
+                progress = Math.max(0, Math.min(1, progress));
+
+                // Header translateY: moves up as you scroll
+                const headerTranslate = -progress * (isMobile ? 60 : 120);
+                heroHeader.style.transform = `translateY(${headerTranslate}px)`;
+
+                // Card effects: rotateX, scale, translateY
+                const rotateX = isMobile ? 0 : 20 - (progress * 20);
+                const scale = isMobile ? 0.7 + (progress * 0.2) : 1.05 - (progress * 0.05);
+                const cardTranslateY = -progress * (isMobile ? 40 : 80);
+
+                heroCard.style.transform =
+                    `rotateX(${rotateX}deg) scale(${scale}) translateY(${cardTranslateY}px)`;
+
+                // Card shadow changes with scroll
+                const shadowIntensity = 1 - progress * 0.5;
+                heroCard.style.boxShadow =
+                    `0 0 #0000004d, 0 ${9 * shadowIntensity}px ${20 * shadowIntensity}px #0000004a, 0 ${37 * shadowIntensity}px ${37 * shadowIntensity}px #00000042, 0 ${84 * shadowIntensity}px ${50 * shadowIntensity}px #00000026, 0 ${149 * shadowIntensity}px ${60 * shadowIntensity}px #0000000a, 0 ${233 * shadowIntensity}px ${65 * shadowIntensity}px #00000003`;
+            }
+
+            // Throttled scroll listener
+            let ticking = false;
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    window.requestAnimationFrame(function() {
+                        updateScrollAnimation();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+
+            // Also update on load and resize
+            window.addEventListener('resize', function() {
+                updateScrollAnimation();
+            });
+
+            // Initial update
+            setTimeout(updateScrollAnimation, 100);
+
             // ===== SUPABASE CONFIG =====
             const SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
             const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
 
             let supabase = null;
-
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             } catch (e) {
@@ -1335,14 +1374,14 @@
                     const mainCategories = categories.filter(c => categoryImages[c.slug]);
 
                     container.innerHTML = mainCategories.map(cat => `
-                        <a href="${cat.slug}.html" class="category-card">
-                            <img src="${categoryImages[cat.slug] || 'https://via.placeholder.com/400x400?text=Category'}" alt="${escapeHtml(cat.name)}">
-                            <div class="category-overlay">
-                                <h3>${categoryLabels[cat.slug] || escapeHtml(cat.name)}</h3>
-                                <p>Shop Collection</p>
-                            </div>
-                        </a>
-                    `).join('');
+                            <a href="${cat.slug}.html" class="category-card">
+                                <img src="${categoryImages[cat.slug] || 'https://via.placeholder.com/400x400?text=Category'}" alt="${escapeHtml(cat.name)}">
+                                <div class="category-overlay">
+                                    <h3>${categoryLabels[cat.slug] || escapeHtml(cat.name)}</h3>
+                                    <p>Shop Collection</p>
+                                </div>
+                            </a>
+                        `).join('');
 
                 } catch (error) {
                     console.error('Error fetching categories:', error);
@@ -1380,20 +1419,20 @@
                             100) : 0;
 
                         return `
-                            <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" class="product-card">
-                                <div class="product-image">
-                                    <img src="${imageUrl}" alt="${escapeHtml(product.name)}" onerror="this.src='https://via.placeholder.com/300x300?text=JMPOTTERS'">
-                                </div>
-                                <div class="product-info">
-                                    <h3>${escapeHtml(product.name)}</h3>
-                                    <div>
-                                        <span class="product-price">${formatPrice(product.price)}</span>
-                                        ${product.compare_price && product.compare_price > product.price ? `<span class="old-price">${formatPrice(product.compare_price)}</span>` : ''}
-                                        ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
+                                <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" class="product-card">
+                                    <div class="product-image">
+                                        <img src="${imageUrl}" alt="${escapeHtml(product.name)}" onerror="this.src='https://via.placeholder.com/300x300?text=JMPOTTERS'">
                                     </div>
-                                </div>
-                            </a>
-                        `;
+                                    <div class="product-info">
+                                        <h3>${escapeHtml(product.name)}</h3>
+                                        <div>
+                                            <span class="product-price">${formatPrice(product.price)}</span>
+                                            ${product.compare_price && product.compare_price > product.price ? `<span class="old-price">${formatPrice(product.compare_price)}</span>` : ''}
+                                            ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
+                                        </div>
+                                    </div>
+                                </a>
+                            `;
                     }).join('');
 
                 } catch (error) {
