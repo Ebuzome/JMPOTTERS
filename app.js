@@ -161,6 +161,16 @@
         return div.innerHTML;
     }
     
+    function safeParseJSON(key, fallback) {
+        try {
+            return JSON.parse(localStorage.getItem(key)) || fallback;
+        } catch (e) {
+            console.error('Failed to parse ' + key + ':', e);
+            localStorage.removeItem(key);
+            return fallback;
+        }
+    }
+    
     function getSupabaseClient() {
         if (window.JMPOTTERS_SUPABASE_CLIENT) return window.JMPOTTERS_SUPABASE_CLIENT;
         if (window.supabase && window.supabase.createClient) {
@@ -240,7 +250,8 @@
                     nameQuery = nameQuery.ilike('name', `%${nameWords[0]}%`);
                 }
                 
-                const { data: keywordMatches } = await nameQuery.limit(10);
+                const { data: keywordMatches, error: keywordError } = await nameQuery.limit(10);
+                if (keywordError) console.error('Keyword recommendations query failed:', keywordError);
                 if (keywordMatches && keywordMatches.length > 0) {
                     recommendations = keywordMatches;
                 }
@@ -260,7 +271,8 @@
                     categoryQuery = categoryQuery.not('id', 'in', `(${existingIds.join(',')})`);
                 }
                 
-                const { data: categoryProducts } = await categoryQuery.limit(needed);
+                const { data: categoryProducts, error: categoryError } = await categoryQuery.limit(needed);
+                if (categoryError) console.error('Category recommendations query failed:', categoryError);
                 if (categoryProducts && categoryProducts.length > 0) {
                     recommendations = [...recommendations, ...categoryProducts];
                 }
@@ -279,7 +291,8 @@
                     randomQuery = randomQuery.not('id', 'in', `(${existingIds.join(',')})`);
                 }
                 
-                const { data: randomProducts } = await randomQuery.limit(needed);
+                const { data: randomProducts, error: randomError } = await randomQuery.limit(needed);
+                if (randomError) console.error('Random recommendations query failed:', randomError);
                 if (randomProducts && randomProducts.length > 0) {
                     recommendations = [...recommendations, ...randomProducts];
                 }
@@ -360,23 +373,26 @@
             
             console.log('✅ Loaded product:', product.name);
             
-            const { data: category } = await supabase
+            const { data: category, error: categoryError } = await supabase
                 .from('categories')
                 .select('id, name, slug')
                 .eq('id', product.category_id)
                 .single();
+            if (categoryError) console.error('Failed to load category:', categoryError);
             
-            const { data: colors } = await supabase
+            const { data: colors, error: colorsError } = await supabase
                 .from('product_colors')
                 .select('*')
                 .eq('product_id', product.id)
                 .order('sort_order');
+            if (colorsError) console.error('Failed to load colors:', colorsError);
             
-            const { data: sizes } = await supabase
+            const { data: sizes, error: sizesError } = await supabase
                 .from('product_sizes')
                 .select('*')
                 .eq('product_id', product.id)
                 .order('size_value');
+            if (sizesError) console.error('Failed to load sizes:', sizesError);
             
             document.title = `${product.name} - JMPOTTERS`;
             
@@ -422,7 +438,7 @@
         const hasComparePrice = product.compare_price && product.compare_price > product.price;
         const discountPercent = hasComparePrice ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
         
-        const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        const wishlist = safeParseJSON('jmpotters_wishlist', []);
         const isInWishlist = wishlist.some(item => item.id === product.id);
         
         const stockStatus = product.stock > 10 ? 'in-stock' : (product.stock > 0 ? 'low-stock' : 'out-of-stock');
@@ -644,15 +660,16 @@
         }
         
         try {
-            const { data: category } = await supabase.from('categories').select('id').eq('slug', categorySlug).single();
-            if (!category) throw new Error('Category not found');
+            const { data: category, error: catError } = await supabase.from('categories').select('id').eq('slug', categorySlug).single();
+            if (catError || !category) throw new Error('Category not found');
             
-            const { data: products } = await supabase
+            const { data: products, error: productsError } = await supabase
                 .from('products')
                 .select('id, name, price, image_url, stock, slug')
                 .eq('category_id', category.id)
                 .eq('is_active', true)
                 .order('created_at', { ascending: false });
+            if (productsError) throw productsError;
             
             if (!products || products.length === 0) {
                 productsGrid.innerHTML = '<div class="no-products">No products found</div>';
@@ -675,7 +692,7 @@
         
         products.forEach(product => {
             const imageUrl = getImageUrl(categorySlug, product.image_url);
-            const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+            const wishlist = safeParseJSON('jmpotters_wishlist', []);
             const isInWishlist = wishlist.some(item => item.id === product.id);
             
             const productLink = document.createElement('a');
@@ -719,7 +736,15 @@
     // ====================
     // CART FUNCTIONS
     // ====================
-    function getCart() { return JSON.parse(localStorage.getItem('jmpotters_cart')) || []; }
+    function getCart() {
+        try {
+            return JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+        } catch (e) {
+            console.error('Failed to parse cart data:', e);
+            localStorage.removeItem('jmpotters_cart');
+            return [];
+        }
+    }
     
     function saveCart(cart) {
         localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
@@ -753,7 +778,7 @@
     function updateCartUI() {
         const cart = getCart();
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        const wishlist = safeParseJSON('jmpotters_wishlist', []);
         
         const cartCount = document.getElementById('cartCount');
         if (cartCount) {
@@ -854,7 +879,7 @@
     }
     
     function toggleWishlist(product) {
-        let wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        let wishlist = safeParseJSON('jmpotters_wishlist', []);
         const exists = wishlist.some(item => item.id === product.id);
         if (exists) {
             wishlist = wishlist.filter(item => item.id !== product.id);
@@ -945,6 +970,10 @@
     
     async function getOrderByNumber(orderNumber) {
         const supabase = getSupabaseClient();
+        if (!supabase) {
+            console.error('Database connection unavailable for order lookup');
+            return null;
+        }
         try {
             // orderNumber is already plain (e.g., "0003")
             console.log('Looking up order:', orderNumber);
@@ -980,7 +1009,7 @@
             return;
         }
         
-        const user = JSON.parse(localStorage.getItem('jmpotters_user'));
+        const user = safeParseJSON('jmpotters_user', null);
         
         if (user && user.address && user.city && user.state) {
             isProcessingCheckout = true;

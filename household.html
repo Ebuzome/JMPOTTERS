@@ -967,11 +967,22 @@
                     window.JMPOTTERS_CONFIG = window.JMPOTTERS_CONFIG || {};
                     window.JMPOTTERS_CONFIG.currentCategory = 'household';
                     window.JMPOTTERS.loadProductsByCategory('household').then(() => {
-                        console.log('✅ Household products loaded from Supabase');
-                    }).catch(err => console.error('Error loading household products:', err));
+                        console.log('Household products loaded from Supabase');
+                    }).catch(err => {
+                        console.error('Error loading household products:', err);
+                        const grid = document.getElementById('productsGrid');
+                        if (grid) grid.innerHTML = '<div class="error-message">Failed to load products. Please refresh the page.</div>';
+                    });
                 }
                 attempts++;
-                if (attempts > 50) clearInterval(waitForApp);
+                if (attempts > 50) {
+                    clearInterval(waitForApp);
+                    const grid = document.getElementById('productsGrid');
+                    if (grid && grid.querySelector('.loading-spinner')) {
+                        grid.innerHTML = '<div class="error-message">Failed to initialize. Please refresh the page.</div>';
+                    }
+                    return;
+                }
             }, 200);
         });
     </script>
