@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -60,10 +62,13 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@jest/globals": "^30.4.1",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "5.7.3"
