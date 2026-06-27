@@ -1498,9 +1498,10 @@
 
             showcase.innerHTML = slides.map(function(s, i) {
                 var img = getImageUrl(s.image_url);
-                var link = s.link || '#featured';
+                var rawLink = (s.link || '#featured').trim();
+                var link = /^(https?:\/\/|\/|#|\?)/.test(rawLink) ? rawLink : '#featured';
                 return '<div class="hero-slide' + (i === 0 ? ' active' : '') + '">' +
-                    '<a href="' + encodeURI(link) + '" style="display:block;width:100%;height:100%">' +
+                    '<a href="' + escapeHtml(link) + '" style="display:block;width:100%;height:100%">' +
                     '<img src="' + img + '" alt="' + escapeHtml(s.name) + '"' + (i === 0 ? ' fetchpriority="high"' : ' loading="lazy"') + '>' +
                     '</a></div>';
             }).join('') + ctaHTML;
