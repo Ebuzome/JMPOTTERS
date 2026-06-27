@@ -373,6 +373,53 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Admin Authentication Gate -->
+    <div id="adminAuthGate" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);z-index:99999;display:flex;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:1rem;padding:2.5rem;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;">
+            <div style="width:4rem;height:4rem;margin:0 auto 1.5rem;background:linear-gradient(135deg,#6366F1,#4F46E5);border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-lock" style="color:white;font-size:1.5rem;"></i></div>
+            <h2 style="margin-bottom:0.5rem;color:#1F2937;">Admin Access</h2>
+            <p style="color:#6B7280;margin-bottom:1.5rem;font-size:0.875rem;">Enter your admin email to continue</p>
+            <input type="email" id="adminEmailInput" placeholder="Admin email address" style="width:100%;padding:0.75rem 1rem;border:1px solid #D1D5DB;border-radius:0.5rem;font-size:1rem;margin-bottom:1rem;outline:none;" onkeydown="if(event.key==='Enter')verifyAdmin()">
+            <div id="adminAuthError" style="color:#DC2626;font-size:0.8rem;margin-bottom:1rem;display:none;"></div>
+            <button onclick="verifyAdmin()" style="width:100%;padding:0.75rem;background:linear-gradient(135deg,#6366F1,#4F46E5);color:white;border:none;border-radius:0.5rem;font-size:1rem;font-weight:600;cursor:pointer;">Sign In</button>
+        </div>
+    </div>
+    <script>
+    (function(){
+        const ADMIN_SESSION_KEY = 'jmpotters_admin_session';
+        const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
+        function checkAdminSession() {
+            const session = localStorage.getItem(ADMIN_SESSION_KEY);
+            if (!session) return false;
+            try {
+                const data = JSON.parse(session);
+                if (Date.now() - data.timestamp > SESSION_DURATION) {
+                    localStorage.removeItem(ADMIN_SESSION_KEY);
+                    return false;
+                }
+                return true;
+            } catch(e) { return false; }
+        }
+        if (checkAdminSession()) {
+            document.getElementById('adminAuthGate').style.display = 'none';
+        }
+        window.verifyAdmin = async function() {
+            const email = document.getElementById('adminEmailInput').value.trim();
+            const errorEl = document.getElementById('adminAuthError');
+            if (!email) { errorEl.textContent = 'Please enter your email'; errorEl.style.display = 'block'; return; }
+            // Verify against Supabase user_profiles with admin/owner role
+            try {
+                const sb = window.supabase.createClient('https://tmpggeeuwdvlngvfncaa.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4');
+                const { data, error } = await sb.from('user_profiles').select('id,email,role').eq('email', email).maybeSingle();
+                if (error || !data) { errorEl.textContent = 'Access denied. Not a registered admin.'; errorEl.style.display = 'block'; return; }
+                if (data.role !== 'admin' && data.role !== 'owner') { errorEl.textContent = 'Access denied. Insufficient privileges.'; errorEl.style.display = 'block'; return; }
+                localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ email: data.email, role: data.role, timestamp: Date.now() }));
+                document.getElementById('adminAuthGate').style.display = 'none';
+            } catch(e) { errorEl.textContent = 'Connection error. Please try again.'; errorEl.style.display = 'block'; }
+        };
+    })();
+    </script>
+
     <div class="toast-container" id="toastContainer"></div>
     <div class="delete-confirm-overlay" id="deleteConfirmOverlay"><div class="delete-confirm-dialog"><div class="delete-confirm-icon"><i class="fas fa-exclamation-triangle"></i></div><h3 class="delete-confirm-title" id="deleteConfirmTitle">Delete Product?</h3><p class="delete-confirm-message" id="deleteConfirmMessage"></p><div class="flex gap-3 justify-center flex-wrap"><button class="btn btn-secondary" onclick="document.getElementById('deleteConfirmOverlay').style.display='none'">Cancel</button><button class="btn" id="deactivateBtn" style="background:var(--warning-500);color:white;display:none" onclick="AdminDashboard.deactivateFromDelete()"><i class="fas fa-power-off"></i> Deactivate Only</button><button class="btn btn-danger" id="permanentDeleteBtn" onclick="AdminDashboard.confirmPermanentDelete()"><i class="fas fa-trash"></i> Delete Permanently</button></div></div></div>
     <div class="delete-confirm-overlay" id="bulkDeleteConfirmOverlay"><div class="delete-confirm-dialog"><div class="delete-confirm-icon"><i class="fas fa-exclamation-triangle"></i></div><h3 class="delete-confirm-title">Bulk Delete Products?</h3><p id="bulkDeleteMessage"></p><div class="flex gap-3 justify-center"><button class="btn btn-secondary" onclick="document.getElementById('bulkDeleteConfirmOverlay').style.display='none'">Cancel</button><button class="btn btn-danger" onclick="AdminDashboard.confirmBulkDelete()"><i class="fas fa-trash"></i> Delete All Selected</button></div></div></div>
@@ -590,7 +637,27 @@
 
         return{init,openAddProductModal,editProduct,saveProduct,closeModal,onCategoryChange,openAddColorModal,closeAddColorModal,saveNewColor,deleteColor,openAddSizeModal,closeAddSizeModal,saveNewSize,loadSizesForColor,updateSizeStock,toggleSizeAvailability,searchColors,selectColor,selectColorFromSearch,removeSelectedColor,filterProducts,nextPage,prevPage,loadProducts:loadInitialData,toggleDarkMode,changeFontSize,changePrimaryColor,backupDatabase,importData,clearCache,resetSettings,saveStoreSettings,saveShippingSettings,saveTaxSettings,saveCurrencySettings,toggleNotifications,toggleProductSelect,selectAllProducts,clearSelection,bulkDeleteRequest,confirmBulkDelete,bulkEditOpen,applyBulkEdit,showDeleteConfirmation,confirmPermanentDelete,deactivateFromDelete,generateSlug,toggleSlugEdit,exportCSV,importCSV,duplicateProduct,duplicateSelected,sortProducts,loadOrders,filterOrdersByStatus,searchOrders,ordersPrevPage,ordersNextPage,updateOrderStatus,viewOrderDetailFull,toggleOrderStatusDropdown,navigateBackToOrders,exportOrders,refreshOrders,filterOrdersByDate,loadUsers,searchUsers,showCouponModal,saveCoupon,loadCoupons,toggleCouponStatus,showCategoryModal,saveCategory,deleteCategory,loadCategories,editCategory,confirmCategoryDeleteProducts,deleteCategoryProducts,deactivateCategoryProducts,deleteCategoryProductsAction,deactivateCategoryProductsAction,showSection:function(s){const l=document.querySelector(`.nav-link[data-section="${s}"]`);if(l)l.click()}}
     })();
-    document.addEventListener('DOMContentLoaded',()=>AdminDashboard.init());
+    document.addEventListener('DOMContentLoaded',()=>{
+        // Only initialize if admin auth passed
+        const session = localStorage.getItem('jmpotters_admin_session');
+        if (session) {
+            try {
+                const data = JSON.parse(session);
+                if (Date.now() - data.timestamp <= 30*60*1000) {
+                    AdminDashboard.init();
+                    return;
+                }
+            } catch(e) {}
+        }
+        // Wait for auth before initializing
+        const observer = new MutationObserver(()=>{
+            if (document.getElementById('adminAuthGate').style.display === 'none') {
+                observer.disconnect();
+                AdminDashboard.init();
+            }
+        });
+        observer.observe(document.getElementById('adminAuthGate'), { attributes: true, attributeFilter: ['style'] });
+    });
     window.AdminDashboard=AdminDashboard;
     </script>
 </body>

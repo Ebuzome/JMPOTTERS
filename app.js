@@ -871,7 +871,7 @@
     // ORDER CREATION WITH SEQUENTIAL ORDER NUMBERS (PLAIN DIGITS)
     // ====================
     async function createOrder(orderData, cart) {
-        console.log('Creating order with data:', orderData);
+
         
         const supabase = getSupabaseClient();
         if (!supabase) {
@@ -885,7 +885,7 @@
             const grandTotal = subtotal + shippingFee;
             
             const orderNumber = await getNextOrderNumber();
-            console.log('Generated order number:', orderNumber);
+
             
             const items = cart.map(item => ({
                 product_id: item.product_id,
@@ -917,7 +917,7 @@
                 created_at: new Date().toISOString()
             };
             
-            console.log('Inserting order:', orderInsert);
+
             
             const { data: order, error: orderError } = await supabase
                 .from('orders')
@@ -947,7 +947,7 @@
         const supabase = getSupabaseClient();
         try {
             // orderNumber is already plain (e.g., "0003")
-            console.log('Looking up order:', orderNumber);
+
             
             const { data: order, error } = await supabase
                 .from('orders')
@@ -968,11 +968,11 @@
     // ====================
     async function proceedToCheckout() {
         if (isProcessingCheckout) {
-            console.log('Checkout already in progress');
+
             return;
         }
         
-        console.log('proceedToCheckout called');
+
         
         const cart = getCart();
         if (cart.length === 0) {
