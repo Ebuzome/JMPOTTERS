@@ -1276,6 +1276,9 @@
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             } catch (e) {
                 console.error('Failed to initialize Supabase:', e);
+                document.querySelectorAll('#categoriesGrid, #featuredProducts').forEach(function(el) {
+                    if (el) el.innerHTML = '<div class="no-products">Failed to connect to database. Please refresh the page.</div>';
+                });
             }
 
             // ===== HELPERS =====
