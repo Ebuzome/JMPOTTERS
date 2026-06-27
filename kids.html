@@ -12,7 +12,10 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="assets/js/shared-layout.js" defer></script>
     <script src="app.js" defer></script>
+    
+    <link rel="stylesheet" href="assets/css/shared-layout.css">
     
     <style>
         /* ===== ORIGINAL PAGE STYLES (preserved, with adjustments for unified header/footer) ===== */
@@ -169,218 +172,8 @@
         }
 
         /* ========== UNIFIED DARK HEADER (glass, centered logo, left hamburger) ========== */
-        .nav-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1050;
-            background: var(--glass-dark);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            transition: var(--transition);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            position: relative;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-        
-        .header-left {
-            flex: 1;
-            display: flex;
-            justify-content: flex-start;
-        }
-        .mobile-toggle {
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
-            font-size: 2rem;
-            width: 52px;
-            height: 52px;
-            border-radius: 30px;
-            color: var(--gold-primary);
-            cursor: pointer;
-            transition: var(--transition);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .mobile-toggle:hover {
-            background: var(--gold-primary);
-            color: #0c0f15;
-            transform: rotate(5deg);
-        }
-        
-        .header-center {
-            flex: 0 0 auto;
-            display: flex;
-            justify-content: center;
-        }
-        .logo-img {
-            height: 70px;
-            width: auto;
-            object-fit: contain;
-            display: block;
-            transition: var(--transition);
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
-        }
-        .logo-img:hover {
-            transform: scale(1.02);
-            filter: drop-shadow(0 6px 12px rgba(212,175,55,0.4));
-        }
-        
-        .header-right {
-            flex: 1;
-            display: flex;
-            justify-content: flex-end;
-            gap: 20px;
-        }
-        .header-icon {
-            position: relative;
-            font-size: 1.8rem;
-            color: #eef2f5;
-            cursor: pointer;
-            transition: var(--transition);
-            background: rgba(255,255,255,0.05);
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        .header-icon:hover {
-            background: var(--gold-primary);
-            color: #0c0f15;
-            transform: translateY(-3px);
-        }
-        .icon-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: var(--gold-primary);
-            color: #0c0f15;
-            font-size: 0.7rem;
-            font-weight: 800;
-            min-width: 22px;
-            height: 22px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            font-family: monospace;
-        }
 
         /* Mobile Navigation (Left Drawer) */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(6px);
-            z-index: 1060;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .overlay.active {
-            display: block;
-            opacity: 1;
-        }
-        .mobile-nav {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 85%;
-            max-width: 380px;
-            height: 100vh;
-            background: #0f1219f2;
-            backdrop-filter: blur(24px);
-            z-index: 1070;
-            transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            padding: 32px 24px;
-            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
-            border-radius: 0 28px 28px 0;
-            overflow-y: auto;
-        }
-        .mobile-nav.active {
-            left: 0;
-        }
-        .mobile-nav-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-        }
-        .mobile-nav-header .logo-img {
-            height: 56px;
-        }
-        .close-nav {
-            background: rgba(255,255,255,0.08);
-            border: none;
-            font-size: 1.9rem;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            color: var(--gold-primary);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .close-nav:hover {
-            background: var(--gold-primary);
-            color: #0c0f15;
-            transform: rotate(90deg);
-        }
-        .mobile-nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .mobile-nav-links li a {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 14px 20px;
-            background: rgba(255,255,255,0.04);
-            border-radius: 50px;
-            font-weight: 500;
-            color: #f0f3f8;
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 1rem;
-        }
-        .mobile-nav-links li a i {
-            font-size: 1.5rem;
-            color: var(--gold-primary);
-        }
-        .mobile-nav-links li a:hover {
-            background: var(--gold-primary);
-            color: #0c0f15;
-            transform: translateX(8px);
-        }
-        .mobile-nav-links li a:hover i {
-            color: #0c0f15;
-        }
 
         /* ========== FOOTER – DARK LUXURY WITH ENLARGED LOGO ========== */
         footer {
@@ -390,37 +183,9 @@
             margin-top: 80px;
             border-top: 1px solid rgba(212, 175, 55, 0.3);
         }
-        .footer-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
         @media (min-width: 640px) {
-            .footer-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
         @media (min-width: 768px) {
-            .footer-container {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        .footer-logo-img {
-            height: 72px;
-            width: auto;
-            object-fit: contain;
-            filter: brightness(0) invert(1);
-            opacity: 0.95;
-            transition: var(--transition);
-            margin-bottom: 20px;
-        }
-        .footer-logo-img:hover {
-            opacity: 1;
-            transform: translateY(-3px);
-            filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(212,175,55,0.3));
         }
         .footer-column h3 {
             font-size: 1.2rem;
@@ -428,9 +193,6 @@
             color: var(--gold-primary);
             font-weight: 600;
             position: relative;
-        }
-        .footer-links {
-            list-style: none;
         }
         .footer-links li {
             margin-bottom: 10px;
@@ -448,11 +210,6 @@
             color: var(--gold-primary);
             transform: translateX(5px);
         }
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
         .social-links a {
             background: rgba(255,255,255,0.06);
             width: 38px;
@@ -469,14 +226,6 @@
             background: var(--gold-primary);
             transform: translateY(-3px);
             color: #0a0d12;
-        }
-        .copyright {
-            text-align: center;
-            padding-top: 32px;
-            margin-top: 32px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            font-size: 0.75rem;
-            color: #9aaeb9;
         }
 
         /* Adjust hero margin to account for fixed header */
@@ -695,21 +444,13 @@
         .close-wishlist:hover { color: var(--gold-primary); transform: rotate(90deg); }
         .wishlist-items { min-height: 300px; }
         .wishlist-empty { text-align: center; padding: 40px 0; color: #888; }
-
-        .whatsapp-float {
-            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: #25d366;
-            color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 100; animation: float 3s ease-in-out infinite; transition: var(--transition); text-decoration: none;
-        }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
 
-        @media (max-width: 1200px) { .footer-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 1200px) { }
         @media (max-width: 992px) { .filters-container { flex-direction: column; align-items: stretch; } }
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .hero { margin-top: 86px; }
-            .logo-img { height: 58px; }
-            .footer-logo-img { height: 62px; }
             body { cursor: default; }
             .cursor, .cursor-follower { display: none; }
         }
@@ -724,51 +465,9 @@
     <div class="cursor"></div>
     <div class="cursor-follower"></div>
 
-    <!-- ========= HEADER (UNIFIED DARK GLASS) ========= -->
-    <nav class="nav-bar">
-        <div class="header-container">
-            <div class="header-left">
-                <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
-                    <i class='bx bx-menu-alt-left'></i>
-                </button>
-            </div>
-            <div class="header-center">
-                <a href="index.html">
-                    <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
-                </a>
-            </div>
-            <div class="header-right">
-                <div class="header-icon" id="wishlistIcon">
-                    <i class='bx bx-heart'></i>
-                    <span class="icon-badge" id="wishlistCount">0</span>
-                </div>
-                <div class="header-icon" id="cartIcon">
-                    <i class='bx bx-shopping-bag'></i>
-                    <span class="icon-badge" id="cartCount">0</span>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Mobile Navigation -->
-    <div class="overlay" id="navOverlay"></div>
-    <div class="mobile-nav" id="mobileNav">
-        <div class="mobile-nav-header">
-            <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
-            <button class="close-nav" id="closeNavBtn"><i class='bx bx-x'></i></button>
-        </div>
-        <ul class="mobile-nav-links">
-            <li><a href="index.html"><i class='bx bx-home'></i> Home</a></li>
-            <li><a href="mensfootwear.html"><i class='bx bx-footwear'></i> Men's Footwear</a></li>
-            <li><a href="womensfootwear.html"><i class='bx bx-female'></i> Women's Footwear</a></li>
-            <li><a href="bags.html"><i class='bx bx-briefcase'></i> Bags</a></li>
-            <li><a href="accessories.html"><i class='bx bx-diamond'></i> Accessories</a></li>
-            <li><a href="household.html"><i class='bx bx-home-smile'></i> Household</a></li>
-            <li><a href="kids.html"><i class='bx bx-baby-carriage'></i> Kids & Babies</a></li>
-            <li><a href="healthcare.html"><i class='bx bx-heart'></i> Healthcare</a></li>
-            <li><a href="contact.html"><i class='bx bx-phone-call'></i> Contact</a></li>
-        </ul>
-    </div>
+        <!-- Shared header and mobile nav injected by shared-layout.js -->
+    <div id="shared-header"></div>
+    <div id="shared-mobile-nav"></div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -820,25 +519,8 @@
     <div class="overlay" id="wishlistOverlay"></div>
     <div class="wishlist-panel" id="wishlistPanel"><div class="wishlist-header"><h3 class="wishlist-title">Your Wishlist</h3><button class="close-wishlist"><i class="fas fa-times"></i></button></div><div class="wishlist-items" id="wishlistItems"><div class="wishlist-empty">Your wishlist is empty</div></div></div>
 
-    <!-- ========= FOOTER (DARK LUXURY) ========= -->
-    <footer>
-        <div class="footer-container">
-            <div class="footer-column">
-                <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
-                <p>Luxury kids essentials designed with love and care for your little ones.</p>
-                <div class="social-links"><a href="#"><i class='bx bxl-whatsapp'></i></a><a href="#"><i class='bx bxl-instagram'></i></a><a href="#"><i class='bx bxl-facebook'></i></a><a href="#"><i class='bx bxl-pinterest'></i></a></div>
-            </div>
-            <div class="footer-column"><h3>Shop</h3><ul class="footer-links"><li><a href="mensfootwear.html"><i class='bx bx-chevron-right'></i> Men's Footwear</a></li><li><a href="womensfootwear.html"><i class='bx bx-chevron-right'></i> Women's Footwear</a></li><li><a href="bags.html"><i class='bx bx-chevron-right'></i> Bags</a></li><li><a href="accessories.html"><i class='bx bx-chevron-right'></i> Accessories</a></li></ul></div>
-            <div class="footer-column"><h3>Information</h3><ul class="footer-links"><li><a href="#"><i class='bx bx-chevron-right'></i> About Us</a></li><li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact</a></li><li><a href="#"><i class='bx bx-chevron-right'></i> Shipping Policy</a></li><li><a href="#"><i class='bx bx-chevron-right'></i> Returns</a></li><li><a href="#"><i class='bx bx-chevron-right'></i> FAQ</a></li></ul></div>
-            <div class="footer-column"><h3>Connect</h3><ul class="footer-links"><li><i class='bx bx-phone-call'></i> +234 813 958 3320</li><li><i class='bx bx-envelope'></i> hello@jmpotters.com</li></ul></div>
-        </div>
-        <div class="copyright">&copy; 2025 JMPOTTERS. All rights reserved.</div>
-    </footer>
-
-    <!-- WhatsApp Float -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank"><i class='bx bxl-whatsapp'></i></a>
-
-    <script>
+        <!-- Shared footer and WhatsApp float injected by shared-layout.js -->
+    <div id="shared-footer"></div><script>
         // ========== SUPABASE INTEGRATION (like mensfootwear) ==========
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize section visibility observer
@@ -860,39 +542,7 @@
                 }, 5000);
             }
 
-            // Mobile navigation
-            const mobileToggle = document.getElementById('mobileToggle');
-            const mobileNav = document.getElementById('mobileNav');
-            const navOverlay = document.getElementById('navOverlay');
-            const closeNav = document.querySelector('.close-nav');
-            function openNav() { mobileNav.classList.add('active'); navOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
-            function closeNavFunc() { mobileNav.classList.remove('active'); navOverlay.classList.remove('active'); document.body.style.overflow = ''; }
-            if (mobileToggle) mobileToggle.addEventListener('click', openNav);
-            if (closeNav) closeNav.addEventListener('click', closeNavFunc);
-            if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
-
-            // UPDATED: Cart icon redirects to cart.html (NO PANEL CODE)
-            const cartIcon = document.getElementById('cartIcon');
-            if (cartIcon) {
-                const newCartIcon = cartIcon.cloneNode(true);
-                cartIcon.parentNode.replaceChild(newCartIcon, cartIcon);
-                
-                newCartIcon.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    window.location.href = 'cart.html';
-                });
-            }
-
-            // Wishlist panel toggles (preserved)
-            const wishlistIcon = document.getElementById('wishlistIcon');
-            const wishlistPanel = document.getElementById('wishlistPanel');
-            const wishlistOverlay = document.getElementById('wishlistOverlay');
-            const closeWishlist = document.querySelector('.close-wishlist');
-            if (wishlistIcon && wishlistPanel && wishlistOverlay) {
-                wishlistIcon.addEventListener('click', () => { wishlistPanel.classList.add('active'); wishlistOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; });
-                if (closeWishlist) closeWishlist.addEventListener('click', () => { wishlistPanel.classList.remove('active'); wishlistOverlay.classList.remove('active'); document.body.style.overflow = ''; });
-                if (wishlistOverlay) wishlistOverlay.addEventListener('click', () => { wishlistPanel.classList.remove('active'); wishlistOverlay.classList.remove('active'); document.body.style.overflow = ''; });
-            }
+            // Mobile nav, cart icon, and wishlist panel handled by shared-layout.js
 
             // Custom cursor (only for desktop)
             if (window.innerWidth > 768) {

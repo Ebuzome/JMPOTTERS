@@ -12,6 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/shared-layout.css">
     
     <!-- Supabase JS -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -103,328 +104,9 @@
             border-radius: 3px;
         }
         
-        /* ========== HEADER – DARK GLASS, CENTERED LOGO, HAMBURGER LEFT ========== */
-        .nav-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1050;
-            background: var(--glass-dark);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
-            transition: var(--transition);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
+        /* Header, nav, footer, overlay, mobile-nav, whatsapp-float styles are in assets/css/shared-layout.css */
         
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 var(--space-5);
-        }
-        
-        .nav-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            position: relative;
-        }
-        
-        /* Left side: hamburger button */
-        .nav-left {
-            flex: 1;
-            display: flex;
-            justify-content: flex-start;
-        }
-        .mobile-toggle {
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
-            font-size: 2rem;
-            width: 52px;
-            height: 52px;
-            border-radius: 30px;
-            color: var(--primary-500);
-            cursor: pointer;
-            transition: var(--transition);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .mobile-toggle:hover {
-            background: var(--primary-600);
-            color: #0c0f15;
-            transform: rotate(5deg);
-        }
-        
-        /* Center: Logo enlarged */
-        .nav-center {
-            flex: 0 0 auto;
-            display: flex;
-            justify-content: center;
-        }
-        .logo-img {
-            height: 70px;
-            width: auto;
-            object-fit: contain;
-            display: block;
-            transition: var(--transition);
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
-        }
-        .logo-img:hover {
-            transform: scale(1.02);
-            filter: drop-shadow(0 6px 12px rgba(99,102,241,0.4));
-        }
-        
-        /* Right side: icons (cart + wishlist) */
-        .nav-right {
-            flex: 1;
-            display: flex;
-            justify-content: flex-end;
-            gap: 20px;
-        }
-        .header-icon {
-            position: relative;
-            font-size: 1.8rem;
-            color: #eef2f5;
-            cursor: pointer;
-            transition: var(--transition);
-            background: rgba(255,255,255,0.05);
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        .header-icon:hover {
-            background: var(--primary-600);
-            color: #0c0f15;
-            transform: translateY(-3px);
-        }
-        .icon-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: var(--danger-500);
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 800;
-            min-width: 22px;
-            height: 22px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            font-family: monospace;
-        }
-        
-        /* Desktop navigation links (hidden on mobile, but we keep for structure) */
-        .nav-links {
-            display: none;
-        }
-        
-        /* Mobile Navigation (Left Drawer) */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(6px);
-            z-index: 1060;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .overlay.active {
-            display: block;
-            opacity: 1;
-        }
-        .mobile-nav {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 85%;
-            max-width: 380px;
-            height: 100vh;
-            background: #0f1219f2;
-            backdrop-filter: blur(24px);
-            z-index: 1070;
-            transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            padding: 32px 24px;
-            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
-            border-radius: 0 28px 28px 0;
-            overflow-y: auto;
-        }
-        .mobile-nav.active {
-            left: 0;
-        }
-        .mobile-nav-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
-        }
-        .mobile-nav-header .logo-img {
-            height: 56px;
-        }
-        .close-nav {
-            background: rgba(255,255,255,0.08);
-            border: none;
-            font-size: 1.9rem;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            color: var(--primary-500);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .close-nav:hover {
-            background: var(--primary-600);
-            color: #0c0f15;
-            transform: rotate(90deg);
-        }
-        .mobile-nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .mobile-nav-links li a {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 14px 20px;
-            background: rgba(255,255,255,0.04);
-            border-radius: 50px;
-            font-weight: 500;
-            color: #f0f3f8;
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 1rem;
-        }
-        .mobile-nav-links li a i {
-            font-size: 1.5rem;
-            color: var(--primary-500);
-        }
-        .mobile-nav-links li a:hover {
-            background: var(--primary-600);
-            color: #0c0f15;
-            transform: translateX(8px);
-        }
-        .mobile-nav-links li a:hover i {
-            color: #0c0f15;
-        }
-        
-        /* ========== FOOTER – DARK LUXURY WITH ENLARGED LOGO ========== */
-        .footer {
-            background: linear-gradient(145deg, #0a0d12 0%, #05070a 100%);
-            color: #eef2f5;
-            padding: 64px 0 32px;
-            margin-top: 80px;
-            border-top: 1px solid rgba(99, 102, 241, 0.25);
-        }
-        .footer-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 var(--space-5);
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: var(--space-6);
-        }
-        @media (min-width: 640px) {
-            .footer-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (min-width: 768px) {
-            .footer-container {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        .footer-logo-img {
-            height: 72px;
-            width: auto;
-            object-fit: contain;
-            filter: brightness(0) invert(1);
-            opacity: 0.95;
-            transition: var(--transition);
-            margin-bottom: 20px;
-        }
-        .footer-logo-img:hover {
-            opacity: 1;
-            transform: translateY(-3px);
-            filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(99,102,241,0.3));
-        }
-        .footer-column h3 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: var(--primary-400);
-            font-weight: 600;
-            position: relative;
-        }
-        .footer-links {
-            list-style: none;
-        }
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-        .footer-links a {
-            color: #cfdee9;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .footer-links a:hover {
-            color: var(--primary-400);
-            transform: translateX(5px);
-        }
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .social-links a {
-            background: rgba(255,255,255,0.06);
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-            transition: var(--transition);
-        }
-        .social-links a:hover {
-            background: var(--primary-600);
-            transform: translateY(-3px);
-            color: #0a0d12;
-        }
-        .copyright {
-            text-align: center;
-            padding-top: 32px;
-            margin-top: 32px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            font-size: 0.75rem;
-            color: #9aaeb9;
-        }
-        
-        /* Preserve all original page styles (hero, promo, products) */
+        /* Page-specific styles (hero, promo, products) */
         .hero {
             height: 70vh;
             min-height: 500px;
@@ -599,26 +281,7 @@
         .availability.in-stock { color: var(--success-500); }
         .availability.out-of-stock { color: var(--danger-500); }
         
-        /* REMOVED: All .cart-panel, .cart-header, .cart-items, .cart-footer, .cart-total, .cart-checkout-btn, .cart-whatsapp-btn styles */
-        
-        .whatsapp-float {
-            position: fixed;
-            bottom: var(--space-4);
-            right: var(--space-4);
-            width: 3rem;
-            height: 3rem;
-            border-radius: 50%;
-            background: #25D366;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            box-shadow: var(--shadow-lg);
-            z-index: 100;
-            text-decoration: none;
-        }
-        .whatsapp-float:hover { transform: scale(1.1); }
+        /* Cart panel and whatsapp-float styles are in assets/css/shared-layout.css */
         .loading-spinner {
             grid-column: 1 / -1;
             text-align: center;
@@ -657,61 +320,14 @@
         @media (max-width: 768px) {
             .hero { margin-top: 86px; }
             .logo-img { height: 58px; }
-            .footer-logo-img { height: 62px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ========= HEADER (DARK GLASS, CENTERED LOGO, HAMBURGER LEFT) ========= -->
-    <nav class="nav-bar">
-        <div class="nav-container">
-            <div class="nav-inner">
-                <div class="nav-left">
-                    <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
-                        <i class='bx bx-menu-alt-left'></i>
-                    </button>
-                </div>
-                <div class="nav-center">
-                    <a href="index.html">
-                        <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
-                    </a>
-                </div>
-                <div class="nav-right">
-                    <div class="header-icon" id="wishlistIcon">
-                        <i class='bx bx-heart'></i>
-                        <span class="icon-badge" id="wishlistCount" style="display: none;">0</span>
-                    </div>
-                    <div class="header-icon" id="cartIcon">
-                        <i class='bx bx-shopping-bag'></i>
-                        <span class="icon-badge" id="cartCount" style="display: none;">0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- ========= MOBILE NAV (LEFT DRAWER) ========= -->
-    <div class="overlay" id="navOverlay"></div>
-    <div class="mobile-nav" id="mobileNav">
-        <div class="mobile-nav-header">
-            <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
-            <button class="close-nav" id="closeNavBtn"><i class='bx bx-x'></i></button>
-        </div>
-        <ul class="mobile-nav-links">
-            <li><a href="index.html"><i class='bx bx-home'></i> Home</a></li>
-            <li><a href="mensfootwear.html"><i class='bx bx-footwear'></i> Men's Footwear</a></li>
-            <li><a href="womensfootwear.html"><i class='bx bx-female'></i> Women's Footwear</a></li>
-            <li><a href="bags.html"><i class='bx bx-briefcase'></i> Bags</a></li>
-            <li><a href="accessories.html"><i class='bx bx-diamond'></i> Accessories</a></li>
-            <li><a href="household.html"><i class='bx bx-home-smile'></i> Household</a></li>
-            <li><a href="kids.html"><i class='bx bx-baby-carriage'></i> Kids & Babies</a></li>
-            <li><a href="healthcare.html"><i class='bx bx-heart'></i> Healthcare</a></li>
-            <li><a href="contact.html"><i class='bx bx-phone-call'></i> Contact</a></li>
-        </ul>
-    </div>
-
-    <!-- REMOVED: Cart Panel HTML (cartOverlay and cartPanel divs) -->
+    <!-- Shared header and mobile nav injected by shared-layout.js -->
+    <div id="shared-header"></div>
+    <div id="shared-mobile-nav"></div>
 
     <!-- Hero Section (unchanged) -->
     <section class="hero">
@@ -756,93 +372,11 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ========= FOOTER – DARK LUXURY WITH ENLARGED LOGO ========= -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-column">
-                <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
-                <p style="font-size: 0.8rem; margin-top: 10px;">Premium quality footwear designed for the modern gentleman who values quality and style.</p>
-                <div class="social-links">
-                    <a href="#"><i class='bx bxl-instagram'></i></a>
-                    <a href="#"><i class='bx bxl-facebook'></i></a>
-                    <a href="#"><i class='bx bxl-twitter'></i></a>
-                </div>
-            </div>
-            <div class="footer-column">
-                <h3>Shop</h3>
-                <ul class="footer-links">
-                    <li><a href="mensfootwear.html"><i class='bx bx-chevron-right'></i> Men's Footwear</a></li>
-                    <li><a href="womensfootwear.html"><i class='bx bx-chevron-right'></i> Women's Footwear</a></li>
-                    <li><a href="bags.html"><i class='bx bx-chevron-right'></i> Bags</a></li>
-                    <li><a href="accessories.html"><i class='bx bx-chevron-right'></i> Accessories</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Support</h3>
-                <ul class="footer-links">
-                    <li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact Us</a></li>
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> Shipping Policy</a></li>
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> Returns & Exchanges</a></li>
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> FAQ</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Contact</h3>
-                <ul class="footer-links">
-                    <li><i class='bx bxl-whatsapp'></i> +234 813 958 3320</li>
-                    <li><i class='bx bx-envelope'></i> hello@jmpotters.com</li>
-                </ul>
-            </div>
-        </div>
-        <div class="copyright">
-            &copy; 2025 JMPOTTERS. All rights reserved.
-        </div>
-    </footer>
-
-    <!-- WhatsApp Float -->
-    <a href="https://wa.me/2348139583320" class="whatsapp-float" target="_blank">
-        <i class='bx bxl-whatsapp'></i>
-    </a>
+    <!-- Shared footer and WhatsApp float injected by shared-layout.js -->
+    <div id="shared-footer"></div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="assets/js/shared-layout.js"></script>
     <script src="app.js"></script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mobile navigation (left drawer)
-            const mobileToggle = document.getElementById('mobileToggle');
-            const mobileNav = document.getElementById('mobileNav');
-            const navOverlay = document.getElementById('navOverlay');
-            const closeNavBtns = document.querySelectorAll('.close-nav');
-            function openNav() { mobileNav.classList.add('active'); navOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
-            function closeNav() { mobileNav.classList.remove('active'); navOverlay.classList.remove('active'); document.body.style.overflow = ''; }
-            if(mobileToggle) mobileToggle.addEventListener('click', openNav);
-            closeNavBtns.forEach(btn => btn.addEventListener('click', closeNav));
-            if(navOverlay) navOverlay.addEventListener('click', closeNav);
-            
-            // UPDATED: Cart icon redirects to cart.html (NO PANEL CODE)
-            const cartIcon = document.getElementById('cartIcon');
-            if (cartIcon) {
-                // Remove any existing event listeners by cloning
-                const newCartIcon = cartIcon.cloneNode(true);
-                cartIcon.parentNode.replaceChild(newCartIcon, cartIcon);
-                
-                newCartIcon.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    window.location.href = 'cart.html';
-                });
-            }
-            
-            // ESC key no longer needed for cart panel, but keep for mobile nav
-            document.addEventListener('keydown', (e) => {
-                if(e.key === 'Escape') {
-                    // Close mobile nav if open
-                    if(mobileNav.classList.contains('active')) {
-                        closeNav();
-                    }
-                }
-            });
-        });
-    </script>
 </body>
 </html>

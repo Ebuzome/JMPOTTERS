@@ -11,6 +11,8 @@
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
+    <link rel="stylesheet" href="assets/css/shared-layout.css">
+    
     <style>
         /* ===== CSS VARIABLES ===== */
         :root {
@@ -62,206 +64,8 @@
         }
 
         /* ===== HEADER ===== */
-        .nav-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1050;
-            background: var(--glass-dark);
-            backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            transition: var(--transition);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
-        }
-
-        .header-left {
-            flex: 1;
-            display: flex;
-            justify-content: flex-start;
-        }
-        .mobile-toggle {
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
-            font-size: 2rem;
-            width: 48px;
-            height: 48px;
-            border-radius: 30px;
-            color: var(--gold);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .mobile-toggle:hover {
-            background: var(--gold);
-            color: #0c0f15;
-        }
-
-        .header-center {
-            flex: 0 0 auto;
-            display: flex;
-            justify-content: center;
-        }
-        .logo-img {
-            height: 64px;
-            width: auto;
-            object-fit: contain;
-            display: block;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
-        }
-
-        .header-right {
-            flex: 1;
-            display: flex;
-            justify-content: flex-end;
-            gap: 16px;
-        }
-        .header-icon {
-            position: relative;
-            font-size: 1.5rem;
-            color: #eef2f5;
-            cursor: pointer;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.05);
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            text-decoration: none;
-        }
-        .header-icon:hover {
-            background: var(--gold);
-            color: #0c0f15;
-        }
-        .icon-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: var(--gold);
-            color: #0c0f15;
-            font-size: 0.7rem;
-            font-weight: 800;
-            min-width: 20px;
-            height: 20px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 5px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            font-family: monospace;
-        }
 
         /* Mobile Nav */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(6px);
-            z-index: 1060;
-            display: none;
-        }
-        .overlay.active {
-            display: block;
-        }
-
-        .mobile-nav {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 85%;
-            max-width: 380px;
-            height: 100vh;
-            background: #0f1219f2;
-            backdrop-filter: blur(24px);
-            z-index: 1070;
-            transition: left 0.4s ease;
-            padding: 32px 24px;
-            border-radius: 0 28px 28px 0;
-            overflow-y: auto;
-        }
-        .mobile-nav.active {
-            left: 0;
-        }
-        .mobile-nav-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-        }
-        .mobile-nav-header .logo-img {
-            height: 52px;
-        }
-        .close-nav {
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
-            font-size: 1.8rem;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            color: var(--gold);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .close-nav:hover {
-            background: var(--gold);
-            color: #0c0f15;
-            transform: rotate(90deg);
-        }
-        .mobile-nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .mobile-nav-links li a {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 14px 20px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 50px;
-            font-weight: 500;
-            color: #f0f3f8;
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 1rem;
-        }
-        .mobile-nav-links li a i {
-            font-size: 1.4rem;
-            color: var(--gold);
-        }
-        .mobile-nav-links li a:hover {
-            background: var(--gold);
-            color: #0c0f15;
-            transform: translateX(8px);
-        }
-        .mobile-nav-links li a:hover i {
-            color: #0c0f15;
-        }
 
         /* ===== SCROLL HERO (ContainerScroll) ===== */
         .scroll-hero-wrapper {
@@ -738,36 +542,9 @@
             padding: 64px 0 32px;
             border-top: 1px solid rgba(212, 175, 55, 0.2);
         }
-        .footer-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
         @media (min-width: 640px) {
-            .footer-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
         @media (min-width: 768px) {
-            .footer-container {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        .footer-logo-img {
-            height: 68px;
-            width: auto;
-            object-fit: contain;
-            filter: brightness(0) invert(1);
-            opacity: 0.95;
-            transition: var(--transition);
-            margin-bottom: 20px;
-        }
-        .footer-logo-img:hover {
-            opacity: 1;
-            transform: translateY(-3px);
         }
         .footer-column h3 {
             font-size: 1.1rem;
@@ -775,9 +552,6 @@
             color: var(--gold);
             font-weight: 600;
             position: relative;
-        }
-        .footer-links {
-            list-style: none;
         }
         .footer-links li {
             margin-bottom: 10px;
@@ -795,11 +569,6 @@
             color: var(--gold);
             transform: translateX(5px);
         }
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
         .social-links a {
             background: rgba(255, 255, 255, 0.06);
             width: 38px;
@@ -816,14 +585,6 @@
             background: var(--gold);
             transform: translateY(-3px);
             color: #0a0d12;
-        }
-        .copyright {
-            text-align: center;
-            padding-top: 32px;
-            margin-top: 32px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 0.75rem;
-            color: #9aaeb9;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -950,51 +711,9 @@
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <nav class="nav-bar">
-        <div class="header-container">
-            <div class="header-left">
-                <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
-                    <i class='bx bx-menu-alt-left'></i>
-                </button>
-            </div>
-            <div class="header-center">
-                <a href="/">
-                    <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
-                </a>
-            </div>
-            <div class="header-right">
-                <a href="#" class="header-icon" id="wishlistIcon">
-                    <i class='bx bx-heart'></i>
-                    <span class="icon-badge" id="wishlistCount">0</span>
-                </a>
-                <a href="cart.html" class="header-icon" id="cartIcon">
-                    <i class='bx bx-shopping-bag'></i>
-                    <span class="icon-badge" id="cartCount">0</span>
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Mobile Navigation -->
-    <div class="overlay" id="navOverlay"></div>
-    <div class="mobile-nav" id="mobileNav">
-        <div class="mobile-nav-header">
-            <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="logo-img">
-            <button class="close-nav" id="closeNavBtn"><i class='bx bx-x'></i></button>
-        </div>
-        <ul class="mobile-nav-links">
-            <li><a href="/"><i class='bx bx-home'></i> Home</a></li>
-            <li><a href="mensfootwear.html"><i class='bx bx-footwear'></i> Men's Footwear</a></li>
-            <li><a href="womensfootwear.html"><i class='bx bx-female'></i> Women's Footwear</a></li>
-            <li><a href="bags.html"><i class='bx bx-briefcase'></i> Bags</a></li>
-            <li><a href="accessories.html"><i class='bx bx-diamond'></i> Accessories</a></li>
-            <li><a href="household.html"><i class='bx bx-home-smile'></i> Household</a></li>
-            <li><a href="kids.html"><i class='bx bx-baby-carriage'></i> Kids & Babies</a></li>
-            <li><a href="healthcare.html"><i class='bx bx-heart'></i> Healthcare</a></li>
-            <li><a href="contact.html"><i class='bx bx-phone-call'></i> Contact</a></li>
-        </ul>
-    </div>
+        <!-- Shared header and mobile nav injected by shared-layout.js -->
+    <div id="shared-header"></div>
+    <div id="shared-mobile-nav"></div>
 
     <!-- ===== SCROLL HERO (ContainerScroll style) ===== -->
     <section class="scroll-hero-wrapper" id="heroSection">
@@ -1162,50 +881,8 @@
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
-    <footer>
-        <div class="footer-container">
-            <div class="footer-column">
-                <img src="assets/logos/logo1.png" alt="JMPOTTERS" class="footer-logo-img">
-                <p>Premium fashion and lifestyle products for the modern individual.</p>
-                <div class="social-links">
-                    <a href="#"><i class='bx bxl-whatsapp'></i></a>
-                    <a href="#"><i class='bx bxl-instagram'></i></a>
-                    <a href="#"><i class='bx bxl-facebook'></i></a>
-                    <a href="#"><i class='bx bxl-pinterest'></i></a>
-                </div>
-            </div>
-            <div class="footer-column">
-                <h3>Shop</h3>
-                <ul class="footer-links">
-                    <li><a href="mensfootwear.html"><i class='bx bx-chevron-right'></i> Men's Footwear</a></li>
-                    <li><a href="womensfootwear.html"><i class='bx bx-chevron-right'></i> Women's Footwear</a></li>
-                    <li><a href="bags.html"><i class='bx bx-chevron-right'></i> Bags</a></li>
-                    <li><a href="accessories.html"><i class='bx bx-chevron-right'></i> Accessories</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Information</h3>
-                <ul class="footer-links">
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> About Us</a></li>
-                    <li><a href="contact.html"><i class='bx bx-chevron-right'></i> Contact</a></li>
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> Shipping Policy</a></li>
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> Returns</a></li>
-                    <li><a href="#"><i class='bx bx-chevron-right'></i> FAQ</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Connect</h3>
-                <ul class="footer-links">
-                    <li><i class='bx bx-phone-call'></i> +234 813 958 3320</li>
-                    <li><i class='bx bx-envelope'></i> hello@jmpotters.com</li>
-                </ul>
-            </div>
-        </div>
-        <div class="copyright">&copy; 2025 JMPOTTERS. All rights reserved.</div>
-    </footer>
-
-    <!-- ===== SCRIPTS ===== -->
+        <!-- Shared footer and WhatsApp float injected by shared-layout.js -->
+    <div id="shared-footer"></div><!-- ===== SCRIPTS ===== -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // ===== SCROLL ANIMATION (ContainerScroll style) =====
@@ -1296,39 +973,7 @@
                 return div.innerHTML;
             }
 
-            // ===== MOBILE NAV =====
-            const mobileToggle = document.getElementById('mobileToggle');
-            const mobileNav = document.getElementById('mobileNav');
-            const navOverlay = document.getElementById('navOverlay');
-            const closeNav = document.querySelector('.close-nav');
-
-            function openNav() {
-                mobileNav.classList.add('active');
-                navOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeNavFunc() {
-                mobileNav.classList.remove('active');
-                navOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            if (mobileToggle) mobileToggle.addEventListener('click', openNav);
-            if (closeNav) closeNav.addEventListener('click', closeNavFunc);
-            if (navOverlay) navOverlay.addEventListener('click', closeNavFunc);
-
-            // ===== CART COUNT =====
-            function updateCartCount() {
-                const cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-                const cartCount = document.getElementById('cartCount');
-                if (cartCount) {
-                    cartCount.textContent = totalItems;
-                    cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
-                }
-            }
-            updateCartCount();
+            // Mobile nav and cart count handled by shared-layout.js
 
             // ===== FETCH CATEGORIES =====
             async function fetchCategories() {
@@ -1456,5 +1101,6 @@
             fetchFeaturedProducts();
         });
     </script>
+    <script src="assets/js/shared-layout.js"></script>
 </body>
 </html>

@@ -111,6 +111,14 @@
     // ====================
     // UTILITY FUNCTIONS
     // ====================
+    function getWishlist() {
+        return JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+    }
+
+    function saveWishlist(wishlist) {
+        localStorage.setItem('jmpotters_wishlist', JSON.stringify(wishlist));
+    }
+
     function getCurrentCategory() {
         if (window.JMPOTTERS_CONFIG && window.JMPOTTERS_CONFIG.currentCategory) {
             return window.JMPOTTERS_CONFIG.currentCategory;
@@ -215,6 +223,29 @@
     // ====================
     // RECOMMENDATION ENGINE
     // ====================
+    const PRODUCT_LIST_FIELDS = 'id, name, price, image_url, slug, stock, category_id';
+    const RECOMMENDATION_LIMIT = 15;
+
+    function buildProductQuery(supabase, excludeId, excludeIds) {
+        let query = supabase
+            .from('products')
+            .select(PRODUCT_LIST_FIELDS)
+            .eq('is_active', true)
+            .neq('id', excludeId);
+        if (excludeIds.length > 0) {
+            query = query.not('id', 'in', `(${excludeIds.join(',')})`);
+        }
+        return query;
+    }
+
+    async function fetchAndAppend(query, limit, results) {
+        const { data } = await query.limit(limit);
+        if (data && data.length > 0) {
+            return [...results, ...data];
+        }
+        return results;
+    }
+
     async function loadRecommendations(currentProduct) {
         try {
             const supabase = getSupabaseClient();
@@ -228,65 +259,32 @@
             let recommendations = [];
             
             if (nameWords.length > 0) {
-                let nameQuery = supabase
-                    .from('products')
-                    .select('id, name, price, image_url, slug, stock, category_id')
-                    .eq('is_active', true)
-                    .neq('id', currentProductId);
-                
+                let nameQuery = buildProductQuery(supabase, currentProductId, []);
                 if (nameWords.length > 1) {
                     nameQuery = nameQuery.or(nameWords.map(w => `name.ilike.%${w}%`).join(','));
                 } else {
                     nameQuery = nameQuery.ilike('name', `%${nameWords[0]}%`);
                 }
-                
-                const { data: keywordMatches } = await nameQuery.limit(10);
-                if (keywordMatches && keywordMatches.length > 0) {
-                    recommendations = keywordMatches;
-                }
+                recommendations = await fetchAndAppend(nameQuery, 10, recommendations);
             }
             
-            if (recommendations.length < 15) {
-                const needed = 15 - recommendations.length;
+            if (recommendations.length < RECOMMENDATION_LIMIT) {
+                const needed = RECOMMENDATION_LIMIT - recommendations.length;
                 const existingIds = recommendations.map(r => r.id);
-                let categoryQuery = supabase
-                    .from('products')
-                    .select('id, name, price, image_url, slug, stock, category_id')
-                    .eq('category_id', currentCategoryId)
-                    .eq('is_active', true)
-                    .neq('id', currentProductId);
-                
-                if (existingIds.length > 0) {
-                    categoryQuery = categoryQuery.not('id', 'in', `(${existingIds.join(',')})`);
-                }
-                
-                const { data: categoryProducts } = await categoryQuery.limit(needed);
-                if (categoryProducts && categoryProducts.length > 0) {
-                    recommendations = [...recommendations, ...categoryProducts];
-                }
+                let categoryQuery = buildProductQuery(supabase, currentProductId, existingIds)
+                    .eq('category_id', currentCategoryId);
+                recommendations = await fetchAndAppend(categoryQuery, needed, recommendations);
             }
             
-            if (recommendations.length < 15) {
-                const needed = 15 - recommendations.length;
+            if (recommendations.length < RECOMMENDATION_LIMIT) {
+                const needed = RECOMMENDATION_LIMIT - recommendations.length;
                 const existingIds = recommendations.map(r => r.id);
-                let randomQuery = supabase
-                    .from('products')
-                    .select('id, name, price, image_url, slug, stock, category_id')
-                    .eq('is_active', true)
-                    .neq('id', currentProductId);
-                
-                if (existingIds.length > 0) {
-                    randomQuery = randomQuery.not('id', 'in', `(${existingIds.join(',')})`);
-                }
-                
-                const { data: randomProducts } = await randomQuery.limit(needed);
-                if (randomProducts && randomProducts.length > 0) {
-                    recommendations = [...recommendations, ...randomProducts];
-                }
+                let randomQuery = buildProductQuery(supabase, currentProductId, existingIds);
+                recommendations = await fetchAndAppend(randomQuery, needed, recommendations);
             }
             
             recommendations = recommendations.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
-            recommendations = recommendations.slice(0, 15);
+            recommendations = recommendations.slice(0, RECOMMENDATION_LIMIT);
             return recommendations;
             
         } catch (error) {
@@ -422,7 +420,7 @@
         const hasComparePrice = product.compare_price && product.compare_price > product.price;
         const discountPercent = hasComparePrice ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
         
-        const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        const wishlist = getWishlist();
         const isInWishlist = wishlist.some(item => item.id === product.id);
         
         const stockStatus = product.stock > 10 ? 'in-stock' : (product.stock > 0 ? 'low-stock' : 'out-of-stock');
@@ -649,7 +647,7 @@
             
             const { data: products } = await supabase
                 .from('products')
-                .select('id, name, price, image_url, stock, slug')
+                .select(PRODUCT_LIST_FIELDS)
                 .eq('category_id', category.id)
                 .eq('is_active', true)
                 .order('created_at', { ascending: false });
@@ -675,7 +673,7 @@
         
         products.forEach(product => {
             const imageUrl = getImageUrl(categorySlug, product.image_url);
-            const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+            const wishlist = getWishlist();
             const isInWishlist = wishlist.some(item => item.id === product.id);
             
             const productLink = document.createElement('a');
@@ -753,7 +751,7 @@
     function updateCartUI() {
         const cart = getCart();
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        const wishlist = getWishlist();
         
         const cartCount = document.getElementById('cartCount');
         if (cartCount) {
@@ -854,7 +852,7 @@
     }
     
     function toggleWishlist(product) {
-        let wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        let wishlist = getWishlist();
         const exists = wishlist.some(item => item.id === product.id);
         if (exists) {
             wishlist = wishlist.filter(item => item.id !== product.id);
@@ -863,7 +861,7 @@
             wishlist.push({ id: product.id, name: product.name, price: product.price, image_url: product.image_url, slug: product.slug });
             showNotification(`${product.name} added to wishlist!`, 'success');
         }
-        localStorage.setItem('jmpotters_wishlist', JSON.stringify(wishlist));
+        saveWishlist(wishlist);
         updateCartUI();
     }
     
@@ -1080,7 +1078,11 @@
         loadSingleProductBySlug,
         updateCartUI,
         getOrderByNumber,
-        createOrder
+        createOrder,
+        getWishlist,
+        saveWishlist,
+        getCart,
+        escapeHtml
     };
     
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializePage);
