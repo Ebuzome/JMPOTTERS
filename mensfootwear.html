@@ -321,6 +321,15 @@
             .hero { margin-top: 86px; }
             .logo-img { height: 58px; }
         }
+        /* ===== AD ZONES ===== */
+        .ad-zone { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .ad-zone:empty { display: none; }
+        .ad-card { position: relative; border-radius: 16px; overflow: hidden; margin: 24px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s ease; }
+        .ad-card:hover { transform: translateY(-2px); }
+        .ad-card a { display: block; }
+        .ad-card img { width: 100%; height: auto; display: block; max-height: 320px; object-fit: cover; }
+        .ad-label { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: #fff; font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-family: sans-serif; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+        .ad-countdown { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.65); color: #D4AF37; font-size: 0.75rem; padding: 4px 10px; border-radius: 10px; font-family: sans-serif; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -337,6 +346,10 @@
             <a href="#products" class="btn">Explore Collection <i class="fas fa-arrow-right"></i></a>
         </div>
     </section>
+
+    <!-- AD ZONE: After Hero -->
+    <div class="ad-zone" id="adZoneAfterHero"></div>
+
 
     <!-- Promo Strip -->
     <div class="promo-strip">
@@ -370,7 +383,14 @@
         </div>
     </section>
 
+    <!-- AD ZONE: Between Sections -->
+    <div class="ad-zone" id="adZoneBetweenSections"></div>
+
+
     <div class="toast-container" id="toastContainer"></div>
+
+    <!-- AD ZONE: Before Footer -->
+    <div class="ad-zone" id="adZoneBeforeFooter"></div>
 
     <!-- Shared footer and WhatsApp float injected by shared-layout.js -->
     <div id="shared-footer"></div>
@@ -378,5 +398,112 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="assets/js/shared-layout.js"></script>
     <script src="app.js"></script>
+    <script>
+    // ===== DYNAMIC HERO BANNERS + AD RENDERING =====
+    (function() {
+        var PAGE_SLUG = 'mensfootwear';
+        function escHtml(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+        // --- Dynamic Hero Banners ---
+        try {
+            var banners = JSON.parse(localStorage.getItem('jmpotters_hero_banners') || '[]');
+            var pageBanners = banners.filter(function(b) { return b.target_page === PAGE_SLUG && b.is_active !== false; });
+            if (pageBanners.length > 0) {
+                // Find the carousel container or hero section
+                var carousel = document.getElementById('heroCarousel') || document.querySelector('.hero-carousel');
+                var heroSection = document.querySelector('section.hero') || document.querySelector('.hero-carousel');
+                var heroContent = document.querySelector('.hero-content') || document.querySelector('.carousel-content');
+
+                if (carousel) {
+                    // Page has a dedicated carousel container - replace slides
+                    carousel.innerHTML = pageBanners.map(function(b, i) {
+                        var cls = carousel.querySelector('.carousel-slide') ? 'carousel-slide' : 'hero-slide';
+                        return '<div class="' + cls + (i === 0 ? ' active' : '') + '" style="background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(\'' + escHtml(b.image_url) + '\');background-size:cover;background-position:center"></div>';
+                    }).join('');
+                    // Hide dots if they exist (they reference old slides)
+                    var dots = carousel.parentElement ? carousel.parentElement.querySelector('.carousel-dots') : null;
+                    if (dots) dots.style.display = 'none';
+                } else if (heroSection) {
+                    // Page has hero section but no carousel - set bg on section + create slides
+                    heroSection.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(\'' + pageBanners[0].image_url + '\')';
+                    heroSection.style.backgroundSize = 'cover';
+                    heroSection.style.backgroundPosition = 'center';
+                    // Create a carousel div for slides
+                    var carouselDiv = document.createElement('div');
+                    carouselDiv.className = 'hero-carousel';
+                    carouselDiv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0';
+                    carouselDiv.innerHTML = pageBanners.map(function(b, i) {
+                        return '<div class="hero-slide' + (i === 0 ? ' active' : '') + '" style="position:absolute;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35)),url(\'' + escHtml(b.image_url) + '\');background-size:cover;background-position:center;opacity:' + (i === 0 ? '1' : '0') + ';transition:opacity 1.5s ease-in-out"></div>';
+                    }).join('');
+                    heroSection.insertBefore(carouselDiv, heroSection.firstChild);
+                    if (heroContent) heroContent.style.position = 'relative';
+                    if (heroContent) heroContent.style.zIndex = '1';
+                    carousel = carouselDiv;
+                }
+
+                // Update hero text overlay
+                if (heroContent && pageBanners[0].title) {
+                    var h1 = heroContent.querySelector('h1');
+                    var p = heroContent.querySelector('p');
+                    if (h1) h1.textContent = pageBanners[0].title;
+                    if (p && pageBanners[0].subtitle) p.textContent = pageBanners[0].subtitle;
+                }
+
+                // Auto-rotate slides
+                if (carousel && pageBanners.length > 1) {
+                    var slides = carousel.querySelectorAll('.hero-slide, .carousel-slide');
+                    var idx = 0;
+                    setInterval(function() {
+                        if (slides[idx]) { slides[idx].classList.remove('active'); slides[idx].style.opacity = '0'; }
+                        idx = (idx + 1) % slides.length;
+                        if (slides[idx]) { slides[idx].classList.add('active'); slides[idx].style.opacity = '1'; }
+                        if (heroContent && pageBanners[idx]) {
+                            var h1 = heroContent.querySelector('h1');
+                            var p = heroContent.querySelector('p');
+                            if (h1 && pageBanners[idx].title) h1.textContent = pageBanners[idx].title;
+                            if (p && pageBanners[idx].subtitle) p.textContent = pageBanners[idx].subtitle;
+                        }
+                    }, 5000);
+                }
+            }
+        } catch(e) { console.error('Banner load error:', e); }
+
+        // --- Ad Rendering ---
+        try {
+            var ads = JSON.parse(localStorage.getItem('jmpotters_ads') || '[]');
+            var now = new Date();
+            var zones = { 'after-hero': 'adZoneAfterHero', 'between-sections': 'adZoneBetweenSections', 'before-footer': 'adZoneBeforeFooter' };
+            Object.keys(zones).forEach(function(zone) {
+                var el = document.getElementById(zones[zone]);
+                if (!el) return;
+                var matching = ads.filter(function(a) {
+                    if (a.is_active === false) return false;
+                    if (a.target_page !== PAGE_SLUG && a.target_page !== 'all') return false;
+                    if (a.placement !== zone) return false;
+                    if (a.start_date && new Date(a.start_date) > now) return false;
+                    if (a.end_date && new Date(a.end_date) < now) return false;
+                    return true;
+                });
+                if (matching.length === 0) { el.innerHTML = ''; return; }
+                el.innerHTML = matching.map(function(a) {
+                    var linkStart = a.link_url ? '<a href="' + escHtml(a.link_url) + '" target="_blank" rel="noopener">' : '';
+                    var linkEnd = a.link_url ? '</a>' : '';
+                    var countdown = '';
+                    if (a.end_date) {
+                        var diff = new Date(a.end_date) - now;
+                        if (diff > 0) {
+                            var days = Math.floor(diff / 86400000);
+                            var hours = Math.floor((diff % 86400000) / 3600000);
+                            countdown = '<div class="ad-countdown">Ends in ' + (days > 0 ? days + 'd ' : '') + hours + 'h</div>';
+                        }
+                    }
+                    return '<div class="ad-card">' + linkStart +
+                        '<img src="' + escHtml(a.image_url) + '" alt="' + escHtml(a.name || 'Advertisement') + '" loading="lazy">' +
+                        linkEnd + '<span class="ad-label">Ad</span>' + countdown + '</div>';
+                }).join('');
+            });
+        } catch(e) { console.error('Ad render error:', e); }
+    })();
+    </script>
 </body>
 </html>
