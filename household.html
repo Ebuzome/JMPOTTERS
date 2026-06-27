@@ -563,6 +563,13 @@
     <script src="assets/js/shared-layout.js"></script>
     <script src="app.js"></script>
     
-    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.JMPOTTERS_SHARED) {
+                window.JMPOTTERS_SHARED.waitForAppAndLoadCategory('household');
+            }
+        });
+    </script>
+
 </body>
 </html>

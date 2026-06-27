@@ -112,7 +112,7 @@
     // UTILITY FUNCTIONS
     // ====================
     function getWishlist() {
-        return JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        return safeParseJSON('jmpotters_wishlist', []);
     }
 
     function saveWishlist(wishlist) {
@@ -167,6 +167,16 @@
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+    
+    function safeParseJSON(key, fallback) {
+        try {
+            return JSON.parse(localStorage.getItem(key)) || fallback;
+        } catch (e) {
+            console.error('Failed to parse ' + key + ':', e);
+            localStorage.removeItem(key);
+            return fallback;
+        }
     }
     
     function getSupabaseClient() {
@@ -238,8 +248,9 @@
         return query;
     }
 
-    async function fetchAndAppend(query, limit, results) {
-        const { data } = await query.limit(limit);
+    async function fetchAndAppend(query, limit, results, label) {
+        const { data, error } = await query.limit(limit);
+        if (error) console.error(label + ' query failed:', error);
         if (data && data.length > 0) {
             return [...results, ...data];
         }
@@ -265,7 +276,7 @@
                 } else {
                     nameQuery = nameQuery.ilike('name', `%${nameWords[0]}%`);
                 }
-                recommendations = await fetchAndAppend(nameQuery, 10, recommendations);
+                recommendations = await fetchAndAppend(nameQuery, 10, recommendations, 'Keyword recommendations');
             }
             
             if (recommendations.length < RECOMMENDATION_LIMIT) {
@@ -273,14 +284,14 @@
                 const existingIds = recommendations.map(r => r.id);
                 let categoryQuery = buildProductQuery(supabase, currentProductId, existingIds)
                     .eq('category_id', currentCategoryId);
-                recommendations = await fetchAndAppend(categoryQuery, needed, recommendations);
+                recommendations = await fetchAndAppend(categoryQuery, needed, recommendations, 'Category recommendations');
             }
             
             if (recommendations.length < RECOMMENDATION_LIMIT) {
                 const needed = RECOMMENDATION_LIMIT - recommendations.length;
                 const existingIds = recommendations.map(r => r.id);
                 let randomQuery = buildProductQuery(supabase, currentProductId, existingIds);
-                recommendations = await fetchAndAppend(randomQuery, needed, recommendations);
+                recommendations = await fetchAndAppend(randomQuery, needed, recommendations, 'Random recommendations');
             }
             
             recommendations = recommendations.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
@@ -358,23 +369,26 @@
             
             console.log('✅ Loaded product:', product.name);
             
-            const { data: category } = await supabase
+            const { data: category, error: categoryError } = await supabase
                 .from('categories')
                 .select('id, name, slug')
                 .eq('id', product.category_id)
                 .single();
+            if (categoryError) console.error('Failed to load category:', categoryError);
             
-            const { data: colors } = await supabase
+            const { data: colors, error: colorsError } = await supabase
                 .from('product_colors')
                 .select('*')
                 .eq('product_id', product.id)
                 .order('sort_order');
+            if (colorsError) console.error('Failed to load colors:', colorsError);
             
-            const { data: sizes } = await supabase
+            const { data: sizes, error: sizesError } = await supabase
                 .from('product_sizes')
                 .select('*')
                 .eq('product_id', product.id)
                 .order('size_value');
+            if (sizesError) console.error('Failed to load sizes:', sizesError);
             
             document.title = `${product.name} - JMPOTTERS`;
             
@@ -642,15 +656,16 @@
         }
         
         try {
-            const { data: category } = await supabase.from('categories').select('id').eq('slug', categorySlug).single();
-            if (!category) throw new Error('Category not found');
+            const { data: category, error: catError } = await supabase.from('categories').select('id').eq('slug', categorySlug).single();
+            if (catError || !category) throw new Error('Category not found');
             
-            const { data: products } = await supabase
+            const { data: products, error: productsError } = await supabase
                 .from('products')
                 .select(PRODUCT_LIST_FIELDS)
                 .eq('category_id', category.id)
                 .eq('is_active', true)
                 .order('created_at', { ascending: false });
+            if (productsError) throw productsError;
             
             if (!products || products.length === 0) {
                 productsGrid.innerHTML = '<div class="no-products">No products found</div>';
@@ -717,7 +732,15 @@
     // ====================
     // CART FUNCTIONS
     // ====================
-    function getCart() { return JSON.parse(localStorage.getItem('jmpotters_cart')) || []; }
+    function getCart() {
+        try {
+            return JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+        } catch (e) {
+            console.error('Failed to parse cart data:', e);
+            localStorage.removeItem('jmpotters_cart');
+            return [];
+        }
+    }
     
     function saveCart(cart) {
         localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
@@ -869,7 +892,7 @@
     // ORDER CREATION WITH SEQUENTIAL ORDER NUMBERS (PLAIN DIGITS)
     // ====================
     async function createOrder(orderData, cart) {
-        console.log('Creating order with data:', orderData);
+
         
         const supabase = getSupabaseClient();
         if (!supabase) {
@@ -883,7 +906,7 @@
             const grandTotal = subtotal + shippingFee;
             
             const orderNumber = await getNextOrderNumber();
-            console.log('Generated order number:', orderNumber);
+
             
             const items = cart.map(item => ({
                 product_id: item.product_id,
@@ -915,7 +938,7 @@
                 created_at: new Date().toISOString()
             };
             
-            console.log('Inserting order:', orderInsert);
+
             
             const { data: order, error: orderError } = await supabase
                 .from('orders')
@@ -943,9 +966,13 @@
     
     async function getOrderByNumber(orderNumber) {
         const supabase = getSupabaseClient();
+        if (!supabase) {
+            console.error('Database connection unavailable for order lookup');
+            return null;
+        }
         try {
             // orderNumber is already plain (e.g., "0003")
-            console.log('Looking up order:', orderNumber);
+
             
             const { data: order, error } = await supabase
                 .from('orders')
@@ -966,11 +993,11 @@
     // ====================
     async function proceedToCheckout() {
         if (isProcessingCheckout) {
-            console.log('Checkout already in progress');
+
             return;
         }
         
-        console.log('proceedToCheckout called');
+
         
         const cart = getCart();
         if (cart.length === 0) {
@@ -978,7 +1005,7 @@
             return;
         }
         
-        const user = JSON.parse(localStorage.getItem('jmpotters_user'));
+        const user = safeParseJSON('jmpotters_user', null);
         
         if (user && user.address && user.city && user.state) {
             isProcessingCheckout = true;
