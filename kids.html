@@ -565,37 +565,18 @@
                 }
             }
 
-            // Wait for app.js to load and load products for 'kids' category
-            let attempts = 0;
-            const waitForApp = setInterval(() => {
-                if (window.JMPOTTERS && window.JMPOTTERS.loadProductsByCategory) {
-                    clearInterval(waitForApp);
-                    window.JMPOTTERS_CONFIG = window.JMPOTTERS_CONFIG || {};
-                    window.JMPOTTERS_CONFIG.currentCategory = 'kids';
-                    window.JMPOTTERS.loadProductsByCategory('kids').then(() => {
-                        const renderProducts = () => {
-                            if (window.JMPOTTERS_RENDER) window.JMPOTTERS_RENDER();
-                        };
-                        document.getElementById('searchBar')?.addEventListener('input', renderProducts);
-                        document.getElementById('minPrice')?.addEventListener('input', renderProducts);
-                        document.getElementById('maxPrice')?.addEventListener('input', renderProducts);
-                        document.getElementById('sortBy')?.addEventListener('change', renderProducts);
-                    }).catch(err => {
-                        console.error('Error loading kids products:', err);
-                        const grid = document.getElementById('productsGrid');
-                        if (grid) grid.innerHTML = '<div class="error-message">Failed to load products. Please refresh the page.</div>';
-                    });
-                }
-                attempts++;
-                if (attempts > 50) {
-                    clearInterval(waitForApp);
-                    const grid = document.getElementById('productsGrid');
-                    if (grid && grid.querySelector('.loading-spinner')) {
-                        grid.innerHTML = '<div class="error-message">Failed to initialize. Please refresh the page.</div>';
-                    }
-                    return;
-                }
-            }, 200);
+            // Set up filter listeners (product loading handled by app.js initializePage)
+            var renderProducts = function() {
+                if (window.JMPOTTERS_RENDER) window.JMPOTTERS_RENDER();
+            };
+            var searchBar = document.getElementById('searchBar');
+            var minPrice = document.getElementById('minPrice');
+            var maxPrice = document.getElementById('maxPrice');
+            var sortBy = document.getElementById('sortBy');
+            if (searchBar) searchBar.addEventListener('input', renderProducts);
+            if (minPrice) minPrice.addEventListener('input', renderProducts);
+            if (maxPrice) maxPrice.addEventListener('input', renderProducts);
+            if (sortBy) sortBy.addEventListener('change', renderProducts);
         });
     </script>
 </body>

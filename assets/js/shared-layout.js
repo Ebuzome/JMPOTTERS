@@ -127,15 +127,24 @@
     }
 
     // ---- Shared Cart Count Updater ----
+    function safeParseJSON(key, fallback) {
+        try {
+            var val = localStorage.getItem(key);
+            return val ? JSON.parse(val) : fallback;
+        } catch (e) {
+            return fallback;
+        }
+    }
+
     function updateCartCount() {
-        var cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
+        var cart = safeParseJSON('jmpotters_cart', []);
         var totalItems = cart.reduce(function (sum, item) { return sum + item.quantity; }, 0);
         var cartCount = document.getElementById('cartCount');
         if (cartCount) {
             cartCount.textContent = totalItems;
             cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
         }
-        var wishlist = JSON.parse(localStorage.getItem('jmpotters_wishlist')) || [];
+        var wishlist = safeParseJSON('jmpotters_wishlist', []);
         var wishlistCount = document.getElementById('wishlistCount');
         if (wishlistCount) {
             wishlistCount.textContent = wishlist.length;
