@@ -47,7 +47,7 @@ function isProductPage(pathname) {
 function getSlugFromURL(pathname, searchParams) {
   if (!isProductPage(pathname)) return null;
   const slug = searchParams ? searchParams.get('slug') : null;
-  return slug ? decodeURIComponent(slug) : null;
+  return slug || null;
 }
 
 function getImageUrl(categorySlug, imageFilename, imagesConfig) {

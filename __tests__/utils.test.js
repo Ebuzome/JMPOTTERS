@@ -76,9 +76,17 @@ describe('getSlugFromURL', () => {
     expect(getSlugFromURL('/product.html', params)).toBe('cool-shoe');
   });
 
-  it('decodes encoded slug', () => {
+  it('returns slug as-is (URLSearchParams already decodes)', () => {
     const params = new URLSearchParams('slug=cool%20shoe%20v2');
+    // URLSearchParams.get() already decodes percent-encoded values
     expect(getSlugFromURL('/product.html', params)).toBe('cool shoe v2');
+  });
+
+  it('does not double-decode slugs containing percent characters', () => {
+    // Simulating a slug that URLSearchParams already decoded to "50%off"
+    const params = { get: () => '50%off' };
+    // Should NOT throw URIError from double-decoding
+    expect(getSlugFromURL('/product.html', params)).toBe('50%off');
   });
 
   it('returns null when not on product page', () => {
