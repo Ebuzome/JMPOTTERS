@@ -952,6 +952,9 @@
         </div>
     </section>
 
+    <!-- AD ZONE: Between Sections -->
+    <div class="ad-zone" id="adZoneBetweenSections"></div>
+
     <!-- New Arrivals / Staff Picks (will be populated by app.js) -->
     <section class="new-arrivals">
         <div class="container">
@@ -1020,15 +1023,17 @@
             // Initialize AOS
             AOS.init({ duration: 800, once: true });
             
-            // Hero carousel rotation
-            const heroSlides = document.querySelectorAll('.hero-slide');
-            let currentHeroSlide = 0;
-            if (heroSlides.length) {
-                setInterval(() => {
-                    heroSlides[currentHeroSlide].classList.remove('active');
-                    currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
-                    heroSlides[currentHeroSlide].classList.add('active');
-                }, 5000);
+            // Hero carousel rotation (skip if dynamic banners took over)
+            if (!window._jmpotters_banner_carousel_active) {
+                const heroSlides = document.querySelectorAll('.hero-slide');
+                let currentHeroSlide = 0;
+                if (heroSlides.length) {
+                    setInterval(() => {
+                        heroSlides[currentHeroSlide].classList.remove('active');
+                        currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
+                        heroSlides[currentHeroSlide].classList.add('active');
+                    }, 5000);
+                }
             }
             
             // Mobile navigation
@@ -1119,7 +1124,7 @@
                     if (dots) dots.style.display = 'none';
                 } else if (heroSection) {
                     // Page has hero section but no carousel - set bg on section + create slides
-                    heroSection.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(\'' + pageBanners[0].image_url + '\')';
+                    heroSection.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(\'' + escHtml(pageBanners[0].image_url) + '\')';
                     heroSection.style.backgroundSize = 'cover';
                     heroSection.style.backgroundPosition = 'center';
                     // Create a carousel div for slides
@@ -1143,6 +1148,7 @@
                     if (p && pageBanners[0].subtitle) p.textContent = pageBanners[0].subtitle;
                 }
 
+                    window._jmpotters_banner_carousel_active = true;
                 // Auto-rotate slides
                 if (carousel && pageBanners.length > 1) {
                     var slides = carousel.querySelectorAll('.hero-slide, .carousel-slide');

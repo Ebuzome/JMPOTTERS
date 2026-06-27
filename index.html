@@ -1584,14 +1584,10 @@
             }
             searchResultsContainer.innerHTML = '<div class="search-status"><i class="icon-loader" style="animation:spin 1s linear infinite;display:inline-block"></i> Searching...</div>';
             try {
-                var supabase = window.JMPOTTERS && window.JMPOTTERS.getSupabaseClient ? window.JMPOTTERS.getSupabaseClient() : null;
-                if (!supabase) {
-                    var SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-                    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
-                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                }
+                var sb = supabase || (window.JMPOTTERS && window.JMPOTTERS.getSupabaseClient ? window.JMPOTTERS.getSupabaseClient() : null);
+                if (!sb) { searchResultsContainer.innerHTML = '<div class="search-empty"><i class="icon-alert-circle"></i><p>Search unavailable</p></div>'; return; }
                 var terms = query.toLowerCase().split(/\s+/).filter(function(t) { return t.length > 0; });
-                var { data: products, error } = await supabase
+                var { data: products, error } = await sb
                     .from('products')
                     .select('id, name, slug, price, image_url, description, category_id, is_active, categories(name, slug)')
                     .eq('is_active', true)
