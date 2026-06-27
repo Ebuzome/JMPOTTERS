@@ -1068,8 +1068,9 @@
             });
         });
 
-        // Carousel (skip if dynamic banners took over)
-        if (!window._jmpotters_banner_carousel_active) {
+        // Carousel (deferred so the dynamic banner IIFE can set the flag first)
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window._jmpotters_banner_carousel_active) return;
             const heroSlides = document.querySelectorAll('.hero-carousel .carousel-slide');
             const heroDots = document.querySelectorAll('.hero-carousel .carousel-dot');
             let heroCurrent = 0;
@@ -1084,7 +1085,7 @@
                 setInterval(() => { let next = (heroCurrent + 1) % heroSlides.length; showHeroSlide(next); }, 5000);
                 heroDots.forEach((dot, i) => dot.addEventListener('click', () => showHeroSlide(i)));
             }
-        }
+        });
 
         // Mobile nav & panels
         function openNav() { mobileNav?.classList.add('active'); navOverlay?.classList.add('active'); document.body.style.overflow = 'hidden'; }
