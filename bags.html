@@ -546,7 +546,6 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5);
         }
-        .modal-overlay, .cart-panel, .wishlist-panel, .notification,
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
@@ -659,11 +658,30 @@
     <div class="modal-overlay" id="modalOverlay"><div class="modal" id="productModal">...</div></div>
     <div class="notification" id="notification"><i class="fas fa-check-circle"></i><span id="notificationText"></span></div>
 
-        <!-- Shared footer and WhatsApp float injected by shared-layout.js -->
-    <div id="shared-footer"></div><script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Shared footer and WhatsApp float injected by shared-layout.js -->
+    <div id="shared-footer"></div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     
-    <!-- ========== SUPABASE INTEGRATION ========== -->
-    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({ duration: 800, once: true });
+            
+            var heroSlides = document.querySelectorAll('.hero-slide');
+            var currentHeroSlide = 0;
+            if (heroSlides.length) {
+                setInterval(function() {
+                    heroSlides[currentHeroSlide].classList.remove('active');
+                    currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
+                    heroSlides[currentHeroSlide].classList.add('active');
+                }, 5000);
+            }
+            
+            if (window.JMPOTTERS_SHARED) {
+                window.JMPOTTERS_SHARED.waitForAppAndLoadCategory('bags');
+            }
+        });
+    </script>
 </body>
 </html>

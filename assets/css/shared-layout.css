@@ -515,6 +515,26 @@
     transform: translateY(-2px);
 }
 
+/* --- Wishlist Panel --- */
+.wishlist-panel {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 400px;
+    height: 100vh;
+    background: white;
+    z-index: 1100;
+    transition: right 0.3s ease;
+    padding: 25px;
+    overflow-y: auto;
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.15);
+}
+
+.wishlist-panel.active {
+    right: 0;
+}
+
 /* --- WhatsApp Float --- */
 .whatsapp-float {
     position: fixed;

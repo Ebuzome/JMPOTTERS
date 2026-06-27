@@ -589,7 +589,10 @@
     <div class="wishlist-panel" id="wishlistPanel"><div class="wishlist-header"><h3>Your Wishlist</h3><button class="close-wishlist"><i class="fas fa-times"></i></button></div><div class="wishlist-items" id="wishlistItems"><div class="wishlist-empty">Your wishlist is empty</div></div></div>
 
         <!-- Shared footer and WhatsApp float injected by shared-layout.js -->
-    <div id="shared-footer"></div><script>
+    <div id="shared-footer"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
         // ========== CART & WISHLIST LOGIC (Preserved with enhancements) ==========
         const products = {
             ansa: { name: "ANSA Soursop Tea - 25 Tea Bags", price: 25000 },
@@ -744,6 +747,7 @@
         updateWishlistCount();
         updateCartCount();
         updateCartTotal();
+    });
     </script>
 </body>
 </html>
