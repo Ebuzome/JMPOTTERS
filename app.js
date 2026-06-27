@@ -1167,7 +1167,9 @@
                     closeCart();
                     window.location.href = 'invoice.html?order=' + order.order_number;
                 } else {
-                    throw new Error('Order creation failed');
+                    completeBtn.disabled = false;
+                    completeBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Order';
+                    validateForm();
                 }
             } catch (error) {
                 console.error('Checkout error:', error);
