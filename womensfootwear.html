@@ -935,15 +935,17 @@
             // Initialize AOS
             AOS.init({ duration: 800, once: true });
 
-            // Hero carousel
-            const slides = document.querySelectorAll('.hero-slide');
-            let currentSlide = 0;
-            if (slides.length) {
-                setInterval(() => {
-                    slides[currentSlide].classList.remove('active');
-                    currentSlide = (currentSlide + 1) % slides.length;
-                    slides[currentSlide].classList.add('active');
-                }, 5000);
+            // Hero carousel (skip if dynamic banners took over)
+            if (!window._jmpotters_banner_carousel_active) {
+                const slides = document.querySelectorAll('.hero-slide');
+                let currentSlide = 0;
+                if (slides.length) {
+                    setInterval(() => {
+                        slides[currentSlide].classList.remove('active');
+                        currentSlide = (currentSlide + 1) % slides.length;
+                        slides[currentSlide].classList.add('active');
+                    }, 5000);
+                }
             }
 
             // Mobile navigation (left drawer)
@@ -1021,7 +1023,7 @@
                     if (dots) dots.style.display = 'none';
                 } else if (heroSection) {
                     // Page has hero section but no carousel - set bg on section + create slides
-                    heroSection.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(\'' + pageBanners[0].image_url + '\')';
+                    heroSection.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(\'' + escHtml(pageBanners[0].image_url) + '\')';
                     heroSection.style.backgroundSize = 'cover';
                     heroSection.style.backgroundPosition = 'center';
                     // Create a carousel div for slides
@@ -1045,6 +1047,7 @@
                     if (p && pageBanners[0].subtitle) p.textContent = pageBanners[0].subtitle;
                 }
 
+                    window._jmpotters_banner_carousel_active = true;
                 // Auto-rotate slides
                 if (carousel && pageBanners.length > 1) {
                     var slides = carousel.querySelectorAll('.hero-slide, .carousel-slide');

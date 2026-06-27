@@ -909,6 +909,9 @@
         </div>
     </section>
 
+    <!-- AD ZONE: Between Sections -->
+    <div class="ad-zone" id="adZoneBetweenSections"></div>
+
     <!-- Cart & Wishlist Panels -->
     <div class="overlay" id="cartOverlay"></div>
     <div class="cart-panel" id="cartPanel"><div class="cart-header"><h3>Your Cart</h3><button class="close-cart"><i class="fas fa-times"></i></button></div><div class="cart-items" id="cartItems"><div class="cart-empty">Your cart is empty</div></div><div class="cart-total"><span>Total:</span><span id="cartTotal">₦0</span></div><a href="#" class="btn" id="whatsappCheckout" style="width:100%;margin-top:15px;"><i class="fab fa-whatsapp"></i> Checkout via WhatsApp</a></div>
@@ -1065,21 +1068,24 @@
             });
         });
 
-        // Carousel
-        const heroSlides = document.querySelectorAll('.hero-carousel .carousel-slide');
-        const heroDots = document.querySelectorAll('.hero-carousel .carousel-dot');
-        let heroCurrent = 0;
-        function showHeroSlide(index) {
-            heroSlides.forEach(s => s.classList.remove('active'));
-            heroDotes?.forEach(d => d.classList.remove('active'));
-            heroSlides[index]?.classList.add('active');
-            heroDots[index]?.classList.add('active');
-            heroCurrent = index;
-        }
-        if (heroSlides.length) {
-            setInterval(() => { let next = (heroCurrent + 1) % heroSlides.length; showHeroSlide(next); }, 5000);
-            heroDots.forEach((dot, i) => dot.addEventListener('click', () => showHeroSlide(i)));
-        }
+        // Carousel (deferred so the dynamic banner IIFE can set the flag first)
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window._jmpotters_banner_carousel_active) return;
+            const heroSlides = document.querySelectorAll('.hero-carousel .carousel-slide');
+            const heroDots = document.querySelectorAll('.hero-carousel .carousel-dot');
+            let heroCurrent = 0;
+            function showHeroSlide(index) {
+                heroSlides.forEach(s => s.classList.remove('active'));
+                heroDots?.forEach(d => d.classList.remove('active'));
+                heroSlides[index]?.classList.add('active');
+                heroDots[index]?.classList.add('active');
+                heroCurrent = index;
+            }
+            if (heroSlides.length) {
+                setInterval(() => { let next = (heroCurrent + 1) % heroSlides.length; showHeroSlide(next); }, 5000);
+                heroDots.forEach((dot, i) => dot.addEventListener('click', () => showHeroSlide(i)));
+            }
+        });
 
         // Mobile nav & panels
         function openNav() { mobileNav?.classList.add('active'); navOverlay?.classList.add('active'); document.body.style.overflow = 'hidden'; }
@@ -1133,7 +1139,7 @@
                     if (dots) dots.style.display = 'none';
                 } else if (heroSection) {
                     // Page has hero section but no carousel - set bg on section + create slides
-                    heroSection.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(\'' + pageBanners[0].image_url + '\')';
+                    heroSection.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(\'' + escHtml(pageBanners[0].image_url) + '\')';
                     heroSection.style.backgroundSize = 'cover';
                     heroSection.style.backgroundPosition = 'center';
                     // Create a carousel div for slides
@@ -1157,6 +1163,7 @@
                     if (p && pageBanners[0].subtitle) p.textContent = pageBanners[0].subtitle;
                 }
 
+                    window._jmpotters_banner_carousel_active = true;
                 // Auto-rotate slides
                 if (carousel && pageBanners.length > 1) {
                     var slides = carousel.querySelectorAll('.hero-slide, .carousel-slide');
