@@ -572,16 +572,20 @@
             }
             const user = JSON.parse(localStorage.getItem('jmpotters_user'));
             if (user && user.address && user.city && user.state) {
-                if (window.JMPOTTERS && window.JMPOTTERS.proceedToCheckout) {
+                if (window.JMPOTTERS && window.JMPOTTERS.showCheckoutModal) {
+                    window.JMPOTTERS.showCheckoutModal();
+                } else if (window.JMPOTTERS && window.JMPOTTERS.proceedToCheckout) {
                     window.JMPOTTERS.proceedToCheckout();
                 } else {
-                    showNotification('Checkout system not ready', 'warning');
+                    showNotification('Checkout system not ready. Please refresh.', 'warning');
                 }
             } else if (user) {
+                showNotification('Please complete your profile before checkout', 'warning');
                 sessionStorage.setItem('checkoutRedirect', window.location.href);
                 window.location.href = 'register.html';
             } else {
                 sessionStorage.setItem('checkoutRedirect', window.location.href);
+                showNotification('Please create an account to complete your purchase', 'info');
                 window.location.href = 'register.html';
             }
         }
