@@ -979,7 +979,9 @@
             cart.forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = 'cart-item';
-                div.innerHTML = `<div style="flex:1;margin-left:10px;"><div style="font-weight:600">${item.name}</div><div style="color:var(--primary-color)">₦${Math.round(item.price).toLocaleString()} × ${item.quantity}</div></div><button class="cart-item-remove" data-idx="${idx}"><i class="fas fa-trash"></i></button>`;
+                const safeName = document.createElement('span');
+                safeName.textContent = item.name;
+                div.innerHTML = `<div style="flex:1;margin-left:10px;"><div style="font-weight:600">${safeName.innerHTML}</div><div style="color:var(--primary-color)">₦${Math.round(item.price).toLocaleString()} × ${parseInt(item.quantity)}</div></div><button class="cart-item-remove" data-idx="${parseInt(idx)}"><i class="fas fa-trash"></i></button>`;
                 cartItems.appendChild(div);
             });
             document.querySelectorAll('.cart-item-remove').forEach(btn => {

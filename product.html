@@ -1193,7 +1193,15 @@
             if (product) {
                 const categoryName = product.category_name || 'Category';
                 const categorySlug = product.category_slug || 'mensfootwear';
-                if (categoryLink) categoryLink.innerHTML = `<a href="${categorySlug}.html" class="text-gray-700 hover:text-primary-600 transition-colors">${categoryName}</a>`;
+                if (categoryLink) {
+                    const safeSlug = encodeURIComponent(categorySlug);
+                    const a = document.createElement('a');
+                    a.href = safeSlug + '.html';
+                    a.className = 'text-gray-700 hover:text-primary-600 transition-colors';
+                    a.textContent = categoryName;
+                    categoryLink.innerHTML = '';
+                    categoryLink.appendChild(a);
+                }
                 if (productNameSpan) productNameSpan.textContent = product.name;
             }
         };
