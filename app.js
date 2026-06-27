@@ -893,6 +893,295 @@
     }
     
     // ====================
+    // RECEIPT UPLOAD TO SUPABASE STORAGE
+    // ====================
+    async function uploadReceiptToStorage(file, tempId) {
+        const supabase = getSupabaseClient();
+        if (!supabase) throw new Error('Database connection error');
+        
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) throw new Error('File size exceeds 5MB limit');
+        
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) throw new Error('Only JPG, PNG, WebP or PDF files are allowed');
+        
+        const ext = file.name.split('.').pop().toLowerCase();
+        const safeName = tempId + '_' + Date.now() + '.' + ext;
+        const filePath = 'receipts/' + safeName;
+        
+        const { data, error } = await supabase.storage
+            .from('payment-receipts')
+            .upload(filePath, file, { cacheControl: '3600', upsert: false });
+        
+        if (error) throw new Error('Upload failed: ' + error.message);
+        
+        const { data: urlData } = supabase.storage
+            .from('payment-receipts')
+            .getPublicUrl(filePath);
+        
+        return urlData.publicUrl;
+    }
+    
+    // ====================
+    // CHECKOUT CONFIRMATION MODAL
+    // ====================
+    function showCheckoutModal() {
+        const cart = getCart();
+        if (cart.length === 0) {
+            showNotification('Your cart is empty', 'warning');
+            return;
+        }
+        
+        const user = safeParseJSON('jmpotters_user', null);
+        if (!user || !user.address || !user.city || !user.state) {
+            showNotification('Please complete your profile before checkout', 'warning');
+            sessionStorage.setItem('checkoutRedirect', window.location.href);
+            window.location.href = 'register.html';
+            return;
+        }
+        
+        let existing = document.getElementById('checkoutConfirmModal');
+        if (existing) existing.remove();
+        
+        const subtotal = cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
+        const shippingFee = subtotal >= 50000 ? 0 : 2000;
+        const grandTotal = subtotal + shippingFee;
+        
+        let itemsHtml = '';
+        cart.forEach(item => {
+            const itemTotal = (item.price || 0) * item.quantity;
+            let desc = escapeHtml(item.name);
+            if (item.color_name) desc += ' (' + escapeHtml(item.color_name) + ')';
+            if (item.size_value) desc += ' - ' + escapeHtml(item.size_value);
+            itemsHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:0.85rem;"><span style="flex:1;color:#e2e8f0;">' + desc + ' x' + item.quantity + '</span><span style="font-weight:600;color:#a5b4fc;">\u20A6' + itemTotal.toLocaleString() + '</span></div>';
+        });
+        
+        const modal = document.createElement('div');
+        modal.id = 'checkoutConfirmModal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:20000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px;backdrop-filter:blur(8px);';
+        modal.innerHTML = `
+            <div id="checkoutModalContent" style="background:linear-gradient(145deg,#0f172a,#1e293b);border-radius:1.5rem;width:100%;max-width:560px;margin:auto;box-shadow:0 25px 60px rgba(0,0,0,0.5);border:1px solid rgba(99,102,241,0.2);animation:slideIn 0.3s ease;">
+                <div style="padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(99,102,241,0.2);padding-bottom:16px;">
+                    <h2 style="color:#f1f5f9;font-size:1.25rem;font-weight:700;display:flex;align-items:center;gap:8px;"><i class="fas fa-clipboard-check" style="color:#818cf8;"></i> Confirm Your Order</h2>
+                    <button id="closeCheckoutModal" style="background:rgba(255,255,255,0.08);border:none;width:36px;height:36px;border-radius:50%;color:#94a3b8;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;"><i class="fas fa-times"></i></button>
+                </div>
+                <div style="padding:20px 24px;max-height:calc(100vh - 160px);overflow-y:auto;">
+                    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.06);">
+                        <h3 style="color:#818cf8;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-weight:600;"><i class="fas fa-user"></i> Customer Information</h3>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.85rem;">
+                            <div><span style="color:#64748b;font-size:0.75rem;">Name</span><div style="color:#e2e8f0;font-weight:500;">${escapeHtml(user.full_name || 'N/A')}</div></div>
+                            <div><span style="color:#64748b;font-size:0.75rem;">Email</span><div style="color:#e2e8f0;font-weight:500;">${escapeHtml(user.email || 'N/A')}</div></div>
+                            <div><span style="color:#64748b;font-size:0.75rem;">Phone</span><div style="color:#e2e8f0;font-weight:500;">${escapeHtml(user.phone || 'N/A')}</div></div>
+                            <div><span style="color:#64748b;font-size:0.75rem;">Location</span><div style="color:#e2e8f0;font-weight:500;">${escapeHtml(user.city || '')}${user.city && user.state ? ', ' : ''}${escapeHtml(user.state || '')}</div></div>
+                        </div>
+                        <div style="margin-top:8px;"><span style="color:#64748b;font-size:0.75rem;">Address</span><div style="color:#e2e8f0;font-weight:500;font-size:0.85rem;">${escapeHtml(user.address || 'N/A')}</div></div>
+                        <a href="register.html" style="display:inline-flex;align-items:center;gap:4px;color:#818cf8;font-size:0.75rem;margin-top:8px;text-decoration:none;"><i class="fas fa-edit"></i> Edit Profile</a>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.06);">
+                        <h3 style="color:#818cf8;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-weight:600;"><i class="fas fa-shopping-bag"></i> Order Summary</h3>
+                        <div>${itemsHtml}</div>
+                        <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">
+                            <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#94a3b8;margin-bottom:4px;"><span>Subtotal</span><span>\u20A6${subtotal.toLocaleString()}</span></div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#94a3b8;margin-bottom:4px;"><span>Shipping</span><span>${shippingFee === 0 ? 'Free' : '\u20A6' + shippingFee.toLocaleString()}</span></div>
+                            <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:700;color:#a5b4fc;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);"><span>Grand Total</span><span>\u20A6${grandTotal.toLocaleString()}</span></div>
+                        </div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.06);">
+                        <h3 style="color:#818cf8;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-weight:600;"><i class="fas fa-receipt"></i> Payment Receipt <span style="color:#ef4444;">*</span></h3>
+                        <p style="color:#94a3b8;font-size:0.8rem;margin-bottom:12px;">Upload a screenshot or photo of your payment receipt (JPG, PNG, WebP or PDF, max 5MB).</p>
+                        <div id="receiptUploadZone" style="border:2px dashed rgba(99,102,241,0.3);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all 0.25s;background:rgba(99,102,241,0.04);position:relative;">
+                            <input type="file" id="receiptFileInput" accept="image/jpeg,image/png,image/webp,application/pdf" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+                            <div id="receiptUploadContent">
+                                <i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:#818cf8;margin-bottom:8px;"></i>
+                                <p style="color:#e2e8f0;font-weight:500;font-size:0.9rem;">Drop your receipt here or click to browse</p>
+                                <p style="color:#64748b;font-size:0.75rem;margin-top:4px;">JPG, PNG, WebP or PDF - Max 5MB</p>
+                            </div>
+                            <div id="receiptPreview" style="display:none;">
+                                <img id="receiptPreviewImg" style="max-width:200px;max-height:150px;border-radius:8px;object-fit:cover;margin-bottom:8px;" alt="Receipt preview">
+                                <div id="receiptFileName" style="color:#e2e8f0;font-size:0.85rem;font-weight:500;"></div>
+                                <button type="button" id="removeReceiptBtn" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);padding:4px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;margin-top:8px;"><i class="fas fa-trash"></i> Remove</button>
+                            </div>
+                        </div>
+                        <div id="receiptError" style="display:none;color:#f87171;font-size:0.8rem;margin-top:8px;"></div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.06);">
+                        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+                            <input type="checkbox" id="termsCheckbox" style="width:18px;height:18px;margin-top:2px;accent-color:#6366f1;cursor:pointer;flex-shrink:0;">
+                            <span style="color:#cbd5e1;font-size:0.85rem;">I agree to the <a href="#" style="color:#818cf8;text-decoration:underline;" onclick="event.preventDefault();event.stopPropagation();">Terms and Conditions</a> of JMPOTTERS. I confirm that the information above is correct and the uploaded receipt is a valid proof of payment. <span style="color:#ef4444;">*</span></span>
+                        </label>
+                    </div>
+                    <button id="completeOrderBtn" disabled style="width:100%;padding:14px;background:linear-gradient(135deg,#4b5563,#374151);color:#6b7280;border:none;border-radius:12px;font-weight:700;font-size:1rem;cursor:not-allowed;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px;">
+                        <i class="fas fa-lock"></i> Complete Order
+                    </button>
+                    <p id="checkoutValidationMsg" style="color:#f87171;font-size:0.8rem;text-align:center;margin-top:8px;">Please upload your payment receipt and agree to the Terms & Conditions.</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        let selectedReceiptFile = null;
+        const fileInput = document.getElementById('receiptFileInput');
+        const uploadZone = document.getElementById('receiptUploadZone');
+        const uploadContent = document.getElementById('receiptUploadContent');
+        const preview = document.getElementById('receiptPreview');
+        const previewImg = document.getElementById('receiptPreviewImg');
+        const fileNameEl = document.getElementById('receiptFileName');
+        const removeBtn = document.getElementById('removeReceiptBtn');
+        const receiptError = document.getElementById('receiptError');
+        const termsCheckbox = document.getElementById('termsCheckbox');
+        const completeBtn = document.getElementById('completeOrderBtn');
+        const validationMsg = document.getElementById('checkoutValidationMsg');
+        const closeBtn = document.getElementById('closeCheckoutModal');
+        
+        function validateForm() {
+            const hasReceipt = selectedReceiptFile !== null;
+            const hasTerms = termsCheckbox.checked;
+            const ready = hasReceipt && hasTerms;
+            completeBtn.disabled = !ready;
+            if (ready) {
+                completeBtn.style.background = 'linear-gradient(135deg,#6366f1,#4f46e5)';
+                completeBtn.style.color = 'white';
+                completeBtn.style.cursor = 'pointer';
+                completeBtn.style.boxShadow = '0 0 20px rgba(99,102,241,0.3)';
+                validationMsg.style.display = 'none';
+            } else {
+                completeBtn.style.background = 'linear-gradient(135deg,#4b5563,#374151)';
+                completeBtn.style.color = '#6b7280';
+                completeBtn.style.cursor = 'not-allowed';
+                completeBtn.style.boxShadow = 'none';
+                let msg = [];
+                if (!hasReceipt) msg.push('upload your payment receipt');
+                if (!hasTerms) msg.push('agree to the Terms & Conditions');
+                validationMsg.textContent = 'Please ' + msg.join(' and ') + '.';
+                validationMsg.style.display = 'block';
+            }
+        }
+        
+        function handleFile(file) {
+            receiptError.style.display = 'none';
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                receiptError.textContent = 'File is too large. Maximum size is 5MB.';
+                receiptError.style.display = 'block';
+                return;
+            }
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+            if (!allowedTypes.includes(file.type)) {
+                receiptError.textContent = 'Invalid file type. Only JPG, PNG, WebP or PDF files are allowed.';
+                receiptError.style.display = 'block';
+                return;
+            }
+            selectedReceiptFile = file;
+            fileNameEl.textContent = file.name;
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImg.style.display = 'none';
+                fileNameEl.innerHTML = '<i class="fas fa-file-pdf" style="color:#ef4444;font-size:2rem;margin-bottom:8px;display:block;"></i>' + escapeHtml(file.name);
+            }
+            uploadContent.style.display = 'none';
+            preview.style.display = 'block';
+            uploadZone.style.borderColor = 'rgba(34,197,94,0.5)';
+            uploadZone.style.background = 'rgba(34,197,94,0.05)';
+            validateForm();
+        }
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) handleFile(this.files[0]);
+        });
+        
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(99,102,241,0.6)';
+            this.style.background = 'rgba(99,102,241,0.08)';
+        });
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            if (!selectedReceiptFile) {
+                this.style.borderColor = 'rgba(99,102,241,0.3)';
+                this.style.background = 'rgba(99,102,241,0.04)';
+            }
+        });
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+        });
+        
+        removeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            selectedReceiptFile = null;
+            fileInput.value = '';
+            uploadContent.style.display = 'block';
+            preview.style.display = 'none';
+            previewImg.style.display = 'none';
+            uploadZone.style.borderColor = 'rgba(99,102,241,0.3)';
+            uploadZone.style.background = 'rgba(99,102,241,0.04)';
+            validateForm();
+        });
+        
+        termsCheckbox.addEventListener('change', validateForm);
+        
+        closeBtn.addEventListener('click', function() {
+            modal.remove();
+        });
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.remove();
+        });
+        
+        completeBtn.addEventListener('click', async function() {
+            if (completeBtn.disabled || isProcessingCheckout) return;
+            isProcessingCheckout = true;
+            completeBtn.disabled = true;
+            completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            completeBtn.style.background = 'linear-gradient(135deg,#4b5563,#374151)';
+            completeBtn.style.color = '#94a3b8';
+            
+            try {
+                const tempId = 'order_' + Date.now();
+                let receiptUrl = null;
+                
+                if (selectedReceiptFile) {
+                    receiptUrl = await uploadReceiptToStorage(selectedReceiptFile, tempId);
+                }
+                
+                const checkoutData = {
+                    user_id: user.id,
+                    email: user.email,
+                    full_name: user.full_name,
+                    phone: user.phone,
+                    address: user.address,
+                    city: user.city,
+                    state: user.state,
+                    notes: '',
+                    receipt_url: receiptUrl
+                };
+                
+                const order = await createOrder(checkoutData, cart);
+                if (order) {
+                    modal.remove();
+                    closeCart();
+                    window.location.href = 'invoice.html?order=' + order.order_number;
+                } else {
+                    throw new Error('Order creation failed');
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                showNotification('Checkout failed: ' + error.message, 'error');
+                completeBtn.disabled = false;
+                completeBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Order';
+                validateForm();
+            } finally {
+                isProcessingCheckout = false;
+            }
+        });
+    }
+    
+    // ====================
     // ORDER CREATION WITH SEQUENTIAL ORDER NUMBERS (PLAIN DIGITS)
     // ====================
     async function createOrder(orderData, cart) {
@@ -939,6 +1228,8 @@
                 payment_status: 'pending',
                 payment_method: 'card',
                 items: items,
+                receipt_url: orderData.receipt_url || null,
+                receipt_uploaded_at: orderData.receipt_url ? new Date().toISOString() : null,
                 created_at: new Date().toISOString()
             };
             
@@ -997,11 +1288,8 @@
     // ====================
     async function proceedToCheckout() {
         if (isProcessingCheckout) {
-
             return;
         }
-        
-
         
         const cart = getCart();
         if (cart.length === 0) {
@@ -1012,31 +1300,7 @@
         const user = safeParseJSON('jmpotters_user', null);
         
         if (user && user.address && user.city && user.state) {
-            isProcessingCheckout = true;
-            showNotification('Processing your order...', 'info');
-            
-            try {
-                const checkoutData = {
-                    user_id: user.id,
-                    email: user.email,
-                    full_name: user.full_name,
-                    phone: user.phone,
-                    address: user.address,
-                    city: user.city,
-                    state: user.state,
-                    notes: ''
-                };
-                
-                const order = await createOrder(checkoutData, cart);
-                if (order) {
-                    window.location.href = `invoice.html?order=${order.order_number}`;
-                }
-            } catch (error) {
-                console.error('Checkout error:', error);
-                showNotification('Checkout failed. Please try again.', 'error');
-            } finally {
-                isProcessingCheckout = false;
-            }
+            showCheckoutModal();
             return;
         }
         
@@ -1101,6 +1365,7 @@
     window.JMPOTTERS = {
         addToCart,
         proceedToCheckout,
+        showCheckoutModal,
         openCart,
         closeCart,
         formatPrice,
@@ -1109,7 +1374,8 @@
         loadSingleProductBySlug,
         updateCartUI,
         getOrderByNumber,
-        createOrder
+        createOrder,
+        uploadReceiptToStorage
     };
     
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializePage);
