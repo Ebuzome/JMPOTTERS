@@ -1193,6 +1193,8 @@
                     return;
                 }
 
+                // Store product data for quick-add event delegation
+                storeProductData(products);
                 // Init hero carousel and marquee with these products
                 initHeroCarousel(products);
                 initMarquee(products);
@@ -1232,7 +1234,7 @@
                                 (discount > 0 ? '<span class="discount-tag">Save ' + discount + '%</span>' : '') +
                             '</div>' +
                         '</div></a>' +
-                        '<button class="quick-add" onclick="event.stopPropagation();quickAddToCart(' + product.id + ',\'' + escapeHtml(product.name).replace(/'/g, "\\'") + '\',' + product.price + ',\'' + (product.image_url || '').replace(/'/g, "\\'") + '\',\'' + (product.categories ? product.categories.slug : '') + '\')">' +
+                        '<button class="quick-add" data-product-id="' + product.id + '">' +
                             '<i class="icon-plus" style="font-size:1rem"></i> Quick Add' +
                         '</button>' +
                     '</div>';
@@ -1244,23 +1246,39 @@
             }
         }
 
-        // Quick add to cart (non-variant products only)
-        window.quickAddToCart = function(id, name, price, imageUrl, catSlug) {
+        // Quick add to cart via event delegation (avoids inline handlers + XSS)
+        var productDataMap = {};
+        function storeProductData(products) {
+            products.forEach(function(p) {
+                productDataMap[p.id] = {
+                    id: p.id, name: p.name, price: p.price,
+                    image_url: p.image_url || '',
+                    category_slug: p.categories ? p.categories.slug : ''
+                };
+            });
+        }
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.quick-add');
+            if (!btn) return;
+            e.stopPropagation();
+            var pid = parseInt(btn.dataset.productId);
+            var data = productDataMap[pid];
+            if (!data) return;
             if (window.JMPOTTERS && window.JMPOTTERS.addToCart) {
                 window.JMPOTTERS.addToCart(
-                    { id: id, name: name, price: price, image_url: imageUrl, stock: 999 },
+                    { id: data.id, name: data.name, price: data.price, image_url: data.image_url, stock: 999 },
                     1,
-                    { category_slug: catSlug }
+                    { category_slug: data.category_slug }
                 );
             } else {
                 var cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                var existing = cart.find(function(item) { return item.product_id === id; });
+                var existing = cart.find(function(item) { return item.product_id === data.id; });
                 if (existing) { existing.quantity += 1; }
-                else { cart.push({ product_id: id, name: name, price: price, quantity: 1, image_url: imageUrl, category_slug: catSlug }); }
+                else { cart.push({ product_id: data.id, name: data.name, price: data.price, quantity: 1, image_url: data.image_url, category_slug: data.category_slug }); }
                 localStorage.setItem('jmpotters_cart', JSON.stringify(cart));
                 updateCartCount();
             }
-        };
+        });
 
         // ===== BRAND COLLAGE =====
         function updateBrandCollage(products) {
