@@ -450,7 +450,7 @@
                     <div class="product-image-wrapper">
                         <img src="${imageUrl}" alt="${product.name}" class="product-image"
                              onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
-                        <div class="magnify-icon"><i class="fas fa-search-plus"></i></div>
+                        <div class="magnify-icon"><i class="icon-zoom-in"></i></div>
                     </div>
                 </div>
                 <div class="product-details">
@@ -462,32 +462,32 @@
                     </div>
                     <div class="stock-tile">
                         <div class="stock-status ${stockStatus}">
-                            <i class="fas ${product.stock > 0 ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                            <i class="${product.stock > 0 ? 'icon-check-circle' : 'icon-x-circle'}"></i>
                             <span>${stockText}</span>
                         </div>
                     </div>
                     <div class="description-tile">
-                        <div class="tile-label"><i class="fas fa-info-circle"></i> Description</div>
+                        <div class="tile-label"><i class="icon-info"></i> Description</div>
                         <div class="product-description">${product.description ? product.description.replace(/\n/g, '<br>') : 'Premium quality product from JMPOTTERS.'}</div>
                     </div>
                     ${isFootwear && currentProductColors.length > 0 ? `
                         <div class="variant-tile">
-                            <div class="tile-label"><i class="fas fa-palette"></i> Select Color</div>
+                            <div class="tile-label"><i class="icon-palette"></i> Select Color</div>
                             <div class="color-options" id="colorOptions">
                                 ${currentProductColors.map(color => `<div class="color-option" data-color-id="${color.id}" data-color-name="${color.color_name}" style="background: ${color.color_code ? `linear-gradient(135deg, ${color.color_code.split('+').join(', ')})` : '#f3f4f6'};">${color.color_name}</div>`).join('')}
                             </div>
                         </div>
                         <div class="variant-tile">
-                            <div class="tile-label"><i class="fas fa-ruler"></i> Select Size</div>
+                            <div class="tile-label"><i class="icon-ruler"></i> Select Size</div>
                             <div class="size-options" id="sizeOptions"><div class="text-gray-400 text-sm">Please select a color first</div></div>
                         </div>
                         <div class="selection-summary" id="selectionSummary" style="display: none;">
                             <div class="selected-variant"><span id="selectedColorName"></span> - <span id="selectedSizeValue"></span></div>
-                            <div class="stock-info"><i class="fas fa-box"></i> Available Stock: <strong id="availableStock">0</strong></div>
+                            <div class="stock-info"><i class="icon-package"></i> Available Stock: <strong id="availableStock">0</strong></div>
                         </div>
                     ` : ''}
                     <div class="quantity-tile">
-                        <div class="tile-label"><i class="fas fa-calculator"></i> Quantity</div>
+                        <div class="tile-label"><i class="icon-calculator"></i> Quantity</div>
                         <div class="quantity-controls">
                             <button class="quantity-btn minus">-</button>
                             <input type="number" id="productQuantity" value="1" min="1" max="${product.stock || 100}">
@@ -498,8 +498,8 @@
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button class="action-btn btn-add-cart" id="pageAddToCart"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-                        <button class="action-btn btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist"><i class="fas fa-heart"></i> ${isInWishlist ? 'Saved' : 'Wishlist'}</button>
+                        <button class="action-btn btn-add-cart" id="pageAddToCart"><i class="icon-shopping-cart"></i> Add to Cart</button>
+                        <button class="action-btn btn-wishlist ${isInWishlist ? 'active' : ''}" id="pageWishlist"><i class="icon-heart"></i> ${isInWishlist ? 'Saved' : 'Wishlist'}</button>
                     </div>
                 </div>
             </div>
@@ -597,7 +597,7 @@
                 toggleWishlist(currentProduct);
                 const isActive = pageWishlist.classList.contains('active');
                 pageWishlist.classList.toggle('active');
-                pageWishlist.innerHTML = `<i class="fas fa-heart"></i> ${isActive ? 'Wishlist' : 'Saved'}`;
+                pageWishlist.innerHTML = `<i class="icon-heart"></i> ${isActive ? 'Wishlist' : 'Saved'}`;
             });
         }
     }
@@ -651,7 +651,7 @@
         const productsGrid = document.getElementById('productsGrid');
         if (!productsGrid) return;
         
-        productsGrid.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i><p>Loading products...</p></div>';
+        productsGrid.innerHTML = '<div class="loading-spinner"><i class="icon-loader"></i><p>Loading products...</p></div>';
         
         const supabase = getSupabaseClient();
         if (!supabase) {
@@ -702,12 +702,12 @@
                 <div class="product-card">
                     <div class="product-image">
                         <img src="${imageUrl}" alt="${product.name}" onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
-                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}" data-action="wishlist"><i class="fas fa-heart"></i></button>
+                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}" data-action="wishlist"><i class="icon-heart"></i></button>
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">${escapeHtml(product.name)}</h3>
                         <div class="product-price">${formatPrice(product.price)}</div>
-                        <div class="availability ${product.stock <= 0 ? 'out-of-stock' : ''}"><i class="fas fa-${product.stock > 0 ? 'check-circle' : 'times-circle'}"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</div>
+                        <div class="availability ${product.stock <= 0 ? 'out-of-stock' : ''}"><i class="icon-${product.stock > 0 ? 'check-circle' : 'x-circle'}"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</div>
                     </div>
                 </div>
             `;
@@ -824,17 +824,10 @@
                         <div class="cart-item-price">${formatPrice(item.price)}</div>
                         <div>Qty: ${item.quantity}</div>
                     </div>
-                    <button class="cart-item-remove" data-index="${index}"><i class="fas fa-trash"></i></button>
+                    <button class="cart-item-remove" data-index="${index}"><i class="icon-trash-2"></i></button>
                 </div>
             `;
         });
-        
-        html += `
-            <div class="cart-footer">
-                <div class="cart-total"><span>Total:</span><span>${formatPrice(total)}</span></div>
-                <button class="cart-checkout-btn" id="checkoutButton"><i class="fas fa-shopping-bag"></i> Proceed to Checkout</button>
-            </div>
-        `;
         
         cartItems.innerHTML = html;
         cartTotal.textContent = formatPrice(total);
@@ -847,18 +840,6 @@
                 showNotification('Item removed', 'info');
             });
         });
-        
-        const checkoutBtn = document.getElementById('checkoutButton');
-        if (checkoutBtn) {
-            const newBtn = checkoutBtn.cloneNode(true);
-            checkoutBtn.parentNode.replaceChild(newBtn, checkoutBtn);
-            newBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Checkout button clicked');
-                proceedToCheckout();
-            });
-        }
     }
     
     function openCart() {
@@ -962,12 +943,12 @@
         modal.innerHTML = `
             <div id="checkoutModalContent" style="background:linear-gradient(145deg,#0f172a,#1e293b);border-radius:1.5rem;width:100%;max-width:560px;margin:auto;box-shadow:0 25px 60px rgba(0,0,0,0.5);border:1px solid rgba(99,102,241,0.2);animation:slideIn 0.3s ease;">
                 <div style="padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(99,102,241,0.2);padding-bottom:16px;">
-                    <h2 style="color:#f1f5f9;font-size:1.25rem;font-weight:700;display:flex;align-items:center;gap:8px;"><i class="fas fa-clipboard-check" style="color:#818cf8;"></i> Confirm Your Order</h2>
-                    <button id="closeCheckoutModal" style="background:rgba(255,255,255,0.08);border:none;width:36px;height:36px;border-radius:50%;color:#94a3b8;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;"><i class="fas fa-times"></i></button>
+                    <h2 style="color:#f1f5f9;font-size:1.25rem;font-weight:700;display:flex;align-items:center;gap:8px;"><i class="icon-clipboard-check" style="color:#818cf8;"></i> Confirm Your Order</h2>
+                    <button id="closeCheckoutModal" style="background:rgba(255,255,255,0.08);border:none;width:36px;height:36px;border-radius:50%;color:#94a3b8;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;"><i class="icon-x"></i></button>
                 </div>
                 <div style="padding:20px 24px;max-height:calc(100vh - 160px);overflow-y:auto;">
                     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.06);">
-                        <h3 style="color:#818cf8;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-weight:600;"><i class="fas fa-user"></i> Customer Information</h3>
+                        <h3 style="color:#818cf8;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-weight:600;"><i class="icon-user"></i> Customer Information</h3>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.85rem;">
                             <div><span style="color:#64748b;font-size:0.75rem;">Name</span><div style="color:#e2e8f0;font-weight:500;">${escapeHtml(user.full_name || 'N/A')}</div></div>
                             <div><span style="color:#64748b;font-size:0.75rem;">Email</span><div style="color:#e2e8f0;font-weight:500;">${escapeHtml(user.email || 'N/A')}</div></div>
@@ -975,10 +956,10 @@
                             <div><span style="color:#64748b;font-size:0.75rem;">Location</span><div style="color:#e2e8f0;font-weight:500;">${escapeHtml(user.city || '')}${user.city && user.state ? ', ' : ''}${escapeHtml(user.state || '')}</div></div>
                         </div>
                         <div style="margin-top:8px;"><span style="color:#64748b;font-size:0.75rem;">Address</span><div style="color:#e2e8f0;font-weight:500;font-size:0.85rem;">${escapeHtml(user.address || 'N/A')}</div></div>
-                        <a href="register.html" style="display:inline-flex;align-items:center;gap:4px;color:#818cf8;font-size:0.75rem;margin-top:8px;text-decoration:none;"><i class="fas fa-edit"></i> Edit Profile</a>
+                        <a href="register.html" style="display:inline-flex;align-items:center;gap:4px;color:#818cf8;font-size:0.75rem;margin-top:8px;text-decoration:none;"><i class="icon-pencil"></i> Edit Profile</a>
                     </div>
                     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.06);">
-                        <h3 style="color:#818cf8;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-weight:600;"><i class="fas fa-shopping-bag"></i> Order Summary</h3>
+                        <h3 style="color:#818cf8;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-weight:600;"><i class="icon-shopping-bag"></i> Order Summary</h3>
                         <div>${itemsHtml}</div>
                         <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">
                             <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#94a3b8;margin-bottom:4px;"><span>Subtotal</span><span>\u20A6${subtotal.toLocaleString()}</span></div>
@@ -987,19 +968,19 @@
                         </div>
                     </div>
                     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.06);">
-                        <h3 style="color:#818cf8;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-weight:600;"><i class="fas fa-receipt"></i> Payment Receipt <span style="color:#ef4444;">*</span></h3>
+                        <h3 style="color:#818cf8;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-weight:600;"><i class="icon-receipt"></i> Payment Receipt <span style="color:#ef4444;">*</span></h3>
                         <p style="color:#94a3b8;font-size:0.8rem;margin-bottom:12px;">Upload a screenshot or photo of your payment receipt (JPG, PNG, WebP or PDF, max 5MB).</p>
                         <div id="receiptUploadZone" style="border:2px dashed rgba(99,102,241,0.3);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all 0.25s;background:rgba(99,102,241,0.04);position:relative;">
                             <input type="file" id="receiptFileInput" accept="image/jpeg,image/png,image/webp,application/pdf" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;">
                             <div id="receiptUploadContent">
-                                <i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:#818cf8;margin-bottom:8px;"></i>
+                                <i class="icon-cloud-upload" style="font-size:2rem;color:#818cf8;margin-bottom:8px;"></i>
                                 <p style="color:#e2e8f0;font-weight:500;font-size:0.9rem;">Drop your receipt here or click to browse</p>
                                 <p style="color:#64748b;font-size:0.75rem;margin-top:4px;">JPG, PNG, WebP or PDF - Max 5MB</p>
                             </div>
                             <div id="receiptPreview" style="display:none;">
                                 <img id="receiptPreviewImg" style="max-width:200px;max-height:150px;border-radius:8px;object-fit:cover;margin-bottom:8px;" alt="Receipt preview">
                                 <div id="receiptFileName" style="color:#e2e8f0;font-size:0.85rem;font-weight:500;"></div>
-                                <button type="button" id="removeReceiptBtn" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);padding:4px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;margin-top:8px;"><i class="fas fa-trash"></i> Remove</button>
+                                <button type="button" id="removeReceiptBtn" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);padding:4px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;margin-top:8px;"><i class="icon-trash-2"></i> Remove</button>
                             </div>
                         </div>
                         <div id="receiptError" style="display:none;color:#f87171;font-size:0.8rem;margin-top:8px;"></div>
@@ -1011,7 +992,7 @@
                         </label>
                     </div>
                     <button id="completeOrderBtn" disabled style="width:100%;padding:14px;background:linear-gradient(135deg,#4b5563,#374151);color:#6b7280;border:none;border-radius:12px;font-weight:700;font-size:1rem;cursor:not-allowed;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px;">
-                        <i class="fas fa-lock"></i> Complete Order
+                        <i class="icon-lock"></i> Complete Order
                     </button>
                     <p id="checkoutValidationMsg" style="color:#f87171;font-size:0.8rem;text-align:center;margin-top:8px;">Please upload your payment receipt and agree to the Terms & Conditions.</p>
                 </div>
@@ -1082,7 +1063,7 @@
                 reader.readAsDataURL(file);
             } else {
                 previewImg.style.display = 'none';
-                fileNameEl.innerHTML = '<i class="fas fa-file-pdf" style="color:#ef4444;font-size:2rem;margin-bottom:8px;display:block;"></i>' + escapeHtml(file.name);
+                fileNameEl.innerHTML = '<i class="icon-file-text" style="color:#ef4444;font-size:2rem;margin-bottom:8px;display:block;"></i>' + escapeHtml(file.name);
             }
             uploadContent.style.display = 'none';
             preview.style.display = 'block';
@@ -1137,7 +1118,7 @@
             if (completeBtn.disabled || isProcessingCheckout) return;
             isProcessingCheckout = true;
             completeBtn.disabled = true;
-            completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            completeBtn.innerHTML = '<i class="icon-loader"></i> Processing...';
             completeBtn.style.background = 'linear-gradient(135deg,#4b5563,#374151)';
             completeBtn.style.color = '#94a3b8';
             
@@ -1168,14 +1149,14 @@
                     window.location.href = 'invoice.html?order=' + order.order_number;
                 } else {
                     completeBtn.disabled = false;
-                    completeBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Order';
+                    completeBtn.innerHTML = '<i class="icon-lock"></i> Complete Order';
                     validateForm();
                 }
             } catch (error) {
                 console.error('Checkout error:', error);
                 showNotification('Checkout failed: ' + error.message, 'error');
                 completeBtn.disabled = false;
-                completeBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Order';
+                completeBtn.innerHTML = '<i class="icon-lock"></i> Complete Order';
                 validateForm();
             } finally {
                 isProcessingCheckout = false;
@@ -1332,6 +1313,28 @@
         if (wishlistIcon && !wishlistIcon._wishlistListener) {
             wishlistIcon._wishlistListener = true;
             wishlistIcon.addEventListener('click', () => showNotification('Wishlist coming soon', 'info'));
+        }
+        
+        const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
+        if (cartCheckoutBtn && !cartCheckoutBtn._checkoutListener) {
+            cartCheckoutBtn._checkoutListener = true;
+            cartCheckoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeCart();
+                proceedToCheckout();
+            });
+        }
+        
+        const closeCartBtn = document.getElementById('closeCartBtn');
+        if (closeCartBtn && !closeCartBtn._closeListener) {
+            closeCartBtn._closeListener = true;
+            closeCartBtn.addEventListener('click', closeCart);
+        }
+        
+        const cartOverlay = document.getElementById('cartOverlay');
+        if (cartOverlay && !cartOverlay._overlayListener) {
+            cartOverlay._overlayListener = true;
+            cartOverlay.addEventListener('click', closeCart);
         }
         
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCart(); });
