@@ -43,7 +43,9 @@
             --radius-lg: 24px;
             --radius-xl: 1.5rem;
             --nav-height: 76px;
+            --success-500: #22C55E;
             --danger-500: #EF4444;
+            --primary-500: #d4af37;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -710,6 +712,7 @@
     </nav>
 
     <!-- ===== MAIN CONTENT ===== -->
+    <div class="notification-container" id="notificationContainer"></div>
     <main id="main-content">
 <div class="register-card">
             <div class="register-header">
@@ -1068,7 +1071,13 @@
                 
             } catch (error) {
                 console.error('Registration error:', error);
-                showNotification(error.message || 'Registration failed. Please try again.', 'error');
+                let msg = error.message || 'Registration failed. Please try again.';
+                if (error.code === '23505') {
+                    if (error.details && error.details.includes('phone')) msg = 'This phone number is already registered. Please sign in.';
+                    else if (error.details && error.details.includes('email')) msg = 'This email is already registered. Please sign in.';
+                    else msg = 'An account with these details already exists.';
+                }
+                showNotification(msg, 'error');
                 registerBtn.disabled = false;
                 registerBtn.innerHTML = originalText;
             }
