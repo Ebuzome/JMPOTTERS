@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE WITH WORKING CHECKOUT & PLAIN ORDER NUMBERS
+// JMPOTTERS APP - COMPLETE WITH UPDATED PRODUCT CARDS, BLACK PRICE ACCENTS, DISCOUNT DISPLAY
 // ====================
 (function() {
     'use strict';
@@ -81,7 +81,7 @@
             warning: { bg: '#fffbeb', border: '#f59e0b', text: '#92400e' },
             info: { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af' }
         };
-        const color = colors[type];
+        const color = colors[type] || colors.info;
         notification.style.cssText = `
             background: ${color.bg};
             border-left: 4px solid ${color.border};
@@ -104,9 +104,13 @@
         setTimeout(() => notification.remove(), 4000);
     }
     
-    const style = document.createElement('style');
-    style.textContent = `@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }`;
-    document.head.appendChild(style);
+    // Inject slideIn animation style if not already present
+    if (!document.getElementById('jmpottersNotificationStyles')) {
+        const style = document.createElement('style');
+        style.id = 'jmpottersNotificationStyles';
+        style.textContent = `@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }`;
+        document.head.appendChild(style);
+    }
     
     // ====================
     // UTILITY FUNCTIONS
@@ -184,14 +188,13 @@
     }
     
     // ====================
-    // GET NEXT SEQUENTIAL ORDER NUMBER (PLAIN DIGITS ONLY)
+    // GET NEXT SEQUENTIAL ORDER NUMBER
     // ====================
     async function getNextOrderNumber() {
         const supabase = getSupabaseClient();
         if (!supabase) return '0001';
         
         try {
-            // Get the highest order number from existing orders
             const { data, error } = await supabase
                 .from('orders')
                 .select('order_number')
@@ -203,16 +206,13 @@
             let highestNumber = 0;
             
             if (data && data.length > 0 && data[0].order_number) {
-                // Extract numeric part (remove any non-numeric characters just in case)
                 const numericPart = String(data[0].order_number).replace(/\D/g, '');
                 if (numericPart) {
                     highestNumber = parseInt(numericPart, 10);
                 }
             }
             
-            // Increment by 1
             const nextNumber = highestNumber + 1;
-            // Pad with zeros to 4 digits (0001, 0002, etc.)
             const paddedNumber = nextNumber.toString().padStart(4, '0');
             return paddedNumber;
             
@@ -240,7 +240,7 @@
             if (nameWords.length > 0) {
                 let nameQuery = supabase
                     .from('products')
-                    .select('id, name, price, image_url, slug, stock, category_id')
+                    .select('id, name, price, compare_price, image_url, slug, stock, category_id, created_at')
                     .eq('is_active', true)
                     .neq('id', currentProductId);
                 
@@ -262,7 +262,7 @@
                 const existingIds = recommendations.map(r => r.id);
                 let categoryQuery = supabase
                     .from('products')
-                    .select('id, name, price, image_url, slug, stock, category_id')
+                    .select('id, name, price, compare_price, image_url, slug, stock, category_id, created_at')
                     .eq('category_id', currentCategoryId)
                     .eq('is_active', true)
                     .neq('id', currentProductId);
@@ -283,7 +283,7 @@
                 const existingIds = recommendations.map(r => r.id);
                 let randomQuery = supabase
                     .from('products')
-                    .select('id, name, price, image_url, slug, stock, category_id')
+                    .select('id, name, price, compare_price, image_url, slug, stock, category_id, created_at')
                     .eq('is_active', true)
                     .neq('id', currentProductId);
                 
@@ -319,10 +319,16 @@
             return;
         }
         
+        const now = Date.now();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        const categorySlug = currentProduct.category_slug || getCurrentCategory();
+        
         let html = '';
         for (const product of recommendations) {
-            const categorySlug = currentProduct.category_slug || getCurrentCategory();
+            const hasComparePrice = product.compare_price && product.compare_price > product.price;
+            const discountPercent = hasComparePrice ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
             const imageUrl = getImageUrl(categorySlug, product.image_url);
+            
             html += `
                 <a href="product.html?slug=${product.slug}" class="recommendation-card">
                     <img src="${imageUrl}" alt="${product.name}" class="rec-image"
@@ -330,6 +336,8 @@
                     <div class="rec-info">
                         <div class="rec-name">${escapeHtml(product.name)}</div>
                         <div class="rec-price">${formatPrice(product.price)}</div>
+                        ${hasComparePrice ? `<div class="rec-old-price" style="font-size:0.7rem;color:var(--gray-400);text-decoration:line-through;">${formatPrice(product.compare_price)}</div>` : ''}
+                        ${hasComparePrice ? `<div class="rec-discount" style="font-size:0.65rem;color:#dc2626;font-weight:700;">Save ${discountPercent}%</div>` : ''}
                         <div class="text-xs ${product.stock > 0 ? 'text-green-600' : 'text-red-600'} mt-1">
                             ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                         </div>
@@ -342,7 +350,194 @@
     }
     
     // ====================
-    // LOAD SINGLE PRODUCT
+    // RENDER PRODUCT CARD (UPDATED - Black accents, discount display, category tags)
+    // ====================
+    function renderProductCard(product, categorySlug, now, sevenDays) {
+        const imageUrl = getImageUrl(categorySlug, product.image_url);
+        const wishlist = safeParseJSON('jmpotters_wishlist', []);
+        const isInWishlist = wishlist.some(item => item.id === product.id);
+        
+        // Check for discount
+        const hasComparePrice = product.compare_price && product.compare_price > product.price;
+        const discountPercent = hasComparePrice ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
+        
+        // Check if product is new (created within last 7 days)
+        const isNew = product.created_at && (now - new Date(product.created_at).getTime()) < sevenDays;
+        
+        // Get category name
+        const catName = product.categories ? product.categories.name : '';
+        
+        // Stock status
+        const inStock = product.stock > 0;
+        
+        // Build the product card HTML
+        let html = `
+            <a href="product.html?slug=${encodeURIComponent(product.slug || product.id)}" class="product-card-wrapper">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${escapeHtml(product.name)}" 
+                             onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                        <div class="product-badges">
+                            ${isNew ? '<span class="badge-new">New</span>' : ''}
+                            ${hasComparePrice ? `<span class="badge-sale">-${discountPercent}%</span>` : ''}
+                        </div>
+                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" 
+                                data-id="${product.id}" data-action="wishlist" 
+                                aria-label="Add to wishlist">
+                            <i class="icon-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        ${catName ? `<div class="product-cat-tag">${escapeHtml(catName)}</div>` : ''}
+                        <h3 class="product-title">${escapeHtml(product.name)}</h3>
+                        <div class="product-price-row">
+                            <span class="product-price">${formatPrice(product.price)}</span>
+                            ${hasComparePrice ? `<span class="old-price">${formatPrice(product.compare_price)}</span>` : ''}
+                            ${hasComparePrice ? `<span class="discount-tag">Save ${discountPercent}%</span>` : ''}
+                        </div>
+                        <div class="availability ${inStock ? '' : 'out-of-stock'}">
+                            <i class="icon-${inStock ? 'check-circle' : 'x-circle'}"></i> 
+                            ${inStock ? 'In Stock' : 'Out of Stock'}
+                        </div>
+                        ${inStock ? `
+                            <button class="quick-add" data-product-id="${product.id}" data-product-name="${escapeHtml(product.name)}" data-product-price="${product.price}" data-product-image="${product.image_url || ''}" data-category-slug="${categorySlug}">
+                                <i class="icon-plus" style="font-size:1rem"></i> Quick Add
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            </a>
+        `;
+        
+        return html;
+    }
+    
+    // ====================
+    // RENDER PRODUCTS (UPDATED)
+    // ====================
+    function renderProducts(products, categorySlug) {
+        const productsGrid = document.getElementById('productsGrid');
+        if (!productsGrid) return;
+        
+        productsGrid.innerHTML = '';
+        
+        const now = Date.now();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        
+        // Store products in cache for wishlist functionality
+        window.JMPOTTERS_PRODUCTS_CACHE = products;
+        
+        products.forEach(product => {
+            const cardHtml = renderProductCard(product, categorySlug, now, sevenDays);
+            // Create a temporary container to parse the HTML
+            const temp = document.createElement('div');
+            temp.innerHTML = cardHtml;
+            const cardElement = temp.firstElementChild;
+            productsGrid.appendChild(cardElement);
+        });
+        
+        setupProductInteractions();
+    }
+    
+    // ====================
+    // SETUP PRODUCT INTERACTIONS (UPDATED for Quick Add)
+    // ====================
+    function setupProductInteractions() {
+        // Wishlist buttons
+        document.addEventListener('click', function(event) {
+            const wishlistBtn = event.target.closest('[data-action="wishlist"]');
+            if (wishlistBtn) {
+                event.preventDefault();
+                event.stopPropagation();
+                const productId = parseInt(wishlistBtn.getAttribute('data-id'));
+                const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
+                if (product) {
+                    toggleWishlist(product);
+                    wishlistBtn.classList.toggle('active');
+                }
+            }
+        });
+        
+        // Quick Add buttons (delegated)
+        document.addEventListener('click', function(event) {
+            const quickBtn = event.target.closest('.quick-add');
+            if (!quickBtn) return;
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const productId = parseInt(quickBtn.dataset.productId);
+            const productName = quickBtn.dataset.productName || 'Product';
+            const productPrice = parseFloat(quickBtn.dataset.productPrice) || 0;
+            const productImage = quickBtn.dataset.productImage || '';
+            const categorySlug = quickBtn.dataset.categorySlug || getCurrentCategory();
+            
+            // Find full product data from cache
+            let product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
+            if (!product) {
+                // Fallback: create minimal product object
+                product = {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image_url: productImage,
+                    stock: 999
+                };
+            }
+            
+            // Add to cart
+            addToCart(product, 1, { category_slug: categorySlug });
+        });
+    }
+    
+    // ====================
+    // LOAD PRODUCTS BY CATEGORY (UPDATED)
+    // ====================
+    async function loadProductsByCategory(categorySlug) {
+        const productsGrid = document.getElementById('productsGrid');
+        if (!productsGrid) return;
+        
+        productsGrid.innerHTML = '<div class="loading-spinner"><i class="icon-loader"></i><p>Loading products...</p></div>';
+        
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            productsGrid.innerHTML = '<div class="error-message">Database connection error</div>';
+            return;
+        }
+        
+        try {
+            const { data: category, error: catError } = await supabase
+                .from('categories')
+                .select('id')
+                .eq('slug', categorySlug)
+                .single();
+            
+            if (catError || !category) throw new Error('Category not found');
+            
+            const { data: products, error: productsError } = await supabase
+                .from('products')
+                .select('id, name, price, compare_price, image_url, stock, slug, created_at, category_id')
+                .eq('category_id', category.id)
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+            
+            if (productsError) throw productsError;
+            
+            if (!products || products.length === 0) {
+                productsGrid.innerHTML = '<div class="no-products">No products found</div>';
+                return;
+            }
+            
+            window.JMPOTTERS_PRODUCTS_CACHE = products;
+            renderProducts(products, categorySlug);
+            
+        } catch (error) {
+            console.error(error);
+            productsGrid.innerHTML = '<div class="error-message">Error loading products</div>';
+        }
+    }
+    
+    // ====================
+    // LOAD SINGLE PRODUCT (UPDATED with compare_price support)
     // ====================
     async function loadSingleProductBySlug(slug) {
         console.log(`📦 Loading single product by slug: ${slug}`);
@@ -428,6 +623,9 @@
         }
     }
     
+    // ====================
+    // RENDER PRODUCT PAGE (UPDATED with black price accents, discount display)
+    // ====================
     function renderProductPage(product) {
         const productViewer = document.getElementById('productViewer');
         if (!productViewer) return;
@@ -444,22 +642,31 @@
         const stockStatus = product.stock > 10 ? 'in-stock' : (product.stock > 0 ? 'low-stock' : 'out-of-stock');
         const stockText = product.stock > 10 ? 'In Stock' : (product.stock > 0 ? `Only ${product.stock} left` : 'Out of Stock');
         
+        const catName = product.category_name || 'Category';
+        
         productViewer.innerHTML = `
             <div class="product-container">
                 <div class="product-image-section" id="productImageSection">
                     <div class="product-image-wrapper">
                         <img src="${imageUrl}" alt="${product.name}" class="product-image"
                              onerror="this.onerror=null; this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
+                        ${hasComparePrice ? `
+                            <div class="product-badges" style="position:absolute;top:12px;left:12px;z-index:2;display:flex;flex-direction:column;gap:6px;">
+                                <span class="badge-sale" style="background:#dc2626;color:white;padding:4px 10px;border-radius:6px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;font-family:'Inter',sans-serif;">-${discountPercent}%</span>
+                            </div>
+                        ` : ''}
                         <div class="magnify-icon"><i class="icon-zoom-in"></i></div>
                     </div>
                 </div>
                 <div class="product-details">
+                    <div class="product-cat-tag" style="font-size:0.7rem;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;font-family:'Inter',sans-serif;">${escapeHtml(catName)}</div>
                     <h1 class="product-title">${escapeHtml(product.name)}</h1>
                     <div class="price-section">
-                        <span class="current-price">${formatPrice(product.price)}</span>
-                        ${hasComparePrice ? `<span class="original-price">${formatPrice(product.compare_price)}</span>` : ''}
-                        ${hasComparePrice ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
+                        <span class="current-price" style="font-size:1.5rem;font-weight:800;color:var(--gray-900);">${formatPrice(product.price)}</span>
+                        ${hasComparePrice ? `<span class="original-price" style="font-size:1rem;color:var(--gray-400);text-decoration:line-through;">${formatPrice(product.compare_price)}</span>` : ''}
+                        ${hasComparePrice ? `<span class="discount-badge" style="background:#dc2626;color:white;padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;">-${discountPercent}%</span>` : ''}
                     </div>
+                    ${hasComparePrice ? `<div style="font-size:0.8rem;color:#dc2626;font-weight:600;margin-top:-4px;">Save ${discountPercent}%</div>` : ''}
                     <div class="stock-tile">
                         <div class="stock-status ${stockStatus}">
                             <i class="${product.stock > 0 ? 'icon-check-circle' : 'icon-x-circle'}"></i>
@@ -474,7 +681,7 @@
                         <div class="variant-tile">
                             <div class="tile-label"><i class="icon-palette"></i> Select Color</div>
                             <div class="color-options" id="colorOptions">
-                                ${currentProductColors.map(color => `<div class="color-option" data-color-id="${color.id}" data-color-name="${color.color_name}" style="background: ${color.color_code ? `linear-gradient(135deg, ${color.color_code.split('+').join(', ')})` : '#f3f4f6'};">${color.color_name}</div>`).join('')}
+                                ${currentProductColors.map(color => `<div class="color-option" data-color-id="${color.id}" data-color-name="${color.color_name}" style="${color.color_code ? 'background: ' + color.color_code + ';' : ''}">${color.color_name}</div>`).join('')}
                             </div>
                         </div>
                         <div class="variant-tile">
@@ -641,95 +848,6 @@
                     }
                 }
             });
-        });
-    }
-    
-    // ====================
-    // LOAD PRODUCTS BY CATEGORY
-    // ====================
-    async function loadProductsByCategory(categorySlug) {
-        const productsGrid = document.getElementById('productsGrid');
-        if (!productsGrid) return;
-        
-        productsGrid.innerHTML = '<div class="loading-spinner"><i class="icon-loader"></i><p>Loading products...</p></div>';
-        
-        const supabase = getSupabaseClient();
-        if (!supabase) {
-            productsGrid.innerHTML = '<div class="error-message">Database connection error</div>';
-            return;
-        }
-        
-        try {
-            const { data: category, error: catError } = await supabase.from('categories').select('id').eq('slug', categorySlug).single();
-            if (catError || !category) throw new Error('Category not found');
-            
-            const { data: products, error: productsError } = await supabase
-                .from('products')
-                .select('id, name, price, image_url, stock, slug')
-                .eq('category_id', category.id)
-                .eq('is_active', true)
-                .order('created_at', { ascending: false });
-            if (productsError) throw productsError;
-            
-            if (!products || products.length === 0) {
-                productsGrid.innerHTML = '<div class="no-products">No products found</div>';
-                return;
-            }
-            
-            window.JMPOTTERS_PRODUCTS_CACHE = products;
-            renderProducts(products, categorySlug);
-            
-        } catch (error) {
-            console.error(error);
-            productsGrid.innerHTML = '<div class="error-message">Error loading products</div>';
-        }
-    }
-    
-    function renderProducts(products, categorySlug) {
-        const productsGrid = document.getElementById('productsGrid');
-        if (!productsGrid) return;
-        productsGrid.innerHTML = '';
-        
-        products.forEach(product => {
-            const imageUrl = getImageUrl(categorySlug, product.image_url);
-            const wishlist = safeParseJSON('jmpotters_wishlist', []);
-            const isInWishlist = wishlist.some(item => item.id === product.id);
-            
-            const productLink = document.createElement('a');
-            productLink.href = `product.html?slug=${encodeURIComponent(product.slug || product.id)}`;
-            productLink.className = 'product-card-wrapper';
-            productLink.innerHTML = `
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="${imageUrl}" alt="${product.name}" onerror="this.src='${window.JMPOTTERS_CONFIG.images.baseUrl}placeholder.jpg'">
-                        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}" data-action="wishlist"><i class="icon-heart"></i></button>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">${escapeHtml(product.name)}</h3>
-                        <div class="product-price">${formatPrice(product.price)}</div>
-                        <div class="availability ${product.stock <= 0 ? 'out-of-stock' : ''}"><i class="icon-${product.stock > 0 ? 'check-circle' : 'x-circle'}"></i> ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</div>
-                    </div>
-                </div>
-            `;
-            productsGrid.appendChild(productLink);
-        });
-        
-        setupProductInteractions();
-    }
-    
-    function setupProductInteractions() {
-        document.addEventListener('click', function(event) {
-            const wishlistBtn = event.target.closest('[data-action="wishlist"]');
-            if (wishlistBtn) {
-                event.preventDefault();
-                event.stopPropagation();
-                const productId = parseInt(wishlistBtn.getAttribute('data-id'));
-                const product = window.JMPOTTERS_PRODUCTS_CACHE?.find(p => p.id === productId);
-                if (product) {
-                    toggleWishlist(product);
-                    wishlistBtn.classList.toggle('active');
-                }
-            }
         });
     }
     
@@ -1165,11 +1283,9 @@
     }
     
     // ====================
-    // ORDER CREATION WITH SEQUENTIAL ORDER NUMBERS (PLAIN DIGITS)
+    // ORDER CREATION
     // ====================
     async function createOrder(orderData, cart) {
-
-        
         const supabase = getSupabaseClient();
         if (!supabase) {
             showNotification('Database connection error', 'error');
@@ -1182,7 +1298,6 @@
             const grandTotal = subtotal + shippingFee;
             
             const orderNumber = await getNextOrderNumber();
-
             
             const items = cart.map(item => ({
                 product_id: item.product_id,
@@ -1216,8 +1331,6 @@
                 created_at: new Date().toISOString()
             };
             
-
-            
             const { data: order, error: orderError } = await supabase
                 .from('orders')
                 .insert(orderInsert)
@@ -1249,9 +1362,6 @@
             return null;
         }
         try {
-            // orderNumber is already plain (e.g., "0003")
-
-            
             const { data: order, error } = await supabase
                 .from('orders')
                 .select('*')
@@ -1269,10 +1379,8 @@
     // ====================
     // PROCEED TO CHECKOUT
     // ====================
-    async function proceedToCheckout() {
-        if (isProcessingCheckout) {
-            return;
-        }
+    function proceedToCheckout() {
+        if (isProcessingCheckout) return;
         
         const cart = getCart();
         if (cart.length === 0) {
@@ -1350,6 +1458,7 @@
         setupHeaderInteractions();
         updateCartUI();
         
+        // Remove any stray checkout buttons
         document.querySelectorAll('#whatsappCheckout').forEach(btn => btn.remove());
         
         if (isProductPage()) {
