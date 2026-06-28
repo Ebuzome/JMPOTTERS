@@ -2184,8 +2184,14 @@
                             countdown = '<div class="ad-countdown">Ends in ' + (days > 0 ? days + 'd ' : '') + hours + 'h</div>';
                         }
                     }
-                    return '<div class="ad-card">' + linkStart +
-                        '<img src="' + escapeHtml(a.image_url) + '" alt="' + escapeHtml(a.name || 'Advertisement') + '" loading="lazy">' +
+                    var imgStyle = '';
+                    if (a.image_size && a.image_size !== 'auto') {
+                        var adSizes = {'banner-sm':{w:320,h:100},'banner-md':{w:728,h:200},'banner-lg':{w:1200,h:320},'square-sm':{w:250,h:250},'square-md':{w:400,h:400},'rect-md':{w:300,h:250},'rect-lg':{w:600,h:400}};
+                        var dim = a.image_size === 'custom' ? {w: a.custom_width, h: a.custom_height} : adSizes[a.image_size];
+                        if (dim) imgStyle = 'max-width:' + dim.w + 'px;height:' + dim.h + 'px;margin:0 auto;';
+                    }
+                    return '<div class="ad-card"' + (imgStyle ? ' style="max-width:' + (a.image_size === 'custom' ? a.custom_width : ({'banner-sm':320,'banner-md':728,'banner-lg':1200,'square-sm':250,'square-md':400,'rect-md':300,'rect-lg':600}[a.image_size] || '')) + 'px;margin:0 auto"' : '') + '>' + linkStart +
+                        '<img src="' + escapeHtml(a.image_url) + '" alt="' + escapeHtml(a.name || 'Advertisement') + '" loading="lazy"' + (imgStyle ? ' style="' + imgStyle + 'object-fit:cover"' : '') + '>' +
                         linkEnd + '<span class="ad-label">Ad</span>' + countdown + '</div>';
                 }).join('');
             });
