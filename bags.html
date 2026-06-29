@@ -427,7 +427,6 @@
             .toast { right: 12px; left: 12px; min-width: auto; }
         }
 
-
         /* ===== HERO ===== */
         .hero {
             min-height: 55vh; display: flex; align-items: center; justify-content: center;
@@ -489,72 +488,239 @@
             text-align: center; color: var(--gray-500); font-size: 0.95rem;
             margin-bottom: 3rem; font-family: 'Inter', sans-serif;
         }
+
+        /* ================================================================
+           ===== START: UPDATED PRODUCT CARD STYLES =====
+           ===== Changes: Black price accents, discount display,     =====
+           ===== category tags, quick-add below price (KEPT for bags) =====
+           ================================================================ */
         .products-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 1.5rem;
         }
+
         .product-card-wrapper {
-            text-decoration: none; color: inherit;
+            text-decoration: none;
+            color: inherit;
         }
+
         .product-card {
-            background: white; border-radius: var(--radius); overflow: hidden;
-            border: 1px solid var(--gray-100); transition: var(--transition);
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--gray-100);
+            transition: var(--transition);
             cursor: pointer;
+            position: relative;
         }
+
         .product-card:hover {
-            transform: translateY(-4px); box-shadow: var(--shadow-lg);
-            border-color: rgba(212,175,55,0.2);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
         }
+
         .product-card .product-image {
-            position: relative; overflow: hidden; height: 240px;
+            position: relative;
+            overflow: hidden;
+            height: 240px;
+            background: var(--gray-50);
         }
+
         .product-card .product-image img {
-            width: 100%; height: 100%; object-fit: cover;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             transition: transform 0.5s ease;
         }
-        .product-card:hover .product-image img { transform: scale(1.05); }
-        .product-card .wishlist-btn {
-            position: absolute; top: 10px; right: 10px;
-            background: white; border: none; width: 36px; height: 36px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: var(--transition); font-size: 0.9rem; color: var(--gray-400);
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
         }
-        .product-card .wishlist-btn.active { color: #ef4444; }
-        .product-card .wishlist-btn:hover { transform: scale(1.1); }
+
+        /* ---- UPDATED: Badges on product image (New & Sale) ---- */
+        .product-badges {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 2;
+        }
+
+        .badge-new {
+            background: #0c0f15;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .badge-sale {
+            background: #dc2626;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ---- UPDATED: Wishlist button ---- */
+        .product-card .wishlist-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            font-size: 0.9rem;
+            color: var(--gray-400);
+            z-index: 2;
+        }
+
+        .product-card .wishlist-btn.active {
+            color: #ef4444;
+        }
+
+        .product-card .wishlist-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* ---- UPDATED: Product info area ---- */
         .product-info {
             padding: 1rem 1.2rem;
         }
-        .product-info h3, .product-title {
-            font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
-            color: var(--gray-800); margin-bottom: 6px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+
+        /* ---- UPDATED: Category tag (NEW) ---- */
+        .product-cat-tag {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            font-family: 'Inter', sans-serif;
         }
+
+        .product-info h3,
+        .product-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ---- UPDATED: Price row with black accent, discount display ---- */
+        .product-price-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* CHANGED: Price is now BLACK (var(--gray-900)) instead of gold */
         .product-price {
-            font-size: 1rem; font-weight: 700; color: var(--gold-dark);
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--gray-900);
             font-family: 'Inter', sans-serif;
         }
+
+        /* CHANGED: Old price with strikethrough */
+        .old-price {
+            font-size: 0.8rem;
+            color: var(--gray-400);
+            text-decoration: line-through;
+        }
+
+        /* CHANGED: Discount tag in RED */
+        .discount-tag {
+            font-size: 0.68rem;
+            color: #dc2626;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ---- UPDATED: Availability ---- */
         .availability {
-            font-size: 0.78rem; margin-top: 6px; color: #16a34a;
+            font-size: 0.78rem;
+            margin-top: 6px;
+            color: #16a34a;
             font-family: 'Inter', sans-serif;
         }
-        .availability.out-of-stock { color: #ef4444; }
+
+        .availability.out-of-stock {
+            color: #ef4444;
+        }
+
+        /* ---- UPDATED: Quick Add button (KEPT for bags - non-footwear) ---- */
+        .quick-add {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--gray-900);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .quick-add:hover {
+            background: var(--gold);
+            color: #0c0f15;
+        }
+
+        /* ---- Loading spinner ---- */
         .loading-spinner {
             text-align: center; padding: 4rem 1rem; color: var(--gray-400);
             grid-column: 1 / -1;
         }
         .loading-spinner i { font-size: 2rem; display: block; margin-bottom: 8px; animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        /* ================================================================
+           ===== END: UPDATED PRODUCT CARD STYLES =====
+           ================================================================ */
 
+        /* ===== RESPONSIVE FOR PRODUCT GRID ===== */
         @media (max-width: 768px) {
             .hero { min-height: 45vh; padding: 100px 1.5rem 40px; }
             .products-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
             .product-card .product-image { height: 180px; }
-        }
-        @media (max-width: 480px) {
-            .products-grid { grid-template-columns: repeat(2, 1fr); }
             .product-info { padding: 0.7rem 0.8rem; }
             .product-info h3 { font-size: 0.82rem; }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
