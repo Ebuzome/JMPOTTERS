@@ -490,9 +490,9 @@
         }
 
         /* ================================================================
-           ===== START: UPDATED PRODUCT CARD STYLES =====
+           ===== START: UPDATED PRODUCT CARD STYLES (NO QUICK ADD) =====
            ===== Changes: Black price accents, discount display,     =====
-           ===== category tags, quick-add below price, badges       =====
+           ===== category tags, NO quick-add button (footwear only)  =====
            ================================================================ */
         .products-grid {
             display: grid;
@@ -674,30 +674,8 @@
             color: #ef4444;
         }
 
-        /* ---- UPDATED: Quick Add button - repositioned BELOW price ---- */
-        .quick-add {
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
-            background: var(--gray-900);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.82rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .quick-add:hover {
-            background: var(--gold);
-            color: #0c0f15;
-        }
+        /* ===== NOTE: Quick Add button is REMOVED for footwear pages ===== */
+        /* Quick Add only appears on non-footwear products in index.html */
 
         /* ---- Loading spinner ---- */
         .loading-spinner {
