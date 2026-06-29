@@ -51,6 +51,9 @@
     // Checkout processing flag
     let isProcessingCheckout = false;
     
+    // ===== FOOTWEAR CATEGORIES (Quick Add will be hidden for these) =====
+    const FOOTWEAR_SLUGS = ['mensfootwear', 'womensfootwear'];
+    
     // ====================
     // NOTIFICATION SYSTEM
     // ====================
@@ -350,7 +353,7 @@
     }
     
     // ====================
-    // RENDER PRODUCT CARD (UPDATED - Quick Add only for non-footwear)
+    // RENDER PRODUCT CARD (UPDATED - Quick Add ONLY for non-footwear)
     // ====================
     function renderProductCard(product, categorySlug, now, sevenDays) {
         const imageUrl = getImageUrl(categorySlug, product.image_url);
@@ -372,8 +375,8 @@
         
         // ===== CHECK IF THIS IS A FOOTWEAR CATEGORY =====
         // Quick Add should ONLY appear on non-footwear products
-        const footwearSlugs = ['mensfootwear', 'womensfootwear'];
-        const isFootwear = footwearSlugs.indexOf(categorySlug) !== -1;
+        // Footwear = mensfootwear, womensfootwear
+        const isFootwear = FOOTWEAR_SLUGS.indexOf(categorySlug) !== -1;
         
         // Build the product card HTML
         let html = `
