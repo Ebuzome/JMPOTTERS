@@ -350,7 +350,7 @@
     }
     
     // ====================
-    // RENDER PRODUCT CARD (UPDATED - Black accents, discount display, category tags)
+    // RENDER PRODUCT CARD (UPDATED - Quick Add only for non-footwear)
     // ====================
     function renderProductCard(product, categorySlug, now, sevenDays) {
         const imageUrl = getImageUrl(categorySlug, product.image_url);
@@ -369,6 +369,11 @@
         
         // Stock status
         const inStock = product.stock > 0;
+        
+        // ===== CHECK IF THIS IS A FOOTWEAR CATEGORY =====
+        // Quick Add should ONLY appear on non-footwear products
+        const footwearSlugs = ['mensfootwear', 'womensfootwear'];
+        const isFootwear = footwearSlugs.indexOf(categorySlug) !== -1;
         
         // Build the product card HTML
         let html = `
@@ -399,7 +404,7 @@
                             <i class="icon-${inStock ? 'check-circle' : 'x-circle'}"></i> 
                             ${inStock ? 'In Stock' : 'Out of Stock'}
                         </div>
-                        ${inStock ? `
+                        ${inStock && !isFootwear ? `
                             <button class="quick-add" data-product-id="${product.id}" data-product-name="${escapeHtml(product.name)}" data-product-price="${product.price}" data-product-image="${product.image_url || ''}" data-category-slug="${categorySlug}">
                                 <i class="icon-plus" style="font-size:1rem"></i> Quick Add
                             </button>
@@ -413,7 +418,7 @@
     }
     
     // ====================
-    // RENDER PRODUCTS (UPDATED)
+    // RENDER PRODUCTS
     // ====================
     function renderProducts(products, categorySlug) {
         const productsGrid = document.getElementById('productsGrid');
@@ -440,7 +445,7 @@
     }
     
     // ====================
-    // SETUP PRODUCT INTERACTIONS (UPDATED for Quick Add)
+    // SETUP PRODUCT INTERACTIONS
     // ====================
     function setupProductInteractions() {
         // Wishlist buttons
@@ -458,7 +463,7 @@
             }
         });
         
-        // Quick Add buttons (delegated)
+        // Quick Add buttons (delegated) - only for non-footwear
         document.addEventListener('click', function(event) {
             const quickBtn = event.target.closest('.quick-add');
             if (!quickBtn) return;
@@ -490,7 +495,7 @@
     }
     
     // ====================
-    // LOAD PRODUCTS BY CATEGORY (UPDATED)
+    // LOAD PRODUCTS BY CATEGORY
     // ====================
     async function loadProductsByCategory(categorySlug) {
         const productsGrid = document.getElementById('productsGrid');
@@ -537,7 +542,7 @@
     }
     
     // ====================
-    // LOAD SINGLE PRODUCT (UPDATED with compare_price support)
+    // LOAD SINGLE PRODUCT
     // ====================
     async function loadSingleProductBySlug(slug) {
         console.log(`📦 Loading single product by slug: ${slug}`);
@@ -624,7 +629,7 @@
     }
     
     // ====================
-    // RENDER PRODUCT PAGE (UPDATED with black price accents, discount display)
+    // RENDER PRODUCT PAGE
     // ====================
     function renderProductPage(product) {
         const productViewer = document.getElementById('productViewer');
