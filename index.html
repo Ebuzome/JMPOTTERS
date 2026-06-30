@@ -528,16 +528,18 @@
         .badge-new { background: #0c0f15; color: white; }
         .badge-sale { background: #dc2626; color: white; }
         .quick-add {
-            position: absolute; bottom: 12px; left: 12px; right: 12px;
-            padding: 10px; background: rgba(12,15,21,0.9);
+            position: absolute; bottom: 8px; left: 50%;
+            padding: 6px 14px; background: rgba(12,15,21,0.9);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             color: white; border: none; border-radius: 10px;
-            font-weight: 600; font-size: 0.82rem; cursor: pointer;
-            transition: var(--transition); opacity: 0; transform: translateY(8px);
+            font-weight: 600; font-size: 0.78rem; cursor: pointer;
+            transition: var(--transition); opacity: 0;
+            transform: translateX(-50%) translateY(8px);
             display: flex; align-items: center; justify-content: center; gap: 6px;
             font-family: 'Inter', sans-serif; z-index: 2;
+            white-space: nowrap; width: auto;
         }
-        .product-card:hover .quick-add { opacity: 1; transform: translateY(0); }
+        .product-card:hover .quick-add { opacity: 1; transform: translateX(-50%) translateY(0); }
         .quick-add:hover { background: var(--gold); color: #0c0f15; }
         .product-info { padding: 1rem 1.2rem; }
         .product-cat-tag {
@@ -1062,7 +1064,7 @@
             .trust-icon { width: 40px; height: 40px; font-size: 1.1rem; }
             .products-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
             .product-image { height: 180px; }
-            .quick-add { opacity: 1; transform: translateY(0); font-size: 0.75rem; padding: 8px; bottom: 8px; left: 8px; right: 8px; }
+            .quick-add { opacity: 1; transform: translateX(-50%) translateY(0); font-size: 0.72rem; padding: 5px 10px; bottom: 6px; }
             .cat-shop-btn { opacity: 1; transform: translateY(0); }
             .categories-grid { grid-template-columns: repeat(2, 1fr); }
             .bento-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
@@ -1798,7 +1800,7 @@
             // Check for admin-managed hero banners first
             var adminBanners = [];
             try { adminBanners = JSON.parse(localStorage.getItem('jmpotters_hero_banners') || '[]'); } catch(e) {}
-            var validBanners = adminBanners.filter(function(b) { return b && b.image_url && b.is_active !== false; });
+            var validBanners = adminBanners.filter(function(b) { return b && b.image_url && b.is_active !== false && (b.target_page === 'index' || b.target_page === 'all'); });
 
             var slides;
             if (validBanners.length > 0) {
