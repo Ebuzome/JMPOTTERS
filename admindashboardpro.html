@@ -481,7 +481,7 @@
             </div>
             <div class="action-card mb-4">
                 <h3 class="section-title-sm mb-3"><i class="fas fa-info-circle" style="color:var(--info-500)"></i> How It Works</h3>
-                <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.5rem">Upload hero banner images for the homepage or any category page carousel. Select a target page, add a title and subtitle for the text overlay, and upload an image.</p>
+                <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.5rem">Upload hero banner images for the homepage or any category page carousel. Select a target page, optionally add a title and subtitle for the text overlay (leave blank for image-only banners), and upload an image.</p>
                 <p style="font-size:0.85rem;color:var(--gray-500)">If no banners are configured for a page, the carousel will default to existing images or product images.</p>
             </div>
             <div id="heroBannersList"><div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div></div>
@@ -536,7 +536,7 @@
     <div class="modal-overlay" id="heroBannerModal" style="display:none"><div class="modal-content" style="max-width:550px"><div class="modal-header"><h2 class="modal-title" id="heroBannerModalTitle">Add Hero Banner</h2><button class="modal-close" onclick="document.getElementById('heroBannerModal').style.display='none'"><i class="fas fa-times"></i></button></div><div class="modal-body">
         <input type="hidden" id="heroBannerEditIndex" value="-1">
         <div class="form-group"><label class="form-label required">Target Page</label><select id="heroBannerTargetPage" class="form-control"><option value="index">Homepage</option><option value="mensfootwear">Men's Footwear</option><option value="womensfootwear">Women's Footwear</option><option value="bags">Bags</option><option value="accessories">Accessories</option><option value="household">Household</option><option value="kids">Kids</option><option value="healthcare">Healthcare</option></select></div>
-        <div class="form-group"><label class="form-label required">Banner Title</label><input type="text" id="heroBannerTitle" class="form-control" placeholder="e.g., Summer Collection 2025"></div>
+        <div class="form-group"><label class="form-label">Banner Title <span style="font-weight:400;color:var(--gray-400);font-size:0.75rem">(optional)</span></label><input type="text" id="heroBannerTitle" class="form-control" placeholder="Leave empty for image-only banner"></div>
         <div class="form-group"><label class="form-label">Subtitle Text</label><input type="text" id="heroBannerSubtitle" class="form-control" placeholder="e.g., Step up your hustle with top-tier kicks"></div>
         <div class="form-group"><label class="form-label required">Image</label>
             <div class="upload-zone" id="heroBannerUploadZone" style="min-height:120px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--gray-300);border-radius:var(--radius);cursor:pointer;position:relative;overflow:hidden;background:var(--gray-50)">
@@ -1221,7 +1221,6 @@
             const imageUrl = heroBannerUploadedUrl || document.getElementById('heroBannerImageUrl').value.trim();
             const link = document.getElementById('heroBannerLink').value.trim() || '#featured';
             const isActive = document.getElementById('heroBannerStatus').value === 'active';
-            if (!title) { showToast('Enter a title', 'warning'); return; }
             if (!imageUrl) { showToast('Upload an image or enter URL', 'warning'); return; }
             const bannerData = { title, subtitle, image_url: imageUrl, link, target_page: targetPage, is_active: isActive, sort_order: 0 };
             const editId = document.getElementById('heroBannerEditIndex').value;
