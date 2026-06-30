@@ -1456,7 +1456,7 @@
     }
     
     // ================================================================
-    // ===== NEW: SUPABASE ADS & HERO BANNER FUNCTIONS =====
+    // ===== SUPABASE ADS & HERO BANNER FUNCTIONS =====
     // ================================================================
     
     // Upload image to Supabase Storage (used by admin, but keep here if needed)
@@ -1676,12 +1676,18 @@
         }
     }
     
-    // Render ads from Supabase (called on each page)
+    // ================================================================
+    // ===== FIX: RENDER ADS FROM SUPABASE =====
+    // ================================================================
     async function renderAdsFromSupabase(pageSlug) {
         const supabase = getSupabaseClient();
         if (!supabase) return;
+        
+        console.log(`📢 Rendering ads for page: ${pageSlug}`);
+        
         try {
             const now = new Date().toISOString();
+            
             // Fetch active ads
             const { data: ads, error } = await supabase
                 .from('ads')
@@ -1691,18 +1697,25 @@
                 .or(`end_date.is.null,end_date.gte.${now}`)
                 .or(`start_date.is.null,start_date.lte.${now}`)
                 .order('created_at', { ascending: false });
+            
             if (error) throw error;
+            
+            console.log(`📢 Found ${ads?.length || 0} ads for page ${pageSlug}`);
+            
             // Render ads in their zones
             const zones = ['after-hero', 'between-sections', 'before-footer'];
             zones.forEach(zone => {
                 const el = document.getElementById('adZone' + zone.charAt(0).toUpperCase() + zone.slice(1).replace('-', ''));
                 if (!el) return;
+                
                 const matchingAds = (ads || []).filter(a => a.placement === zone);
+                
                 if (matchingAds.length === 0) {
                     el.innerHTML = '';
                     el.style.display = 'none';
                     return;
                 }
+                
                 el.style.display = 'block';
                 el.innerHTML = matchingAds.map(a => {
                     const linkStart = a.link_url ? `<a href="${escapeHtml(a.link_url)}" target="_blank" rel="noopener">` : '';
@@ -1741,6 +1754,7 @@
                     `;
                 }).join('');
             });
+            
             // Fetch and render hero banners
             const { data: banners, error: bannerError } = await supabase
                 .from('hero_banners')
@@ -1748,43 +1762,74 @@
                 .eq('is_active', true)
                 .or(`target_page.eq.${pageSlug},target_page.eq.all`)
                 .order('sort_order', { ascending: true });
+            
             if (bannerError) throw bannerError;
+            
+            console.log(`📢 Found ${banners?.length || 0} hero banners for page ${pageSlug}`);
+            
             if (banners && banners.length > 0) {
                 renderHeroBanners(banners, pageSlug);
             }
+            
         } catch (error) {
             console.error('Error rendering ads from Supabase:', error);
         }
     }
     
-    // Render hero banners
+    // ================================================================
+    // ===== FIX: RENDER HERO BANNERS (Only shows banners for current page) =====
+    // ================================================================
     function renderHeroBanners(banners, pageSlug) {
         const heroSection = document.querySelector('section.hero') || document.querySelector('.hero');
         const heroContent = document.querySelector('.hero-content');
         if (!heroSection || !heroContent) return;
+        
+        // ===== FILTER BANNERS FOR THIS PAGE =====
+        // Only show banners where target_page matches the current page
+        // If banner has no title, it's image-only - we still show it
+        const pageBanners = (banners || []).filter(b => {
+            // If banner target_page is 'all', it shows on all pages
+            // Otherwise, it must match the current page
+            return b.target_page === 'all' || b.target_page === pageSlug;
+        });
+        
+        // If no matching banners, don't override the default hero
+        if (pageBanners.length === 0) {
+            console.log(`ℹ️ No hero banners for page: ${pageSlug}, using default`);
+            // Reset to default background if needed
+            return;
+        }
+        
         // Clear any existing carousel
         const existingCarousel = heroSection.querySelector('.hero-carousel');
         if (existingCarousel) existingCarousel.remove();
-        // If there are banners, use the first one as the background
-        heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('${escapeHtml(banners[0].image_url)}')`;
+        
+        // Use the first matching banner as the background
+        heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('${escapeHtml(pageBanners[0].image_url)}')`;
         heroSection.style.backgroundSize = 'cover';
         heroSection.style.backgroundPosition = 'center';
-        // Update text content
-        if (banners[0].title) {
+        
+        // Update text content (only if title exists)
+        if (pageBanners[0].title) {
             const h1 = heroContent.querySelector('h1');
-            if (h1) h1.textContent = banners[0].title;
+            if (h1) h1.textContent = pageBanners[0].title;
         }
-        if (banners[0].subtitle) {
+        // If no title, keep the default text (or leave as is)
+        
+        if (pageBanners[0].subtitle) {
             const p = heroContent.querySelector('p');
-            if (p) p.textContent = banners[0].subtitle;
+            if (p) p.textContent = pageBanners[0].subtitle;
         }
-        // If there are multiple banners, create a carousel
-        if (banners.length > 1) {
+        // If no subtitle, keep the default text (or leave as is)
+        
+        // If there are multiple matching banners, create a carousel
+        if (pageBanners.length > 1) {
             const carouselDiv = document.createElement('div');
             carouselDiv.className = 'hero-carousel';
             carouselDiv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0';
             heroSection.insertBefore(carouselDiv, heroSection.firstChild);
-            carouselDiv.innerHTML = banners.map((b, i) => `
+            
+            carouselDiv.innerHTML = pageBanners.map((b, i) => `
                 <div class="hero-slide ${i === 0 ? 'active' : ''}" 
                      style="position:absolute;top:0;left:0;width:100%;height:100%;
                             background-image:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35)),url('${escapeHtml(b.image_url)}');
@@ -1793,6 +1838,7 @@
                             transition:opacity 1.5s ease-in-out">
                 </div>
             `).join('');
+            
             // Start carousel rotation
             const slides = carouselDiv.querySelectorAll('.hero-slide');
             let idx = 0;
@@ -1801,18 +1847,39 @@
                 slides[idx].style.opacity = '0';
                 idx = (idx + 1) % slides.length;
                 slides[idx].style.opacity = '1';
-                // Update text content
-                if (banners[idx]) {
-                    if (banners[idx].title) {
+                
+                // Update text content (only if title exists)
+                if (pageBanners[idx]) {
+                    if (pageBanners[idx].title) {
                         const h1 = heroContent.querySelector('h1');
-                        if (h1) h1.textContent = banners[idx].title;
+                        if (h1) h1.textContent = pageBanners[idx].title;
                     }
-                    if (banners[idx].subtitle) {
+                    if (pageBanners[idx].subtitle) {
                         const p = heroContent.querySelector('p');
-                        if (p) p.textContent = banners[idx].subtitle;
+                        if (p) p.textContent = pageBanners[idx].subtitle;
                     }
                 }
             }, 5000);
+        }
+    }
+    
+    // ================================================================
+    // ===== GET HERO BANNERS (for index.html fallback) =====
+    // ================================================================
+    async function getHeroBanners() {
+        const supabase = getSupabaseClient();
+        if (!supabase) return [];
+        try {
+            const { data, error } = await supabase
+                .from('hero_banners')
+                .select('*')
+                .eq('is_active', true)
+                .order('sort_order', { ascending: true });
+            if (error) throw error;
+            return data || [];
+        } catch (e) {
+            console.error('Failed to get hero banners:', e);
+            return [];
         }
     }
     
@@ -1831,6 +1898,7 @@
         
         // Determine page slug for ads
         const pageSlug = window.JMPOTTERS_CONFIG?.currentCategory || 'index';
+        console.log(`📄 Current page slug: ${pageSlug}`);
         
         if (isProductPage()) {
             const slug = getSlugFromURL();
@@ -1869,14 +1937,15 @@
         getOrderByNumber,
         createOrder,
         uploadReceiptToStorage,
-        // Expose new functions for admin dashboard
+        // Expose new functions for admin dashboard and index.html
         uploadAdImage,
         saveAdToSupabase,
         deleteAdFromSupabase,
         saveHeroBannerToSupabase,
         deleteHeroBannerFromSupabase,
         renderAdsFromSupabase,
-        renderHeroBanners
+        renderHeroBanners,
+        getHeroBanners  // Added for index.html fallback
     };
     
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializePage);
