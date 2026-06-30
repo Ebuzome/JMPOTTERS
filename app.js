@@ -1,5 +1,5 @@
 // ====================
-// JMPOTTERS APP - COMPLETE WITH UPDATED PRODUCT CARDS, BLACK PRICE ACCENTS, DISCOUNT DISPLAY
+// JMPOTTERS APP - COMPLETE WITH SUPABASE ADS & HERO BANNERS (CROSS‑BROWSER)
 // ====================
 (function() {
     'use strict';
@@ -353,7 +353,7 @@
     }
     
     // ====================
-    // RENDER PRODUCT CARD (UPDATED - Quick Add ONLY for non-footwear)
+    // RENDER PRODUCT CARD (UPDATED - Quick Add only for non-footwear)
     // ====================
     function renderProductCard(product, categorySlug, now, sevenDays) {
         const imageUrl = getImageUrl(categorySlug, product.image_url);
@@ -375,7 +375,6 @@
         
         // ===== CHECK IF THIS IS A FOOTWEAR CATEGORY =====
         // Quick Add should ONLY appear on non-footwear products
-        // Footwear = mensfootwear, womensfootwear
         const isFootwear = FOOTWEAR_SLUGS.indexOf(categorySlug) !== -1;
         
         // Build the product card HTML
@@ -1456,9 +1455,370 @@
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCart(); });
     }
     
-    // ====================
+    // ================================================================
+    // ===== NEW: SUPABASE ADS & HERO BANNER FUNCTIONS =====
+    // ================================================================
+    
+    // Upload image to Supabase Storage (used by admin, but keep here if needed)
+    async function uploadAdImage(file, folder = 'ads') {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showNotification('Database connection error', 'error');
+            return null;
+        }
+        // Validate
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            showNotification('File too large (max 5MB)', 'error');
+            return null;
+        }
+        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!allowed.includes(file.type)) {
+            showNotification('Invalid file type', 'error');
+            return null;
+        }
+        try {
+            const ext = file.name.split('.').pop().toLowerCase();
+            const ts = Date.now();
+            const rand = Math.random().toString(36).substring(2, 8);
+            const fileName = `${folder}/${ts}_${rand}.${ext}`;
+            const { data, error } = await supabase.storage
+                .from('ad-images')
+                .upload(fileName, file, { cacheControl: '3600', upsert: false });
+            if (error) throw error;
+            const { data: urlData } = supabase.storage.from('ad-images').getPublicUrl(fileName);
+            return urlData.publicUrl;
+        } catch (e) {
+            console.error('Upload error:', e);
+            showNotification('Upload failed: ' + e.message, 'error');
+            return null;
+        }
+    }
+    
+    // Save ad to Supabase (for admin usage)
+    async function saveAdToSupabase(adData) {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showNotification('Database connection error', 'error');
+            return null;
+        }
+        try {
+            let result;
+            if (adData.id) {
+                const { data, error } = await supabase
+                    .from('ads')
+                    .update({
+                        name: adData.name,
+                        image_url: adData.image_url,
+                        link_url: adData.link_url || null,
+                        target_page: adData.target_page || 'all',
+                        placement: adData.placement || 'after-hero',
+                        image_size: adData.image_size || 'auto',
+                        custom_width: adData.custom_width || null,
+                        custom_height: adData.custom_height || null,
+                        is_active: adData.is_active !== undefined ? adData.is_active : true,
+                        start_date: adData.start_date || null,
+                        end_date: adData.end_date || null,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', adData.id)
+                    .select()
+                    .single();
+                if (error) throw error;
+                result = data;
+            } else {
+                const { data, error } = await supabase
+                    .from('ads')
+                    .insert({
+                        name: adData.name,
+                        image_url: adData.image_url,
+                        link_url: adData.link_url || null,
+                        target_page: adData.target_page || 'all',
+                        placement: adData.placement || 'after-hero',
+                        image_size: adData.image_size || 'auto',
+                        custom_width: adData.custom_width || null,
+                        custom_height: adData.custom_height || null,
+                        is_active: adData.is_active !== undefined ? adData.is_active : true,
+                        start_date: adData.start_date || null,
+                        end_date: adData.end_date || null,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    })
+                    .select()
+                    .single();
+                if (error) throw error;
+                result = data;
+            }
+            showNotification('Ad saved successfully!', 'success');
+            return result;
+        } catch (e) {
+            console.error('Save ad error:', e);
+            showNotification('Failed to save ad: ' + e.message, 'error');
+            return null;
+        }
+    }
+    
+    // Delete ad from Supabase
+    async function deleteAdFromSupabase(adId) {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showNotification('Database connection error', 'error');
+            return false;
+        }
+        try {
+            // Get image URL to delete from storage
+            const { data: ad, error: fetchError } = await supabase
+                .from('ads')
+                .select('image_url')
+                .eq('id', adId)
+                .single();
+            if (!fetchError && ad && ad.image_url) {
+                const urlParts = ad.image_url.split('/');
+                const fileName = urlParts.slice(urlParts.indexOf('ad-images') + 1).join('/');
+                if (fileName) {
+                    await supabase.storage.from('ad-images').remove([fileName]);
+                }
+            }
+            const { error } = await supabase.from('ads').delete().eq('id', adId);
+            if (error) throw error;
+            showNotification('Ad deleted', 'success');
+            return true;
+        } catch (e) {
+            console.error('Delete ad error:', e);
+            showNotification('Failed to delete ad: ' + e.message, 'error');
+            return false;
+        }
+    }
+    
+    // Save hero banner to Supabase
+    async function saveHeroBannerToSupabase(bannerData) {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showNotification('Database connection error', 'error');
+            return null;
+        }
+        try {
+            let result;
+            if (bannerData.id) {
+                const { data, error } = await supabase
+                    .from('hero_banners')
+                    .update({
+                        title: bannerData.title,
+                        subtitle: bannerData.subtitle || '',
+                        image_url: bannerData.image_url,
+                        link: bannerData.link || null,
+                        target_page: bannerData.target_page || 'all',
+                        is_active: bannerData.is_active !== undefined ? bannerData.is_active : true,
+                        sort_order: bannerData.sort_order || 0,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', bannerData.id)
+                    .select()
+                    .single();
+                if (error) throw error;
+                result = data;
+            } else {
+                const { data, error } = await supabase
+                    .from('hero_banners')
+                    .insert({
+                        title: bannerData.title,
+                        subtitle: bannerData.subtitle || '',
+                        image_url: bannerData.image_url,
+                        link: bannerData.link || null,
+                        target_page: bannerData.target_page || 'all',
+                        is_active: bannerData.is_active !== undefined ? bannerData.is_active : true,
+                        sort_order: bannerData.sort_order || 0,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    })
+                    .select()
+                    .single();
+                if (error) throw error;
+                result = data;
+            }
+            showNotification('Hero banner saved', 'success');
+            return result;
+        } catch (e) {
+            console.error('Save hero banner error:', e);
+            showNotification('Failed to save hero banner: ' + e.message, 'error');
+            return null;
+        }
+    }
+    
+    // Delete hero banner from Supabase
+    async function deleteHeroBannerFromSupabase(bannerId) {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showNotification('Database connection error', 'error');
+            return false;
+        }
+        try {
+            const { data: banner, error: fetchError } = await supabase
+                .from('hero_banners')
+                .select('image_url')
+                .eq('id', bannerId)
+                .single();
+            if (!fetchError && banner && banner.image_url) {
+                const urlParts = banner.image_url.split('/');
+                const fileName = urlParts.slice(urlParts.indexOf('ad-images') + 1).join('/');
+                if (fileName) {
+                    await supabase.storage.from('ad-images').remove([fileName]);
+                }
+            }
+            const { error } = await supabase.from('hero_banners').delete().eq('id', bannerId);
+            if (error) throw error;
+            showNotification('Hero banner deleted', 'success');
+            return true;
+        } catch (e) {
+            console.error('Delete hero banner error:', e);
+            showNotification('Failed to delete hero banner: ' + e.message, 'error');
+            return false;
+        }
+    }
+    
+    // Render ads from Supabase (called on each page)
+    async function renderAdsFromSupabase(pageSlug) {
+        const supabase = getSupabaseClient();
+        if (!supabase) return;
+        try {
+            const now = new Date().toISOString();
+            // Fetch active ads
+            const { data: ads, error } = await supabase
+                .from('ads')
+                .select('*')
+                .eq('is_active', true)
+                .or(`target_page.eq.${pageSlug},target_page.eq.all`)
+                .or(`end_date.is.null,end_date.gte.${now}`)
+                .or(`start_date.is.null,start_date.lte.${now}`)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            // Render ads in their zones
+            const zones = ['after-hero', 'between-sections', 'before-footer'];
+            zones.forEach(zone => {
+                const el = document.getElementById('adZone' + zone.charAt(0).toUpperCase() + zone.slice(1).replace('-', ''));
+                if (!el) return;
+                const matchingAds = (ads || []).filter(a => a.placement === zone);
+                if (matchingAds.length === 0) {
+                    el.innerHTML = '';
+                    el.style.display = 'none';
+                    return;
+                }
+                el.style.display = 'block';
+                el.innerHTML = matchingAds.map(a => {
+                    const linkStart = a.link_url ? `<a href="${escapeHtml(a.link_url)}" target="_blank" rel="noopener">` : '';
+                    const linkEnd = a.link_url ? '</a>' : '';
+                    let countdown = '';
+                    if (a.end_date) {
+                        const diff = new Date(a.end_date) - new Date();
+                        if (diff > 0) {
+                            const days = Math.floor(diff / 86400000);
+                            const hours = Math.floor((diff % 86400000) / 3600000);
+                            countdown = `<div class="ad-countdown">Ends in ${days > 0 ? days + 'd ' : ''}${hours}h</div>`;
+                        }
+                    }
+                    let imgStyle = '';
+                    if (a.image_size && a.image_size !== 'auto') {
+                        const adSizes = {
+                            'banner-sm': { w: 320, h: 100 },
+                            'banner-md': { w: 728, h: 200 },
+                            'banner-lg': { w: 1200, h: 320 },
+                            'square-sm': { w: 250, h: 250 },
+                            'square-md': { w: 400, h: 400 },
+                            'rect-md': { w: 300, h: 250 },
+                            'rect-lg': { w: 600, h: 400 }
+                        };
+                        const dim = a.image_size === 'custom' ? { w: a.custom_width, h: a.custom_height } : adSizes[a.image_size];
+                        if (dim) imgStyle = `max-width:${dim.w}px;height:${dim.h}px;margin:0 auto;`;
+                    }
+                    return `
+                        <div class="ad-card" ${imgStyle ? `style="max-width:${(a.image_size === 'custom' ? a.custom_width : ({'banner-sm':320,'banner-md':728,'banner-lg':1200,'square-sm':250,'square-md':400,'rect-md':300,'rect-lg':600}[a.image_size] || ''))}px;margin:0 auto"` : ''}>
+                            ${linkStart}
+                            <img src="${escapeHtml(a.image_url)}" alt="${escapeHtml(a.name || 'Advertisement')}" loading="lazy" ${imgStyle ? `style="${imgStyle}object-fit:cover"` : ''}>
+                            ${linkEnd}
+                            <span class="ad-label">Ad</span>
+                            ${countdown}
+                        </div>
+                    `;
+                }).join('');
+            });
+            // Fetch and render hero banners
+            const { data: banners, error: bannerError } = await supabase
+                .from('hero_banners')
+                .select('*')
+                .eq('is_active', true)
+                .or(`target_page.eq.${pageSlug},target_page.eq.all`)
+                .order('sort_order', { ascending: true });
+            if (bannerError) throw bannerError;
+            if (banners && banners.length > 0) {
+                renderHeroBanners(banners, pageSlug);
+            }
+        } catch (error) {
+            console.error('Error rendering ads from Supabase:', error);
+        }
+    }
+    
+    // Render hero banners
+    function renderHeroBanners(banners, pageSlug) {
+        const heroSection = document.querySelector('section.hero') || document.querySelector('.hero');
+        const heroContent = document.querySelector('.hero-content');
+        if (!heroSection || !heroContent) return;
+        // Clear any existing carousel
+        const existingCarousel = heroSection.querySelector('.hero-carousel');
+        if (existingCarousel) existingCarousel.remove();
+        // If there are banners, use the first one as the background
+        heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('${escapeHtml(banners[0].image_url)}')`;
+        heroSection.style.backgroundSize = 'cover';
+        heroSection.style.backgroundPosition = 'center';
+        // Update text content
+        if (banners[0].title) {
+            const h1 = heroContent.querySelector('h1');
+            if (h1) h1.textContent = banners[0].title;
+        }
+        if (banners[0].subtitle) {
+            const p = heroContent.querySelector('p');
+            if (p) p.textContent = banners[0].subtitle;
+        }
+        // If there are multiple banners, create a carousel
+        if (banners.length > 1) {
+            const carouselDiv = document.createElement('div');
+            carouselDiv.className = 'hero-carousel';
+            carouselDiv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0';
+            heroSection.insertBefore(carouselDiv, heroSection.firstChild);
+            carouselDiv.innerHTML = banners.map((b, i) => `
+                <div class="hero-slide ${i === 0 ? 'active' : ''}" 
+                     style="position:absolute;top:0;left:0;width:100%;height:100%;
+                            background-image:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35)),url('${escapeHtml(b.image_url)}');
+                            background-size:cover;background-position:center;
+                            opacity:${i === 0 ? '1' : '0'};
+                            transition:opacity 1.5s ease-in-out">
+                </div>
+            `).join('');
+            // Start carousel rotation
+            const slides = carouselDiv.querySelectorAll('.hero-slide');
+            let idx = 0;
+            if (window._heroCarouselInterval) clearInterval(window._heroCarouselInterval);
+            window._heroCarouselInterval = setInterval(() => {
+                slides[idx].style.opacity = '0';
+                idx = (idx + 1) % slides.length;
+                slides[idx].style.opacity = '1';
+                // Update text content
+                if (banners[idx]) {
+                    if (banners[idx].title) {
+                        const h1 = heroContent.querySelector('h1');
+                        if (h1) h1.textContent = banners[idx].title;
+                    }
+                    if (banners[idx].subtitle) {
+                        const p = heroContent.querySelector('p');
+                        if (p) p.textContent = banners[idx].subtitle;
+                    }
+                }
+            }, 5000);
+        }
+    }
+    
+    // ================================================================
     // INITIALIZATION
-    // ====================
+    // ================================================================
     async function initializePage() {
         console.log('🚀 Initializing JMPOTTERS...');
         
@@ -1469,6 +1829,9 @@
         // Remove any stray checkout buttons
         document.querySelectorAll('#whatsappCheckout').forEach(btn => btn.remove());
         
+        // Determine page slug for ads
+        const pageSlug = window.JMPOTTERS_CONFIG?.currentCategory || 'index';
+        
         if (isProductPage()) {
             const slug = getSlugFromURL();
             if (slug) await loadSingleProductBySlug(slug);
@@ -1477,6 +1840,14 @@
             const category = getCurrentCategory();
             if (document.getElementById('productsGrid')) await loadProductsByCategory(category);
         }
+        
+        // ============================================================
+        // REPLACE localStorage AD RENDERING WITH SUPABASE
+        // ============================================================
+        // Old localStorage code is removed; we now call Supabase.
+        // The ad zone elements (adZoneAfterHero, adZoneBetweenSections, adZoneBeforeFooter)
+        // are rendered by renderAdsFromSupabase.
+        await renderAdsFromSupabase(pageSlug);
         
         console.log('✅ JMPOTTERS ready');
     }
@@ -1497,7 +1868,15 @@
         updateCartUI,
         getOrderByNumber,
         createOrder,
-        uploadReceiptToStorage
+        uploadReceiptToStorage,
+        // Expose new functions for admin dashboard
+        uploadAdImage,
+        saveAdToSupabase,
+        deleteAdFromSupabase,
+        saveHeroBannerToSupabase,
+        deleteHeroBannerFromSupabase,
+        renderAdsFromSupabase,
+        renderHeroBanners
     };
     
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializePage);
