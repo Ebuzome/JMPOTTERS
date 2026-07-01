@@ -1793,10 +1793,16 @@
             return b.target_page === 'all' || b.target_page === pageSlug;
         });
         
-        // If no matching banners, don't override the default hero
+        // If no matching banners, clear any hardcoded text and return
         if (pageBanners.length === 0) {
             console.log(`ℹ️ No hero banners for page: ${pageSlug}, using default`);
-            // Reset to default background if needed
+            // Clear hardcoded banner text
+            if (heroContent) {
+                const h1 = heroContent.querySelector('h1');
+                const p = heroContent.querySelector('p');
+                if (h1) h1.textContent = '';
+                if (p) p.textContent = '';
+            }
             return;
         }
         
@@ -1809,18 +1815,19 @@
         heroSection.style.backgroundSize = 'cover';
         heroSection.style.backgroundPosition = 'center';
         
-        // Update text content (only if title exists)
+        // Update text content - clear defaults when banner has no title/subtitle
+        const h1 = heroContent.querySelector('h1');
+        const p = heroContent.querySelector('p');
         if (pageBanners[0].title) {
-            const h1 = heroContent.querySelector('h1');
             if (h1) h1.textContent = pageBanners[0].title;
+        } else {
+            if (h1) h1.textContent = '';
         }
-        // If no title, keep the default text (or leave as is)
-        
         if (pageBanners[0].subtitle) {
-            const p = heroContent.querySelector('p');
             if (p) p.textContent = pageBanners[0].subtitle;
+        } else {
+            if (p) p.textContent = '';
         }
-        // If no subtitle, keep the default text (or leave as is)
         
         // If there are multiple matching banners, create a carousel
         if (pageBanners.length > 1) {
@@ -1848,15 +1855,19 @@
                 idx = (idx + 1) % slides.length;
                 slides[idx].style.opacity = '1';
                 
-                // Update text content (only if title exists)
+                // Update text content - clear when no title/subtitle
                 if (pageBanners[idx]) {
+                    const h1 = heroContent.querySelector('h1');
+                    const p = heroContent.querySelector('p');
                     if (pageBanners[idx].title) {
-                        const h1 = heroContent.querySelector('h1');
                         if (h1) h1.textContent = pageBanners[idx].title;
+                    } else {
+                        if (h1) h1.textContent = '';
                     }
                     if (pageBanners[idx].subtitle) {
-                        const p = heroContent.querySelector('p');
                         if (p) p.textContent = pageBanners[idx].subtitle;
+                    } else {
+                        if (p) p.textContent = '';
                     }
                 }
             }, 5000);
