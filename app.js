@@ -1686,21 +1686,27 @@
         console.log(`📢 Rendering ads for page: ${pageSlug}`);
         
         try {
-            const now = new Date().toISOString();
-            
-            // Fetch active ads
-            const { data: ads, error } = await supabase
+            // Fetch all active ads, then filter client-side.
+            // (Supabase-js .or() calls on the same table overwrite each other, so
+            // combining target_page and date range in PostgREST is unreliable. Client-side
+            // filtering on a small set of active ads is simpler and safer.)
+            const { data: allAds, error } = await supabase
                 .from('ads')
                 .select('*')
                 .eq('is_active', true)
-                .or(`target_page.eq.${pageSlug},target_page.eq.all`)
-                .or(`end_date.is.null,end_date.gte.${now}`)
-                .or(`start_date.is.null,start_date.lte.${now}`)
                 .order('created_at', { ascending: false });
             
             if (error) throw error;
             
-            console.log(`📢 Found ${ads?.length || 0} ads for page ${pageSlug}`);
+            const now = Date.now();
+            const ads = (allAds || []).filter(a => {
+                if (a.target_page && a.target_page !== 'all' && a.target_page !== pageSlug) return false;
+                if (a.start_date && new Date(a.start_date).getTime() > now) return false;
+                if (a.end_date && new Date(a.end_date).getTime() < now) return false;
+                return true;
+            });
+            
+            console.log(`📢 Found ${ads.length} active ads for page ${pageSlug} (from ${(allAds || []).length} total active)`);
             
             // Render ads in their zones
             const zones = ['after-hero', 'between-sections', 'before-footer'];
@@ -1782,21 +1788,17 @@
     function renderHeroBanners(banners, pageSlug) {
         const heroSection = document.querySelector('section.hero') || document.querySelector('.hero');
         const heroContent = document.querySelector('.hero-content');
-        if (!heroSection || !heroContent) return;
+        if (!heroSection) return;
         
         // ===== FILTER BANNERS FOR THIS PAGE =====
-        // Only show banners where target_page matches the current page
-        // If banner has no title, it's image-only - we still show it
+        // Only show banners where target_page matches the current page.
         const pageBanners = (banners || []).filter(b => {
-            // If banner target_page is 'all', it shows on all pages
-            // Otherwise, it must match the current page
             return b.target_page === 'all' || b.target_page === pageSlug;
         });
         
-        // If no matching banners, clear any hardcoded text and return
+        // If no matching banners, clear any hardcoded text and return.
         if (pageBanners.length === 0) {
             console.log(`ℹ️ No hero banners for page: ${pageSlug}, using default`);
-            // Clear hardcoded banner text
             if (heroContent) {
                 const h1 = heroContent.querySelector('h1');
                 const p = heroContent.querySelector('p');
@@ -1810,41 +1812,46 @@
         const existingCarousel = heroSection.querySelector('.hero-carousel');
         if (existingCarousel) existingCarousel.remove();
         
-        // Use the first matching banner as the background
-        heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('${escapeHtml(pageBanners[0].image_url)}')`;
+        // Use the first matching banner as the background. Only apply the
+        // dim gradient when the banner has visible text so the image is not
+        // blurred out for image-only banners.
+        const first = pageBanners[0];
+        const firstHasText = !!(first.title || first.subtitle);
+        heroSection.style.backgroundImage = firstHasText
+            ? `linear-gradient(rgba(0,0,0,0.30), rgba(0,0,0,0.30)), url('${escapeHtml(first.image_url)}')`
+            : `url('${escapeHtml(first.image_url)}')`;
         heroSection.style.backgroundSize = 'cover';
         heroSection.style.backgroundPosition = 'center';
         
-        // Update text content - clear defaults when banner has no title/subtitle
-        const h1 = heroContent.querySelector('h1');
-        const p = heroContent.querySelector('p');
-        if (pageBanners[0].title) {
-            if (h1) h1.textContent = pageBanners[0].title;
-        } else {
-            if (h1) h1.textContent = '';
-        }
-        if (pageBanners[0].subtitle) {
-            if (p) p.textContent = pageBanners[0].subtitle;
-        } else {
-            if (p) p.textContent = '';
+        // Update text content if there is a hero-content container.
+        if (heroContent) {
+            const h1 = heroContent.querySelector('h1');
+            const p = heroContent.querySelector('p');
+            if (h1) h1.textContent = first.title || '';
+            if (p) p.textContent = first.subtitle || '';
         }
         
-        // If there are multiple matching banners, create a carousel
+        // If there are multiple matching banners, create a rotating carousel.
         if (pageBanners.length > 1) {
             const carouselDiv = document.createElement('div');
             carouselDiv.className = 'hero-carousel';
             carouselDiv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0';
             heroSection.insertBefore(carouselDiv, heroSection.firstChild);
             
-            carouselDiv.innerHTML = pageBanners.map((b, i) => `
-                <div class="hero-slide ${i === 0 ? 'active' : ''}" 
+            carouselDiv.innerHTML = pageBanners.map((b, i) => {
+                const hasText = !!(b.title || b.subtitle);
+                // No dim gradient for image-only banners - keep the image crisp.
+                const bg = hasText
+                    ? `linear-gradient(rgba(0,0,0,0.30),rgba(0,0,0,0.30)),url('${escapeHtml(b.image_url)}')`
+                    : `url('${escapeHtml(b.image_url)}')`;
+                return `<div class="hero-slide ${i === 0 ? 'active' : ''}"
                      style="position:absolute;top:0;left:0;width:100%;height:100%;
-                            background-image:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35)),url('${escapeHtml(b.image_url)}');
+                            background-image:${bg};
                             background-size:cover;background-position:center;
                             opacity:${i === 0 ? '1' : '0'};
                             transition:opacity 1.5s ease-in-out">
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
             
             // Start carousel rotation
             const slides = carouselDiv.querySelectorAll('.hero-slide');
@@ -1855,20 +1862,11 @@
                 idx = (idx + 1) % slides.length;
                 slides[idx].style.opacity = '1';
                 
-                // Update text content - clear when no title/subtitle
-                if (pageBanners[idx]) {
+                if (pageBanners[idx] && heroContent) {
                     const h1 = heroContent.querySelector('h1');
                     const p = heroContent.querySelector('p');
-                    if (pageBanners[idx].title) {
-                        if (h1) h1.textContent = pageBanners[idx].title;
-                    } else {
-                        if (h1) h1.textContent = '';
-                    }
-                    if (pageBanners[idx].subtitle) {
-                        if (p) p.textContent = pageBanners[idx].subtitle;
-                    } else {
-                        if (p) p.textContent = '';
-                    }
+                    if (h1) h1.textContent = pageBanners[idx].title || '';
+                    if (p) p.textContent = pageBanners[idx].subtitle || '';
                 }
             }, 5000);
         }
