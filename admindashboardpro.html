@@ -609,7 +609,7 @@
     <script>
     function escapeHtml(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
     const AdminDashboard=(function(){
-        let supabase,categories=[],allProducts=[],allProductsData=[],filteredProducts=[],currentPage=1,productsPerPage=20,currentFilter='all',productColors={},productSizes={},currentProductId=null,currentEditingColors=[],currentEditingSizes={},selectedColorIds=[],refreshInterval=null,selectedProductIds=new Set(),slugManuallyEdited=false,productToDelete=null,uploadedImageUrl=null,isUploading=false,allOrders=[],filteredOrders=[],ordersCurrentPage=1,ordersPerPage=15,currentOrderStatusFilter='all',currentOrderSearch='',currentOrderDateStart='',currentOrderDateEnd='',allUsers=[],filteredUsers=[],currentSort='newest',categoryToDelete=null;
+        let supabase,categories=[],allProducts=[],allProductsData=[],filteredProducts=[],currentPage=1,productsPerPage=20,currentFilter='all',productColors={},productSizes={},currentProductId=null,currentEditingColors=[],currentEditingSizes={},selectedColorIds=[],selectedProductIds=new Set(),slugManuallyEdited=false,productToDelete=null,uploadedImageUrl=null,isUploading=false,allOrders=[],filteredOrders=[],ordersCurrentPage=1,ordersPerPage=15,currentOrderStatusFilter='all',currentOrderSearch='',currentOrderDateStart='',currentOrderDateEnd='',allUsers=[],filteredUsers=[],currentSort='newest',categoryToDelete=null;
         const commonSizes=['36','37','38','39','40','41','42','43','44','45'];
         const colorDB={};[{name:"Black",codes:["#000000"]},{name:"White",codes:["#FFFFFF"]},{name:"Red",codes:["#FF0000"]},{name:"Blue",codes:["#0000FF"]},{name:"Green",codes:["#008000"]},{name:"Yellow",codes:["#FFFF00"]},{name:"Orange",codes:["#FFA500"]},{name:"Purple",codes:["#800080"]},{name:"Pink",codes:["#FFC0CB"]},{name:"Brown",codes:["#8B4513"]},{name:"Gray",codes:["#808080"]},{name:"Black + White",codes:["#000000","#FFFFFF"]},{name:"Red + Black",codes:["#FF0000","#000000"]},{name:"Blue + White",codes:["#0000FF","#FFFFFF"]},{name:"Navy Blue",codes:["#000080"]},{name:"Royal Blue",codes:["#4169E1"]},{name:"Sky Blue",codes:["#87CEEB"]},{name:"Teal",codes:["#008080"]},{name:"Emerald",codes:["#50C878"]},{name:"Maroon",codes:["#800000"]},{name:"Burgundy",codes:["#800020"]},{name:"Coral",codes:["#FF7F50"]},{name:"Gold",codes:["#FFD700"]},{name:"Silver",codes:["#C0C0C0"]},{name:"Rose Gold",codes:["#B76E79"]},{name:"Lavender",codes:["#E6E6FA"]},{name:"Violet",codes:["#EE82EE"]},{name:"Indigo",codes:["#4B0082"]},{name:"Beige",codes:["#F5F5DC"]},{name:"Charcoal",codes:["#36454F"]}].forEach(c=>colorDB[c.name.toLowerCase()]=c);
         const pageLabels={index:'Homepage',mensfootwear:"Men's Footwear",womensfootwear:"Women's Footwear",bags:'Bags',accessories:'Accessories',household:'Household',kids:'Kids',healthcare:'Healthcare'};
@@ -1037,8 +1037,8 @@
                 const startOk = !a.start_date || new Date(a.start_date) <= now;
                 const endOk = !a.end_date || new Date(a.end_date) >= now;
                 const isLive = a.is_active !== false && startOk && endOk;
-                const statusText = a.is_active === false ? 'Inactive' : (!startOk ? 'Scheduled' : (endOk ? 'Live' : 'Expired'));
-                const statusBg = isLive ? 'var(--success-100);color:var(--success-600)' : (statusText === 'Scheduled' ? 'var(--info-100);color:var(--info-600)' : (statusText === 'Expired' ? 'var(--danger-100);color:var(--danger-600)' : 'var(--gray-100);color:var(--gray-500)'));
+                const statusText = a.is_active === false ? 'Inactive' : 'Active';
+                const statusBg = a.is_active === false ? 'var(--gray-100);color:var(--gray-500)' : 'var(--success-100);color:var(--success-600)';
                 return `<div class="action-card mb-3" style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
                     <img src="${escapeHtml(a.image_url || '')}" style="width:160px;height:90px;object-fit:cover;border-radius:var(--radius);flex-shrink:0" onerror="this.style.display='none'">
                     <div style="flex:1;min-width:150px">
@@ -1510,7 +1510,7 @@
                 await loadUsers();
                 await loadCoupons();
                 updateDashboardStats();
-                setupAutoRefresh();
+                // Auto-refresh disabled per user request
                 initImageUpload();
                 populateColorPickerGrid();
                 renderHeroBanners();
@@ -1522,10 +1522,7 @@
             }
         }
 
-        function setupAutoRefresh() {
-            const i = parseInt(localStorage.getItem('refreshInterval') || '60000');
-            if (i > 0) refreshInterval = setInterval(() => { loadInitialData(); loadOrders(); updateDashboardStats(); }, i);
-        }
+        // setupAutoRefresh removed - auto-refresh disabled
 
         function showSection(s) {
             const l = document.querySelector(`.nav-link[data-section="${s}"]`);
