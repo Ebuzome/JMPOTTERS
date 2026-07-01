@@ -17,6 +17,14 @@
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
+    <script>
+        (function() {
+            'use strict';
+            if (!window.JMPOTTERS_CONFIG) window.JMPOTTERS_CONFIG = {};
+            window.JMPOTTERS_CONFIG.currentCategory = 'invoice';
+        })();
+    </script>
+
     <style>
         /* ===== CSS VARIABLES ===== */
         :root {
@@ -291,38 +299,39 @@
         .toast-action:hover { text-decoration: underline; }
 
         /* Cart Slide-out Panel */
-        .cart-overlay-panel { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1090; display: none; }
-        .cart-overlay-panel.active { display: block; }
-        .cart-slide-panel {
+        .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1090; display: none; }
+        .cart-overlay.active { display: block; }
+        .cart-panel {
             position: fixed; top: 0; right: -400px; width: 380px; max-width: 90vw; height: 100%;
             background: white; z-index: 1100; transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
             display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,0.15);
         }
-        .cart-slide-panel.active { right: 0; }
-        .cart-slide-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--gray-100); }
-        .cart-slide-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--gray-800); }
-        .close-cart-slide { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--gray-500); transition: var(--transition); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
-        .close-cart-slide:hover { background: var(--gray-100); color: var(--gray-800); }
-        .cart-slide-items { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
-        .cart-slide-empty { text-align: center; padding: 3rem 1rem; color: var(--gray-400); font-size: 0.9rem; }
-        .cart-slide-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--gray-50); align-items: center; }
-        .cart-slide-item-image { width: 60px; height: 60px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-        .cart-slide-item-image img { width: 100%; height: 100%; object-fit: cover; }
-        .cart-slide-item-details { flex: 1; min-width: 0; }
-        .cart-slide-item-name { font-size: 0.85rem; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .cart-slide-item-price { font-size: 0.8rem; color: var(--gold-dark); font-weight: 700; }
-        .cart-slide-item-remove { background: none; border: none; color: var(--gray-300); cursor: pointer; font-size: 0.85rem; padding: 6px; transition: var(--transition); }
-        .cart-slide-item-remove:hover { color: #ef4444; }
-        .cart-slide-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--gray-100); background: var(--gray-50); }
-        .cart-slide-total { display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem; }
-        .cart-slide-checkout-btn {
+        .cart-panel.active { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--gray-100); }
+        .cart-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--gray-800); }
+        .close-cart { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--gray-500); transition: var(--transition); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+        .close-cart:hover { background: var(--gray-100); color: var(--gray-800); }
+        .cart-items { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
+        .cart-empty { text-align: center; padding: 3rem 1rem; color: var(--gray-400); font-size: 0.9rem; }
+        .cart-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--gray-50); align-items: center; }
+        .cart-item-image { width: 60px; height: 60px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+        .cart-item-image img { width: 100%; height: 100%; object-fit: cover; }
+        .cart-item-details { flex: 1; min-width: 0; }
+        .cart-item-name { font-size: 0.85rem; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cart-item-price { font-size: 0.8rem; color: var(--gold-dark); font-weight: 700; }
+        .cart-item-remove { background: none; border: none; color: var(--gray-300); cursor: pointer; font-size: 0.85rem; padding: 6px; transition: var(--transition); }
+        .cart-item-remove:hover { color: #ef4444; }
+        .cart-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--gray-100); background: var(--gray-50); }
+        .cart-total { display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem; }
+        .cart-checkout-btn {
             display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
             padding: 12px; background: var(--gold); color: #0c0f15; border: none; border-radius: 50px;
             font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: var(--transition); margin-bottom: 8px;
+            font-family: 'Inter', sans-serif;
         }
-        .cart-slide-checkout-btn:hover { transform: translateY(-1px); box-shadow: var(--gold-glow); }
-        .cart-slide-view-btn { display: block; text-align: center; color: var(--gray-500); font-size: 0.82rem; text-decoration: none; }
-        .cart-slide-view-btn:hover { color: var(--gold-dark); }
+        .cart-checkout-btn:hover { transform: translateY(-1px); box-shadow: var(--gold-glow); }
+        .cart-view-btn { display: block; text-align: center; color: var(--gray-500); font-size: 0.82rem; text-decoration: none; font-family: 'Inter', sans-serif; }
+        .cart-view-btn:hover { color: var(--gold-dark); }
 
         /* Ad Zones */
         .ad-zone { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
@@ -1065,6 +1074,23 @@
         <a href="cart.html" class="toast-action">View Cart</a>
     </div>
 
+    <!-- Cart Slide-out Panel -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-panel" id="cartPanel">
+        <div class="cart-header">
+            <h3 class="cart-title">Your Cart</h3>
+            <button class="close-cart" id="closeCartBtn" aria-label="Close cart"><i class="icon-x"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty">Your cart is empty</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total"><span>Total:</span><span id="cartTotal">₦0</span></div>
+            <button class="cart-checkout-btn" id="cartCheckoutBtn"><i class="icon-shopping-bag"></i> Proceed to Checkout</button>
+            <a href="cart.html" class="cart-view-btn">View Full Cart</a>
+        </div>
+    </div>
+
     <!-- Theme Toggle -->
     <button class="theme-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
         <i class="icon-moon"></i>
@@ -1075,588 +1101,286 @@
     <script>
         // ============================================================
         // INVOICE PAGE JAVASCRIPT
+        //   Header, mobile nav, search, and cart panel are all driven
+        //   by app.js (loaded above). This script only handles the
+        //   invoice rendering, WhatsApp share, PDF download, and the
+        //   dark mode toggle.
         // ============================================================
 
-        // ===== HELPER FUNCTIONS =====
-        function escapeHtml(text) {
-            if (!text) return '';
-            var div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        (function() {
+            'use strict';
 
-        function formatPrice(price) {
-            return '₦' + parseInt(price || 0).toLocaleString();
-        }
+            // ===== HELPERS =====
+            function escapeHtml(text) {
+                if (!text) return '';
+                var div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
 
-        function getImageUrl(filename) {
-            if (!filename) return '';
-            if (filename.startsWith('http')) return filename;
-            return 'https://ebuzome.github.io/JMPOTTERS/assets/images/' + filename;
-        }
+            // ===== DARK MODE =====
+            function initDarkMode() {
+                var darkMode = localStorage.getItem('invoiceDarkMode') === 'true';
+                if (darkMode) {
+                    document.body.classList.add('dark-mode');
+                    var icon = document.querySelector('.theme-toggle i');
+                    if (icon) icon.className = 'icon-sun';
+                }
+            }
 
-        // ===== DARK MODE =====
-        function initDarkMode() {
-            var darkMode = localStorage.getItem('invoiceDarkMode') === 'true';
-            if (darkMode) {
-                document.body.classList.add('dark-mode');
+            window.toggleDarkMode = function() {
+                var isDark = document.body.classList.toggle('dark-mode');
+                localStorage.setItem('invoiceDarkMode', isDark);
                 var icon = document.querySelector('.theme-toggle i');
-                if (icon) {
-                    icon.className = 'icon-sun';
-                }
-            }
-        }
-
-        function toggleDarkMode() {
-            var isDark = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('invoiceDarkMode', isDark);
-            var icon = document.querySelector('.theme-toggle i');
-            if (icon) {
-                if (isDark) {
-                    icon.className = 'icon-sun';
-                } else {
-                    icon.className = 'icon-moon';
-                }
-            }
-        }
-
-        // ===== WHATSAPP SHARE =====
-        function shareViaWhatsApp() {
-            var orderNumberEl = document.querySelector('.invoice-number');
-            var grandTotalEl = document.querySelector('.grand-total .totals-value');
-            var orderNumber = orderNumberEl ? orderNumberEl.innerText : 'Order';
-            var grandTotal = grandTotalEl ? grandTotalEl.innerText : '₦0';
-            var message = encodeURIComponent(
-                '*JMPOTTERS Order Confirmation*\n\n' +
-                'Order Number: ' + orderNumber + '\n' +
-                'Total Amount: ' + grandTotal + '\n\n' +
-                'Thank you for shopping with JMPOTTERS!'
-            );
-            window.open('https://wa.me/2348139583320?text=' + message, '_blank');
-        }
-
-        // ===== DOWNLOAD PDF =====
-        function downloadPDF() {
-            var element = document.getElementById('invoiceContent');
-            var orderNumberEl = document.querySelector('.invoice-number');
-            var orderNumber = orderNumberEl ? orderNumberEl.innerText : 'invoice';
-
-            // Check if html2pdf is available
-            if (typeof html2pdf === 'undefined') {
-                // Load html2pdf dynamically
-                var script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-                script.onload = function() {
-                    generatePDF(element, orderNumber);
-                };
-                document.head.appendChild(script);
-            } else {
-                generatePDF(element, orderNumber);
-            }
-        }
-
-        function generatePDF(element, orderNumber) {
-            html2pdf().from(element).set({
-                margin: 0.5,
-                filename: 'JMPOTTERS_' + orderNumber + '.pdf',
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            }).save();
-        }
-
-        // ===== LOAD INVOICE =====
-        async function loadInvoice() {
-            var invoiceContent = document.getElementById('invoiceContent');
-
-            // Wait for app.js to load
-            var attempts = 0;
-            while (!window.JMPOTTERS && attempts < 50) {
-                await new Promise(function(r) { setTimeout(r, 100); });
-                attempts++;
-            }
-
-            if (!window.JMPOTTERS) {
-                invoiceContent.innerHTML = `
-                    <div class="error-state">
-                        <i class="icon-alert-triangle"></i>
-                        <p>App not loaded. Please refresh.</p>
-                        <a href="index.html" class="btn btn-primary" style="margin-top:1rem;">Go Home</a>
-                    </div>
-                `;
-                return;
-            }
-
-            var urlParams = new URLSearchParams(window.location.search);
-            var orderNumber = urlParams.get('order');
-
-            if (!orderNumber) {
-                invoiceContent.innerHTML = `
-                    <div class="error-state">
-                        <i class="icon-alert-triangle"></i>
-                        <p>No order specified</p>
-                        <a href="index.html" class="btn btn-primary" style="margin-top:1rem;">Go Home</a>
-                    </div>
-                `;
-                return;
-            }
-
-            try {
-                var order = await window.JMPOTTERS.getOrderByNumber(orderNumber);
-                if (!order) throw new Error('Order not found');
-
-                var items = order.items || [];
-                var subtotal = order.total_amount || 0;
-                var shippingFee = order.shipping_fee || 0;
-                var grandTotal = order.grand_total || (subtotal + shippingFee);
-                var orderDate = new Date(order.created_at).toLocaleDateString('en-NG', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
-
-                var statusText = order.status === 'pending' ? 'Pending' :
-                                order.status === 'processing' ? 'Processing' :
-                                order.status === 'shipped' ? 'Shipped' :
-                                order.status === 'delivered' ? 'Delivered' : 'Cancelled';
-
-                var paymentStatusText = order.payment_status === 'paid' ? 'Paid' : 'Pending Payment';
-
-                var itemsHtml = '';
-                if (items.length > 0) {
-                    items.forEach(function(item) {
-                        itemsHtml += `
-                            <tr>
-                                <td>${escapeHtml(item.name || 'Product')}</td>
-                                <td>${item.color_name ? escapeHtml(item.color_name) + (item.size_value ? ' / ' + escapeHtml(item.size_value) : '') : '-'}</td>
-                                <td style="text-align:center;">${item.quantity}</td>
-                                <td style="text-align:right;">₦${(item.price || 0).toLocaleString()}</td>
-                                <td style="text-align:right;">₦${((item.price || 0) * item.quantity).toLocaleString()}</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    itemsHtml = `<tr><td colspan="5" style="text-align:center;">No items found</td></tr>`;
-                }
-
-                // Build the invoice HTML
-                invoiceContent.innerHTML = `
-                    <div class="invoice-container">
-                        <div class="invoice-header">
-                            <div class="invoice-logo"><i class="icon-store"></i></div>
-                            <h1>JMPOTTERS</h1>
-                            <p>Premium Quality Products</p>
-                            <div class="invoice-number">Order Number: ${escapeHtml(order.order_number)}</div>
-                        </div>
-                        <div class="invoice-body">
-
-                            <!-- ===== CHECKMARK ANIMATION ===== -->
-                            <div class="checkmark-container">
-                                <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-                                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                                </svg>
-                                <div class="success-message">✓ Order placed successfully!</div>
-                            </div>
-
-                            <!-- ===== BILLING & SHIPPING INFO ===== -->
-                            <div class="info-grid">
-                                <div class="info-section">
-                                    <h3><i class="icon-user"></i> Billing Details</h3>
-                                    <p>
-                                        <strong>${escapeHtml(order.full_name || order.user_name || 'N/A')}</strong><br>
-                                        ${escapeHtml(order.user_email || 'No email provided')}<br>
-                                        ${escapeHtml(order.user_phone || 'No phone provided')}
-                                    </p>
-                                </div>
-                                <div class="info-section">
-                                    <h3><i class="icon-truck"></i> Shipping Address</h3>
-                                    <p>
-                                        ${escapeHtml(order.shipping_address || 'No address provided')}<br>
-                                        ${order.city ? escapeHtml(order.city) + ', ' : ''}${order.state ? escapeHtml(order.state) : ''}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- ===== ORDER DATE & STATUS ===== -->
-                            <div class="info-grid">
-                                <div class="info-section">
-                                    <h3><i class="icon-calendar"></i> Order Date</h3>
-                                    <p>${orderDate}</p>
-                                </div>
-                                <div class="info-section">
-                                    <h3><i class="icon-trending-up"></i> Order Status</h3>
-                                    <p><span class="status-badge status-pending"><i class="icon-clock"></i> ${statusText}</span></p>
-                                </div>
-                            </div>
-
-                            <!-- ===== ORDER SUMMARY ===== -->
-                            <div class="order-summary">
-                                <h3><i class="icon-receipt"></i> Order Summary</h3>
-                                <div class="table-wrapper">
-                                    <table class="invoice-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Product</th>
-                                                <th>Variant</th>
-                                                <th style="text-align:center;">Qty</th>
-                                                <th style="text-align:right;">Price</th>
-                                                <th style="text-align:right;">Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>${itemsHtml}</tbody>
-                                    </table>
-                                </div>
-                                <div class="totals">
-                                    <div class="totals-row">
-                                        <span class="totals-label">Subtotal:</span>
-                                        <span class="totals-value">₦${subtotal.toLocaleString()}</span>
-                                    </div>
-                                    <div class="totals-row">
-                                        <span class="totals-label">Shipping Fee:</span>
-                                        <span class="totals-value">${shippingFee === 0 ? 'Free' : '₦' + shippingFee.toLocaleString()}</span>
-                                    </div>
-                                    <div class="totals-row grand-total">
-                                        <span class="totals-label">Grand Total:</span>
-                                        <span class="totals-value">₦${grandTotal.toLocaleString()}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- ===== PAYMENT INSTRUCTION ===== -->
-                            <div class="payment-instruction">
-                                <i class="icon-credit-card"></i>
-                                <p>Payment Status: <strong>${paymentStatusText}</strong></p>
-                                ${order.receipt_url ? `
-                                    <div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid rgba(99,102,241,0.15);">
-                                        <i class="icon-check-circle" style="color: var(--success-500); margin-right: 4px;"></i>
-                                        <span style="font-size: 0.8rem; color: var(--success-600); font-weight: 600;">Payment receipt uploaded</span>
-                                        <div style="margin-top: var(--space-2);">
-                                            <a href="${escapeHtml(order.receipt_url)}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--primary-600); text-decoration: none;">
-                                                <i class="icon-external-link"></i> View Receipt
-                                            </a>
-                                        </div>
-                                    </div>
-                                ` : `
-                                    <p style="font-size: 0.7rem; margin-top: var(--space-2); color: var(--gray-500);">
-                                        Please complete payment within 24 hours to confirm your order.
-                                    </p>
-                                `}
-                            </div>
-                        </div>
-                        <div class="invoice-footer">
-                            <p>Thank you for shopping with JMPOTTERS!</p>
-                            <p style="font-size: 0.65rem; margin-top: var(--space-1); color: var(--gray-500);">
-                                For inquiries, contact us on WhatsApp: <strong>+234 813 958 3320</strong> | Email: hello@jmpotters.com
-                            </p>
-                        </div>
-                    </div>
-                `;
-
-                // Show action buttons
-                document.getElementById('actionButtons').style.display = 'flex';
-
-            } catch (error) {
-                console.error('Error loading invoice:', error);
-                invoiceContent.innerHTML = `
-                    <div class="error-state">
-                        <i class="icon-alert-triangle"></i>
-                        <p>Error: ${escapeHtml(error.message || 'Failed to load invoice')}</p>
-                        <a href="index.html" class="btn btn-primary" style="margin-top:1rem;">Go Home</a>
-                    </div>
-                `;
-            }
-        }
-
-        // ============================================================
-        // HEADER FUNCTIONALITY (Shared with other pages)
-        // ============================================================
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var SUPABASE_URL = 'https://tmpggeeuwdvlngvfncaa.supabase.co';
-            var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtcGdnZWV1d2R2bG5ndmZuY2FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTc0MDYsImV4cCI6MjA3Nzc3MzQwNn0.EKzkKWmzYMvQuN11vEjRTDHrUbh6dYXk7clxVsYQ0b4';
-            var supabase = null;
-            try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
-
-            function getImageUrlHelper(f) {
-                if (!f) return 'https://via.placeholder.com/400x400?text=JMPOTTERS';
-                if (f.startsWith('http')) return f;
-                return 'https://ebuzome.github.io/JMPOTTERS/assets/images/' + f;
-            }
-
-            function escapeHtmlHelper(t) {
-                if (!t) return '';
-                var d = document.createElement('div');
-                d.textContent = t;
-                return d.innerHTML;
-            }
-
-            // Mobile Nav
-            var mobileToggle = document.getElementById('mobileToggle');
-            var mobileNav = document.getElementById('mobileNav');
-            var navOverlay = document.getElementById('navOverlay');
-            var closeNavBtn = document.getElementById('closeNavBtn');
-
-            function openNav() {
-                mobileNav.classList.add('active');
-                navOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeNav() {
-                mobileNav.classList.remove('active');
-                navOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            if (mobileToggle) mobileToggle.addEventListener('click', openNav);
-            if (closeNavBtn) closeNavBtn.addEventListener('click', closeNav);
-            if (navOverlay) navOverlay.addEventListener('click', closeNav);
-
-            // Search
-            var searchToggle = document.getElementById('searchToggle');
-            var searchOverlay = document.getElementById('searchOverlay');
-            var searchClose = document.getElementById('searchClose');
-            var searchInput = document.getElementById('searchInput');
-            var searchResultsContainer = document.getElementById('searchResultsContainer');
-            var searchDebounceTimer = null;
-            var searchCache = {};
-
-            function openSearch() {
-                searchOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                setTimeout(function() { searchInput.focus(); }, 100);
-            }
-
-            function closeSearch() {
-                searchOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-                searchInput.value = '';
-                if (searchResultsContainer) searchResultsContainer.innerHTML = '';
-            }
-
-            if (searchToggle) searchToggle.addEventListener('click', openSearch);
-            if (searchClose) searchClose.addEventListener('click', closeSearch);
-            if (searchOverlay) searchOverlay.addEventListener('click', function(e) {
-                if (e.target === searchOverlay) closeSearch();
-            });
-
-            function highlightMatch(text, query) {
-                if (!query) return escapeHtmlHelper(text);
-                var escaped = escapeHtmlHelper(text);
-                var regex = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-                return escaped.replace(regex, '<mark>$1</mark>');
-            }
-
-            async function performSearch(query) {
-                if (!searchResultsContainer) return;
-                if (!query || query.length < 2) {
-                    searchResultsContainer.innerHTML = '';
-                    return;
-                }
-                if (searchCache[query.toLowerCase()]) {
-                    renderSearchResults(searchCache[query.toLowerCase()], query);
-                    return;
-                }
-                searchResultsContainer.innerHTML = '<div class="search-status"><i class="icon-loader" style="animation:spin 1s linear infinite;display:inline-block"></i> Searching...</div>';
-                try {
-                    var sb = supabase || (window.JMPOTTERS && window.JMPOTTERS.getSupabaseClient ? window.JMPOTTERS.getSupabaseClient() : null);
-                    if (!sb) {
-                        searchResultsContainer.innerHTML = '<div class="search-empty"><i class="icon-alert-circle"></i><p>Search unavailable</p></div>';
-                        return;
-                    }
-                    var terms = query.toLowerCase().split(/\s+/).filter(function(t) { return t.length > 0; });
-                    var { data: products, error } = await sb
-                        .from('products')
-                        .select('id, name, slug, price, image_url, description, category_id, is_active, categories(name, slug)')
-                        .eq('is_active', true)
-                        .order('name');
-                    if (error) throw error;
-                    var results = (products || []).filter(function(p) {
-                        var searchable = [
-                            (p.name || '').toLowerCase(),
-                            (p.slug || '').toLowerCase(),
-                            (p.description || '').toLowerCase(),
-                            (p.categories && p.categories.name ? p.categories.name.toLowerCase() : ''),
-                            (p.categories && p.categories.slug ? p.categories.slug.toLowerCase() : '')
-                        ].join(' ');
-                        return terms.every(function(term) { return searchable.indexOf(term) !== -1; });
-                    });
-                    searchCache[query.toLowerCase()] = results;
-                    renderSearchResults(results, query);
-                } catch(err) {
-                    searchResultsContainer.innerHTML = '<div class="search-empty"><i class="icon-alert-circle"></i><p>Search unavailable</p><div class="search-hint">Please try again later</div></div>';
-                }
-            }
-
-            function renderSearchResults(results, query) {
-                if (!searchResultsContainer) return;
-                if (results.length === 0) {
-                    searchResultsContainer.innerHTML = '<div class="search-empty"><i class="icon-search"></i><p>No products found for "' + escapeHtmlHelper(query) + '"</p><div class="search-hint">Try different keywords</div></div>';
-                    return;
-                }
-                var html = '<div class="search-status">' + results.length + ' product' + (results.length !== 1 ? 's' : '') + ' found</div><div class="search-results-grid">';
-                results.slice(0, 20).forEach(function(p) {
-                    var catName = p.categories && p.categories.name ? p.categories.name : '';
-                    html += '<a href="product.html?slug=' + encodeURIComponent(p.slug || p.id) + '" class="search-result-item">' +
-                        '<img class="search-result-img" src="' + getImageUrlHelper(p.image_url) + '" alt="' + escapeHtmlHelper(p.name) + '" loading="lazy">' +
-                        '<div class="search-result-info">' +
-                        (catName ? '<span class="search-result-category">' + escapeHtmlHelper(catName) + '</span>' : '') +
-                        '<div class="search-result-name">' + highlightMatch(p.name || '', query) + '</div>' +
-                        '<div class="search-result-price">₦' + (p.price || 0).toLocaleString() + '</div>' +
-                        '</div></a>';
-                });
-                html += '</div>';
-                searchResultsContainer.innerHTML = html;
-            }
-
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    var q = searchInput.value.trim();
-                    clearTimeout(searchDebounceTimer);
-                    searchDebounceTimer = setTimeout(function() { performSearch(q); }, 300);
-                });
-                searchInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') closeSearch();
-                });
-            }
-
-            // Nav shrink
-            var navBar = document.getElementById('navBar');
-            window.addEventListener('scroll', function() {
-                if ((window.scrollY || window.pageYOffset) > 80) navBar.classList.add('shrunk');
-                else navBar.classList.remove('shrunk');
-            }, { passive: true });
-
-            // Cart count
-            function updateCartCountShared() {
-                var cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                var total = cart.reduce(function(s, i) { return s + i.quantity; }, 0);
-                var el = document.getElementById('cartCount');
-                if (el) {
-                    el.textContent = total;
-                    el.style.display = total > 0 ? 'flex' : 'none';
-                }
-            }
-            updateCartCountShared();
-
-            // Back to top
-            var backToTop = document.getElementById('backToTop');
-            window.addEventListener('scroll', function() {
-                if ((window.scrollY || window.pageYOffset) > 500) backToTop.classList.add('visible');
-                else backToTop.classList.remove('visible');
-            }, { passive: true });
-            if (backToTop) backToTop.addEventListener('click', function() {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-
-            // ESC
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') { closeNav(); closeSearch(); }
-            });
-
-            // Load invoice
-            initDarkMode();
-            loadInvoice();
-
-            // Toast notification support
-            var toast = document.getElementById('cartToast');
-            var toastImg = document.getElementById('toastImg');
-            var toastTitle = document.getElementById('toastTitle');
-
-            window.showToast = function(name, imageUrl) {
-                if (!toast) return;
-                toastTitle.textContent = name;
-                toastImg.src = getImageUrlHelper(imageUrl);
-                toastImg.alt = name;
-                toast.classList.add('show');
-                clearTimeout(toast._timer);
-                toast._timer = setTimeout(function() { toast.classList.remove('show'); }, 3500);
+                if (icon) icon.className = isDark ? 'icon-sun' : 'icon-moon';
             };
 
-            // Cart panel functions
-            var cartPanel = document.getElementById('cartPanel');
-            var cartOverlayEl = document.getElementById('cartOverlay');
-            var closeCartBtn = document.getElementById('closeCartBtn');
-            var cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
-            var cartIconEl = document.getElementById('cartIcon');
+            // ===== WHATSAPP SHARE =====
+            window.shareViaWhatsApp = function() {
+                var orderNumberEl = document.querySelector('.invoice-number');
+                var grandTotalEl = document.querySelector('.grand-total .totals-value');
+                var orderNumber = orderNumberEl ? orderNumberEl.innerText : 'Order';
+                var grandTotal = grandTotalEl ? grandTotalEl.innerText : '\u20A60';
+                var message = encodeURIComponent(
+                    '*JMPOTTERS Order Confirmation*\n\n' +
+                    'Order Number: ' + orderNumber + '\n' +
+                    'Total Amount: ' + grandTotal + '\n\n' +
+                    'Thank you for shopping with JMPOTTERS!'
+                );
+                window.open('https://wa.me/2348139583320?text=' + message, '_blank');
+            };
 
-            function openCartPanel() {
-                if (cartPanel) cartPanel.classList.add('active');
-                if (cartOverlayEl) cartOverlayEl.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                renderCartPanel();
-            }
+            // ===== DOWNLOAD PDF =====
+            window.downloadPDF = function() {
+                var element = document.getElementById('invoiceContent');
+                var orderNumberEl = document.querySelector('.invoice-number');
+                var orderNumber = orderNumberEl ? orderNumberEl.innerText : 'invoice';
 
-            function closeCartPanel() {
-                if (cartPanel) cartPanel.classList.remove('active');
-                if (cartOverlayEl) cartOverlayEl.classList.remove('active');
-                document.body.style.overflow = '';
-            }
+                if (typeof html2pdf === 'undefined') {
+                    var script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+                    script.onload = function() { window.generatePDF(element, orderNumber); };
+                    document.head.appendChild(script);
+                } else {
+                    window.generatePDF(element, orderNumber);
+                }
+            };
 
-            function renderCartPanel() {
-                var cartItemsEl = document.getElementById('cartItems');
-                var cartTotalEl = document.getElementById('cartTotal');
-                if (!cartItemsEl || !cartTotalEl) return;
-                var cart = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                if (cart.length === 0) {
-                    cartItemsEl.innerHTML = '<div class="cart-empty"><i class="icon-shopping-bag" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3"></i>Your cart is empty</div>';
-                    cartTotalEl.textContent = '₦0';
+            window.generatePDF = function(element, orderNumber) {
+                html2pdf().from(element).set({
+                    margin: 0.5,
+                    filename: 'JMPOTTERS_' + orderNumber + '.pdf',
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                }).save();
+            };
+
+            // ===== LOAD INVOICE =====
+            async function loadInvoice() {
+                var invoiceContent = document.getElementById('invoiceContent');
+
+                // Wait for app.js to attach window.JMPOTTERS (defer keeps order, but be safe)
+                var attempts = 0;
+                while (!window.JMPOTTERS && attempts < 50) {
+                    await new Promise(function(r) { setTimeout(r, 100); });
+                    attempts++;
+                }
+
+                if (!window.JMPOTTERS) {
+                    invoiceContent.innerHTML =
+                        '<div class="error-state">' +
+                            '<i class="icon-alert-triangle"></i>' +
+                            '<p>App not loaded. Please refresh.</p>' +
+                            '<a href="index.html" class="btn btn-primary" style="margin-top:1rem;">Go Home</a>' +
+                        '</div>';
                     return;
                 }
-                var html = '';
-                var total = 0;
-                cart.forEach(function(item, idx) {
-                    var itemTotal = (item.price || 0) * item.quantity;
-                    total += itemTotal;
-                    var desc = escapeHtmlHelper(item.name || 'Product');
-                    if (item.color_name) desc += ' <span style="color:#94A3B8;font-size:0.75rem">(' + escapeHtmlHelper(item.color_name) + ')</span>';
-                    if (item.size_value) desc += ' <span style="color:#94A3B8;font-size:0.75rem">- ' + escapeHtmlHelper(item.size_value) + '</span>';
-                    var imgSrc = getImageUrlHelper(item.image_url);
-                    html += '<div class="cart-item">' +
-                        '<div class="cart-item-image"><img src="' + imgSrc + '" alt="' + escapeHtmlHelper(item.name || '') + '" loading="lazy"></div>' +
-                        '<div class="cart-item-details"><div class="cart-item-name">' + desc + '</div>' +
-                        '<div class="cart-item-price">₦' + itemTotal.toLocaleString() + '</div>' +
-                        '<div style="font-size:0.75rem;color:#94A3B8">Qty: ' + item.quantity + '</div></div>' +
-                        '<button class="cart-item-remove" data-cart-idx="' + idx + '" aria-label="Remove item"><i class="icon-trash-2"></i></button></div>';
-                });
-                cartItemsEl.innerHTML = html;
-                cartTotalEl.textContent = '₦' + total.toLocaleString();
 
-                cartItemsEl.querySelectorAll('.cart-item-remove').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        var idx = parseInt(this.dataset.cartIdx);
-                        var c = JSON.parse(localStorage.getItem('jmpotters_cart')) || [];
-                        c.splice(idx, 1);
-                        localStorage.setItem('jmpotters_cart', JSON.stringify(c));
-                        updateCartCountShared();
-                        renderCartPanel();
+                var urlParams = new URLSearchParams(window.location.search);
+                var orderNumber = urlParams.get('order');
+
+                if (!orderNumber) {
+                    invoiceContent.innerHTML =
+                        '<div class="error-state">' +
+                            '<i class="icon-alert-triangle"></i>' +
+                            '<p>No order specified</p>' +
+                            '<a href="index.html" class="btn btn-primary" style="margin-top:1rem;">Go Home</a>' +
+                        '</div>';
+                    return;
+                }
+
+                try {
+                    var order = await window.JMPOTTERS.getOrderByNumber(orderNumber);
+                    if (!order) throw new Error('Order not found');
+
+                    var items = order.items || [];
+                    var subtotal = order.total_amount || 0;
+                    var shippingFee = order.shipping_fee || 0;
+                    var grandTotal = order.grand_total || (subtotal + shippingFee);
+                    var orderDate = new Date(order.created_at).toLocaleDateString('en-NG', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
                     });
-                });
-            }
 
-            if (cartIconEl) {
-                cartIconEl.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    openCartPanel();
-                });
-            }
-            if (closeCartBtn) closeCartBtn.addEventListener('click', closeCartPanel);
-            if (cartOverlayEl) cartOverlayEl.addEventListener('click', closeCartPanel);
-            if (cartCheckoutBtn) {
-                cartCheckoutBtn.addEventListener('click', function() {
-                    closeCartPanel();
-                    if (typeof window.JMPOTTERS !== 'undefined' && window.JMPOTTERS.proceedToCheckout) {
-                        window.JMPOTTERS.proceedToCheckout();
+                    var statusText = order.status === 'pending' ? 'Pending' :
+                                    order.status === 'processing' ? 'Processing' :
+                                    order.status === 'shipped' ? 'Shipped' :
+                                    order.status === 'delivered' ? 'Delivered' : 'Cancelled';
+
+                    var paymentStatusText = order.payment_status === 'paid' ? 'Paid' : 'Pending Payment';
+
+                    var itemsHtml = '';
+                    if (items.length > 0) {
+                        items.forEach(function(item) {
+                            itemsHtml +=
+                                '<tr>' +
+                                    '<td>' + escapeHtml(item.name || 'Product') + '</td>' +
+                                    '<td>' + (item.color_name ? escapeHtml(item.color_name) + (item.size_value ? ' / ' + escapeHtml(item.size_value) : '') : '-') + '</td>' +
+                                    '<td style="text-align:center;">' + item.quantity + '</td>' +
+                                    '<td style="text-align:right;">\u20A6' + (item.price || 0).toLocaleString() + '</td>' +
+                                    '<td style="text-align:right;">\u20A6' + ((item.price || 0) * item.quantity).toLocaleString() + '</td>' +
+                                '</tr>';
+                        });
                     } else {
-                        window.location.href = 'cart.html';
+                        itemsHtml = '<tr><td colspan="5" style="text-align:center;">No items found</td></tr>';
                     }
-                });
+
+                    invoiceContent.innerHTML =
+                        '<div class="invoice-container">' +
+                            '<div class="invoice-header">' +
+                                '<div class="invoice-logo"><i class="icon-store"></i></div>' +
+                                '<h1>JMPOTTERS</h1>' +
+                                '<p>Premium Quality Products</p>' +
+                                '<div class="invoice-number">Order Number: ' + escapeHtml(order.order_number) + '</div>' +
+                            '</div>' +
+                            '<div class="invoice-body">' +
+                                // ===== CHECKMARK ANIMATION =====
+                                '<div class="checkmark-container">' +
+                                    '<svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">' +
+                                        '<circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />' +
+                                        '<path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />' +
+                                    '</svg>' +
+                                    '<div class="success-message">\u2713 Order placed successfully!</div>' +
+                                '</div>' +
+                                // ===== BILLING & SHIPPING INFO =====
+                                '<div class="info-grid">' +
+                                    '<div class="info-section">' +
+                                        '<h3><i class="icon-user"></i> Billing Details</h3>' +
+                                        '<p>' +
+                                            '<strong>' + escapeHtml(order.full_name || order.user_name || 'N/A') + '</strong><br>' +
+                                            escapeHtml(order.user_email || 'No email provided') + '<br>' +
+                                            escapeHtml(order.user_phone || 'No phone provided') +
+                                        '</p>' +
+                                    '</div>' +
+                                    '<div class="info-section">' +
+                                        '<h3><i class="icon-truck"></i> Shipping Address</h3>' +
+                                        '<p>' +
+                                            escapeHtml(order.shipping_address || 'No address provided') + '<br>' +
+                                            (order.city ? escapeHtml(order.city) + ', ' : '') +
+                                            (order.state ? escapeHtml(order.state) : '') +
+                                        '</p>' +
+                                    '</div>' +
+                                '</div>' +
+                                // ===== ORDER DATE & STATUS =====
+                                '<div class="info-grid">' +
+                                    '<div class="info-section">' +
+                                        '<h3><i class="icon-calendar"></i> Order Date</h3>' +
+                                        '<p>' + orderDate + '</p>' +
+                                    '</div>' +
+                                    '<div class="info-section">' +
+                                        '<h3><i class="icon-trending-up"></i> Order Status</h3>' +
+                                        '<p><span class="status-badge status-pending"><i class="icon-clock"></i> ' + statusText + '</span></p>' +
+                                    '</div>' +
+                                '</div>' +
+                                // ===== ORDER SUMMARY =====
+                                '<div class="order-summary">' +
+                                    '<h3><i class="icon-receipt"></i> Order Summary</h3>' +
+                                    '<div class="table-wrapper">' +
+                                        '<table class="invoice-table">' +
+                                            '<thead>' +
+                                                '<tr>' +
+                                                    '<th>Product</th>' +
+                                                    '<th>Variant</th>' +
+                                                    '<th style="text-align:center;">Qty</th>' +
+                                                    '<th style="text-align:right;">Price</th>' +
+                                                    '<th style="text-align:right;">Total</th>' +
+                                                '</tr>' +
+                                            '</thead>' +
+                                            '<tbody>' + itemsHtml + '</tbody>' +
+                                        '</table>' +
+                                    '</div>' +
+                                    '<div class="totals">' +
+                                        '<div class="totals-row">' +
+                                            '<span class="totals-label">Subtotal:</span>' +
+                                            '<span class="totals-value">\u20A6' + subtotal.toLocaleString() + '</span>' +
+                                        '</div>' +
+                                        '<div class="totals-row">' +
+                                            '<span class="totals-label">Shipping Fee:</span>' +
+                                            '<span class="totals-value">' + (shippingFee === 0 ? 'Free' : '\u20A6' + shippingFee.toLocaleString()) + '</span>' +
+                                        '</div>' +
+                                        '<div class="totals-row grand-total">' +
+                                            '<span class="totals-label">Grand Total:</span>' +
+                                            '<span class="totals-value">\u20A6' + grandTotal.toLocaleString() + '</span>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                                // ===== PAYMENT INSTRUCTION =====
+                                '<div class="payment-instruction">' +
+                                    '<i class="icon-credit-card"></i>' +
+                                    '<p>Payment Status: <strong>' + paymentStatusText + '</strong></p>' +
+                                    (order.receipt_url ?
+                                        '<div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid rgba(99,102,241,0.15);">' +
+                                            '<i class="icon-check-circle" style="color: var(--success-500); margin-right: 4px;"></i>' +
+                                            '<span style="font-size: 0.8rem; color: var(--success-600); font-weight: 600;">Payment receipt uploaded</span>' +
+                                            '<div style="margin-top: var(--space-2);">' +
+                                                '<a href="' + escapeHtml(order.receipt_url) + '" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--primary-600); text-decoration: none;">' +
+                                                    '<i class="icon-external-link"></i> View Receipt' +
+                                                '</a>' +
+                                            '</div>' +
+                                        '</div>'
+                                    :
+                                        '<p style="font-size: 0.7rem; margin-top: var(--space-2); color: var(--gray-500);">' +
+                                            'Please complete payment within 24 hours to confirm your order.' +
+                                        '</p>'
+                                    ) +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="invoice-footer">' +
+                                '<p>Thank you for shopping with JMPOTTERS!</p>' +
+                                '<p style="font-size: 0.65rem; margin-top: var(--space-1); color: var(--gray-500);">' +
+                                    'For inquiries, contact us on WhatsApp: <strong>+234 813 958 3320</strong> | Email: hello@jmpotters.com' +
+                                '</p>' +
+                            '</div>' +
+                        '</div>';
+
+                    // Show action buttons
+                    var actionButtons = document.getElementById('actionButtons');
+                    if (actionButtons) actionButtons.style.display = 'flex';
+
+                } catch (error) {
+                    console.error('Error loading invoice:', error);
+                    invoiceContent.innerHTML =
+                        '<div class="error-state">' +
+                            '<i class="icon-alert-triangle"></i>' +
+                            '<p>Error: ' + escapeHtml(error.message || 'Failed to load invoice') + '</p>' +
+                            '<a href="index.html" class="btn btn-primary" style="margin-top:1rem;">Go Home</a>' +
+                        '</div>';
+                }
             }
 
-            })();
+            // ===== BOOT =====
+            function boot() {
+                initDarkMode();
+                loadInvoice();
+            }
 
-        }); // end DOMContentLoaded
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', boot);
+            } else {
+                boot();
+            }
+        })();
     </script>
 
 </body>
