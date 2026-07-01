@@ -2145,49 +2145,7 @@
             });
         }
 
-        // ===== AD RENDERING =====
-        function renderPageAds(pageName) {
-            var ads;
-            // Ads now managed via app.js Supabase - localStorage fallback removed
-            var now = new Date();
-            var zones = { 'after-hero': 'adZoneAfterHero', 'between-sections': 'adZoneBetweenSections', 'before-footer': 'adZoneBeforeFooter' };
-            Object.keys(zones).forEach(function(zone) {
-                var el = document.getElementById(zones[zone]);
-                if (!el) return;
-                var matching = ads.filter(function(a) {
-                    if (a.is_active === false) return false;
-                    if (a.target_page !== pageName && a.target_page !== 'all') return false;
-                    if (a.placement !== zone) return false;
-                    if (a.start_date && new Date(a.start_date) > now) return false;
-                    if (a.end_date && new Date(a.end_date) < now) return false;
-                    return true;
-                });
-                if (matching.length === 0) { el.innerHTML = ''; return; }
-                el.innerHTML = matching.map(function(a) {
-                    var linkStart = a.link_url ? '<a href="' + escapeHtml(a.link_url) + '" target="_blank" rel="noopener">' : '';
-                    var linkEnd = a.link_url ? '</a>' : '';
-                    var countdown = '';
-                    if (a.end_date) {
-                        var diff = new Date(a.end_date) - now;
-                        if (diff > 0) {
-                            var days = Math.floor(diff / 86400000);
-                            var hours = Math.floor((diff % 86400000) / 3600000);
-                            countdown = '<div class="ad-countdown">Ends in ' + (days > 0 ? days + 'd ' : '') + hours + 'h</div>';
-                        }
-                    }
-                    var imgStyle = '';
-                    if (a.image_size && a.image_size !== 'auto') {
-                        var adSizes = {'banner-sm':{w:320,h:100},'banner-md':{w:728,h:200},'banner-lg':{w:1200,h:320},'square-sm':{w:250,h:250},'square-md':{w:400,h:400},'rect-md':{w:300,h:250},'rect-lg':{w:600,h:400}};
-                        var dim = a.image_size === 'custom' ? {w: a.custom_width, h: a.custom_height} : adSizes[a.image_size];
-                        if (dim) imgStyle = 'max-width:' + dim.w + 'px;height:' + dim.h + 'px;margin:0 auto;';
-                    }
-                    return '<div class="ad-card"' + (imgStyle ? ' style="max-width:' + (a.image_size === 'custom' ? a.custom_width : ({'banner-sm':320,'banner-md':728,'banner-lg':1200,'square-sm':250,'square-md':400,'rect-md':300,'rect-lg':600}[a.image_size] || '')) + 'px;margin:0 auto"' : '') + '>' + linkStart +
-                        '<img src="' + escapeHtml(a.image_url) + '" alt="' + escapeHtml(a.name || 'Advertisement') + '" loading="lazy"' + (imgStyle ? ' style="' + imgStyle + 'object-fit:cover"' : '') + '>' +
-                        linkEnd + '<span class="ad-label">Ad</span>' + countdown + '</div>';
-                }).join('');
-            });
-        }
-        renderPageAds('index');
+        // Ads & banners now managed via app.js (Supabase)
 
         // ===== LOAD =====
         fetchCategories();
