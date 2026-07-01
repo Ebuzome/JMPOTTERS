@@ -932,7 +932,6 @@
         (function() {
             var PAGE_SLUG = 'cart';
             try {
-                var ads = JSON.parse(localStorage.getItem('jmpotters_ads') || '[]');
                 var now = new Date();
                 var zones = { 'after-hero': 'adZoneAfterHero', 'between-sections': 'adZoneBetweenSections', 'before-footer': 'adZoneBeforeFooter' };
                 Object.keys(zones).forEach(function(zone) {
