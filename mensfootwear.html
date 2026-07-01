@@ -1056,7 +1056,6 @@
         (function() {
             var PAGE_SLUG = 'mensfootwear';
             try {
-                var ads = JSON.parse(localStorage.getItem('jmpotters_ads') || '[]');
                 var now = new Date();
                 var zones = { 'after-hero': 'adZoneAfterHero', 'between-sections': 'adZoneBetweenSections', 'before-footer': 'adZoneBeforeFooter' };
                 Object.keys(zones).forEach(function(zone) {
@@ -1092,42 +1091,9 @@
 
             // --- Dynamic Hero Banners ---
             try {
-                var banners = JSON.parse(localStorage.getItem('jmpotters_hero_banners') || '[]');
                 var pageBanners = banners.filter(function(b) { return b.target_page === PAGE_SLUG && b.is_active !== false; });
-                if (pageBanners.length > 0) {
-                    var heroSection = document.querySelector('section.hero') || document.querySelector('.hero');
-                    var heroContent = document.querySelector('.hero-content');
-                    if (heroSection) {
-                        heroSection.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(\'' + escapeHtml(pageBanners[0].image_url) + '\')';
-                        heroSection.style.backgroundSize = 'cover';
-                        heroSection.style.backgroundPosition = 'center';
-                        if (pageBanners.length > 1) {
-                            var carouselDiv = document.createElement('div');
-                            carouselDiv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0';
-                            carouselDiv.innerHTML = pageBanners.map(function(b, i) {
-                                return '<div class="hero-slide' + (i === 0 ? ' active' : '') + '" style="position:absolute;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35)),url(\'' + escapeHtml(b.image_url) + '\');background-size:cover;background-position:center;opacity:' + (i === 0 ? '1' : '0') + ';transition:opacity 1.5s ease-in-out"></div>';
-                            }).join('');
-                            heroSection.insertBefore(carouselDiv, heroSection.firstChild);
-                            if (heroContent) { heroContent.style.position = 'relative'; heroContent.style.zIndex = '1'; }
-                            var slides = carouselDiv.querySelectorAll('.hero-slide');
-                            var idx = 0;
-                            setInterval(function() {
-                                if (slides[idx]) { slides[idx].style.opacity = '0'; }
-                                idx = (idx + 1) % slides.length;
-                                if (slides[idx]) { slides[idx].style.opacity = '1'; }
-                                if (heroContent && pageBanners[idx]) {
-                                    var h1 = heroContent.querySelector('h1');
-                                    var p = heroContent.querySelector('p');
-                                    if (h1 && pageBanners[idx].title) h1.textContent = pageBanners[idx].title;
-                                    if (p && pageBanners[idx].subtitle) p.textContent = pageBanners[idx].subtitle;
-                                }
-                            }, 5000);
-                        }
-                        if (heroContent && pageBanners[0].title) {
                             var h1 = heroContent.querySelector('h1');
                             var p = heroContent.querySelector('p');
-                            if (h1) h1.textContent = pageBanners[0].title;
-                            if (p && pageBanners[0].subtitle) p.textContent = pageBanners[0].subtitle;
                         }
                     }
                 }
