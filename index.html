@@ -1135,9 +1135,15 @@
     <main id="main-content">
 
     <!-- ===== HERO ===== -->
-    <!-- Hero shows product imagery (via app.js / inline carousel). Admin-uploaded
-         hero banners from the dashboard render as background with no text overlay
-         so the images are not blocked. -->
+    <!-- Hero showcase: prefers admin-uploaded hero banners from Supabase
+         (hero_banners table, target_page='index') set via admindashboardpro →
+         Marketing → Hero Banners. Falls back to the first 4 product images only
+         when no active banner targets the homepage. Both modes use the same
+         #heroShowcase carousel so the existing CSS, progress bar, swipe and
+         touch handlers (defined later in this file) keep working unchanged.
+         app.js's renderHeroBanners is intentionally a no-op on this page so it
+         does not paint a section background image or inject an overlay on top
+         of the showcase. -->
     <section class="hero" id="heroSection">
         <div class="hero-inner">
             <div class="hero-showcase" id="heroShowcase"></div>
@@ -1748,6 +1754,93 @@
         var touchStartX = 0;
         var touchEndX = 0;
 
+        // ===== ADMIN HERO BANNERS (Supabase → admindashboardpro → Hero Banners) =====
+        // Hero images uploaded via the admin dashboard are stored in the
+        // `hero_banners` table with `target_page='index'` for the homepage.
+        // The dashboard's hero-banner modal only exposes 'index', the per-
+        // category pages and 'all' as targets; for the homepage we filter
+        // strictly to `target_page='index'` so banners configured for other
+        // category pages never bleed into the homepage rotation.
+        async function loadAdminHeroBanners() {
+            if (!supabase) return [];
+            try {
+                var result = await supabase
+                    .from('hero_banners')
+                    .select('*')
+                    .eq('is_active', true)
+                    .eq('target_page', 'index')
+                    .order('sort_order', { ascending: true });
+                if (result.error) throw result.error;
+                return (result.data || []).filter(function(b) { return !!b.image_url; });
+            } catch (e) {
+                console.warn('[hero] could not load admin hero banners:', e);
+                return [];
+            }
+        }
+
+        // Build the same carousel DOM that initHeroCarousel() expects
+        // (#heroShowcase + #heroProgressBar with .hero-slide / .hero-progress
+        // children) from admin-uploaded banners so the existing carousel
+        // state (heroSlideIndex, heroSlideInterval, goToSlide, startHeroTimer,
+        // touch + click handlers) works unchanged. Returns true when at least
+        // one slide was rendered so the caller can decide whether to fall
+        // back to the product-image hero. NOTE: we assign .onclick /
+        // .ontouchstart properties (not addEventListener) so re-renders do
+        // not stack duplicate handlers.
+        function initHeroShowcaseFromAdminBanners(banners) {
+            var showcase = document.getElementById('heroShowcase');
+            var progressBar = document.getElementById('heroProgressBar');
+            if (!showcase || !progressBar) return false;
+            if (!banners || banners.length === 0) return false;
+
+            var slides = banners.map(function(b) {
+                return {
+                    image_url: b.image_url,
+                    name: b.title || 'Featured',
+                    link: b.link || '#featured',
+                    subtitle: b.subtitle || ''
+                };
+            });
+            if (slides.length === 0) return false;
+
+            heroSlideCount = slides.length;
+            heroSlideIndex = 0;
+
+            showcase.innerHTML = slides.map(function(s, i) {
+                var img = getImageUrl(s.image_url);
+                var rawLink = (s.link || '#featured').trim();
+                var link = /^(javascript|data|vbscript)\s*:/i.test(rawLink) ? '#featured' : rawLink;
+                return '<div class="hero-slide' + (i === 0 ? ' active' : '') + '">' +
+                    '<a href="' + escapeHtml(link).replace(/"/g, '&quot;') + '" style="display:block;width:100%;height:100%">' +
+                    '<img src="' + img + '" alt="' + escapeHtml(s.name) + '"' + (i === 0 ? ' fetchpriority="high"' : ' loading="lazy"') + '>' +
+                    '</a>' +
+                    (s.subtitle ? '<div class="hero-text-overlay"><p>' + escapeHtml(s.subtitle) + '</p></div>' : '') +
+                '</div>';
+            }).join('');
+
+            progressBar.innerHTML = slides.map(function(_, i) {
+                return '<div class="hero-progress' + (i === 0 ? ' active' : '') + '" data-index="' + i + '"><div class="fill"></div></div>';
+            }).join('');
+
+            progressBar.onclick = function(e) {
+                var prog = e.target.closest('.hero-progress');
+                if (prog) goToSlide(parseInt(prog.dataset.index));
+            };
+
+            showcase.ontouchstart = function(e) { touchStartX = e.changedTouches[0].screenX; };
+            showcase.ontouchend = function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                var diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) goToSlide((heroSlideIndex + 1) % heroSlideCount);
+                    else goToSlide((heroSlideIndex - 1 + heroSlideCount) % heroSlideCount);
+                }
+            };
+
+            startHeroTimer();
+            return true;
+        }
+
         function initHeroCarousel(products) {
             var showcase = document.getElementById('heroShowcase');
             var progressBar = document.getElementById('heroProgressBar');
@@ -1931,7 +2024,13 @@
 
                 allProducts = products;
                 storeProductData(products);
-                initHeroCarousel(products);
+                // Hero source priority: admin-uploaded banners for `target_page='index'`
+                // (Supabase hero_banners table) -> fall back to first-4 product images
+                // only when no active banner targets the homepage.
+                var adminBanners = await loadAdminHeroBanners();
+                if (!initHeroShowcaseFromAdminBanners(adminBanners)) {
+                    initHeroCarousel(products);
+                }
                 initMarquee(products);
                 updateBrandCollage(products);
                 initShopTheLookCarousel(products);
@@ -2196,3 +2295,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+
