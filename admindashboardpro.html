@@ -487,12 +487,12 @@
         </section>
 
         <!-- ================================================================ -->
-        <!-- ADVERTISEMENTS (UPDATED: Supabase Storage)                        -->
+        <!-- PROMOS (UPDATED: Supabase Storage)                                -->
         <!-- ================================================================ -->
         <section id="advertisements" class="dashboard-section">
-            <div class="section-header"><h1 class="section-title">Advertisement Management</h1><p class="section-subtitle">Create and manage ads across your store pages</p></div>
+            <div class="section-header"><h1 class="section-title">Promo Management</h1><p class="section-subtitle">Create and manage promos across your store pages</p></div>
             <div class="mb-4" style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center">
-                <button class="btn btn-primary" onclick="AdminDashboard.showAdModal()"><i class="fas fa-plus"></i> Create Ad</button>
+                <button class="btn btn-primary" onclick="AdminDashboard.showAdModal()"><i class="fas fa-plus"></i> Create Promo</button>
                 <select id="adFilter" class="form-control" style="width:auto;min-width:180px" onchange="AdminDashboard.renderAds()">
                     <option value="all">All Pages</option>
                     <option value="index">Homepage</option>
@@ -507,8 +507,8 @@
             </div>
             <div class="action-card mb-4">
                 <h3 class="section-title-sm mb-3"><i class="fas fa-info-circle" style="color:var(--info-500)"></i> How It Works</h3>
-                <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.5rem">Create advertisements that display in strategic locations on your store pages. Choose a placement zone, set start/end dates, and upload an image. Ads with expired timers auto-hide.</p>
-                <p style="font-size:0.85rem;color:var(--gray-500)">If no ads are configured for a zone, that space remains invisible — no placeholders are shown.</p>
+                <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.5rem">Create promos that display in strategic locations on your store pages. Choose a placement zone, set start/end dates, and upload an image. Promos with expired timers auto-hide.</p>
+                <p style="font-size:0.85rem;color:var(--gray-500)">If no promos are configured for a zone, that space remains invisible — no placeholders are shown.</p>
             </div>
             <div id="adsList"><div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div></div>
         </section>
@@ -552,14 +552,14 @@
     </div></div></div>
 
     <!-- ================================================================ -->
-    <!-- AD MODAL (UPDATED: with Supabase Storage support)                 -->
+    <!-- PROMO MODAL (UPDATED: with Supabase Storage support)              -->
     <!-- ================================================================ -->
-    <div class="modal-overlay" id="adModal" style="display:none"><div class="modal-content" style="max-width:550px"><div class="modal-header"><h2 class="modal-title" id="adModalTitle">Create Advertisement</h2><button class="modal-close" onclick="document.getElementById('adModal').style.display='none'"><i class="fas fa-times"></i></button></div><div class="modal-body">
+    <div class="modal-overlay" id="adModal" style="display:none"><div class="modal-content" style="max-width:550px"><div class="modal-header"><h2 class="modal-title" id="adModalTitle">Create Promo</h2><button class="modal-close" onclick="document.getElementById('adModal').style.display='none'"><i class="fas fa-times"></i></button></div><div class="modal-body">
         <input type="hidden" id="adEditIndex" value="-1">
-        <div class="form-group"><label class="form-label required">Ad Name</label><input type="text" id="adName" class="form-control" placeholder="e.g., Summer Sale Banner"></div>
+        <div class="form-group"><label class="form-label required">Promo Name</label><input type="text" id="adName" class="form-control" placeholder="e.g., Summer Sale Banner"></div>
         <div class="form-row"><div class="form-group"><label class="form-label required">Target Page</label><select id="adTargetPage" class="form-control"><option value="index">Homepage</option><option value="mensfootwear">Men's Footwear</option><option value="womensfootwear">Women's Footwear</option><option value="bags">Bags</option><option value="accessories">Accessories</option><option value="household">Household</option><option value="kids">Kids</option><option value="healthcare">Healthcare</option><option value="all">All Pages</option></select></div>
         <div class="form-group"><label class="form-label required">Placement Zone</label><select id="adPlacement" class="form-control"><option value="after-hero">After Hero Section</option><option value="between-sections">Between Sections</option><option value="before-footer">Before Footer</option><option value="sidebar">Sidebar</option></select></div></div>
-        <div class="form-group"><label class="form-label required">Ad Image</label>
+        <div class="form-group"><label class="form-label required">Promo Image</label>
             <div class="upload-zone" id="adUploadZone" style="min-height:120px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--gray-300);border-radius:var(--radius);cursor:pointer;position:relative;overflow:hidden;background:var(--gray-50)">
                 <input type="file" id="adFileInput" accept="image/*" style="display:none">
                 <div id="adUploadPlaceholder" style="text-align:center;padding:1rem"><i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:var(--gray-400);margin-bottom:0.5rem;display:block"></i><p style="font-size:0.85rem;color:var(--gray-500)">Click to upload or drag & drop</p><p style="font-size:0.75rem;color:var(--gray-400)">JPG, PNG, WebP (max 5MB)</p></div>
@@ -588,7 +588,7 @@
         <div class="form-group"><label class="form-label">Click-through URL</label><input type="text" id="adLinkUrl" class="form-control" placeholder="e.g., https://... or product.html?slug=..."></div>
         <div class="form-row"><div class="form-group"><label class="form-label">Start Date</label><input type="datetime-local" id="adStartDate" class="form-control"></div><div class="form-group"><label class="form-label">End Date</label><input type="datetime-local" id="adEndDate" class="form-control"></div></div>
         <div class="form-group"><label class="form-label">Status</label><select id="adStatus" class="form-control"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-        <div class="flex gap-3 pt-3"><button class="btn btn-secondary flex-1" onclick="document.getElementById('adModal').style.display='none'">Cancel</button><button class="btn btn-primary flex-1" onclick="AdminDashboard.saveAd()"><i class="fas fa-save"></i> Save Ad</button></div>
+        <div class="flex gap-3 pt-3"><button class="btn btn-secondary flex-1" onclick="document.getElementById('adModal').style.display='none'">Cancel</button><button class="btn btn-primary flex-1" onclick="AdminDashboard.saveAd()"><i class="fas fa-save"></i> Save Promo</button></div>
     </div></div></div>
 
     <!-- PRODUCT MODAL (unchanged) -->
@@ -1106,7 +1106,7 @@
         function showAdModal(editId) {
             const modal = document.getElementById('adModal');
             document.getElementById('adEditIndex').value = editId != null ? editId : -1;
-            document.getElementById('adModalTitle').textContent = editId != null ? 'Edit Advertisement' : 'Create Advertisement';
+            document.getElementById('adModalTitle').textContent = editId != null ? 'Edit Promo' : 'Create Promo';
             adUploadedUrl = null;
             if (editId != null) {
                 const ad = window._ads?.find(a => a.id === editId);
