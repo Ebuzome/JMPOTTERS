@@ -1901,6 +1901,13 @@
         const heroSection = document.querySelector('section.hero') || document.querySelector('.hero');
         const heroContent = document.querySelector('.hero-content');
         if (!heroSection) return;
+        // The homepage uses a #heroShowcase carousel managed entirely by
+        // index.html's inline script, which loads admin banners directly from
+        // the hero_banners table and falls back to product images. Returning
+        // here prevents us from painting a stale background image or an
+        // absolutely-positioned .hero-carousel overlay on top of that
+        // showcase (race-safe structural check, no globals involved).
+        if (document.getElementById('heroShowcase')) return;
         
         // ===== FILTER BANNERS FOR THIS PAGE =====
         // Only show banners where target_page matches the current page.
