@@ -114,6 +114,103 @@
         style.textContent = `@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }`;
         document.head.appendChild(style);
     }
+
+    // ================================================================
+    // ===== PROMO / AD STYLES (injected so the rules stay consistent ===== 
+    // ===== across every storefront page without editing 11 HTML files) =====
+    // ================================================================
+    if (!document.getElementById('jmpottersPromoStyles')) {
+        const promoStyle = document.createElement('style');
+        promoStyle.id = 'jmpottersPromoStyles';
+        promoStyle.textContent = `
+            .ad-label {
+                position: absolute !important;
+                top: 12px !important;
+                right: 12px !important;
+                background: rgba(0, 0, 0, 0.55) !important;
+                color: #ffffff !important;
+                font-size: 0.65rem !important;
+                padding: 4px 10px !important;
+                border-radius: 6px !important;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.7px !important;
+                text-transform: uppercase !important;
+                backdrop-filter: blur(4px) !important;
+                -webkit-backdrop-filter: blur(4px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.14) !important;
+                z-index: 3 !important;
+            }
+            .ad-bottom-bar {
+                position: absolute !important;
+                left: 0; right: 0; bottom: 0 !important;
+                padding: 18px 16px 12px !important;
+                background: linear-gradient(transparent, rgba(0, 0, 0, 0.78)) !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: flex-end !important;
+                gap: 14px !important;
+                pointer-events: none !important;
+                z-index: 2 !important;
+            }
+            .ad-title {
+                color: #ffffff !important;
+                font-size: 0.95rem !important;
+                font-weight: 700 !important;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+                text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
+                flex: 1 !important;
+                min-width: 0 !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                line-height: 1.3 !important;
+            }
+            .ad-countdown {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 4px !important;
+                background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+                color: #ffffff !important;
+                font-size: 0.72rem !important;
+                padding: 5px 10px !important;
+                border-radius: 6px !important;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.3px !important;
+                box-shadow: 0 2px 10px rgba(220, 38, 38, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+                animation: jmpottersPromoPulse 1.8s ease-in-out infinite !important;
+                bottom: 14px !important;
+                right: 14px !important;
+                flex-shrink: 0 !important;
+                z-index: 3 !important;
+            }
+            .ad-countdown-icon {
+                font-size: 0.82rem !important;
+                line-height: 1 !important;
+            }
+            @keyframes jmpottersPromoPulse {
+                0%, 100% {
+                    box-shadow: 0 2px 10px rgba(220, 38, 38, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                    transform: scale(1);
+                }
+                50% {
+                    box-shadow: 0 4px 22px rgba(220, 38, 38, 0.78), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                    transform: scale(1.05);
+                }
+            }
+            @media (max-width: 480px) {
+                .ad-title { font-size: 0.82rem !important; }
+                .ad-countdown { font-size: 0.65rem !important; padding: 4px 8px !important; }
+            }
+            .ad-card {
+                position: relative !important;
+                overflow: hidden !important;
+            }
+        `;
+        document.head.appendChild(promoStyle);
+    }
     
     // ====================
     // UTILITY FUNCTIONS
@@ -1708,13 +1805,22 @@
             
             console.log(`📢 Found ${ads.length} active ads for page ${pageSlug} (from ${(allAds || []).length} total active)`);
             
-            // Render ads in their zones
-            const zones = ['after-hero', 'between-sections', 'before-footer'];
-            zones.forEach(zone => {
-                const el = document.getElementById('adZone' + zone.charAt(0).toUpperCase() + zone.slice(1).replace('-', ''));
+            // Render promos in their zones.
+            // IMPORTANT: Map placement -> DOM id explicitly. The previous code
+            // used zone.charAt(0).toUpperCase() + slice(1).replace('-','') which
+            // produced ids like 'adZoneAfterhero' (lowercase 'h'), so the lookups
+            // never resolved and promos never appeared on destination pages.
+            const zones = [
+                { placement: 'after-hero',        elId: 'adZoneAfterHero' },
+                { placement: 'between-sections',  elId: 'adZoneBetweenSections' },
+                { placement: 'before-footer',     elId: 'adZoneBeforeFooter' },
+                { placement: 'sidebar',           elId: 'adZoneSidebar' }
+            ];
+            zones.forEach(({ placement, elId }) => {
+                const el = document.getElementById(elId);
                 if (!el) return;
                 
-                const matchingAds = (ads || []).filter(a => a.placement === zone);
+                const matchingAds = (ads || []).filter(a => a.placement === placement);
                 
                 if (matchingAds.length === 0) {
                     el.innerHTML = '';
@@ -1724,42 +1830,48 @@
                 
                 el.style.display = 'block';
                 el.innerHTML = matchingAds.map(a => {
+                    const safeName = escapeHtml(a.name || 'Promo');
+                    
+                    // Pre-compute image size styling (wrap + img widths).
+                    const adSizeMap = {
+                        'banner-sm': 320, 'banner-md': 728, 'banner-lg': 1200,
+                        'square-sm': 250, 'square-md': 400, 'rect-md': 300, 'rect-lg': 600
+                    };
+                    let maxW = null;
+                    if (a.image_size === 'custom') maxW = a.custom_width;
+                    else if (a.image_size && a.image_size !== 'auto') maxW = adSizeMap[a.image_size];
+                    const wrapStyle = maxW ? ` style="max-width:${maxW}px;margin:0 auto;"` : '';
+                    const imgStyle  = maxW ? ` style="width:100%;height:auto;display:block;"` : '';
+                    
                     const linkStart = a.link_url ? `<a href="${escapeHtml(a.link_url)}" target="_blank" rel="noopener">` : '';
-                    const linkEnd = a.link_url ? '</a>' : '';
+                    const linkEnd   = a.link_url ? '</a>' : '';
+                    
+                    // Build the live countdown container. The actual time text is
+                    // populated and refreshed by startPromoCountdowns() (called
+                    // below). When no end_date is set, the countdown slot is hidden.
                     let countdown = '';
-                    if (a.end_date) {
-                        const diff = new Date(a.end_date) - new Date();
-                        if (diff > 0) {
-                            const days = Math.floor(diff / 86400000);
-                            const hours = Math.floor((diff % 86400000) / 3600000);
-                            countdown = `<div class="ad-countdown">Ends in ${days > 0 ? days + 'd ' : ''}${hours}h</div>`;
-                        }
+                    if (a.end_date && new Date(a.end_date).getTime() > Date.now()) {
+                        countdown = `<div class="ad-countdown" data-end-date="${escapeHtml(a.end_date)}"><i class="icon-clock ad-countdown-icon"></i> <span class="ad-countdown-text">…</span></div>`;
                     }
-                    let imgStyle = '';
-                    if (a.image_size && a.image_size !== 'auto') {
-                        const adSizes = {
-                            'banner-sm': { w: 320, h: 100 },
-                            'banner-md': { w: 728, h: 200 },
-                            'banner-lg': { w: 1200, h: 320 },
-                            'square-sm': { w: 250, h: 250 },
-                            'square-md': { w: 400, h: 400 },
-                            'rect-md': { w: 300, h: 250 },
-                            'rect-lg': { w: 600, h: 400 }
-                        };
-                        const dim = a.image_size === 'custom' ? { w: a.custom_width, h: a.custom_height } : adSizes[a.image_size];
-                        if (dim) imgStyle = `max-width:${dim.w}px;height:${dim.h}px;margin:0 auto;`;
-                    }
+                    
                     return `
-                        <div class="ad-card" ${imgStyle ? `style="max-width:${(a.image_size === 'custom' ? a.custom_width : ({'banner-sm':320,'banner-md':728,'banner-lg':1200,'square-sm':250,'square-md':400,'rect-md':300,'rect-lg':600}[a.image_size] || ''))}px;margin:0 auto"` : ''}>
+                        <div class="ad-card"${wrapStyle}>
                             ${linkStart}
-                            <img src="${escapeHtml(a.image_url)}" alt="${escapeHtml(a.name || 'Advertisement')}" loading="lazy" ${imgStyle ? `style="${imgStyle}object-fit:cover"` : ''}>
+                            <img src="${escapeHtml(a.image_url)}" alt="${safeName}" loading="lazy"${imgStyle}>
                             ${linkEnd}
-                            <span class="ad-label">Ad</span>
-                            ${countdown}
+                            <span class="ad-label">Promo</span>
+                            <div class="ad-bottom-bar">
+                                <div class="ad-title">${safeName}</div>
+                                ${countdown}
+                            </div>
                         </div>
                     `;
                 }).join('');
             });
+            
+            // Start (or refresh) the live countdown timers that tick down the
+            // remaining time on every visible promo. Hides expired ones.
+            startPromoCountdowns();
             
             // Fetch and render hero banners
             const { data: banners, error: bannerError } = await supabase
@@ -1872,6 +1984,56 @@
         }
     }
     
+    // ================================================================
+    // ===== LIVE PROMO COUNTDOWN (red-themed, every-1s tick)        =====
+    // ================================================================
+    function formatCountdown(ms) {
+        const totalSec = Math.max(0, Math.floor(ms / 1000));
+        const days = Math.floor(totalSec / 86400);
+        const hours = Math.floor((totalSec % 86400) / 3600);
+        const minutes = Math.floor((totalSec % 3600) / 60);
+        const seconds = totalSec % 60;
+        const pad = n => String(n).padStart(2, '0');
+        if (days > 0)  return `${days}d ${pad(hours)}:${pad(minutes)}`;
+        if (hours > 0) return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        return `${pad(minutes)}:${pad(seconds)}`;
+    }
+
+    function startPromoCountdowns() {
+        function tick() {
+            const now = Date.now();
+            const els = document.querySelectorAll('.ad-countdown[data-end-date]');
+            els.forEach(el => {
+                const end = Date.parse(el.getAttribute('data-end-date'));
+                if (isNaN(end)) return;
+                const diff = end - now;
+                if (diff <= 0) {
+                    // Hide the entire ad card with a quick fade and remove it
+                    // from the DOM; empty zones auto-collapse via :empty CSS.
+                    const card = el.closest('.ad-card');
+                    if (card) {
+                        card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(-6px)';
+                        setTimeout(() => {
+                            card.remove();
+                            const zone = card.parentElement;
+                            if (zone && zone.classList.contains('ad-zone') && !zone.querySelector('.ad-card')) {
+                                zone.innerHTML = '';
+                            }
+                        }, 450);
+                    }
+                    return;
+                }
+                const text = el.querySelector('.ad-countdown-text');
+                if (text) text.textContent = formatCountdown(diff);
+            });
+        }
+        tick();
+        if (window._jmpottersPromoInterval) clearInterval(window._jmpottersPromoInterval);
+        window._jmpottersPromoInterval = setInterval(tick, 1000);
+    }
+
     // ================================================================
     // ===== GET HERO BANNERS (for index.html fallback) =====
     // ================================================================
